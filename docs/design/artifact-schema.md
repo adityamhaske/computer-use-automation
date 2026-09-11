@@ -114,8 +114,11 @@ recovery:            # bounded, declared remediation — never open-ended
 
 ```yaml
 escalation:
-  on: [target_ambiguous, target_not_found, checkpoint_failed, recovery_exhausted,
-       unexpected_state, risky_action_unapproved]
+  # `triggers`, not `on`: YAML 1.1 resolves a bare `on` key to the boolean True, and an artifact
+  # format humans hand-edit should not contain that landmine. (The loader disables the coercion
+  # too -- see serde.py -- but the field name should not need the fix.)
+  triggers: [target_ambiguous, target_not_found, checkpoint_failed, recovery_exhausted,
+             unexpected_state]
   policy: pause_and_request_human      # or: fail_closed
 
 policy:

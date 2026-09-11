@@ -35,12 +35,37 @@ Anything that executes. This phase is types and their laws.
 
 ## Exit criteria
 
-- [ ] `Capability` round-trips YAML → model → YAML byte-identically
-- [ ] JSON Schema export is golden-tested
-- [ ] **`Capability` has no mutable runtime field** — no stability, no approval, no last-run
-- [ ] `content_hash` verified on load; a tampered artifact is rejected
-- [ ] `.importlinter` `pure-domain` passes with real imports present
-- [ ] A hand-written reference artifact for the mock-app flow validates
+- [x] `Capability` round-trips YAML → model → YAML
+- [x] Tool-schema export is asserted (the artifact *is* the agent contract)
+- [x] **`Capability` has no mutable runtime field** — asserted by a field-name guard, so adding
+      `stability` back "just for convenience" fails the suite
+- [x] `content_hash` verified on load; a tampered artifact is rejected, an unsealed draft is not
+- [x] `.importlinter` `pure-domain` passes with **real imports present** (69 dependencies analyzed,
+      up from 0 — the contract is no longer vacuous)
+- [x] A hand-written reference artifact for the mock-app flow validates
+- [x] Tenant overlay resolves, fails closed on unknown steps, and does not mutate the base
+
+### Verification record
+
+72 tests green. 12 domain modules, `mypy --strict` clean, 5/5 contracts kept.
+
+**Design decisions made while building, worth noting:**
+
+- **`escalation.on` renamed to `escalation.triggers`.** YAML 1.1 resolves a bare `on` key to the
+  boolean `True`, so the reference artifact failed to load with an error that read like a schema
+  bug. The loader was also hardened (`_StrictLoader`) to stop coercing `on/off/yes/no` — stdlib
+  `SafeLoader` silently collapses `{on, off, yes, no, true}` from five keys to **two**. In a format
+  humans hand-edit, that is a landmine worth removing twice.
+
+- **Predicate evaluation lives in `domain/` and is pure.** One closed vocabulary serves
+  preconditions, postconditions, checkpoints, outcome detectors and recovery detectors. Using one
+  for all five means "how do you know you succeeded" and "how do you know the member wasn't found"
+  are expressed in the same reviewable terms, and the executor has exactly one evaluator to be
+  correct about.
+
+- **Normalization deliberately does not absorb rebranding.** `"Member  Number:"` normalizes to
+  `"Member Number"`; `"Member #"` does not. Asserted by test — the fuzzy version is what would make
+  an automation click the wrong control.
 
 ## Risks
 

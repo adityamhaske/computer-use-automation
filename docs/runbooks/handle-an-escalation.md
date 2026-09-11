@@ -4,7 +4,7 @@ A run stopped because it could not safely proceed. This is a **designed outcome*
 
 ## Why it stopped
 
-`NEEDS_HUMAN` comes from one of the declared triggers in the capability's `escalation.on`:
+`NEEDS_HUMAN` comes from one of the declared triggers in the capability's `escalation.triggers`:
 
 | Trigger | Meaning |
 |---|---|

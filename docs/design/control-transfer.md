@@ -45,7 +45,7 @@ Escalation is triggered by declared conditions, not by a vibe:
 | `UNEXPECTED_STATE` | Fail-closed default |
 | `risky_action_unapproved` | Policy requires a human for an irreversible action |
 
-The capability declares which of these escalate via `escalation.on`, and whether the disposition is
+The capability declares which of these escalate via `escalation.triggers`, and whether the disposition is
 `pause_and_request_human` or `fail_closed`.
 
 ## The intervention request

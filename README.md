@@ -29,7 +29,7 @@ This repository is under active construction. Phases complete so far:
       the system is built to satisfy
 - [x] **Phase 01** — Hostile mock back-office app, plus the Phase 03 semantic-tree spike
       pulled forward ([results](docs/prd/phases/phase-03-perception-driver.md))
-- [ ] Phase 02 — Domain model & artifact schema
+- [x] **Phase 02** — Domain model & artifact schema ([the centerpiece](docs/design/artifact-schema.md))
 - [ ] Phase 03 — Perception & surface driver
 - [ ] Phase 04 — Semantic targeting & resolution ladder
 - [ ] Phase 05 — Policy chokepoint, redaction, evidence
