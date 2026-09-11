@@ -122,7 +122,12 @@ redaction:
     - { name: ssn,            pattern: "\\b\\d{3}-\\d{2}-\\d{4}\\b" }
     - { name: card_pan,       pattern: "\\b(?:\\d[ -]?){13,19}\\b" }
     - { name: account_number, pattern: "\\b\\d{8,17}\\b" }
-    - { name: email,          pattern: "[\\w.+-]+@[\\w-]+\\.[\\w.]+" }
+    # The final label must be alphabetic. Without that, a capability reference
+    # (`corebank.member.savings_balance@1.2.0`) reads as an address and every run
+    # record said `<redacted:email>` where it should say which capability ran --
+    # which is exactly the question immutable, content-addressed artifacts exist
+    # to answer. Found by reading a committed trace, not by a test.
+    - { name: email,          pattern: "[\\w.+-]+@[\\w-]+(?:\\.[\\w-]+)*\\.[a-zA-Z]{2,}" }
     - { name: phone,          pattern: "\\b\\(?\\d{3}\\)?[ -]?\\d{3}[ -]?\\d{4}\\b" }
   # Fields marked `sensitive: true` in a capability's inputs/outputs are always
   # masked, excluded from evidence, and blurred in screenshots.

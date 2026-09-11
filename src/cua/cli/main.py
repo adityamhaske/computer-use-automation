@@ -213,6 +213,22 @@ def console(
 
 
 @app.command()
+def demo(
+    headless: Annotated[bool, typer.Option(help="Run the browser headless.")] = True,
+) -> None:
+    """Run the whole story end to end and leave the evidence behind.
+
+    Discovery, artifact compilation, deterministic replay, a business outcome, an injected fault
+    recovered, a fail-closed escalation, a human takeover on the same live session, and a
+    re-anchored resume. Works without an API key -- discovery falls back to a recorded transcript
+    and says so.
+    """
+    from cua.cli.demo import run_demo
+
+    raise typer.Exit(code=run_demo(headless=headless))
+
+
+@app.command()
 def version() -> None:
     from cua import __version__
 

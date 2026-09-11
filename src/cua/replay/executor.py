@@ -39,8 +39,10 @@ from cua.domain.result import (
     RunResult,
     RunStatus,
 )
+from cua.domain.run_record import RunKind
 from cua.domain.snapshot import UiSnapshot
 from cua.evidence.bus import EventType, EvidenceBus
+from cua.evidence.record import build_run_record, write_run_record
 from cua.replay.bind import UnboundReferenceError, bind_action
 from cua.replay.classify import classify
 from cua.replay.inputs import InputValidationError, validate_inputs
@@ -75,6 +77,25 @@ class ReplayExecutor:
     lease_epoch: int = 1
 
     def run(self, capability: Capability, supplied: dict[str, Any]) -> RunResult:
+        """Execute the capability and leave a `run_record.json` behind, whichever way it ends.
+
+        The record is written here rather than at each return path so that a failure, a business
+        outcome and an escalation are all as well evidenced as a success. The run you most want a
+        record of is the one that did not succeed.
+        """
+        result = self._execute(capability, supplied)
+        try:
+            write_run_record(
+                build_run_record(self.evidence.run_dir, kind=RunKind.REPLAY, result=result),
+                self.evidence.run_dir,
+            )
+        except OSError as exc:  # pragma: no cover -- evidence must not mask the run's own outcome
+            self.evidence.emit(
+                EventType.NOTE, actor=Actor.AUTOMATION, note=f"run record not written: {exc}"
+            )
+        return result
+
+    def _execute(self, capability: Capability, supplied: dict[str, Any]) -> RunResult:
         run_id = f"rep-{uuid.uuid4().hex[:10]}"
         started = time.monotonic()
 

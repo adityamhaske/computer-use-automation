@@ -159,3 +159,23 @@ def test_redaction_survives_nested_structures(redactor: Redactor) -> None:
     cleaned = json.dumps(redactor.structure(nested))
     assert SSN not in cleaned
     assert EMAIL not in cleaned
+
+
+def test_capability_references_survive_redaction(redactor: Redactor) -> None:
+    """Over-redaction is a failure too.
+
+    `id@version` looks enough like an email address that a naive pattern eats it, and then every
+    run record reports `<redacted:email>` in the one field that says *which capability ran* --
+    the question immutable, content-addressed artifacts exist to answer. Redaction has to be tight
+    enough to leave structural identifiers legible while still catching real addresses.
+    """
+    for ref in (
+        "corebank.member.savings_balance@1.2.0",
+        "memberdesk.savings_balance@1.0.0",
+        "corebank.auth.login@10.20.30",
+    ):
+        assert redactor.text(ref) == ref, f"capability reference was redacted: {ref}"
+
+    # ...and the tightening did not cost us real addresses.
+    for address in (EMAIL, "jane.doe+tag@mail.example.co.uk", "ops@bank-internal.org"):
+        assert address not in redactor.text(f"contact {address} about it")
