@@ -1,4 +1,7 @@
-"""When to stop a discovery run.
+"""Budgets that bound a discovery run.
+
+`StopReason` itself lives in `cua.domain.discovery` with the trace it describes; this module owns
+the accounting, because it reads a clock and the domain may not.
 
 Every one of these is a bound on a *probabilistic* process, which is the half of the system where
 things can run away. The replay engine needs none of this: it executes a fixed list of steps and is
@@ -12,23 +15,10 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass, field
-from enum import StrEnum
 
+from cua.domain.discovery import StopReason
 
-class StopReason(StrEnum):
-    GOAL_MET = "goal_met"
-    GAVE_UP = "gave_up"
-    """The model declined to guess. A legitimate ending, and a better one than a wrong action."""
-    MAX_STEPS = "max_steps"
-    TIMEOUT = "timeout"
-    TOKEN_BUDGET = "token_budget"
-    DEAD_END = "dead_end"
-    """Several actions in a row changed nothing. Usually a control the model keeps clicking that
-    does not do what it thinks, and the loop cannot tell the difference from the inside."""
-    POLICY_WALL = "policy_wall"
-    """Repeatedly denied. The goal needs authority this run does not have; continuing would just
-    generate more refusals."""
-    ERROR = "error"
+__all__ = ["Budget", "StopReason"]
 
 
 @dataclass

@@ -28,70 +28,19 @@ from typing import Any
 from cua.agent.llm import LlmError, LlmPort, ToolCall
 from cua.agent.prompts.system import SYSTEM_PROMPT, goal_message
 from cua.agent.render import render_snapshot
-from cua.agent.stop import Budget, StopReason
-from cua.agent.tools import TERMINAL_TOOLS, TOOL_NAMES, TOOLS
+from cua.agent.stop import Budget
+from cua.agent.tools import TOOL_NAMES, TOOLS
 from cua.domain.action import Action, Click, Navigate, PressKey, Select, Type
 from cua.domain.actor import Actor
+from cua.domain.discovery import DiscoveryRun, DiscoveryStep, StopReason
 from cua.domain.snapshot import UiSnapshot
-from cua.domain.target import ResolutionStrategy, TargetDescriptor
+from cua.domain.target import TargetDescriptor
 from cua.evidence.bus import EventType, EvidenceBus
 from cua.policy.redact import Redactor
 from cua.runtime.dispatcher import Dispatcher, DispatchStatus
 from cua.targeting.synthesize import synthesize_descriptor
 
 MAX_HISTORY_TURNS = 12
-
-
-@dataclass
-class DiscoveryStep:
-    """One model decision and what came of it. The raw material the compiler works from."""
-
-    index: int
-    tool: str
-    why: str
-    arguments: dict[str, Any]
-    node_id: str | None = None
-    descriptor: TargetDescriptor | None = None
-    strategy: ResolutionStrategy | None = None
-    descriptor_verified: bool = False
-    """Whether the synthesized description resolved back to the node the model picked."""
-    ok: bool = False
-    detail: str = ""
-    url_before: str = ""
-    extracted: tuple[str, str] | None = None
-
-
-@dataclass
-class DiscoveryRun:
-    run_id: str
-    goal: str
-    target_url: str
-    stop_reason: StopReason
-    steps: list[DiscoveryStep] = field(default_factory=list)
-    outputs: dict[str, str] = field(default_factory=dict)
-    summary: str = ""
-    checkpoint_hint: str = ""
-    """The model's own statement of what proves the goal was reached.
-
-    A hint, not a checkpoint: the compiler turns it into an assertion a human then reviews. Trusting
-    a model's self-report as a success condition would make the checkpoint exactly as reliable as
-    the run it came from.
-    """
-    budget: dict[str, float | int] = field(default_factory=dict)
-    model: str = ""
-
-    @property
-    def succeeded(self) -> bool:
-        return self.stop_reason is StopReason.GOAL_MET
-
-    @property
-    def effective_steps(self) -> list[DiscoveryStep]:
-        """Steps that actually did something -- the ones worth compiling into an artifact.
-
-        A discovery run wanders: refused actions, a click that did nothing, a field typed twice.
-        Compiling the wandering would produce a capability that reproduces the model's confusion.
-        """
-        return [step for step in self.steps if step.ok and step.tool not in TERMINAL_TOOLS]
 
 
 @dataclass
