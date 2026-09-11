@@ -31,7 +31,7 @@ This repository is under active construction. Phases complete so far:
       pulled forward ([results](docs/prd/phases/phase-03-perception-driver.md))
 - [x] **Phase 02** — Domain model & artifact schema ([the centerpiece](docs/design/artifact-schema.md))
 - [x] **Phase 03** — Perception & surface driver (semantic tree, stitched across frames)
-- [ ] Phase 04 — Semantic targeting & resolution ladder
+- [x] **Phase 04** — Semantic targeting & resolution ladder ([how it resolves](docs/design/target-resolution.md))
 - [ ] Phase 05 — Policy chokepoint, redaction, evidence
 - [ ] Phase 06 — Discovery agent loop (real LLM)
 - [ ] Phase 07 — Artifact compiler

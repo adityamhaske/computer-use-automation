@@ -77,8 +77,10 @@ def build_snapshot(
             region = infer_region(name) or region
 
         hints: dict[str, str] = {}
-        if element.attributes and callable(hint_builder) and (
-            hint := hint_builder(role, element.attributes)
+        if (
+            element.attributes
+            and callable(hint_builder)
+            and (hint := hint_builder(role, element.attributes))
         ):
             hints["css"] = str(hint)
         if element.native_handle is not None:

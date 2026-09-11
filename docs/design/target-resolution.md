@@ -14,20 +14,33 @@ Strategies are tried in this **fixed order**. The first that yields exactly one 
 |---|---|---|---|
 | 1 | `semantic_exact` | role + accessible name, exact, unique in scope | most things |
 | 2 | `semantic_normalized` | as above, case/whitespace/punctuation folded | cosmetic label edits |
-| 3 | `label_association` | control ↔ its associated label | unnamed inputs |
-| 4 | `structural_anchor` | position relative to nearby text — *"the textbox in the row whose first cell reads 'Member Number'"* | **rebranding, and controls with no usable name at all** |
-| 5 | `hint_cached` | the stored CSS/node-path hint | nothing structural; it is a speed optimization |
-| 6 | `ordinal_in_region` | Nth control of a role within a scope | last resort before refusal |
-| 7 | `vision` | OCR / bounding box | **discovery only — hard-disabled in replay** |
+| 3 | `structural_anchor` | position relative to nearby text — *"the textbox in the row whose first cell reads 'Member Number'"* | **controls with no usable name at all** |
+| 4 | `hint_cached` | the stored CSS/node-path hint | nothing structural; it is a speed optimization |
+| 5 | `ordinal_in_region` | Nth control of a role within a scope | rebranding; last resort before refusal |
+| 6 | `vision` | OCR / bounding box | **discovery only — hard-disabled in replay** |
 
-Strategy 4 is the one that makes legacy enterprise apps tractable. Those apps are full of controls
-with no name, no label, and no test ID, sitting in a table cell next to the text that identifies
-them. A human reads the row; so does this.
+Rung 3 is the one that makes legacy enterprise apps tractable. Those apps are full of controls with
+no name, no label, and no test ID, sitting in a table cell next to the text that identifies them. A
+human reads the row; so does this.
 
-Strategy 5 is a **cache, not an identity**. A hint is accepted only if the node it resolves to
-*also* satisfies the semantic assertion. If the CSS still matches but the role or name has changed,
-the hint is discarded and the ladder continues. This is what stops the artifact from silently
-becoming CSS-coupled.
+Rung 4 is a **cache, not an identity**. A hint is accepted only if the node it resolves to *also*
+satisfies the semantic assertion. If the CSS still matches but the role or name has changed, the
+hint is discarded and the ladder continues. This is what stops the artifact from silently becoming
+CSS-coupled.
+
+### A rung that was removed
+
+An earlier draft carried `label_association` between rungs 2 and 3. Implementing the resolver showed
+it could never fire: every surface this design targets — ARIA, UIA, macOS AX — already folds label
+association into the computed accessible name. A control *with* an associated label is therefore
+found by `semantic_exact`, and one *without* is found by `structural_anchor`. There is no case in
+between.
+
+A rung that cannot fire is worse than no rung. It makes the ladder look more capable than it is, and
+it invites someone to "fix" a resolution problem by adding logic to a dead path. A driver on a
+surface that genuinely exposes labelling separately (UIA's `LabeledBy` is a distinct property from
+`Name`) should fold it into the node's name during normalization, where the rest of the system
+already handles it.
 
 ## Determinism rules
 

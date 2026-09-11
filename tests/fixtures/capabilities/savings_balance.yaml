@@ -26,7 +26,12 @@ surface:
     version_range: ">=4.2 <5"
 
 entrypoint:
-  url_pattern: "{base_url}/search"
+  # The frameset shell, not the bare /search page. This app is only ever used through its frameset:
+  # navigation lives in one frame and the working area in another, which is why every descriptor
+  # below scopes itself to `frame: content`. Entering at /search directly would load the form
+  # outside any frame -- a state a real operator never sees, and one where the recorded scopes would
+  # not apply.
+  url_pattern: "{base_url}/"
 
 inputs:
   - name: member_id
@@ -63,7 +68,9 @@ steps:
         # Recorded even though semantic_exact won, so the ladder has a rung to fall back to when a
         # tenant restyles the page. Costs nothing now; saves a re-record later.
         anchor: {relation: row_of, text: Member Number}
-        hints: {css: "input.frmfld"}
+        # The selector the driver actually caches for this control on the base tenant.
+        # Tenant B renames the form field, so this is dead there -- which is the point.
+        hints: {css: 'input[name="memno"]'}
         recorded_strategy: semantic_exact
     precondition:
       assert: node_exists

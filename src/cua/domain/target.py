@@ -84,7 +84,6 @@ class ResolutionStrategy(StrEnum):
 
     SEMANTIC_EXACT = "semantic_exact"
     SEMANTIC_NORMALIZED = "semantic_normalized"
-    LABEL_ASSOCIATION = "label_association"
     STRUCTURAL_ANCHOR = "structural_anchor"
     HINT_CACHED = "hint_cached"
     ORDINAL_IN_REGION = "ordinal_in_region"
@@ -94,13 +93,24 @@ class ResolutionStrategy(StrEnum):
 LADDER: tuple[ResolutionStrategy, ...] = (
     ResolutionStrategy.SEMANTIC_EXACT,
     ResolutionStrategy.SEMANTIC_NORMALIZED,
-    ResolutionStrategy.LABEL_ASSOCIATION,
     ResolutionStrategy.STRUCTURAL_ANCHOR,
     ResolutionStrategy.HINT_CACHED,
     ResolutionStrategy.ORDINAL_IN_REGION,
     ResolutionStrategy.VISION,
 )
-"""The fixed order strategies are attempted in. Fixed = deterministic."""
+"""The fixed order strategies are attempted in. Fixed = deterministic.
+
+An earlier draft carried a seventh rung, `label_association`, between normalized matching and
+structural anchoring. It was removed when implementing the resolver made clear it could never fire:
+every surface we target -- ARIA, UIA, macOS AX -- already folds label association into the computed
+accessible name, so a control with an associated label is found by `semantic_exact` and one without
+is found by `structural_anchor`. There is no case in between.
+
+A rung that cannot fire is worse than no rung: it makes the ladder look more capable than it is, and
+invites someone to "fix" resolution by adding logic to a dead path. A driver on a surface that
+genuinely exposes labelling separately (UIA's `LabeledBy` is separate from `Name`) should fold it
+into the node's name during normalization, where the rest of the system already handles it.
+"""
 
 REPLAY_FORBIDDEN: frozenset[ResolutionStrategy] = frozenset({ResolutionStrategy.VISION})
 """Strategies unavailable during replay.

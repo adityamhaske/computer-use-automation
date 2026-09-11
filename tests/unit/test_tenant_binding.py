@@ -59,8 +59,9 @@ def test_applies_only_declared_overrides(capability: Capability, binding: Tenant
 
 
 def test_substitutes_tenant_variables(capability: Capability, binding: TenantBinding) -> None:
+    """Each tenant runs the same product at its own address."""
     effective = binding.apply(capability)
-    assert effective.entrypoint.url_pattern == "http://127.0.0.1:8821/search"
+    assert effective.entrypoint.url_pattern == "http://127.0.0.1:8821/"
     assert "{base_url}" not in effective.entrypoint.url_pattern
 
 
