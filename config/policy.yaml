@@ -31,6 +31,10 @@ actions:
     - wait_for
     - extract
     - assert
+    # A recovery rule's remedy for a transient gateway error. Omitting it meant every declared
+    # transient-failure recovery was silently denied by policy and then looked, from the run's
+    # point of view, like a remedy that ran and did not help.
+    - reload
   # raw_input exists so a human operator's console input is a first-class,
   # policed action rather than a bypass. Automation may never originate one.
   human_only:

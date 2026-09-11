@@ -96,6 +96,12 @@ steps:
 
   - id: read_balance
     description: Read the savings balance from the cell beside its label.
+    # Assert we are actually on the member record before reading a number off it. Without this, an
+    # unexpected interstitial would be diagnosed as "could not find the cell" rather than "this is
+    # not a screen I understand" -- both stop the run, but only the second says why.
+    precondition:
+      assert: node_exists
+      query: {role: cell, name_contains: Savings Balance, scope: {frame: content}}
     action:
       type: extract
       into: savings_balance
@@ -110,6 +116,9 @@ steps:
 
   - id: read_status
     description: Read the account status from the cell beside its label.
+    precondition:
+      assert: node_exists
+      query: {role: cell, name: Status, scope: {frame: content}}
     action:
       type: extract
       into: account_status
@@ -122,6 +131,9 @@ steps:
 
   - id: read_as_of
     description: Read the as-of date.
+    precondition:
+      assert: node_exists
+      query: {role: cell, name: As Of, scope: {frame: content}}
     action:
       type: extract
       into: as_of

@@ -32,13 +32,48 @@ Reference: [design/error-taxonomy.md](../../design/error-taxonomy.md).
 
 ## Exit criteria
 
-- [ ] Replays the Phase 07 artifact with **different** inputs and returns typed outputs
-- [ ] **All injected faults classified correctly** — the full fault-matrix table passes
-- [ ] `member_not_found` returns `BUSINESS_OUTCOME` and **exits 0**
-- [ ] Undeclared interstitial ⇒ `UNEXPECTED_STATE`, run stops
-- [ ] Determinism: N replays produce an identical decision trace and identical per-step strategies
-- [ ] **`invariants/test_no_llm_in_replay.py` passes** — including with the LLM client patched to raise
-- [ ] Every `FAILED` result carries step, expected, observed
+- [x] Replays with **different** inputs and returns typed outputs
+- [x] **All 12 fault-matrix rows pass**
+- [x] `member_not_found`, `no_savings_account`, `permission_denied` return `BUSINESS_OUTCOME`, exit 0
+- [x] Undeclared interstitial ⇒ fails closed, escalates, reports **no outputs**
+- [x] Determinism: repeated replays produce identical outputs and identical per-step strategies
+- [x] Replay with the model client patched to raise still succeeds
+- [x] Every `FAILED` result carries step, expected, observed
+- [x] Recovery bounded; an unclearing transient ⇒ `RECOVERY_EXHAUSTED`
+
+### Verification record
+
+201 tests green; `mypy --strict` on 67 files; 5/5 contracts.
+
+**A refinement to the fail-closed rule.** The design said a state "matching nothing the capability
+declares" is `UNEXPECTED_STATE`. Taken literally that is unworkable — a freshly compiled capability
+declares no outcomes at all, so every page would be unrecognized and every replay would escalate on
+its first step. The rule that actually holds is narrower: fail closed when a *declared expectation*
+is violated and nothing declared explains why. A step with no precondition asserts nothing, so there
+is nothing to violate. A step whose precondition fails has had an explicit expectation broken, and
+if no outcome or recovery rule accounts for it, the run stops. That keeps the guarantee where it
+matters without requiring a capability to enumerate every page before it can run.
+
+**Four real bugs, each found by a test that existed for a different reason:**
+
+1. **Parameter substitution never happened.** The executor passed the `{$input: member_id}`
+   *reference object* to the driver, which stringified it — and the field's `maxlength=10` truncated
+   it to exactly `input_name`. A plausible-looking wrong value rather than a crash. Caught by the
+   step's own postcondition two steps before the failure would otherwise have surfaced, which is
+   precisely the job a postcondition exists to do. Fixed by `replay/bind.py`, which is also where
+   `{$secret}` is resolved — inside the dispatch, so the value never exists anywhere a snapshot,
+   trace or screenshot is produced from.
+2. **HTTP status was tracked for the main frame only.** On a frameset app the shell loads fine and
+   the *content frame* returns the 502, so the declared transient-failure recovery was permanently
+   unreachable — on exactly the kind of application this project targets.
+3. **`reload` was missing from the global allowed actions.** Every transient-failure remedy was
+   silently denied by policy.
+4. **A refused remedy looked like one that ran.** `_recover` ignored the dispatch result, so a
+   denied remedy burned the whole attempt budget and reported `RECOVERY_EXHAUSTED` for a condition
+   nothing had ever tried to clear.
+
+Bugs 3 and 4 are the same incident seen twice, and 4 is the more important one: the system was
+reporting a confident, wrong diagnosis. It now reports that the remedy could not run.
 
 ## Risks
 

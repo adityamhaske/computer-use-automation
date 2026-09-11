@@ -102,6 +102,75 @@ def discover(
 
 
 @app.command()
+def replay(
+    artifact: Annotated[Path, typer.Argument(help="Path to a capability YAML.")],
+    input: Annotated[  # noqa: A002 - reads naturally on the command line
+        list[str] | None, typer.Option("--input", help="name=value, repeatable.")
+    ] = None,
+    base_url: Annotated[
+        str | None, typer.Option(help="Bind {base_url} for this deployment.")
+    ] = None,
+    allow_irreversible: Annotated[
+        bool, typer.Option(help="Caller opt-in for an irreversible capability.")
+    ] = False,
+    headless: Annotated[bool, typer.Option(help="Run the browser headless.")] = True,
+) -> None:
+    """Execute a saved capability deterministically. No model is involved."""
+    from cua.domain.serde import load_capability
+    from cua.domain.tenant_binding import TenantBinding
+    from cua.replay.executor import ReplayExecutor
+    from cua.runtime.capture import FailureCapture
+
+    capability = load_capability(artifact.read_text(encoding="utf-8"))
+    if base_url:
+        capability = TenantBinding(
+            capability_ref=capability.ref, tenant="cli", vars={"base_url": base_url}
+        ).apply(capability)
+
+    supplied: dict[str, str] = {}
+    for pair in input or []:
+        if "=" not in pair:
+            typer.secho(f"--input expects name=value, got {pair!r}", fg=typer.colors.RED, err=True)
+            raise typer.Exit(code=2)
+        name, _, value = pair.partition("=")
+        supplied[name] = value
+
+    run_id = f"rep-{uuid.uuid4().hex[:10]}"
+    rig = build_rig(run_id=run_id, kind="replay", headless=headless, allow_vision=False)
+    try:
+        executor = ReplayExecutor(
+            dispatcher=rig.dispatcher,
+            evidence=rig.evidence,
+            capture=FailureCapture(driver=rig.driver, evidence=rig.evidence),
+            allow_irreversible=allow_irreversible,
+        )
+        result = executor.run(capability, supplied)
+    finally:
+        rig.close()
+
+    colour = {
+        "success": typer.colors.GREEN,
+        "business_outcome": typer.colors.CYAN,
+        "needs_human": typer.colors.YELLOW,
+        "failed": typer.colors.RED,
+    }[result.status.value]
+    typer.secho(f"\n{result.summary}", fg=colour)
+
+    if result.outputs:
+        typer.echo(f"  outputs  : {json.dumps(result.outputs, indent=2)}")
+    if result.outcome:
+        typer.echo(f"  data     : {json.dumps(result.outcome.data)}")
+    if result.error and result.error.expected:
+        typer.echo(f"  expected : {result.error.expected}")
+        typer.echo(f"  observed : {result.error.observed}")
+    typer.echo(f"  evidence : {rig.run_dir}")
+    typer.echo(f"  drift    : {result.drift_score:.2f}   strategies: {result.strategy_mix}")
+
+    # A business outcome exits 0: it is a successful execution that returned a negative answer.
+    raise typer.Exit(code=result.exit_code)
+
+
+@app.command()
 def version() -> None:
     from cua import __version__
 

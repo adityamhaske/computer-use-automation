@@ -79,22 +79,44 @@ class PlaywrightCdpDriver:
         # node_id -> CDP backend node id, refreshed on every observe(). This is how an action
         # reaches the node that was actually resolved.
         self._handles: dict[str, int] = {}
-        self._last_status: int | None = None
+        # Per-frame navigation status. On a frameset app the interesting failure is almost never
+        # in the main document: the shell loads fine and the *content frame* returns the 502.
+        # Tracking only the main frame made transient-failure recovery unreachable on exactly the
+        # kind of application this project targets.
+        self._frame_status: dict[str, int] = {}
         self._page.on("response", self._note_response)
 
     # ------------------------------------------------------------- plumbing
-
     def _note_response(self, response: Any) -> None:
-        """Remember the main document's status so a recovery rule can match on 502/503/504.
+        """Remember each frame's navigation status, so a recovery rule can match on 502/503/504.
 
         Matching transport status beats matching page text: a rule keyed on the words "Service
         Unavailable" would also fire on a member whose name happened to contain them.
         """
         try:
-            if response.request.is_navigation_request() and response.frame == self._page.main_frame:
-                self._last_status = response.status
+            if response.request.is_navigation_request():
+                # Keyed by the document URL being loaded rather than by the frame, because a frame
+                # that has not finished loading reports an empty name and an empty url -- so frame
+                # identity is not yet usable at the moment the response arrives.
+                self._frame_status[response.url] = response.status
         except Exception:
             pass
+
+    @property
+    def _last_status(self) -> int | None:
+        """The status a recovery rule should reason about.
+
+        An error in *any* frame wins over a success in another. On a frameset app the shell loads
+        perfectly around a content frame that returned 502, and reporting 200 for that page would
+        leave the declared transient-failure recovery permanently unreachable -- on exactly the kind
+        of application this project exists to automate.
+        """
+        if not self._frame_status:
+            return None
+        errors = [status for status in self._frame_status.values() if status >= 400]
+        if errors:
+            return max(errors)
+        return next(iter(self._frame_status.values()))
 
     def _object_id(self, node_id: str) -> str | None:
         backend_id = self._handles.get(node_id)
@@ -196,10 +218,15 @@ class PlaywrightCdpDriver:
 
     def _perform(self, inner: Any, node_id: str | None) -> tuple[bool, str]:
         if isinstance(inner, Navigate):
+            # Statuses describe *the current page load*. Clearing first means a 502 from the page
+            # we are leaving cannot make the page we are arriving at look broken -- which would
+            # leave a declared recovery rule firing forever against a condition that had cleared.
+            self._frame_status.clear()
             self._page.goto(inner.url, wait_until="load")
             return True, ""
 
         if isinstance(inner, Reload):
+            self._frame_status.clear()
             self._page.reload(wait_until="load")
             return True, ""
 

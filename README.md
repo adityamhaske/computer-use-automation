@@ -35,7 +35,7 @@ This repository is under active construction. Phases complete so far:
 - [x] **Phase 05** — Policy chokepoint, redaction, evidence ([the guardrail model](docs/adr/0004-single-policy-chokepoint.md))
 - [x] **Phase 06** — Discovery agent loop *(live-model run pending an API key)*
 - [x] **Phase 07** — Artifact compiler (trace → reviewable capability)
-- [ ] Phase 08 — Deterministic replay engine
+- [x] **Phase 08** — Deterministic replay engine ([the error taxonomy](docs/design/error-taxonomy.md))
 - [ ] Phase 09 — HITL escalation & live control transfer
 - [ ] Phase 12 — Docs, evidence, submission
 
