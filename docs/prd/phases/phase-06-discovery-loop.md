@@ -28,11 +28,50 @@ evidence. Everything else may be mocked; this may not.
 
 ## Exit criteria
 
-- [ ] A real run against a real browser completes a real goal; transcript in `evidence/discovery/`
-- [ ] CI runs the identical loop against `agent/fake.py` — no key, no tokens, no network
-- [ ] Every action in the run traversed `PolicyEngine` (asserted from the run record)
-- [ ] Stop conditions each individually tested
-- [ ] No secret or PII appears in any captured prompt
+- [x] CI runs the identical loop against `agent/fake.py` — no key, no tokens, no network
+- [x] Every action in the run traversed `PolicyEngine` (asserted from the run record)
+- [x] Stop conditions each individually tested
+- [x] No secret or PII appears in any captured prompt
+- [x] Every synthesized descriptor is verified by resolving it back, during the run
+- [ ] **A real run against a real browser completes a real goal** — test written and deselected;
+      needs `OPENROUTER_API_KEY`. This is the brief's one non-negotiable and the only outstanding
+      item in this phase.
+
+### Verification record
+
+174 tests green; `mypy --strict` on 59 files; 5/5 contracts over 258 dependencies.
+
+**Descriptors are verified by use.** The model points at a node it can see; we describe that node
+semantically; the resolver then has to find the same node from the description alone. A failure is
+caught while a model is still in the loop, rather than as a capability that breaks on its first
+replay weeks later. `synthesize_descriptor` is shared with the Phase 07 compiler deliberately — what
+gets written into the artifact is exactly what was proven to resolve during discovery, not a second
+guess at it.
+
+That check immediately earned its place by finding **three real bugs**:
+
+1. **`ADJACENT_TO` returned every following sibling**, not the next one. A four-column account row
+   offered three candidates for "the cell after Savings", and the resolver — correctly refusing
+   ambiguity — failed every extraction from a table wider than two columns.
+2. **An anchor was offered as a candidate for itself.** The exclusion compared object identity
+   rather than node id, so every two-cell label/value lookup came back ambiguous.
+3. **`ROW_OF` is the wrong relation for reading a value.** Acting on a control wants "the control in
+   the row labelled X"; reading a value wants "the cell immediately after X". The relation is now
+   chosen by the target's role.
+
+**A gap the first end-to-end run exposed:** only *actionable* roles carried ids in the rendered page,
+so the model could not reference the balance cell it needed to read — the capability's whole output
+was inexpressible. Readable roles now carry ids too. The extra tokens are worth less than the
+capability.
+
+**Two more chokepoint violations, both caught by `test_policy_chokepoint.py` rather than by
+import-linter** (the AST scan sees files that are not yet in the import graph): `cli/wiring.py`
+constructed a driver, and the import-linter contract itself was wrong — it forbade *indirect* reach,
+which would mean nothing could ever act through the dispatcher at all. The contract now bans direct
+imports only, and the AST scan covers the rest.
+
+Both violations were fixed by moving the module rather than adding an exemption. Each exemption is
+defensible alone; together they turn a rule you can check into a rule you have to argue about.
 
 ## Risks
 

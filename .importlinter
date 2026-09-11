@@ -44,7 +44,14 @@ source_modules =
     cua.perception
 forbidden_modules =
     cua.surfaces
-allow_indirect_imports = False
+# Direct imports only. Reaching a surface *through* cua.runtime.dispatcher is the entire point of
+# a chokepoint -- forbidding indirect chains would mean nothing could ever act. What must stay
+# banned is a module holding a driver itself, and that is a direct import.
+#
+# tests/invariants/test_policy_chokepoint.py checks the same rule by parsing each file's imports,
+# so the guarantee does not rest on this flag alone: that scan also catches a module that is not
+# yet in the import graph, which is how the evidence/capture.py violation was found.
+allow_indirect_imports = True
 
 # --- INVARIANT 3: Target identity is semantic, never surface-specific. ---------
 # If targeting can see Playwright or a DOM, the artifact will quietly grow

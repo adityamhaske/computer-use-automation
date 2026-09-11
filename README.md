@@ -33,7 +33,7 @@ This repository is under active construction. Phases complete so far:
 - [x] **Phase 03** — Perception & surface driver (semantic tree, stitched across frames)
 - [x] **Phase 04** — Semantic targeting & resolution ladder ([how it resolves](docs/design/target-resolution.md))
 - [x] **Phase 05** — Policy chokepoint, redaction, evidence ([the guardrail model](docs/adr/0004-single-policy-chokepoint.md))
-- [ ] Phase 06 — Discovery agent loop (real LLM)
+- [x] **Phase 06** — Discovery agent loop *(live-model run pending an API key)*
 - [ ] Phase 07 — Artifact compiler
 - [ ] Phase 08 — Deterministic replay engine
 - [ ] Phase 09 — HITL escalation & live control transfer

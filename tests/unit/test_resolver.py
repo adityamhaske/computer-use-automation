@@ -223,6 +223,44 @@ def test_adjacent_to_extracts_the_value_beside_its_label(resolver: TargetResolve
     assert resolution.node.name == "$4,210.55"
 
 
+def test_adjacent_to_means_the_next_cell_not_every_later_cell(resolver: TargetResolver) -> None:
+    """Regression. In a multi-column grid, "the cell after Savings" must be exactly one cell.
+
+    An earlier version returned every following sibling, so a four-column account row offered three
+    candidates and the resolver -- correctly refusing ambiguity -- failed every extraction from a
+    table wider than two columns. Caught because discovery verifies each synthesized descriptor by
+    resolving it back.
+    """
+    elements = [
+        RawElement("1", "RootWebArea", "x", child_ids=["t"], frame="content"),
+        RawElement("t", "LayoutTable", child_ids=["r"], parent_id="1", frame="content"),
+        RawElement(
+            "r", "LayoutTableRow", child_ids=["a", "b", "c", "d"], parent_id="t", frame="content"
+        ),
+        RawElement("a", "LayoutTableCell", "0001234501", parent_id="r", frame="content"),
+        RawElement("b", "LayoutTableCell", "Savings", parent_id="r", frame="content"),
+        RawElement("c", "LayoutTableCell", "$4,210.55", parent_id="r", frame="content"),
+        RawElement("d", "LayoutTableCell", "Active", parent_id="r", frame="content"),
+    ]
+    snapshot = build_snapshot(elements, snapshot_id="s", url="http://x")
+
+    target = TargetDescriptor(
+        role="cell", anchor=Anchor(relation=AnchorRelation.ADJACENT_TO, text="Savings")
+    )
+    assert resolver.resolve(target, snapshot).node.name == "$4,210.55"
+
+
+def test_an_anchor_is_never_its_own_candidate(resolver: TargetResolver) -> None:
+    """Regression. The label cell was being offered as a candidate for its own anchor, because the
+    exclusion compared object identity rather than node id -- which made every two-cell lookup come
+    back ambiguous."""
+    target = TargetDescriptor(
+        role="cell", anchor=Anchor(relation=AnchorRelation.ROW_OF, text="Savings Balance")
+    )
+    resolved = resolver.resolve(target, _detail_page())
+    assert resolved.node.name == "$4,210.55"
+
+
 def test_adjacent_to_does_not_leak_across_rows(resolver: TargetResolver) -> None:
     """Scoped to the anchor's own row -- otherwise 'the cell after Status' could pick up a value
     from the row below, which is exactly the class of silent error this design exists to prevent."""

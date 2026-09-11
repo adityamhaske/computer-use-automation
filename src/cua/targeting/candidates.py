@@ -103,7 +103,11 @@ def structural_anchor(target: TargetDescriptor, snapshot: UiSnapshot) -> list[Ui
             found.extend(
                 n
                 for n in snapshot.descendants(row)
-                if _role_matches(n, target) and _in_scope(n, target) and n is not anchor_node
+                if _role_matches(n, target)
+                and _in_scope(n, target)
+                # By id, not identity: `is not` silently failed here, so the label cell was
+                # offered as a candidate for its own anchor and every lookup came back ambiguous.
+                and n.node_id != anchor_node.node_id
             )
 
         elif anchor.relation is AnchorRelation.ADJACENT_TO:
@@ -133,11 +137,20 @@ def structural_anchor(target: TargetDescriptor, snapshot: UiSnapshot) -> list[Ui
             )
             if index is None:
                 continue
-            found.extend(
-                n
-                for n in siblings[index + 1 :]
-                if _role_matches(n, target) and _in_scope(n, target)
+            # The FIRST matching sibling after the anchor, not every one that follows.
+            # "Adjacent to" means next to. Taking all of them made a four-column grid row offer
+            # three candidates for "the cell after Savings", which the resolver then refused as
+            # ambiguous -- so every extraction from a multi-column table failed to resolve.
+            following = next(
+                (
+                    n
+                    for n in siblings[index + 1 :]
+                    if _role_matches(n, target) and _in_scope(n, target)
+                ),
+                None,
             )
+            if following is not None:
+                found.append(following)
 
         elif anchor.relation is AnchorRelation.WITHIN_SECTION:
             section = snapshot.nearest_ancestor(anchor_node, "table") or snapshot.parent(
@@ -148,7 +161,9 @@ def structural_anchor(target: TargetDescriptor, snapshot: UiSnapshot) -> list[Ui
             found.extend(
                 n
                 for n in snapshot.descendants(section)
-                if _role_matches(n, target) and _in_scope(n, target) and n is not anchor_node
+                if _role_matches(n, target)
+                and _in_scope(n, target)
+                and n.node_id != anchor_node.node_id
             )
 
     # De-duplicate while preserving document order -- two anchors can reach the same node.
