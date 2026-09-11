@@ -1,0 +1,126 @@
+# Safety policy. Nothing in this system acts outside what this file permits.
+#
+# Evaluated by cua.policy.PolicyEngine at the single chokepoint, for EVERY actor:
+# the discovery agent, the replay executor, and a human operator during an intervention.
+# See docs/adr/0004-single-policy-chokepoint.md.
+
+version: 1
+
+# --- Where the agent may go ---------------------------------------------------
+# A navigation outside this list is NAVIGATION_BLOCKED and is not followed.
+# This is also the primary defense against a prompt-injection redirect: page text
+# can ask the agent to go somewhere, but policy is evaluated outside the model.
+allowlist:
+  domains:
+    - "localhost:8811"        # mock back-office, base tenant
+    - "localhost:8812"        # operator console
+    - "127.0.0.1:8811"
+    - "127.0.0.1:8812"
+  url_patterns:
+    - "^https?://(localhost|127\\.0\\.0\\.1):881[12](/.*)?$"
+
+# --- What the agent may do ----------------------------------------------------
+actions:
+  allowed:
+    - click
+    - type
+    - select
+    - press_key
+    - navigate
+    - scroll
+    - wait_for
+    - extract
+    - assert
+  # raw_input exists so a human operator's console input is a first-class,
+  # policed action rather than a bypass. Automation may never originate one.
+  human_only:
+    - raw_input
+
+# --- Risk classification ------------------------------------------------------
+# Three independent signals; the HIGHEST resulting tier wins, because any one
+# signal alone can be fooled:
+#   1. the action type
+#   2. the target control's semantics (the lexicon below, matched on accessible name)
+#   3. the step's explicit `risk:` annotation in the artifact
+risk:
+  default_tier: safe
+
+  tiers_by_action:
+    click: safe
+    type: safe
+    select: safe
+    press_key: safe
+    navigate: safe
+    scroll: safe
+    wait_for: safe
+    extract: safe
+    assert: safe
+    raw_input: elevated
+
+  # Matched case-insensitively against a control's accessible name.
+  lexicon:
+    elevated:
+      - submit
+      - save
+      - update
+      - create
+      - open account
+      - confirm
+    irreversible:
+      - delete
+      - remove
+      - close account
+      - transfer
+      - withdraw
+      - post
+      - authorize payment
+      - wire
+      - void
+      - reverse
+
+# --- How each tier is handled, per actor --------------------------------------
+# Escalation WIDENS a human's authority deliberately and auditably. It does not
+# disable the chokepoint: the allowlist, the classification, and the evidence
+# trail apply to a human operator exactly as they do to automation.
+dispositions:
+  AUTOMATION:
+    safe: allow
+    elevated: allow_if_declared     # the artifact must annotate the step
+    irreversible: block_and_escalate
+  HUMAN:
+    safe: allow
+    elevated: allow                 # recorded
+    irreversible: require_confirmation
+
+# Replay of an irreversible step additionally requires BOTH:
+#   - CapabilityApproval.state == approved for that exact id@version, and
+#   - an explicit caller opt-in on the invocation.
+replay_gates:
+  irreversible_requires_approval: true
+  irreversible_requires_caller_optin: true
+
+# --- Budgets ------------------------------------------------------------------
+budgets:
+  max_steps: 40
+  max_duration_ms: 120000
+  max_recovery_attempts_total: 6
+
+# --- Redaction ----------------------------------------------------------------
+# Applied at EVERY sink: logs, artifacts, evidence, screenshots, and outbound
+# LLM prompts. Regulated data should not leave the process just because a model
+# asked for context.
+#
+# Redact values, keep shapes -- `<redacted:string[5]>` still tells a debugger the
+# field was present and well-formed.
+redaction:
+  preserve_shape: true
+  rules:
+    - { name: ssn,            pattern: "\\b\\d{3}-\\d{2}-\\d{4}\\b" }
+    - { name: card_pan,       pattern: "\\b(?:\\d[ -]?){13,19}\\b" }
+    - { name: account_number, pattern: "\\b\\d{8,17}\\b" }
+    - { name: email,          pattern: "[\\w.+-]+@[\\w-]+\\.[\\w.]+" }
+    - { name: phone,          pattern: "\\b\\(?\\d{3}\\)?[ -]?\\d{3}[ -]?\\d{4}\\b" }
+  # Fields marked `sensitive: true` in a capability's inputs/outputs are always
+  # masked, excluded from evidence, and blurred in screenshots.
+  always_redact_sensitive_inputs: true
+  blur_sensitive_regions_in_screenshots: true

@@ -1,0 +1,106 @@
+# Architectural invariants, mechanically enforced.
+#
+# Every contract here corresponds to a claim made in REPORT.md and AGENTS.md.
+# If a contract is deleted or weakened, the claim it backs is no longer true.
+# Run with: lint-imports
+
+[importlinter]
+root_package = cua
+include_external_packages = True
+
+# --- INVARIANT 1: Replay never calls or imports the LLM. -----------------------
+# The whole thesis is "discovery is probabilistic; execution is deterministic".
+# If replay can reach the model, the thesis is false.
+
+[importlinter:contract:no-llm-in-replay]
+name = Replay must not import the agent or any LLM client
+type = forbidden
+source_modules =
+    cua.replay
+forbidden_modules =
+    cua.agent
+    httpx
+    openai
+    anthropic
+allow_indirect_imports = False
+
+# --- INVARIANT 2: No action reaches a driver without policy authorization. -----
+# cua.runtime.dispatcher is the ONLY module permitted to touch a SurfaceDriver.
+# Everything else must go through it, which forces it through PolicyEngine.
+
+[importlinter:contract:policy-chokepoint]
+name = Only cua.runtime may import cua.surfaces
+type = forbidden
+source_modules =
+    cua.agent
+    cua.replay
+    cua.hitl
+    cua.recorder
+    cua.targeting
+    cua.policy
+    cua.catalog
+    cua.cli
+    cua.evidence
+    cua.perception
+forbidden_modules =
+    cua.surfaces
+allow_indirect_imports = False
+
+# --- INVARIANT 3: Target identity is semantic, never surface-specific. ---------
+# If targeting can see Playwright or a DOM, the artifact will quietly grow
+# web-shaped assumptions and stop being replayable on a desktop driver.
+
+[importlinter:contract:surface-neutral-targeting]
+name = Targeting and perception must be surface-neutral
+type = forbidden
+source_modules =
+    cua.targeting
+    cua.perception
+forbidden_modules =
+    playwright
+    cua.surfaces
+allow_indirect_imports = False
+
+# --- INVARIANT 9: domain/ is pure. --------------------------------------------
+# No I/O, no network, no browser. The artifact schema must be reasonable about
+# in isolation, and testable without a process running.
+
+[importlinter:contract:pure-domain]
+name = Domain is pure (no I/O, no other cua packages)
+type = forbidden
+source_modules =
+    cua.domain
+forbidden_modules =
+    playwright
+    httpx
+    fastapi
+    uvicorn
+    cua.agent
+    cua.replay
+    cua.surfaces
+    cua.targeting
+    cua.policy
+    cua.runtime
+    cua.hitl
+    cua.recorder
+    cua.evidence
+    cua.catalog
+    cua.cli
+    cua.perception
+allow_indirect_imports = False
+
+# --- Layering: the dependency direction of the system. ------------------------
+# Higher layers may import lower ones; never the reverse.
+
+[importlinter:contract:layers]
+name = Package layering
+type = layers
+layers =
+    cua.cli
+    cua.agent | cua.replay | cua.recorder | cua.catalog
+    cua.runtime
+    cua.hitl
+    cua.policy
+    cua.targeting
+    cua.perception
+    cua.domain
