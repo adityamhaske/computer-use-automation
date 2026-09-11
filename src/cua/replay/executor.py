@@ -62,6 +62,15 @@ class ReplayExecutor:
     irreversible step runs unattended -- two independent gates, because either alone is one
     accident away from a wire transfer."""
 
+    broker: Any = None
+    """An optional `SessionBroker`. When present, an escalating failure opens a real intervention
+    and pauses the lease rather than merely returning NEEDS_HUMAN.
+
+    Optional because a replay invoked by an agent with no operator on duty still has to terminate
+    cleanly -- it reports NEEDS_HUMAN and stops, which is the honest answer when there is nobody to
+    hand the session to. Typed loosely: `cua.replay` sits above `cua.hitl` in the layering and calls
+    it without depending on its type."""
+
     session_id: str = field(default_factory=lambda: f"replay-{uuid.uuid4().hex[:8]}")
     lease_epoch: int = 1
 
@@ -407,6 +416,24 @@ class ReplayExecutor:
             and state.capability.escalation.policy.value == "pause_and_request_human"
         )
 
+        intervention_id = f"int-{uuid.uuid4().hex[:8]}"
+        if escalates and self.broker is not None:
+            # Open a real intervention and pause the lease. From here the session belongs to
+            # nobody until an operator claims it -- so any automation action still in flight is
+            # refused rather than landing on a page a human is about to work in.
+            request = self.broker.escalate(
+                run_id=state.run_id,
+                capability_ref=state.capability.ref,
+                goal=state.capability.description or state.capability.title,
+                reason=message,
+                step_id=step.id if step else None,
+                failure_code=code.value,
+                snapshot=snapshot,
+                snapshot_ref=capture_ref.snapshot_ref if capture_ref else None,
+                screenshot_ref=capture_ref.screenshot_ref if capture_ref else None,
+            )
+            intervention_id = request.intervention_id
+
         self.evidence.emit(
             EventType.ESCALATE if escalates else EventType.RUN_END,
             actor=Actor.AUTOMATION,
@@ -435,7 +462,7 @@ class ReplayExecutor:
             return RunResult(
                 status=RunStatus.NEEDS_HUMAN,
                 intervention=InterventionRef(
-                    intervention_id=f"int-{uuid.uuid4().hex[:8]}",
+                    intervention_id=intervention_id,
                     reason=message,
                     step_id=step.id if step else None,
                 ),

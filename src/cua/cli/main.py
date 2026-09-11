@@ -171,6 +171,48 @@ def replay(
 
 
 @app.command()
+def console(
+    port: Annotated[int, typer.Option(help="Port for the operator console.")] = 8812,
+    target: Annotated[str, typer.Option(help="URL to open in the supervised session.")] = (
+        "http://localhost:8811/"
+    ),
+    headless: Annotated[bool, typer.Option(help="Run the supervised browser headless.")] = True,
+) -> None:
+    """Run the operator console over a supervised live session.
+
+    Single operator, no authentication, local only -- a documented cut (REPORT.md §5). What is real:
+    the operator drives the same Chromium session automation uses, their input travels the same
+    policy chokepoint, and every action is recorded with actor=HUMAN.
+    """
+    import uvicorn
+
+    from cua.hitl.console.server import ConsoleDeps, create_console
+    from cua.runtime.wiring import build_supervised_session
+
+    run_id = f"con-{uuid.uuid4().hex[:10]}"
+    supervised = build_supervised_session(run_id=run_id, target=target, headless=headless)
+
+    typer.secho(f"Operator console on http://127.0.0.1:{port}", fg=typer.colors.GREEN)
+    typer.echo(f"  supervising : {target}")
+    typer.echo(f"  evidence    : {supervised.run_dir}")
+    try:
+        uvicorn.run(
+            create_console(
+                ConsoleDeps(
+                    broker=supervised.broker,
+                    driver=supervised.driver,
+                    session=supervised.session,
+                )
+            ),
+            host="127.0.0.1",
+            port=port,
+            log_level="warning",
+        )
+    finally:
+        supervised.close()
+
+
+@app.command()
 def version() -> None:
     from cua import __version__
 

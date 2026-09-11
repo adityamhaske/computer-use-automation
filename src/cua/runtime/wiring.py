@@ -19,6 +19,7 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 from cua.evidence.bus import EvidenceBus
 from cua.policy.config import PolicyConfig, parse_policy
@@ -103,4 +104,66 @@ def build_rig(
         secrets=secrets,
         config=config,
         run_dir=run_dir,
+    )
+
+
+@dataclass
+class SupervisedSession:
+    """A live session an operator can take over, wired for the console."""
+
+    broker: Any
+    driver: Any
+    session: Any
+    evidence: EvidenceBus
+    run_dir: Path
+
+    def close(self) -> None:
+        self.session.call(self.driver.close)
+        self.session.stop()
+
+
+def build_supervised_session(
+    *, run_id: str, target: str, headless: bool = True, policy_path: Path | None = None
+) -> SupervisedSession:
+    """Wire a session the operator console can supervise.
+
+    Lives here because it constructs a driver, and only `cua.runtime` may do that. The CLI asked to
+    build one directly first, and `tests/invariants/test_policy_chokepoint.py` caught it -- the
+    third time that scan has found a violation the import-linter contract did not.
+
+    The session is created **on its owning thread**: synchronous Playwright binds to the thread that
+    constructs it, and the console serves requests from a threadpool. Building the browser here on
+    the calling thread and marshalling to another would forward to the wrong one.
+    """
+    from cua.hitl.broker import SessionBroker
+    from cua.hitl.session_thread import SessionThread
+    from cua.surfaces.playwright_cdp.driver import PlaywrightCdpDriver
+
+    config = load_policy(policy_path)
+    redactor = Redactor(config.redaction)
+    run_dir = EVIDENCE_ROOT / "escalation" / run_id
+    run_dir.mkdir(parents=True, exist_ok=True)
+    evidence = EvidenceBus(run_dir, redactor, run_id=run_id)
+
+    thread = SessionThread(name="cua-console-session")
+    thread.start()
+
+    def boot() -> PlaywrightCdpDriver:
+        instance = PlaywrightCdpDriver(headless=headless, session_id=run_id)
+        instance.page.goto(target, wait_until="load")
+        return instance
+
+    driver = thread.call(boot)
+    broker = SessionBroker(
+        session_id=run_id,
+        evidence=evidence,
+        dispatch=Dispatcher(
+            driver=driver,
+            policy=PolicyEngine(config),
+            resolver=TargetResolver(allow_vision=False),
+            evidence=evidence,
+        ),
+    )
+    return SupervisedSession(
+        broker=broker, driver=driver, session=thread, evidence=evidence, run_dir=run_dir
     )

@@ -36,7 +36,7 @@ This repository is under active construction. Phases complete so far:
 - [x] **Phase 06** — Discovery agent loop *(live-model run pending an API key)*
 - [x] **Phase 07** — Artifact compiler (trace → reviewable capability)
 - [x] **Phase 08** — Deterministic replay engine ([the error taxonomy](docs/design/error-taxonomy.md))
-- [ ] Phase 09 — HITL escalation & live control transfer
+- [x] **Phase 09** — HITL escalation & live control transfer ([the model](docs/design/control-transfer.md))
 - [ ] Phase 12 — Docs, evidence, submission
 
 Plan: [`docs/prd/phases/`](docs/prd/phases/). Design write-up: [`REPORT.md`](REPORT.md).

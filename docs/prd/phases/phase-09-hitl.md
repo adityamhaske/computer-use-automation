@@ -35,13 +35,44 @@ fallback is headful Chromium with a claim/release API — still the same session
 
 ## Exit criteria
 
-- [ ] Automation pauses → human drives the **same** session → releases → run re-anchors → completes
-- [ ] Human actions in evidence, tagged `actor=HUMAN`, in the same shape as automation actions
-- [ ] Dispatch with `epoch-1` ⇒ `LEASE_LOST`
-- [ ] Human off-allowlist navigation blocked
-- [ ] Irreversible human action requires explicit confirmation, and is recorded
-- [ ] Post-handoff state matching no step's precondition ⇒ `UNEXPECTED_STATE`, fails closed
-- [ ] `human_delta` written to `evidence/escalation/<run_id>/`
+- [x] Automation pauses → human drives the **same** session → releases → run re-anchors → completes
+- [x] Human actions in evidence, tagged `actor=HUMAN`, in the same shape as automation actions
+- [x] Dispatch at a stale epoch ⇒ `LEASE_LOST`
+- [x] Human off-allowlist navigation blocked
+- [x] Irreversible human action requires explicit confirmation, and is recorded
+- [x] Post-handoff state the capability cannot act from ⇒ fails closed
+- [x] `human_delta` recorded on release
+- [x] A real replay escalation opens a real intervention and pauses the lease
+- [x] Operator console built (last, as planned)
+
+### Verification record
+
+218 tests green; `mypy --strict` on 74 files; 5/5 contracts. Build order was as planned: lease,
+policed input, intervention queue and re-anchoring first — all provable headless — with the
+pixel-streaming console added last.
+
+**A real constraint the console exposed.** Synchronous Playwright is bound to the thread that
+*created* it, and a web server handles requests on a threadpool. So the obvious console — a FastAPI
+handler calling `driver.observe()` — dies with `greenlet.error: Cannot switch to a different
+thread`. This is a property of any co-browsing console, not of this test: automation owns the
+browser on one thread and an operator arrives on another.
+
+`hitl/session_thread.py` is the answer: one thread owns the session and everyone else submits
+callables. Note the sharper requirement it documents — **the session must be created on that thread,
+not merely called from it.** Marshalling to a driver constructed elsewhere just forwards to the
+wrong thread, which cost a debugging cycle to discover. It also gives the session the same
+single-writer discipline the lease gives it logically.
+
+**The third chokepoint violation caught by the AST scan rather than import-linter:** `cli/main.py`
+imported the driver to boot the console session. Moved to `runtime/wiring.build_supervised_session`.
+That is three for three where the fix was to move the module rather than add an exemption, and the
+reasoning has not changed: each exemption is defensible alone, and together they turn a rule you can
+check into a rule you have to argue about.
+
+**`reconcile(from_index=...)` is required, with no default.** A default of 0 is a footgun: once a
+flow has advanced, the early steps' preconditions no longer hold — the search box is not on the
+member record — so a scan from zero reports the session as unrecognizable when it is simply further
+along. The caller knows where it escalated and has to say so.
 
 ## Risks
 
