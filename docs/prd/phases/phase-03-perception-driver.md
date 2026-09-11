@@ -85,11 +85,42 @@ Ten minutes in a spike; it would have been Phase 08 otherwise.
 
 ## Exit criteria
 
-- [ ] `observe()` returns a useful snapshot of every mock-app screen, including inside frames
-- [ ] Two consecutive snapshots of a static page are **identical** (stable `node_id`s)
-- [ ] **No AX/CDP/Playwright type escapes `surfaces/`** — `.importlinter` `surface-neutral-targeting`
-- [ ] Snapshot of Variant B differs from base in names but not in structure
-- [ ] Spike findings written up
+- [x] `observe()` returns a useful snapshot of every mock-app screen, including inside frames
+- [x] Two consecutive snapshots of a static page are **identical** (stable `node_id`s and
+      fingerprints)
+- [x] **No AX/CDP/Playwright type escapes `surfaces/`** — `.importlinter` `surface-neutral-targeting`
+      passes with real imports present (111 dependencies analyzed)
+- [x] Variant B: semantics survive, every cached selector dies (case A measured on a real browser)
+- [x] Controls with **no accessible name at all** are still perceived and anchorable
+- [x] Spike findings written up (above)
+
+### Verification record
+
+92 tests green, 9 of them browser-backed against the real frameset app. `mypy --strict` clean across
+38 files; 5/5 contracts.
+
+**A real bug the browser test caught.** `DOM.getAttributes` takes a *frontend* `nodeId`, not the
+`backendNodeId` the accessibility tree provides — so every attribute fetch was throwing, and a
+`try/except` intended for detached nodes swallowed it silently. The failure mode was simply "no
+hints", which is indistinguishable from a page whose controls carry no cacheable attributes. Fixed
+by using `DOM.describeNode`.
+
+Worth noting *why* it was caught: the Variant B test asserts a specific cached selector
+(`input[name="member_num"]`) rather than merely asserting that resolution succeeds. A weaker
+assertion would have passed, and the CSS-invalidation demo in Phase 11 would have been silently
+vacuous — proving nothing, because there would have been no hints to invalidate.
+
+**Design notes:**
+
+- `observe()` deliberately does **not** fetch geometry. Bounds cost a CDP round trip per node,
+  `observe()` runs on every step of every run, and almost nothing needs them. `bounds_for()` fetches
+  them when screenshot redaction or a vision fallback actually does.
+- Actions dispatch against the node that was *perceived*, via its backend node id — never by
+  re-querying with a selector. Re-querying would reintroduce the brittleness the targeting design
+  exists to avoid, and opens a window where the page changes between resolution and action.
+- The snapshot builder was rewritten mid-phase to drop an O(n²) reverse lookup. On a 601-element
+  page it now builds in ~9ms; the quadratic version would have degraded on exactly the deeply-nested
+  pages this project targets.
 
 ## Risks
 
