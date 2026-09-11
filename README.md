@@ -32,7 +32,7 @@ This repository is under active construction. Phases complete so far:
 - [x] **Phase 02** — Domain model & artifact schema ([the centerpiece](docs/design/artifact-schema.md))
 - [x] **Phase 03** — Perception & surface driver (semantic tree, stitched across frames)
 - [x] **Phase 04** — Semantic targeting & resolution ladder ([how it resolves](docs/design/target-resolution.md))
-- [ ] Phase 05 — Policy chokepoint, redaction, evidence
+- [x] **Phase 05** — Policy chokepoint, redaction, evidence ([the guardrail model](docs/adr/0004-single-policy-chokepoint.md))
 - [ ] Phase 06 — Discovery agent loop (real LLM)
 - [ ] Phase 07 — Artifact compiler
 - [ ] Phase 08 — Deterministic replay engine

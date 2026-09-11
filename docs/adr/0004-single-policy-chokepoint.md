@@ -23,9 +23,19 @@ feature of it.
 **One path to a surface, for every actor:**
 
 ```
-Action ──► PolicyEngine ──► TargetResolver ──► SurfaceDriver
-       (authorize)        (resolve or refuse)   (dispatch)
+Action ──► TargetResolver ──► PolicyEngine ──► SurfaceDriver
+       (resolve or refuse)    (authorize)      (dispatch)
 ```
+
+**Amended during implementation.** This ADR originally specified `PolicyEngine` first. Building the
+engine showed that risk classification's second signal — what the control *says it does* — requires
+the resolved node, so authorizing before resolving means classifying on action type alone.
+
+The order was changed rather than the signal dropped, because resolution is a pure function over a
+snapshot that was already captured: it touches nothing, changes nothing, and cannot be observed by
+the application. The invariant being protected was never "policy runs first"; it is *nothing
+reaches a surface without authorization*, and that is unchanged. A resolution failure now
+short-circuits, so policy is never consulted for an action that cannot happen.
 
 Enforced three independent ways, because an invariant everyone agrees with is weaker than one nobody
 can violate:

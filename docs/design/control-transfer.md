@@ -58,7 +58,7 @@ evidence reference.
 
 The console does **not** forward CDP input to the page. It submits `raw_input` actions to the
 `SessionBroker`, which runs them through the same
-`Action → PolicyEngine → TargetResolver → SurfaceDriver` path under the `HUMAN` policy profile
+`Action → TargetResolver → PolicyEngine → SurfaceDriver` path under the `HUMAN` policy profile
 (table in ADR 0004).
 
 Consequences worth stating plainly:

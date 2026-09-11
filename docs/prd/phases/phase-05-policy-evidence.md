@@ -8,7 +8,7 @@ Reference: [ADR 0004](../../adr/0004-single-policy-chokepoint.md).
 ## Scope
 
 ```
-Action ──► PolicyEngine ──► TargetResolver ──► SurfaceDriver
+Action ──► TargetResolver ──► PolicyEngine ──► SurfaceDriver
 ```
 
 | Module | Responsibility |
@@ -31,13 +31,44 @@ recorded. See the table in ADR 0004.
 
 ## Exit criteria
 
-- [ ] A hand-constructed `AuthorizedAction` is **rejected** by `dispatch()`
-- [ ] Off-allowlist navigation ⇒ `NAVIGATION_BLOCKED`, not followed
-- [ ] Irreversible action classified correctly from each of the three signals independently
-- [ ] **Redaction test finds zero leaks** — seeded secrets and PII appear in no log, artifact,
-      evidence file, screenshot manifest, or captured LLM prompt
-- [ ] Every `dispatch` event in a run record has a matching `authorize` event
-- [ ] `.importlinter` `policy-chokepoint` passes with real imports present
+- [x] A hand-constructed `AuthorizedAction` is **rejected** by `dispatch()`
+- [x] Off-allowlist navigation ⇒ `NAVIGATION_BLOCKED`, not followed
+- [x] Irreversible action classified correctly from each of the three signals independently
+- [x] **Redaction test finds zero leaks** — asserted by sweeping every file the run wrote, not by
+      checking the redactor in isolation
+- [x] Every `dispatch` event in a run record has a matching `authorize` event
+- [x] `.importlinter` `policy-chokepoint` passes with real imports present (185 dependencies)
+- [x] Stale lease epoch refused before anything else happens
+
+### Verification record
+
+162 tests green (21 invariant, 18 policy unit, 11 dispatcher integration). `mypy --strict` clean on
+49 files; 5/5 contracts.
+
+**Pipeline order corrected.** The plan specified `Action → PolicyEngine → TargetResolver →
+SurfaceDriver`. Risk classification's second signal is *what the control says it does*, which
+requires the resolved node — so authorizing first classifies on action type alone. The real order is
+`Action → TargetResolver → PolicyEngine → SurfaceDriver`. This does not weaken the chokepoint:
+resolution is a pure function over an already-captured snapshot, and the invariant was never "policy
+runs first" but *nothing reaches a surface without authorization*. AGENTS.md, ADR 0004 and the
+design docs were amended with the reasoning recorded.
+
+**Two bugs my own tests caught:**
+
+- `evidence/capture.py` imported `SurfaceDriver` — a real chokepoint violation, moved to
+  `runtime/capture.py`. Import-linter missed it because the module was not yet in the import graph;
+  the AST scan in `test_policy_chokepoint.py` did not. Worth noting the reasoning on the fix: a
+  carve-out for "read-only driver methods are fine" would have been defensible in isolation and
+  would immediately have made the invariant something to reason about case-by-case rather than
+  something to check. Moving one module was cheaper than weakening the rule.
+- **An allowlist narrowing could be bypassed.** A capability's `allowed_domains` intersected the
+  domain set but then fell through to the *global* `url_patterns`, so a capability scoped to one
+  host still reached anything a pattern matched. A narrowing a pattern can reopen is not a
+  narrowing. Now applied as a separate check after the global one.
+
+**Note on layer 2's strength.** The mint token stops accidents, not a determined caller — Python has
+no real private constructor. That limit is stated in `policy/authorized.py` rather than oversold;
+the import rule and the authorize↔dispatch reconciliation are what hold against intent.
 
 ## Risks
 

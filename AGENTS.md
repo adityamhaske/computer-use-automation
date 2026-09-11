@@ -40,13 +40,20 @@ monkeypatched to raise, proving the import rule isn't being routed around at run
 The only path to a surface, for every actor, is:
 
 ```
-Action ──► PolicyEngine ──► TargetResolver ──► SurfaceDriver
-       (authorize)        (resolve or refuse)   (dispatch)
+Action ──► TargetResolver ──► PolicyEngine ──► SurfaceDriver
+       (resolve or refuse)    (authorize)      (dispatch)
 ```
 
-`cua.runtime.dispatcher` is the **only** module permitted to import `cua.surfaces`.
+`cua.runtime.dispatcher` is the **only** module permitted to call `dispatch()`.
 `SurfaceDriver.dispatch()` accepts only an `AuthorizedAction`, which carries a token that only
 `PolicyEngine` can mint.
+
+*Note the order.* An earlier version of this document put policy first. Implementing it exposed the
+flaw: risk classification's second signal is what the control *says it does*, which requires the
+resolved node — so authorizing first means authorizing half-blind. Resolution is a pure function
+over an already-captured snapshot; it touches nothing. Running it first means policy decides
+knowing exactly what it is about to act on. The invariant was never "policy runs first" — it is
+**nothing reaches a surface without authorization**.
 
 *Why:* a guardrail with one bypass is not a guardrail. Discovery, replay, and human intervention all
 take the same path, which is how we know production behaves like the tests.
