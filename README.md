@@ -21,25 +21,36 @@ goal + target ──► LLM discovery run ──► capability artifact ──�
 
 ---
 
-## 🚧 Build status
+## Try it
 
-This repository is under active construction. Phases complete so far:
+```bash
+make setup          # venv, dependencies, Chromium
+make demo           # the whole story, one command
+```
 
-- [x] **Phase 00** — Foundations: toolchain, CI, and the architectural invariants that the rest of
-      the system is built to satisfy
-- [x] **Phase 01** — Hostile mock back-office app, plus the Phase 03 semantic-tree spike
-      pulled forward ([results](docs/prd/phases/phase-03-perception-driver.md))
-- [x] **Phase 02** — Domain model & artifact schema ([the centerpiece](docs/design/artifact-schema.md))
-- [x] **Phase 03** — Perception & surface driver (semantic tree, stitched across frames)
-- [x] **Phase 04** — Semantic targeting & resolution ladder ([how it resolves](docs/design/target-resolution.md))
-- [x] **Phase 05** — Policy chokepoint, redaction, evidence ([the guardrail model](docs/adr/0004-single-policy-chokepoint.md))
-- [x] **Phase 06** — Discovery agent loop *(live-model run pending an API key)*
-- [x] **Phase 07** — Artifact compiler (trace → reviewable capability)
-- [x] **Phase 08** — Deterministic replay engine ([the error taxonomy](docs/design/error-taxonomy.md))
-- [x] **Phase 09** — HITL escalation & live control transfer ([the model](docs/design/control-transfer.md))
-- [ ] Phase 12 — Docs, evidence, submission
+`make demo` boots the mock back-office and runs eleven stages end to end, writing everything to
+[`evidence/`](evidence/):
 
-Plan: [`docs/prd/phases/`](docs/prd/phases/). Design write-up: [`REPORT.md`](REPORT.md).
+```
+  1. Mock back-office running                              hostile frameset app, no test ids
+  2. Discovery                                             the model drives the live UI to the goal
+  3. Capability compiled and sealed                        typed I/O, semantic targets, content hash
+  4. Deterministic replay, new inputs                      SUCCESS  — no model in the loop
+  5. Business outcome (exit 0 — an answer, not a crash)    BUSINESS_OUTCOME(member_not_found)
+  6. Injected 502 — declared recovery cleared it           SUCCESS  recovery_attempts=1
+  7. Same fault past its declared budget                   NEEDS_HUMAN(recovery_exhausted)
+  8. Malformed input rejected before acting                FAILED — the browser never moved
+  9. Undeclared screen — failed closed and escalated       NEEDS_HUMAN(unexpected_state)
+ 10. Operator drove the same live session, handed it back  actor=human, lease epoch 3
+ 11. Re-anchored after the handoff                         resumes at the right step, not step 1
+```
+
+**It works without an API key.** Stage 2 falls back to a recorded transcript and says so, in the
+output and in the evidence. Everything after it is model-free by construction, so the demo is not
+pretending. Set `OPENROUTER_API_KEY` and re-run for a genuine LLM-driven discovery.
+
+Takes about a minute. Then read [`REPORT.md`](REPORT.md) and
+[`evidence/README.md`](evidence/README.md).
 
 ---
 
@@ -70,25 +81,37 @@ says so explicitly. CI is configured with no key on purpose: if a test needs the
 
 ---
 
-## Demo path
+## The commands underneath
+
+`make demo` is orchestration, not a second implementation — every stage is a command you can run on
+its own:
 
 ```bash
-make demo           # the whole story, one command  (arrives in Phase 12)
-```
+make app                                      # the hostile mock back-office, on :8811
+make app-variant-b                            # the same product, rebranded and restyled: a second tenant
 
-Individual commands, each independently runnable:
-
-```bash
-make app                                                 # the hostile mock back-office
 cua discover --goal "Look up member 12345 and read their current savings balance" \
              --target http://localhost:8811 \
-             --out evidence/capabilities/
-cua replay <artifact> --input member_id=67890            # SUCCESS + typed outputs
-cua replay <artifact> --input member_id=99999            # BUSINESS_OUTCOME, exits 0
-cua replay <artifact> --fault transient_load             # RECOVERABLE -> recovered
-cua replay <artifact> --fault undeclared_dialog          # UNEXPECTED_STATE -> fails closed
-cua console                                              # operator console: take over, act, release
+             --out evidence/capabilities/     # needs OPENROUTER_API_KEY
+
+cua replay <artifact> --base-url http://localhost:8811 --input member_id=67890   # SUCCESS
+cua replay <artifact> --base-url http://localhost:8811 --input member_id=99999   # BUSINESS_OUTCOME, exits 0
+
+cua console --target http://localhost:8811    # operator console: claim, act, release
 ```
+
+Exit codes are part of the contract: `0` success **and** business outcome, `1` failed, `2` needs a
+human. A business outcome is an answer, not an incident.
+
+Faults are injected into the mock app rather than passed to the replay engine — the executor must
+not know a fault is coming, or the error-handling demonstration would be staged:
+
+```bash
+curl -X POST localhost:8811/_control/arm -d '{"fault":"transient_load","count":1}' -H 'content-type: application/json'
+curl -X POST localhost:8811/_control/reset
+```
+
+Available faults: `transient_load`, `session_timeout`, `undeclared_dialog`, `validation_error`.
 
 ---
 
@@ -99,6 +122,10 @@ make check          # lint + strict typecheck + architectural invariants + tests
 make test           # offline suite; no API key, no network
 make invariants     # just the architectural contracts
 ```
+
+219 tests, `mypy --strict` clean, five enforced import contracts. The whole suite runs **offline
+with no API key** — the fake-LLM harness replays recorded transcripts, so a reviewer with no
+credentials can run everything except the one live-model test (`make test-live`).
 
 ### The invariants
 
@@ -122,19 +149,19 @@ Run `make invariants` to check them. Break one on purpose to watch it fail — t
 
 ```
 src/cua/          domain · perception · surfaces · targeting · policy · runtime
-                  agent · recorder · replay · hitl · evidence · catalog · cli
+                  agent · recorder · replay · hitl · evidence · cli
 apps/mock_bank/   the hostile target application (+ a "second tenant" variant)
 docs/             ADRs (why) · design (how) · prd (what, in what order) · runbooks
 tests/            unit · integration · contract · invariants · e2e(live)
-evals/            stability and cross-tenant measurement
-evidence/         proof that the end-to-end thread actually ran
+evidence/         proof that the end-to-end thread actually ran  (start here)
 ```
 
 ## Documentation
 
 | Read this | For |
 |---|---|
-| [`REPORT.md`](REPORT.md) | The design write-up and the trade-offs |
+| [`REPORT.md`](REPORT.md) | The design write-up and the trade-offs — **read this first** |
+| [`evidence/README.md`](evidence/README.md) | What each committed run proves, and how to read one |
 | [`AGENTS.md`](AGENTS.md) | Working agreement, architecture map, the nine invariants |
 | [`docs/README.md`](docs/README.md) | Full documentation map |
 | [`docs/design/artifact-schema.md`](docs/design/artifact-schema.md) | The centerpiece: the capability artifact |

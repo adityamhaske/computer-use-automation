@@ -51,8 +51,9 @@ typecheck: ## Strict type check
 	$(PY) -m mypy
 
 .PHONY: invariants
-invariants: ## Verify the architectural contracts (import-linter)
+invariants: ## Verify the architectural contracts and that the docs describe what exists
 	$(PY) -m importlinter.cli lint
+	$(PY) scripts/check_traceability.py
 
 .PHONY: test
 test: ## Full test suite, offline, no API key required
@@ -84,8 +85,11 @@ demo: ## THE GRADING STORY: discover -> artifact -> replay -> outcome -> fault -
 	$(PY) -m cua.cli.main demo
 
 .PHONY: eval
-eval: ## Stability + cross-tenant evaluation reports
-	$(PY) -m evals.runner --all
+eval: ## Evaluation suites -- CUT, see REPORT.md section 7
+	@echo "The eval suites were cut. REPORT.md section 7 says why and what is lost."
+	@echo "The deterministic assertions they would have made are tests: make test."
+	@echo "  cross-tenant ladder descent  -> tests/integration/test_variant_b.py"
+	@echo "  fault taxonomy               -> tests/integration/test_fault_matrix.py"
 
 # ------------------------------------------------------------------ housekeeping
 

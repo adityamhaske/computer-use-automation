@@ -1,0 +1,627 @@
+{
+  "snapshot_id": "snap-79bff274d8",
+  "url": "http://127.0.0.1:52775/",
+  "title": "MemberDesk",
+  "nodes": [
+    {
+      "node_id": "main:/document[0]",
+      "role": "document",
+      "name": "MemberDesk",
+      "value": null,
+      "states": [
+        "focused"
+      ],
+      "bounds": null,
+      "scope": {
+        "frame": null,
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "159"
+      },
+      "fingerprint": "34942f57acae2b27"
+    },
+    {
+      "node_id": "main:/frame[1]",
+      "role": "frame",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": null,
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "168"
+      },
+      "fingerprint": "dac0da6641c0fbca"
+    },
+    {
+      "node_id": "main:/frame[2]",
+      "role": "frame",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": null,
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "169"
+      },
+      "fingerprint": "dac0da6641c0fbca"
+    },
+    {
+      "node_id": "nav:/document[3]",
+      "role": "document",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "162"
+      },
+      "fingerprint": "d3a596dc8cf2c44a"
+    },
+    {
+      "node_id": "nav:/table[4]",
+      "role": "table",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "175"
+      },
+      "fingerprint": "71449859354b6cef"
+    },
+    {
+      "node_id": "nav:/row[5]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/row[5]/cell[0]"
+      ],
+      "hints": {
+        "native": "177"
+      },
+      "fingerprint": "fa1f5bbbdad001d1"
+    },
+    {
+      "node_id": "nav:/row[5]/cell[0]",
+      "role": "cell",
+      "name": "Functions",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[5]",
+      "child_ids": [
+        "nav:/row[5]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "178"
+      },
+      "fingerprint": "a6860dcb7608e989"
+    },
+    {
+      "node_id": "nav:/row[5]/cell[0]/text[0]",
+      "role": "text",
+      "name": "Functions",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[5]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "189"
+      },
+      "fingerprint": "e4dad854fe14f36d"
+    },
+    {
+      "node_id": "nav:/row[6]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/row[6]/cell[0]"
+      ],
+      "hints": {
+        "native": "180"
+      },
+      "fingerprint": "fa1f5bbbdad001d1"
+    },
+    {
+      "node_id": "nav:/row[6]/cell[0]",
+      "role": "cell",
+      "name": "Member Search",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[6]",
+      "child_ids": [
+        "nav:/row[6]/cell[0]/link[0]"
+      ],
+      "hints": {
+        "native": "181"
+      },
+      "fingerprint": "d50d2553ca8865ec"
+    },
+    {
+      "node_id": "nav:/row[6]/cell[0]/link[0]",
+      "role": "link",
+      "name": "Member Search",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[6]/cell[0]",
+      "child_ids": [
+        "nav:/row[6]/cell[0]/link[0]/text[0]"
+      ],
+      "hints": {
+        "css": "a[href=\"#\"]",
+        "native": "182"
+      },
+      "fingerprint": "c5ec08a2c78d2403"
+    },
+    {
+      "node_id": "nav:/row[6]/cell[0]/link[0]/text[0]",
+      "role": "text",
+      "name": "Member Search",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[6]/cell[0]/link[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "190"
+      },
+      "fingerprint": "46ba5b490b98688e"
+    },
+    {
+      "node_id": "nav:/row[7]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/row[7]/cell[0]"
+      ],
+      "hints": {
+        "native": "183"
+      },
+      "fingerprint": "fa1f5bbbdad001d1"
+    },
+    {
+      "node_id": "nav:/row[7]/cell[0]",
+      "role": "cell",
+      "name": "Reports",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[7]",
+      "child_ids": [
+        "nav:/row[7]/cell[0]/link[0]"
+      ],
+      "hints": {
+        "native": "184"
+      },
+      "fingerprint": "c7133279a03177da"
+    },
+    {
+      "node_id": "nav:/row[7]/cell[0]/link[0]",
+      "role": "link",
+      "name": "Reports",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[7]/cell[0]",
+      "child_ids": [
+        "nav:/row[7]/cell[0]/link[0]/text[0]"
+      ],
+      "hints": {
+        "css": "a[href=\"#\"]",
+        "native": "185"
+      },
+      "fingerprint": "eea752b2f3040250"
+    },
+    {
+      "node_id": "nav:/row[7]/cell[0]/link[0]/text[0]",
+      "role": "text",
+      "name": "Reports",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[7]/cell[0]/link[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "191"
+      },
+      "fingerprint": "e9b643b64b9fb7bf"
+    },
+    {
+      "node_id": "nav:/row[8]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/row[8]/cell[0]"
+      ],
+      "hints": {
+        "native": "186"
+      },
+      "fingerprint": "fa1f5bbbdad001d1"
+    },
+    {
+      "node_id": "nav:/row[8]/cell[0]",
+      "role": "cell",
+      "name": "Administration",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[8]",
+      "child_ids": [
+        "nav:/row[8]/cell[0]/link[0]"
+      ],
+      "hints": {
+        "native": "187"
+      },
+      "fingerprint": "72fe99457961cc31"
+    },
+    {
+      "node_id": "nav:/row[8]/cell[0]/link[0]",
+      "role": "link",
+      "name": "Administration",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[8]/cell[0]",
+      "child_ids": [
+        "nav:/row[8]/cell[0]/link[0]/text[0]"
+      ],
+      "hints": {
+        "css": "a[href=\"#\"]",
+        "native": "188"
+      },
+      "fingerprint": "3e0ca16cb2e51805"
+    },
+    {
+      "node_id": "nav:/row[8]/cell[0]/link[0]/text[0]",
+      "role": "text",
+      "name": "Administration",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[8]/cell[0]/link[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "192"
+      },
+      "fingerprint": "c28b3d03a05cec35"
+    },
+    {
+      "node_id": "content:/document[9]",
+      "role": "document",
+      "name": "MemberDesk",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "163"
+      },
+      "fingerprint": "eba30ff83962866f"
+    },
+    {
+      "node_id": "content:/table[10]",
+      "role": "table",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "198"
+      },
+      "fingerprint": "f6d07955fec5f341"
+    },
+    {
+      "node_id": "content:/row[11]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[11]/cell[0]"
+      ],
+      "hints": {
+        "native": "200"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[11]/cell[0]",
+      "role": "cell",
+      "name": "System Notice",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[11]",
+      "child_ids": [
+        "content:/row[11]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "201"
+      },
+      "fingerprint": "d7271651741997e8"
+    },
+    {
+      "node_id": "content:/row[11]/cell[0]/text[0]",
+      "role": "text",
+      "name": "System Notice",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[11]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "208"
+      },
+      "fingerprint": "6b36bc12c8726792"
+    },
+    {
+      "node_id": "content:/row[12]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[12]/cell[0]"
+      ],
+      "hints": {
+        "native": "203"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[12]/cell[0]",
+      "role": "cell",
+      "name": "A scheduled core maintenance window has been announced for this weekend. Some account functions may be unavailable. Contact your administrator for details.",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[12]",
+      "child_ids": [
+        "content:/row[12]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "204"
+      },
+      "fingerprint": "745b975a7a5d072a"
+    },
+    {
+      "node_id": "content:/row[12]/cell[0]/text[0]",
+      "role": "text",
+      "name": "A scheduled core maintenance window has been announced for this weekend. Some account functions may be unavailable. Contact your administrator for details.",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[12]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "209"
+      },
+      "fingerprint": "a09fd40aabf82bcf"
+    },
+    {
+      "node_id": "content:/row[13]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[13]/cell[0]"
+      ],
+      "hints": {
+        "native": "205"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[13]/cell[0]",
+      "role": "cell",
+      "name": "Continue",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[13]",
+      "child_ids": [
+        "content:/row[13]/cell[0]/button[0]"
+      ],
+      "hints": {
+        "native": "206"
+      },
+      "fingerprint": "d13a573cbe4520e8"
+    },
+    {
+      "node_id": "content:/row[13]/cell[0]/button[0]",
+      "role": "button",
+      "name": "Continue",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[13]/cell[0]",
+      "child_ids": [
+        "content:/row[13]/cell[0]/button[0]/text[0]"
+      ],
+      "hints": {
+        "css": "input.btn1",
+        "native": "207"
+      },
+      "fingerprint": "a59d144f368d1b11"
+    },
+    {
+      "node_id": "content:/row[13]/cell[0]/button[0]/text[0]",
+      "role": "text",
+      "name": "Continue",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[13]/cell[0]/button[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "210"
+      },
+      "fingerprint": "d711eb93a8bc15a6"
+    }
+  ],
+  "captured_at": "2026-09-11T21:23:32.864309Z",
+  "http_status": 200
+}

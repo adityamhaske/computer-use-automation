@@ -16,6 +16,7 @@ cannot run at all. Every other stage is model-free by construction.
 
 from __future__ import annotations
 
+import shutil
 import socket
 import threading
 import time
@@ -32,7 +33,7 @@ from cua.agent.loop import DiscoveryAgent
 from cua.agent.stop import Budget
 from cua.domain.action import RawInput, RawInputKind, Type
 from cua.domain.capability import Capability
-from cua.domain.result import RunResult, RunStatus
+from cua.domain.result import FailureCode, RunResult, RunStatus
 from cua.domain.run_record import RunKind
 from cua.domain.serde import dump_capability
 from cua.domain.snapshot import NodeScope
@@ -102,7 +103,13 @@ class Demo:
 
     # ------------------------------------------------------------ reporting
 
-    def say(self, number: int, name: str, detail: str = "", ok: bool = True) -> None:
+    def say(self, name: str, detail: str = "", ok: bool = True) -> None:
+        """Report a stage. The number is the position in the sequence, not a literal.
+
+        These were hand-numbered at first and inserting a stage meant renumbering every one after
+        it -- which went wrong twice. A counter cannot be off by one.
+        """
+        number = len(self.stages) + 1
         self.stages.append(Stage(number, name, detail, ok))
         mark = (
             typer.style("ok", fg=typer.colors.GREEN)
@@ -165,6 +172,13 @@ class Demo:
         use the proper seam rather than widen the rule.
         """
         host = base_url.removeprefix("http://")
+        # Stable ids, not timestamps: re-running the demo overwrites the same directories, so the
+        # evidence committed to this repository is exactly what `make demo` regenerates and a
+        # reviewer can diff the two. The trace is opened for append, so a stale one from a previous
+        # run would silently concatenate -- clear it rather than accumulate.
+        stale = EVIDENCE / kind / run_id
+        if stale.exists():
+            shutil.rmtree(stale)
         return build_rig(
             run_id=run_id,
             kind=kind,
@@ -212,7 +226,7 @@ class Demo:
 
         with self.app() as base_url:
             # 1-2. Discovery.
-            rig = self.rig(base_url, "discovery", f"demo-disc-{int(time.time())}", vision=True)
+            rig = self.rig(base_url, "discovery", "demo-discovery", vision=True)
             disc_dir = rig.run_dir
             try:
                 self.sign_in(rig, base_url)
@@ -222,7 +236,7 @@ class Demo:
                     if self.live_model
                     else "RECORDED TRANSCRIPT — no OPENROUTER_API_KEY set"
                 )
-                self.say(1, "Mock back-office running", f"hostile frameset app at {base_url}")
+                self.say("Mock back-office running", f"hostile frameset app at {base_url}")
 
                 run = DiscoveryAgent(
                     llm=llm,
@@ -235,9 +249,9 @@ class Demo:
                 rig.close()
 
             if not run.succeeded:
-                self.say(2, "Discovery", f"{run.stop_reason.value}: {run.summary}", ok=False)
+                self.say("Discovery", f"{run.stop_reason.value}: {run.summary}", ok=False)
                 return 1
-            self.say(2, "Discovery", f"{mode} — {len(run.effective_steps)} effective step(s)")
+            self.say("Discovery", f"{mode} — {len(run.effective_steps)} effective step(s)")
 
             # 3. Compile.
             compiled = compile_capability(
@@ -254,7 +268,6 @@ class Demo:
             )
             artifact_path.write_text(dump_capability(compiled.capability), encoding="utf-8")
             self.say(
-                3,
                 "Capability compiled and sealed",
                 f"{artifact_path}  inputs={[i.name for i in compiled.capability.inputs]} "
                 f"outputs={[o.name for o in compiled.capability.outputs]}",
@@ -268,7 +281,6 @@ class Demo:
             # 4. Replay with different inputs.
             result = self.replay(base_url, reference, {"member_id": "67890"}, "success")
             self.say(
-                4,
                 "Deterministic replay, new inputs",
                 f"{result.summary}  outputs={result.outputs}",
                 ok=result.status is RunStatus.SUCCESS,
@@ -277,7 +289,6 @@ class Demo:
             # 5. A business outcome.
             outcome = self.replay(base_url, reference, {"member_id": "99999"}, "business-outcome")
             self.say(
-                5,
                 "Business outcome (exit 0 — an answer, not a crash)",
                 f"{outcome.summary}   exit={outcome.exit_code}",
                 ok=outcome.status is RunStatus.BUSINESS_OUTCOME,
@@ -292,13 +303,45 @@ class Demo:
                 fault=("transient_load", 1),
             )
             self.say(
-                6,
                 "Injected 502 — declared recovery cleared it",
                 f"{recovered.summary}  recovery_attempts={recovered.recovery_attempts}",
                 ok=recovered.status is RunStatus.SUCCESS,
             )
 
-            # 7-9. Fail closed, hand to a human, resume.
+            # 7. The same fault, past its declared budget. Recovery is bounded by design: three
+            #    attempts are declared, a fourth 502 is not survivable, and RECOVERABLE converts to
+            #    RECOVERY_EXHAUSTED -- a hard failure. This is the stage that proves recovery cannot
+            #    loop forever, which is the failure mode a retry loop without a budget actually has.
+            exhausted = self.replay(
+                base_url,
+                reference,
+                {"member_id": "12345"},
+                "recovery-exhausted",
+                fault=("transient_load", 9),
+            )
+            self.say(
+                "Same fault past its declared budget — bounded, so it escalated",
+                f"{exhausted.summary}   exit={exhausted.exit_code}",
+                ok=exhausted.status is RunStatus.NEEDS_HUMAN,
+            )
+
+            # Typed inputs are a contract, checked before the surface is touched. A caller that
+            # sends the wrong shape gets FAILED(INPUT_VALIDATION_FAILED) and the browser never
+            # moves -- the cheapest possible place to reject a bad call. This is also the one
+            # hard failure the artifact does *not* route to a human: nobody can fix a malformed
+            # argument by taking over the session.
+            rejected = self.replay(
+                base_url, reference, {"member_id": "not-a-member"}, "input-rejected"
+            )
+            self.say(
+                "Malformed input rejected before acting",
+                f"{rejected.summary}   exit={rejected.exit_code}",
+                ok=rejected.status is RunStatus.FAILED
+                and rejected.error is not None
+                and rejected.error.code is FailureCode.INPUT_VALIDATION_FAILED,
+            )
+
+            # 8-10. Fail closed, hand to a human, resume.
             ok = self.escalation(reference, base_url)
 
         self.summary()
@@ -326,7 +369,7 @@ class Demo:
         *,
         fault: tuple[str, int] | None = None,
     ) -> RunResult:
-        rig = self.rig(base_url, "replay", f"demo-{label}-{int(time.time())}", vision=False)
+        rig = self.rig(base_url, "replay", f"demo-{label}", vision=False)
         try:
             self.sign_in(rig, base_url)
             # Armed AFTER sign-in. Arming beforehand lets the sign-in navigation consume the
@@ -348,7 +391,7 @@ class Demo:
         """The stage the brief says submissions most often fake."""
         import httpx
 
-        rig = self.rig(base_url, "escalation", f"demo-escalation-{int(time.time())}", vision=False)
+        rig = self.rig(base_url, "escalation", "demo-escalation", vision=False)
         driver = rig.driver
         try:
             self.sign_in(rig, base_url)
@@ -366,10 +409,9 @@ class Demo:
             httpx.post(f"{base_url}/_control/reset")
 
             if result.status is not RunStatus.NEEDS_HUMAN or result.intervention is None:
-                self.say(7, "Fail closed on an unknown screen", result.summary, ok=False)
+                self.say("Fail closed on an unknown screen", result.summary, ok=False)
                 return False
             self.say(
-                7,
                 "Undeclared screen — failed closed and escalated",
                 f"{result.summary}   exit={result.exit_code}",
             )
@@ -403,7 +445,6 @@ class Demo:
             delta = broker.release(snapshot_after=driver.observe())
             epoch = broker.resume()
             self.say(
-                8,
                 "Operator drove the same live session, then handed it back",
                 f"epoch {epoch} — {delta.summary() if delta else 'no delta'}",
             )
@@ -422,7 +463,6 @@ class Demo:
                 rig.run_dir,
             )
             self.say(
-                9,
                 "Re-anchored after the handoff",
                 plan.reason if plan.can_resume else f"fails closed: {plan.reason[:90]}",
             )

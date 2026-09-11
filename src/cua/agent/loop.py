@@ -33,9 +33,11 @@ from cua.agent.tools import TOOL_NAMES, TOOLS
 from cua.domain.action import Action, Click, Navigate, PressKey, Select, Type
 from cua.domain.actor import Actor
 from cua.domain.discovery import DiscoveryRun, DiscoveryStep, StopReason
+from cua.domain.run_record import RunKind
 from cua.domain.snapshot import UiSnapshot
 from cua.domain.target import TargetDescriptor
 from cua.evidence.bus import EventType, EvidenceBus
+from cua.evidence.record import build_run_record, write_run_record
 from cua.policy.redact import Redactor
 from cua.runtime.dispatcher import Dispatcher, DispatchStatus
 from cua.targeting.synthesize import synthesize_descriptor
@@ -171,6 +173,24 @@ class DiscoveryAgent:
             outputs=sorted(outputs),
             budget=self.budget.summary(),
         )
+        # A discovery run gets a record too, for the same reason a replay does: the provenance of
+        # an artifact is only checkable if the run that produced it left one. `tokens_used` is the
+        # field that distinguishes a genuine model-driven run from a scripted one, which matters
+        # because the artifact's credibility rests on how it was discovered.
+        try:
+            write_run_record(
+                build_run_record(
+                    self.evidence.run_dir,
+                    kind=RunKind.DISCOVERY,
+                    goal=goal,
+                    model_name=self.llm.model_name,
+                ),
+                self.evidence.run_dir,
+            )
+        except OSError as exc:  # pragma: no cover -- evidence must not mask the run's own outcome
+            self.evidence.emit(
+                EventType.NOTE, actor=Actor.SYSTEM, note=f"run record not written: {exc}"
+            )
         return run
 
     # ------------------------------------------------------------- messages

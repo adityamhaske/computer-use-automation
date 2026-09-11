@@ -1,0 +1,548 @@
+{
+  "snapshot_id": "snap-a21791684a",
+  "url": "http://127.0.0.1:52775/",
+  "title": "MemberDesk",
+  "nodes": [
+    {
+      "node_id": "main:/document[0]",
+      "role": "document",
+      "name": "MemberDesk",
+      "value": null,
+      "states": [
+        "focused"
+      ],
+      "bounds": null,
+      "scope": {
+        "frame": null,
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "182"
+      },
+      "fingerprint": "34942f57acae2b27"
+    },
+    {
+      "node_id": "main:/frame[1]",
+      "role": "frame",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": null,
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "190"
+      },
+      "fingerprint": "dac0da6641c0fbca"
+    },
+    {
+      "node_id": "main:/frame[2]",
+      "role": "frame",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": null,
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "191"
+      },
+      "fingerprint": "dac0da6641c0fbca"
+    },
+    {
+      "node_id": "nav:/document[3]",
+      "role": "document",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "184"
+      },
+      "fingerprint": "d3a596dc8cf2c44a"
+    },
+    {
+      "node_id": "nav:/table[4]",
+      "role": "table",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "197"
+      },
+      "fingerprint": "71449859354b6cef"
+    },
+    {
+      "node_id": "nav:/row[5]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/row[5]/cell[0]"
+      ],
+      "hints": {
+        "native": "199"
+      },
+      "fingerprint": "fa1f5bbbdad001d1"
+    },
+    {
+      "node_id": "nav:/row[5]/cell[0]",
+      "role": "cell",
+      "name": "Functions",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[5]",
+      "child_ids": [
+        "nav:/row[5]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "200"
+      },
+      "fingerprint": "a6860dcb7608e989"
+    },
+    {
+      "node_id": "nav:/row[5]/cell[0]/text[0]",
+      "role": "text",
+      "name": "Functions",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[5]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "211"
+      },
+      "fingerprint": "e4dad854fe14f36d"
+    },
+    {
+      "node_id": "nav:/row[6]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/row[6]/cell[0]"
+      ],
+      "hints": {
+        "native": "202"
+      },
+      "fingerprint": "fa1f5bbbdad001d1"
+    },
+    {
+      "node_id": "nav:/row[6]/cell[0]",
+      "role": "cell",
+      "name": "Member Search",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[6]",
+      "child_ids": [
+        "nav:/row[6]/cell[0]/link[0]"
+      ],
+      "hints": {
+        "native": "203"
+      },
+      "fingerprint": "d50d2553ca8865ec"
+    },
+    {
+      "node_id": "nav:/row[6]/cell[0]/link[0]",
+      "role": "link",
+      "name": "Member Search",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[6]/cell[0]",
+      "child_ids": [
+        "nav:/row[6]/cell[0]/link[0]/text[0]"
+      ],
+      "hints": {
+        "css": "a[href=\"#\"]",
+        "native": "204"
+      },
+      "fingerprint": "c5ec08a2c78d2403"
+    },
+    {
+      "node_id": "nav:/row[6]/cell[0]/link[0]/text[0]",
+      "role": "text",
+      "name": "Member Search",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[6]/cell[0]/link[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "212"
+      },
+      "fingerprint": "46ba5b490b98688e"
+    },
+    {
+      "node_id": "nav:/row[7]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/row[7]/cell[0]"
+      ],
+      "hints": {
+        "native": "205"
+      },
+      "fingerprint": "fa1f5bbbdad001d1"
+    },
+    {
+      "node_id": "nav:/row[7]/cell[0]",
+      "role": "cell",
+      "name": "Reports",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[7]",
+      "child_ids": [
+        "nav:/row[7]/cell[0]/link[0]"
+      ],
+      "hints": {
+        "native": "206"
+      },
+      "fingerprint": "c7133279a03177da"
+    },
+    {
+      "node_id": "nav:/row[7]/cell[0]/link[0]",
+      "role": "link",
+      "name": "Reports",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[7]/cell[0]",
+      "child_ids": [
+        "nav:/row[7]/cell[0]/link[0]/text[0]"
+      ],
+      "hints": {
+        "css": "a[href=\"#\"]",
+        "native": "207"
+      },
+      "fingerprint": "eea752b2f3040250"
+    },
+    {
+      "node_id": "nav:/row[7]/cell[0]/link[0]/text[0]",
+      "role": "text",
+      "name": "Reports",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[7]/cell[0]/link[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "213"
+      },
+      "fingerprint": "e9b643b64b9fb7bf"
+    },
+    {
+      "node_id": "nav:/row[8]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/row[8]/cell[0]"
+      ],
+      "hints": {
+        "native": "208"
+      },
+      "fingerprint": "fa1f5bbbdad001d1"
+    },
+    {
+      "node_id": "nav:/row[8]/cell[0]",
+      "role": "cell",
+      "name": "Administration",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[8]",
+      "child_ids": [
+        "nav:/row[8]/cell[0]/link[0]"
+      ],
+      "hints": {
+        "native": "209"
+      },
+      "fingerprint": "72fe99457961cc31"
+    },
+    {
+      "node_id": "nav:/row[8]/cell[0]/link[0]",
+      "role": "link",
+      "name": "Administration",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[8]/cell[0]",
+      "child_ids": [
+        "nav:/row[8]/cell[0]/link[0]/text[0]"
+      ],
+      "hints": {
+        "css": "a[href=\"#\"]",
+        "native": "210"
+      },
+      "fingerprint": "3e0ca16cb2e51805"
+    },
+    {
+      "node_id": "nav:/row[8]/cell[0]/link[0]/text[0]",
+      "role": "text",
+      "name": "Administration",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[8]/cell[0]/link[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "214"
+      },
+      "fingerprint": "c28b3d03a05cec35"
+    },
+    {
+      "node_id": "content:/document[9]",
+      "role": "document",
+      "name": "Service Unavailable",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "185"
+      },
+      "fingerprint": "2036af81e670b643"
+    },
+    {
+      "node_id": "content:/table[10]",
+      "role": "table",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "219"
+      },
+      "fingerprint": "f6d07955fec5f341"
+    },
+    {
+      "node_id": "content:/row[11]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[11]/cell[0]"
+      ],
+      "hints": {
+        "native": "221"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[11]/cell[0]",
+      "role": "cell",
+      "name": "502 \u2014 Service Temporarily Unavailable",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[11]",
+      "child_ids": [
+        "content:/row[11]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "222"
+      },
+      "fingerprint": "c394caaebdfce97b"
+    },
+    {
+      "node_id": "content:/row[11]/cell[0]/text[0]",
+      "role": "text",
+      "name": "502 \u2014 Service Temporarily Unavailable",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[11]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "226"
+      },
+      "fingerprint": "a760c5991922e47e"
+    },
+    {
+      "node_id": "content:/row[12]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[12]/cell[0]"
+      ],
+      "hints": {
+        "native": "224"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[12]/cell[0]",
+      "role": "cell",
+      "name": "The application server did not respond. Please try again.",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[12]",
+      "child_ids": [
+        "content:/row[12]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "225"
+      },
+      "fingerprint": "1933f3b8613c4c07"
+    },
+    {
+      "node_id": "content:/row[12]/cell[0]/text[0]",
+      "role": "text",
+      "name": "The application server did not respond. Please try again.",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[12]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "227"
+      },
+      "fingerprint": "faaa60e7413fd03b"
+    }
+  ],
+  "captured_at": "2026-09-11T21:23:29.677907Z",
+  "http_status": 502
+}

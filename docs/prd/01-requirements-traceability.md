@@ -5,54 +5,112 @@ proves it, and the evidence that demonstrates it.
 
 A row with no test is a claim. A row with no evidence is a demo that never ran.
 
-| Brief | Requirement | Module | Test | Evidence |
-|---|---|---|---|---|
-| **3.1** | Accept goal + target | `cua/cli`, `cua/agent/loop.py` | `unit/test_cli_args.py` | `evidence/discovery/*/run_record.json` |
-| 3.1 | LLM observe→decide→act loop against a live surface | `cua/agent/loop.py` | `integration/test_discovery_fake_llm.py`, `e2e/test_live_discovery.py` *(live)* | `evidence/discovery/*/trace.jsonl`, `llm_calls.jsonl` |
-| 3.1 | Stopping conditions (max steps, timeout, dead-end) | `cua/agent/stop.py` | `unit/test_stop_conditions.py` | `evidence/discovery/*/run_record.json` |
-| 3.1 | Works without a clean DOM | `cua/perception`, `cua/targeting` | `integration/test_variant_b.py` | `evidence/evals/cross_tenant.md` |
-| **3.2** | Ordered steps | `domain/capability.py` | `contract/test_capability_schema.py` | `evidence/capabilities/*.yaml` |
-| 3.2 | How each control is identified | `domain/target.py`, `cua/targeting` | `unit/test_resolver_*.py` | `evidence/capabilities/*.yaml` |
-| 3.2 | Typed input parameters | `domain/capability.py` | `contract/test_json_schema_export.py` | `evidence/capabilities/*.yaml` |
-| 3.2 | Typed outputs / data to extract | `domain/capability.py`, `cua/replay/extract.py` | `integration/test_replay_outputs.py` | `evidence/replay/*/run_record.json` |
-| 3.2 | Checkpoint / success condition | `cua/replay/checkpoint.py` | `integration/test_checkpoint.py` | `evidence/replay/*/run_record.json` |
-| 3.2 | Versioned and reviewable | `domain/capability.py` | `contract/test_capability_immutability.py` | `evidence/capabilities/*.yaml` |
-| 3.2 | Decoupled from the raw model transcript | `domain/capability.py` (`transcript_ref`) | `contract/test_capability_schema.py` | `evidence/capabilities/*.yaml` |
-| **3.3** | Replay without the LLM in the decision loop | `cua/replay` | **`invariants/test_no_llm_in_replay.py`**, `.importlinter` | `evidence/replay/*/run_record.json` |
-| 3.3 | Stable element targeting | `cua/targeting/resolver.py` | `unit/test_resolver_ladder.py` | `evidence/replay/*/run_record.json` (`strategy_used`) |
-| 3.3 | Verify checkpoint, return declared outputs | `cua/replay/executor.py` | `integration/test_replay_outputs.py` | `evidence/replay/*/run_record.json` |
-| 3.3 | Business outcomes vs recoverable vs hard failure | `domain/result.py`, `cua/replay/classify.py` | **`integration/test_fault_matrix.py`** | `evidence/replay/*-not-found/`, `*-fault/` |
-| 3.3 | Bounded recovery | `cua/replay/recovery.py` | `integration/test_fault_matrix.py` | `evidence/replay/*-fault/run_record.json` |
-| 3.3 | Fail closed on unknown states | `cua/replay/classify.py` | **`integration/test_fail_closed.py`** | `evidence/escalation/*/` |
-| 3.3 | Structured, debuggable result | `domain/result.py` | `unit/test_result_contract.py` | `evidence/replay/*/run_record.json` |
-| **3.4** | Configurable allowlist, enforced | `cua/policy/allowlist.py` | **`invariants/test_policy_chokepoint.py`** | `evidence/*/trace.jsonl` (authorize events) |
-| 3.4 | Safe vs risky/irreversible actions | `cua/policy/risk.py` | `unit/test_risk_classifier.py` | `evidence/capabilities/*.yaml` (`risk:`) |
-| 3.4 | Never persist secrets or raw PII | `cua/policy/redact.py` | **`invariants/test_redaction.py`** | all of `evidence/` (asserted clean) |
-| **3.5** | Structured log of what and why | `cua/evidence/bus.py` | `unit/test_evidence_bus.py` | `evidence/*/trace.jsonl` |
-| 3.5 | Richer signal on failure | `cua/evidence/capture.py` | `integration/test_failure_capture.py` | `evidence/*/screenshots/`, `snapshots/` |
-| **3.6** | Detect stuck, route intervention with context | `cua/hitl/intervention.py` | `integration/test_escalation.py` | `evidence/escalation/*/intervention.json` |
-| 3.6 | Human takes control of the **live** session | `cua/hitl/broker.py`, `cua/hitl/console/` | `integration/test_handoff.py` | `evidence/escalation/*/human_actions.jsonl` |
-| 3.6 | Hand control back; run resumes | `cua/hitl/broker.py`, `cua/replay/executor.py` | `integration/test_reanchor_resume.py` | `evidence/escalation/*/human_delta.json` |
-| 3.6 | Know who is in control | `cua/hitl/lease.py` | `unit/test_lease.py`, **`invariants/test_human_control_safety.py`** | `evidence/*/trace.jsonl` (`actor`, `lease_epoch`) |
-| **3.7** | Surface abstraction extends to legacy/desktop | `cua/surfaces/` port, `desktop_uia/` stub | `.importlinter` `surface-neutral-targeting` | `REPORT.md` §4, ADR 0001 |
-| 3.7 | Multi-tenant reuse without re-recording | `domain/tenant_binding.py`, `cua/catalog/overlay.py` | **`integration/test_variant_b.py`** | `evidence/evals/cross_tenant.md` |
-| 3.7 | Detect and manage per-tenant drift | `cua/targeting/drift.py` | `unit/test_drift.py` | `evidence/replay/*/run_record.json` (`drift_score`) |
+> Every path and test name below is checked by `scripts/check_traceability.py`, which runs in
+> `make check`. An earlier version of this table was written ahead of the build and accumulated 37
+> references to files that were never created — a matrix that points at fiction is worse than no
+> matrix, because it reads like proof.
 
-## Deliverables
+Test names are given as `file::test`. Evidence paths are regenerated by `make demo`.
 
-| Brief §6 | Required path | Status |
-|---|---|---|
-| 1 | `/README.md` — setup, config, demo path | Phase 12 |
-| 2 | `/REPORT.md` — the seven mandated headings | Phase 12 |
-| 3 | `/evidence/` — artifact + discovery log + replay log + an error-path replay | Phases 06–09, indexed in 12 |
+## 3.1 — Capability discovery (LLM-driven)
 
-## Stretch goals (brief §8) — at most two, depth over breadth
+| Requirement | Module | Test | Evidence |
+|---|---|---|---|
+| Accept a goal + a target surface | `cli/main.py`, `agent/loop.py` | `integration/test_discovery_loop.py::test_the_loop_completes_a_real_goal` | `evidence/discovery/demo-discovery/run_record.json` |
+| Observe → decide → act against a live surface | `agent/loop.py` | `integration/test_discovery_loop.py::test_the_loop_completes_a_real_goal`, `e2e/test_live_discovery.py::test_a_real_model_completes_a_real_goal` *(live)* | `evidence/discovery/demo-discovery/trace.jsonl` |
+| The model sees a semantic view, not raw HTML | `agent/render.py` | `integration/test_discovery_loop.py::test_the_model_is_shown_a_snapshot_not_raw_html` | `evidence/discovery/demo-discovery/snapshots/` |
+| Stopping conditions | `agent/stop.py` | `integration/test_discovery_loop.py::test_max_steps_bounds_the_run`, `::test_a_dead_end_is_detected` | `evidence/discovery/demo-discovery/trace.jsonl` (`run_end.stop_reason`) |
+| Discovery obeys the same guardrails as replay | `runtime/dispatcher.py` | `integration/test_discovery_loop.py::test_discovery_actions_pass_through_the_chokepoint` | `evidence/discovery/demo-discovery/run_record.json` |
+| Works without a clean DOM | `perception/`, `targeting/` | `integration/test_variant_b.py::test_case_a_survives_dead_selectors` | `apps/mock_bank/` (frameset, table layout, no test ids) |
 
-| Goal | Status |
+## 3.2 — The capability artifact
+
+| Requirement | Module | Test | Evidence |
+|---|---|---|---|
+| Ordered steps | `domain/capability.py` | `contract/test_capability_schema.py::test_reference_artifact_validates` | `evidence/capabilities/*.yaml` |
+| How each control is identified | `domain/target.py`, `targeting/` | `contract/test_capability_schema.py::test_no_target_uses_a_css_selector_as_its_identity` | `evidence/capabilities/*.yaml` |
+| Typed input parameters | `domain/capability.py` | `integration/test_compiler.py::test_the_literal_from_the_goal_becomes_a_parameter` | `evidence/capabilities/*.yaml` |
+| Typed outputs | `domain/capability.py`, `replay/executor.py` | `integration/test_compiler.py::test_outputs_are_typed_from_what_was_observed` | `evidence/replay/demo-success/run_record.json` |
+| Checkpoint / success condition | `domain/predicates.py`, `replay/executor.py` | `integration/test_fault_matrix.py::test_success_returns_typed_outputs` | `evidence/capabilities/*.yaml` (`checkpoint:`) |
+| Versioned, immutable, reviewable | `domain/capability.py` | `contract/test_capability_schema.py::test_capability_is_frozen`, `::test_tampering_is_detected` | `evidence/capabilities/*.yaml` (`content_hash`) |
+| Carries no run telemetry | `domain/capability.py` | `contract/test_capability_schema.py::test_capability_carries_no_runtime_telemetry` | `evidence/*/run_record.json` (telemetry lives here instead) |
+| Decoupled from the raw model transcript | `domain/capability.py` | `contract/test_capability_schema.py::test_provenance_is_a_reference_not_a_transcript` | `evidence/capabilities/*.yaml` (`transcript_ref`) |
+| Callable by an agent as a typed function | `domain/capability.py` | `contract/test_capability_schema.py::test_exports_an_agent_callable_tool_schema` | `evidence/capabilities/*.yaml` (`inputs`/`outputs`) |
+
+## 3.3 — Deterministic replay
+
+| Requirement | Module | Test | Evidence |
+|---|---|---|---|
+| **Replay without the LLM in the decision loop** | `replay/` | **`integration/test_fault_matrix.py::test_replay_uses_no_model`**, `invariants/test_import_contracts.py`, `.importlinter` | `evidence/replay/*/trace.jsonl` (no `llm_call` events) |
+| Stable element targeting | `targeting/resolver.py` | `unit/test_resolver.py::test_semantic_exact_is_preferred` | `evidence/replay/*/run_record.json` (`strategy_used`) |
+| Ambiguity is refused, never guessed | `targeting/resolver.py` | `unit/test_resolver.py::test_ambiguity_is_refused_not_tiebroken` | `evidence/replay/*/run_record.json` (`candidates_considered`) |
+| Verify checkpoint, return declared outputs | `replay/executor.py` | `integration/test_fault_matrix.py::test_success_returns_typed_outputs` | `evidence/replay/demo-success/run_record.json` |
+| **Business outcome ≠ failure** | `domain/result.py`, `replay/classify.py` | **`integration/test_fault_matrix.py::test_business_outcomes_are_answers_not_failures`**, `unit/test_taxonomy.py::test_business_outcome_exits_zero` | `evidence/replay/demo-business-outcome/` (**exit 0**) |
+| Recoverable conditions, bounded | `replay/classify.py`, `replay/executor.py` | `integration/test_fault_matrix.py::test_a_transient_failure_is_recovered`, `::test_a_transient_that_never_clears_is_bounded` | `evidence/replay/demo-recovered-fault/`, `evidence/replay/demo-recovery-exhausted/` |
+| Hard failures stop | `domain/result.py` | `integration/test_fault_matrix.py::test_bad_input_is_caught_before_the_browser` | `evidence/replay/demo-input-rejected/` |
+| **Unknown states fail closed** | `replay/classify.py` | **`integration/test_fault_matrix.py::test_an_undeclared_screen_fails_closed`** | `evidence/escalation/demo-escalation/` |
+| Structured, debuggable result | `domain/result.py`, `evidence/record.py` | `integration/test_fault_matrix.py::test_a_failure_says_what_was_expected_and_what_was_seen` | `evidence/*/run_record.json` |
+| Determinism | `targeting/resolver.py`, `replay/executor.py` | `integration/test_fault_matrix.py::test_repeated_replays_produce_identical_decisions` | `evidence/replay/*/trace.jsonl` |
+
+## 3.4 — Safety & data handling
+
+| Requirement | Module | Test | Evidence |
+|---|---|---|---|
+| **Allowlist, enforced for every actor** | `policy/allowlist.py` | `unit/test_policy_pieces.py::test_allowlist_decisions`, `integration/test_handoff.py::test_a_human_still_cannot_leave_the_allowlist` | `evidence/*/trace.jsonl` (`authorize`) |
+| A capability may narrow but never widen it | `policy/engine.py` | `unit/test_policy_pieces.py::test_a_capability_can_narrow_but_never_widen` | `config/policy.yaml` |
+| **Nothing reaches a surface unauthorized** | `runtime/dispatcher.py`, `policy/authorized.py` | **`invariants/test_policy_chokepoint.py`** (6 tests) | `evidence/*/run_record.json` (`unauthorized_dispatches` empty) |
+| Risky / irreversible actions handled | `policy/risk.py` | `unit/test_policy_pieces.py::test_each_signal_can_classify_on_its_own`, `invariants/test_human_control_safety.py::test_automation_is_blocked_from_an_irreversible_action` | `evidence/capabilities/*.yaml` (`risk:`) |
+| **Never persist secrets or raw PII** | `policy/redact.py`, `policy/secrets.py` | **`invariants/test_redaction.py`** (7 tests) | all of `evidence/` |
+| Redaction is not over-broad | `policy/redact.py` | `invariants/test_redaction.py::test_capability_references_survive_redaction` | `evidence/*/run_record.json` (`capability_ref` legible) |
+
+## 3.5 — Observability & evidence
+
+| Requirement | Module | Test | Evidence |
+|---|---|---|---|
+| Structured log of what happened and why | `evidence/bus.py` | `invariants/test_policy_chokepoint.py::test_only_the_dispatcher_dispatches` | `evidence/*/trace.jsonl` |
+| A structured run record | `evidence/record.py`, `domain/run_record.py` | `integration/test_fault_matrix.py::test_every_run_records_its_drift_and_strategy_mix` | `evidence/*/run_record.json` |
+| Richer signal on failure | `runtime/capture.py` | `integration/test_fault_matrix.py::test_an_undeclared_screen_fails_closed` | `evidence/escalation/demo-escalation/screenshots/`, `snapshots/` |
+
+## 3.6 — Human-in-the-loop escalation
+
+| Requirement | Module | Test | Evidence |
+|---|---|---|---|
+| Detect stuck and route an intervention with context | `hitl/intervention.py` | `integration/test_handoff.py::test_the_intervention_carries_enough_context_to_act_on` | `evidence/escalation/demo-escalation/trace.jsonl` (`escalate`) |
+| **A human takes control of the live session** | `hitl/broker.py`, `hitl/console/` | **`integration/test_handoff.py::test_a_human_takes_over_acts_and_hands_back`** | `evidence/escalation/demo-escalation/run_record.json` (`actor: human`) |
+| Human input cannot bypass policy | `hitl/broker.py` | `integration/test_handoff.py::test_human_input_goes_through_policy`, `invariants/test_human_control_safety.py` | `evidence/escalation/demo-escalation/run_record.json` (`authorized: true`) |
+| Stale automation cannot act after takeover | `hitl/lease.py` | `integration/test_handoff.py::test_stale_automation_cannot_act_after_a_takeover` | `evidence/escalation/demo-escalation/run_record.json` (`lease_epoch`) |
+| Hand control back; the run resumes | `hitl/reanchor.py` | `integration/test_console.py::test_handing_back_reconciles_and_reports_what_changed` | `evidence/escalation/demo-escalation/run_record.json` (`lease_transitions`) |
+| Resume fails closed if the state is unrecognized | `hitl/reanchor.py` | `integration/test_handoff.py::test_resuming_into_an_unrecognized_state_fails_closed` | `REPORT.md` §5 |
+| Know who is in control | `hitl/lease.py` | `integration/test_handoff.py::test_every_human_action_is_attributed` | `evidence/*/trace.jsonl` (`actor`, `lease_epoch`) |
+
+## 3.7 — Heterogeneity & multi-tenant *(design, per the brief)*
+
+| Requirement | Module | Test | Evidence |
+|---|---|---|---|
+| Surface abstraction extends beyond the browser | `surfaces/base.py`, `surfaces/desktop_uia/` | `.importlinter` `surface-neutral-targeting`, `invariants/test_import_contracts.py` | `REPORT.md` §4, `docs/adr/0001-uisnapshot-as-the-cross-surface-abstraction.md` |
+| Multi-tenant reuse without re-recording | `domain/tenant_binding.py` | `integration/test_variant_b.py::test_case_a_survives_dead_selectors`, `::test_case_b_resolves_with_a_four_line_overlay` | `unit/test_tenant_binding.py` (8 tests) |
+| An overlay never forks the definition | `domain/tenant_binding.py` | `integration/test_variant_b.py::test_overlay_leaves_untouched_steps_alone` | `REPORT.md` §4 |
+| Detect and manage per-tenant drift | `domain/target.py`, `domain/run_record.py` | `unit/test_target_ladder.py::test_drift_is_descent_not_mere_difference` | `evidence/*/run_record.json` (`drift_score`) |
+
+---
+
+## Deliverables (brief §6)
+
+| Deliverable | Where |
 |---|---|
-| Agent-facing capability catalog | Phase 10 — **first to be cut** |
-| Confidence & approval gating | Partly core: `CapabilityApproval` gates irreversible replay |
-| Canonicalization / cross-tenant reuse | Phase 11 — Variant B demo |
-| Multi-run stability signal | Phase 11 — `replay_stability` eval |
-| Code generation from an artifact | Not planned |
-| Assisted LLM fallback on replay failure | Designed, not built — would breach the no-LLM-in-replay invariant without a separate, explicitly-policed path |
+| `/README.md` — setup + demo path | [`README.md`](../../README.md) |
+| `/REPORT.md` — the seven mandated headings | [`REPORT.md`](../../REPORT.md) |
+| `/evidence/` — artifact + discovery log + replay logs | [`evidence/`](../../evidence/) |
+| An error-path replay | `evidence/replay/demo-recovery-exhausted/`, `evidence/replay/demo-input-rejected/`, `evidence/escalation/demo-escalation/` |
+
+## Known gaps
+
+Stated here rather than left to be discovered:
+
+- **`e2e/test_live_discovery.py` is skipped without `OPENROUTER_API_KEY`.** The brief's one
+  non-negotiable is a genuine model-driven run; committed discovery evidence showing
+  `"model_name": "fake/scripted"` is a recorded transcript, not a live run.
+- **Evals were cut** (REPORT.md §7), so there is no aggregate drift-trend report. Per-run drift is
+  in every `run_record.json`.
+- **Variant B is exercised by tests, not by `make demo`.** The cross-tenant story is real and
+  measured, but a reviewer sees it by running `make test` rather than in the demo output.
