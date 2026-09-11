@@ -27,7 +27,8 @@ This repository is under active construction. Phases complete so far:
 
 - [x] **Phase 00** — Foundations: toolchain, CI, and the architectural invariants that the rest of
       the system is built to satisfy
-- [ ] Phase 01 — Hostile mock back-office app
+- [x] **Phase 01** — Hostile mock back-office app, plus the Phase 03 semantic-tree spike
+      pulled forward ([results](docs/prd/phases/phase-03-perception-driver.md))
 - [ ] Phase 02 — Domain model & artifact schema
 - [ ] Phase 03 — Perception & surface driver
 - [ ] Phase 04 — Semantic targeting & resolution ladder

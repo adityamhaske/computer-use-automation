@@ -38,13 +38,13 @@ endif
 
 .PHONY: fmt
 fmt: ## Auto-format and auto-fix
-	$(PY) -m ruff format src tests apps evals
-	$(PY) -m ruff check --fix src tests apps evals
+	$(PY) -m ruff format src tests apps evals scripts
+	$(PY) -m ruff check --fix src tests apps evals scripts
 
 .PHONY: lint
 lint: ## Lint (no fixes)
-	$(PY) -m ruff check src tests apps evals
-	$(PY) -m ruff format --check src tests apps evals
+	$(PY) -m ruff check src tests apps evals scripts
+	$(PY) -m ruff format --check src tests apps evals scripts
 
 .PHONY: typecheck
 typecheck: ## Strict type check

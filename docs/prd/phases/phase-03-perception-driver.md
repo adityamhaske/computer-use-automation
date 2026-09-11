@@ -5,18 +5,72 @@ driver could also implement.
 
 Reference: [ADR 0001](../../adr/0001-uisnapshot-as-the-cross-surface-abstraction.md).
 
-## Spike first
+## Spike — RUN EARLY, results below
 
-**Before anything else**, measure semantic-tree quality on the Phase 01 frameset/table app:
+Run during Phase 01 rather than at the start of Phase 03, because it is the load-bearing assumption
+of the whole design and the cost of being wrong compounds with every phase that builds on it.
 
-- Do controls carry usable roles and accessible names?
-- Do labels in adjacent `<td>`s associate at all?
-- Are frames traversable in one snapshot?
+### Result 1 — frame traversal needs an explicit frame id ⚠️
 
-This is the load-bearing assumption of the whole design. If it fails, the fallback is *driver-side
-enrichment* (infer names from table headers, adjacent cells, and headings) — which changes the
-driver's internals and nothing above it. **The spike result goes in the phase log and into REPORT.md
-§4 either way**, because "we measured this" is a better answer than "we assumed this."
+`Accessibility.getFullAXTree` at page level on a frameset returns **3 nodes**: the root and two
+opaque `Iframe` entries. It does *not* descend into frames.
+
+```
+RootWebArea  name='MemberDesk'
+Iframe       name=''
+Iframe       name=''
+```
+
+The fix: enumerate frames via `Page.getFrameTree`, then call
+`Accessibility.getFullAXTree({"frameId": ...})` per frame and stitch the results into one
+`UiSnapshot`. Confirmed working.
+
+Two mechanisms that do **not** work, recorded so nobody retries them:
+- `BrowserContext.new_cdp_session(frame)` → *"This frame does not have a separate CDP session, it is
+  part of the parent frame's session."* Same-process frames have no session of their own.
+- Page-level `getFullAXTree` with a depth argument — frames are a boundary, not a depth limit.
+
+### Result 2 — the semantic tree is rich enough ✅
+
+Inside a frame, on deliberately hostile table markup, the tree carries exactly what the design
+needs:
+
+```
+row "Member Number":
+  cell "Member Number"
+  cell:
+    textbox "Member Number"      <- from a title attribute, as legacy apps commonly have
+
+row "Savings Balance $4,210.55":
+  cell "Savings Balance"
+  cell "$4,210.55"               <- adjacent-cell extraction is directly implementable
+```
+
+So `semantic_exact` is viable (`textbox`/`button` carry real accessible names), and
+`structural_anchor` is viable (row → label cell → value cell is explicit in the tree). No
+driver-side enrichment fallback is needed. The AX-first bet holds.
+
+### Result 3 — a design claim was wrong, and the spike caught it ⚠️
+
+An earlier draft asserted that `structural_anchor` survives tenant rebranding. It does not: Variant
+B relabels the *label cell* along with the field, so the anchor text changes too and the anchor has
+nothing stable to hold.
+
+This reshaped Variant B into two distinct cases — markup churn (ladder absorbs it) and rebranding
+(fails closed, needs a `TenantBinding` overlay) — and corrected
+[design/target-resolution.md](../../design/target-resolution.md) and
+[ADR 0005](../../adr/0005-tenant-overlay-not-fork.md). The corrected position is the stronger one:
+detect → refuse → cheap override, rather than a system that guesses "Savings Bal." means "Savings
+Balance".
+
+Ten minutes in a spike; it would have been Phase 08 otherwise.
+
+### Consequences for this phase
+
+- The driver must stitch per-frame AX trees into one `UiSnapshot`, with `scope.frame` recording
+  which frame a node came from.
+- `node_id` must be stable across snapshots and unique across frames.
+- No enrichment fallback required — but keep it available behind the port if a future surface needs it.
 
 ## Scope
 

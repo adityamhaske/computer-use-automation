@@ -48,11 +48,20 @@ at all, because the resolution ladder already degrades from exact naming to stru
 The drift score tells us *which* tenants are diverging and by how much, before a replay starts
 failing.
 
-**Demonstrated, not asserted.** Variant B of the mock app is designed specifically to prove this:
-it relabels controls (breaking `semantic_exact`) **and** restyles the markup (invalidating every
-cached CSS hint), while preserving row structure. A run can therefore only succeed via
-`structural_anchor`. `tests/integration/test_variant_b.py` asserts exactly that, and the
-`cross_tenant` eval measures it.
+**Demonstrated, not asserted.** Variant B of the mock app carries two distinct kinds of divergence:
+
+- *Markup churn* — a control keeps its label but changes CSS class and form field name. The ladder
+  absorbs this automatically, which is the falsifiable form of "this system does not depend on CSS
+  selectors."
+- *Rebranding* — a control is relabeled. This defeats `semantic_exact`, `semantic_normalized`
+  **and** `structural_anchor` (the anchor text is the label). There is deliberately no automatic
+  recovery: the replay fails closed with a high drift score, and a four-line overlay fixes it.
+
+The second case is the one that justifies this ADR. If the ladder silently absorbed rebranding, the
+overlay would be redundant — and the system would be guessing that "Savings Bal." means "Savings
+Balance". In a system that reads account balances, that guess is not one to make.
+
+`tests/integration/test_variant_b.py` asserts both cases; the `cross_tenant` eval measures them.
 
 **Bad.** Overlays can rot independently of the base capability, and a base version bump may
 invalidate overrides that refer to steps that no longer exist. We validate `capability_ref` against

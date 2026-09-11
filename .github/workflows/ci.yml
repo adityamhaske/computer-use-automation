@@ -40,10 +40,10 @@ jobs:
         run: .venv/bin/python -m playwright install chromium --with-deps
 
       - name: Lint
-        run: .venv/bin/python -m ruff check src tests apps evals
+        run: .venv/bin/python -m ruff check src tests apps evals scripts
 
       - name: Format check
-        run: .venv/bin/python -m ruff format --check src tests apps evals
+        run: .venv/bin/python -m ruff format --check src tests apps evals scripts
 
       - name: Type check (strict)
         run: .venv/bin/python -m mypy

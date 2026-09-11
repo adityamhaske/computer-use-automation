@@ -1,0 +1,76 @@
+{% extends "_shell.html" %}{% block content %}
+{# The member record. Deeply nested tables, and the savings balance lives in the cell ADJACENT to
+   the label cell -- there is no id, no class, and no accessible name on the value itself. The only
+   way to extract it is structurally: "the cell next to the one that reads 'Savings Balance'".
+   That is the legacy-app reality this whole targeting design exists for. #}
+<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td>
+
+<table class="{{ v.css_data_table }}" cellpadding="4" cellspacing="1" border="0" width="520">
+  <tr><td colspan="2"><b>{{ v.detail_heading }}</b></td></tr>
+  <tr>
+    <td class="{{ v.css_label_cell }}">{{ v.label_member_no }}</td>
+    <td>{{ member.member_id }}</td>
+  </tr>
+  <tr>
+    <td class="{{ v.css_label_cell }}">Name</td>
+    <td>{{ member.name }}</td>
+  </tr>
+  <tr>
+    <td class="{{ v.css_label_cell }}">Member Since</td>
+    <td>{{ member.joined }}</td>
+  </tr>
+  <tr>
+    <td class="{{ v.css_label_cell }}">Branch</td>
+    <td>{{ member.branch }}</td>
+  </tr>
+</table>
+
+<img src="/static/spacer.gif" width="1" height="12" border="0"><br>
+
+<table class="{{ v.css_data_table }}" cellpadding="4" cellspacing="1" border="0" width="520">
+  <tr><td colspan="4"><b>Accounts</b></td></tr>
+  <tr>
+    <td class="{{ v.css_label_cell }}">Account</td>
+    <td class="{{ v.css_label_cell }}">Type</td>
+    <td class="{{ v.css_label_cell }}">Balance</td>
+    <td class="{{ v.css_label_cell }}">{{ v.label_status }}</td>
+  </tr>
+  {% for a in member.accounts %}
+  <tr>
+    <td>{{ a.number }}</td>
+    <td>{{ a.kind }}</td>
+    <td>{{ a.balance }}</td>
+    <td>{{ a.status }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+<img src="/static/spacer.gif" width="1" height="12" border="0"><br>
+
+{# The summary row the capability actually extracts from. #}
+<table class="{{ v.css_data_table }}" cellpadding="4" cellspacing="1" border="0" width="520">
+  {% if savings %}
+  <tr>
+    <td class="{{ v.css_label_cell }}">{{ v.label_savings }}</td>
+    <td>{{ savings.balance }}</td>
+  </tr>
+  <tr>
+    <td class="{{ v.css_label_cell }}">{{ v.label_status }}</td>
+    <td>{{ savings.status }}</td>
+  </tr>
+  <tr>
+    <td class="{{ v.css_label_cell }}">As Of</td>
+    <td>{{ as_of }}</td>
+  </tr>
+  {% else %}
+  <tr><td colspan="2">No savings account on file for this member.</td></tr>
+  {% endif %}
+</table>
+
+<img src="/static/spacer.gif" width="1" height="12" border="0"><br>
+<a href="#" onclick="location='/member/{{ member.member_id }}/new-subaccount';return false;">Open Sub-Account</a>
+&nbsp;|&nbsp;
+<a href="/search">New Search</a>
+
+</td></tr></table>
+{% endblock %}

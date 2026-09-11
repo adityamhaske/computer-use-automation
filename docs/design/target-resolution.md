@@ -69,16 +69,53 @@ cheap.
 
 ## Worked example: Variant B
 
-Variant B of the mock app stands in for a second credit union running the same vendor product. It:
+Variant B of the mock app stands in for a second credit union running the same vendor product. It
+contains **two different kinds of divergence**, which need two different answers. Conflating them
+produces a system that guesses.
 
-- relabels `"Member Number"` → `"Member #"` — defeats `semantic_exact` **and** `semantic_normalized`
-  (these are different words, not different whitespace)
-- restyles the markup entirely — invalidates every cached CSS `hint`
-- **preserves the row structure** — the field is still the input in the row labelled by that cell
+### Case A — markup churn, same vocabulary (the ladder handles this)
 
-So the ladder descends to `structural_anchor`, the run succeeds, and `drift_score > 0`. That
-sequence is asserted in `tests/integration/test_variant_b.py` and measured by the `cross_tenant`
-eval.
+The member-number field keeps its label, and changes everything a selector could have cached:
 
-It is the concrete proof of the claim that would otherwise be hand-waving: **this system does not
-depend on CSS selectors.** If it did, Variant B would fail.
+| | base | variant B |
+|---|---|---|
+| accessible name | `Member Number` | `Member Number` — **same** |
+| form field name | `memno` | `member_num` — changed |
+| CSS class | `frmfld` | `ng-inp` — changed |
+
+`semantic_exact` resolves it on both. The cached `hint.css` is invalidated and discarded, and
+nothing breaks. **This is the falsifiable form of the claim "this system does not depend on CSS
+selectors":** if it did, Variant B would fail here. It does not.
+
+### Case B — rebranding, different vocabulary (this needs an overlay)
+
+The savings-balance row and the account-type control are relabeled:
+
+| | base | variant B |
+|---|---|---|
+| balance label | `Savings Balance` | `Savings Bal.` |
+| account type | `Account Type` | `Type of Account` |
+
+Note carefully what this defeats. Not only `semantic_exact` and `semantic_normalized` — but
+**`structural_anchor` as well**, because the anchor text *is* the label, and the label changed.
+
+There is no automatic recovery here, and that is correct. Inferring that "Savings Bal." means
+"Savings Balance" is a fuzzy guess, and a system that guesses which row holds a balance will
+eventually read the wrong one. So the designed behaviour is:
+
+1. Resolution fails → `TARGET_NOT_FOUND`, with a high `drift_score` naming the diverged step
+2. A four-line `TenantBinding` overlay supplies the new label ([ADR 0005](../adr/0005-tenant-overlay-not-fork.md))
+3. The replay succeeds
+
+**Detect → refuse → cheap override.** That is the multi-tenant story, and it is a stronger claim
+than pretending the ladder absorbs rebranding silently.
+
+### Why this is written down
+
+An earlier draft of this design asserted that `structural_anchor` survives rebranding. Spiking the
+accessibility tree against the real app before building the resolver disproved it in about ten
+minutes: Variant B's label *cell* is relabeled along with the field, so the anchor has nothing
+stable to anchor to. Cheaper to find in a spike than in Phase 08.
+
+`tests/integration/test_variant_b.py` asserts case A succeeds without an overlay and case B fails
+closed without one and succeeds with one. The `cross_tenant` eval measures both.

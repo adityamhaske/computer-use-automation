@@ -1,0 +1,10 @@
+/* Base tenant styling. Class names are the kind a 2006 enterprise app ships with:
+   short, opaque, and exactly what a naive automation would cache as a selector. */
+body   { font-family: Verdana, Arial, sans-serif; font-size: 11px; }
+.bnr   { background: #003366; color: #ffffff; font-size: 11px; }
+.bnr a { color: #ffffff; }
+.frmtbl { background: #f4f4f4; border: 1px solid #cccccc; }
+.lblcel { background: #e0e6ee; font-weight: bold; width: 150px; }
+.frmfld { border: 1px solid #999999; font-size: 11px; }
+.btn1   { background: #d4d0c8; border: 2px outset #d4d0c8; font-size: 11px; }
+.dtatbl { background: #ffffff; border: 1px solid #aaaaaa; }

@@ -28,12 +28,16 @@ login → member search → member detail (savings balance) → open sub-account
 `undeclared_dialog` (an interstitial no capability declares → must produce `UNEXPECTED_STATE`).
 Then, only if cheap: `validation_error`, `permission_denied`.
 
-**Variant B** — the "second tenant" running the same vendor product:
-- relabels controls (`"Member Number"` → `"Member #"`) — defeats exact *and* normalized matching
-- restyles markup — invalidates every cached CSS hint
-- **preserves row structure** — so `structural_anchor` still resolves
+**Variant B** — the "second tenant" running the same vendor product. Two distinct divergences:
 
-That combination is what makes the no-CSS claim testable rather than rhetorical.
+- *Case A — markup churn:* the member-number field keeps its label but changes CSS class and form
+  field name. The ladder absorbs this automatically → the falsifiable form of the no-CSS claim.
+- *Case B — rebranding:* the savings-balance and account-type labels change. This defeats
+  `structural_anchor` too (the anchor text is the label), so it fails closed and needs a four-line
+  `TenantBinding` overlay.
+
+Case B is the one that justifies the overlay design. Making the ladder appear to absorb rebranding
+would be making it guess.
 
 ## Non-scope
 
@@ -41,11 +45,32 @@ Real auth, a database, styling beyond what hostility requires, more screens than
 
 ## Exit criteria
 
-- [ ] Boots via `make app`; Variant B via `make app-variant-b`
-- [ ] Every fault reproducible by flag, identically, every time
-- [ ] Zero nondeterminism outside fault flags (asserted: same request → same HTML)
-- [ ] Variant B breaks exact-name matching **and** CSS hints, but not row structure
-- [ ] No real PII; credentials are obvious fakes
+- [x] Boots via `make app`; Variant B via `make app-variant-b`
+- [x] Every fault reproducible by flag, identically, every time
+- [x] Zero nondeterminism outside fault flags (asserted: same request → byte-identical HTML)
+- [x] Variant B demonstrates both divergence cases (markup churn / rebranding)
+- [x] No real PII; credentials are obvious fakes
+- [x] Every business outcome has a member that produces it
+
+### Verification record
+
+27 tests green (`tests/integration/test_mock_app.py`), covering the full flow, all four faults,
+every business outcome, byte-level determinism, and both Variant B cases.
+
+The Phase 03 semantic-tree spike was pulled forward and run against this app —
+`scripts/spike_semantic_tree.py`, results in
+[phase-03](phase-03-perception-driver.md). It confirmed the app is hostile in the way intended
+(page-level AX tree sees only opaque frames) and tractable in the way required (per-frame trees
+expose `row → label cell → value cell`). It also disproved a design claim, which reshaped Variant B.
+
+Live confirmation of case A, from the spike output — Variant B's field has a different form name
+(`member_num`) and CSS class (`ng-inp`), and still resolves:
+
+```
+VARIANT B  2. Per-frame getFullAXTree ...... 45 nodes in 'content'
+              textbox        name='Member Number'
+              button         name='Search'
+```
 
 ## Risks
 
