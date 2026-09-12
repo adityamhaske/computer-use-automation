@@ -5,11 +5,11 @@
    That is the legacy-app reality this whole targeting design exists for. #}
 <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td>
 
-<table class="{{ v.css_data_table }}" cellpadding="4" cellspacing="1" border="0" width="520">
+<table class="{{ v.css_data_table }}" cellpadding="4" cellspacing="1" border="0" width="560">
   <tr><td colspan="2"><b>{{ v.detail_heading }}</b></td></tr>
   <tr>
     <td class="{{ v.css_label_cell }}">{{ v.label_member_no }}</td>
-    <td>{{ member.member_id }}</td>
+    <td><b>{{ member.member_id }}</b></td>
   </tr>
   <tr>
     <td class="{{ v.css_label_cell }}">Name</td>
@@ -25,10 +25,8 @@
   </tr>
 </table>
 
-<img src="/static/spacer.gif" width="1" height="12" border="0"><br>
-
-<table class="{{ v.css_data_table }}" cellpadding="4" cellspacing="1" border="0" width="520">
-  <tr><td colspan="4"><b>Accounts</b></td></tr>
+<table class="{{ v.css_data_table }}" cellpadding="4" cellspacing="1" border="0" width="560">
+  <tr><td colspan="4"><b>Accounts Overview</b></td></tr>
   <tr>
     <td class="{{ v.css_label_cell }}">Account</td>
     <td class="{{ v.css_label_cell }}">Type</td>
@@ -37,18 +35,22 @@
   </tr>
   {% for a in member.accounts %}
   <tr>
-    <td>{{ a.number }}</td>
+    <td><code style="font-family: ui-monospace, SFMono-Regular, monospace; font-size: 12px; color: #334155;">{{ a.number }}</code></td>
     <td>{{ a.kind }}</td>
-    <td>{{ a.balance }}</td>
-    <td>{{ a.status }}</td>
+    <td style="font-variant-numeric: tabular-nums; font-weight: 500;">{{ a.balance }}</td>
+    <td>
+      {% if a.status == 'Active' %}
+      <span style="display: inline-block; padding: 2px 8px; background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; border-radius: 9999px; font-size: 11px; font-weight: 600;">{{ a.status }}</span>
+      {% else %}
+      <span style="display: inline-block; padding: 2px 8px; background: #fffbeb; color: #92400e; border: 1px solid #fde68a; border-radius: 9999px; font-size: 11px; font-weight: 600;">{{ a.status }}</span>
+      {% endif %}
+    </td>
   </tr>
   {% endfor %}
 </table>
 
-<img src="/static/spacer.gif" width="1" height="12" border="0"><br>
-
 {# The summary row the capability actually extracts from. #}
-<table class="{{ v.css_data_table }}" cellpadding="4" cellspacing="1" border="0" width="520">
+<table class="{{ v.css_data_table }}" cellpadding="4" cellspacing="1" border="0" width="560">
   {% if savings %}
   <tr>
     <td class="{{ v.css_label_cell }}">{{ v.label_savings }}</td>
@@ -77,10 +79,13 @@
   {% endif %}
 </table>
 
-<img src="/static/spacer.gif" width="1" height="12" border="0"><br>
-<a href="#" onclick="location='/member/{{ member.member_id }}/new-subaccount';return false;">Open Sub-Account</a>
-&nbsp;|&nbsp;
-<a href="/search">New Search</a>
-
+<div style="margin-top: 18px; display: flex; gap: 10px; align-items: center;">
+  <a href="#" onclick="location='/member/{{ member.member_id }}/new-subaccount';return false;" class="{{ v.css_button }}">
+    Open Sub-Account &rarr;
+  </a>
+  <a href="/search" style="display: inline-flex; align-items: center; padding: 8px 16px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; color: #334155; font-size: 13px; font-weight: 500; text-decoration: none; transition: all 0.15s;">
+    &larr; New Search
+  </a>
+</div>
 </td></tr></table>
 {% endblock %}

@@ -217,13 +217,13 @@ async function renderDetail(container, ctx, kind, runId) {
 
     <div class="card card-pad" style="margin-bottom:var(--space-6);">
       <dl class="kv-grid">
-        <div><dt>Capability</dt><dd>${escapeHtml(record.capability_ref || "—")}</dd></div>
+        <div class="kv-grid-col-2"><dt>Capability</dt><dd class="mono">${escapeHtml(record.capability_ref || "—")}</dd></div>
         <div><dt>Kind</dt><dd>${escapeHtml(capitalize(record.kind || kind))}</dd></div>
         <div><dt>Started</dt><dd>${fmtDate(record.started_at)}</dd></div>
         <div><dt>Duration</dt><dd>${fmtDuration(record.duration_ms)}</dd></div>
         <div><dt>Drift</dt><dd>${fmtPercent(result && result.drift_score)}</dd></div>
         <div><dt>Human actions</dt><dd>${record.human_actions ?? "—"}</dd></div>
-        <div><dt>Evidence</dt><dd><code class="mono">${escapeHtml(
+        <div class="kv-grid-col-2"><dt>Evidence</dt><dd><code class="mono">${escapeHtml(
           record.evidence_ref || "—"
         )}</code></dd></div>
       </dl>

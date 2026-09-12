@@ -1,11 +1,20 @@
 {% extends "_shell.html" %}{% block content %}
-<table class="{{ v.css_data_table }}" cellpadding="4" cellspacing="1" border="0" width="520">
+<table class="{{ v.css_data_table }}" cellpadding="4" cellspacing="1" border="0" width="560">
   <tr><td colspan="2"><b>{{ v.confirm_heading }}</b></td></tr>
-  <tr><td class="{{ v.css_label_cell }}">{{ v.label_member_no }}</td><td>{{ member.member_id }}</td></tr>
+  <tr><td class="{{ v.css_label_cell }}">{{ v.label_member_no }}</td><td><b>{{ member.member_id }}</b></td></tr>
   <tr><td class="{{ v.css_label_cell }}">{{ v.label_acct_type }}</td><td>{{ acct_type }}</td></tr>
-  <tr><td class="{{ v.css_label_cell }}">{{ v.label_initial_deposit }}</td><td>{{ deposit }}</td></tr>
-  <tr><td class="{{ v.css_label_cell }}">Reference</td><td>{{ reference }}</td></tr>
-  <tr><td colspan="2">The sub-account request has been recorded.</td></tr>
-  <tr><td colspan="2"><a href="/member/{{ member.member_id }}">Return to member record</a></td></tr>
+  <tr><td class="{{ v.css_label_cell }}">{{ v.label_initial_deposit }}</td><td style="font-variant-numeric: tabular-nums; font-weight: 500;">{{ deposit }}</td></tr>
+  <tr><td class="{{ v.css_label_cell }}">Reference</td><td><code style="font-family: ui-monospace, SFMono-Regular, monospace; font-size: 12px; color: #334155;">{{ reference }}</code></td></tr>
+  <tr>
+    <td colspan="2" style="background: #ecfdf5; color: #065f46; padding: 12px 18px; border-top: 1px solid #a7f3d0;">
+      <span style="font-weight: 600;">&check; Request Recorded:</span> The sub-account request has been recorded in the core system.
+    </td>
+  </tr>
 </table>
+
+<div style="margin-top: 16px;">
+  <a href="/member/{{ member.member_id }}" class="{{ v.css_button }}" style="text-decoration: none;">
+    Return to member record &rarr;
+  </a>
+</div>
 {% endblock %}

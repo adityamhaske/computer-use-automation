@@ -129,15 +129,9 @@ function renderGeneral() {
                 <div class="form-row-desc">System follows your OS setting; Light/Dark pin it explicitly for this browser.</div>
               </div>
               <div class="segmented" id="set-theme-segmented" role="group" aria-label="Theme">
-                <button type="button" data-theme-choice="system" data-active="${theme === "system"}">${icon(
-    "monitor"
-  )} System</button>
-                <button type="button" data-theme-choice="light" data-active="${theme === "light"}">${icon(
-    "sun"
-  )} Light</button>
-                <button type="button" data-theme-choice="dark" data-active="${theme === "dark"}">${icon(
-    "moon"
-  )} Dark</button>
+                <button type="button" data-theme-choice="system" data-active="${theme === "system"}">System</button>
+                <button type="button" data-theme-choice="light" data-active="${theme === "light"}">Light</button>
+                <button type="button" data-theme-choice="dark" data-active="${theme === "dark"}">Dark</button>
               </div>
             </div>
             <div class="form-row">
@@ -430,9 +424,8 @@ function renderSession(settings) {
           </dl>
         </div>
       </div>
-      <div class="card card-pad" style="display:flex;gap:10px;align-items:flex-start;">
-        ${icon("user")}
-        <p style="font-size:var(--text-sm);color:var(--text-secondary);">There is no operator identity
+      <div class="card card-pad">
+        <p style="font-size:var(--text-sm);color:var(--text-secondary);margin:0;">There is no operator identity
         or auth system yet — every action in this console is attributed to a single fixed
         <code class="mono">"operator"</code> identity. This is a documented cut, not a gap hidden from you.</p>
       </div>
@@ -452,11 +445,10 @@ function readonlyHeader(tabId, settings) {
 }
 
 function policyMissingNote(settings) {
-  return `<div class="card card-pad" style="display:flex;gap:10px;align-items:flex-start;">
-    ${icon("alertTriangle")}
+  return `<div class="card card-pad">
     <div>
       <strong style="font-size:var(--text-sm);">No policy loaded</strong>
-      <p style="margin-top:4px;color:var(--text-secondary);font-size:var(--text-sm);">
+      <p style="margin-top:4px;color:var(--text-secondary);font-size:var(--text-sm);margin-bottom:0;">
         ${
           settings.policy_file
             ? `PolicyEngine looked for <code class="mono">${escapeHtml(settings.policy_file)}</code> and found nothing usable. `
@@ -497,13 +489,9 @@ function chips(list) {
 function boolRow(label, value) {
   let valueHtml;
   if (value === true) {
-    valueHtml = `<span style="display:inline-flex;align-items:center;gap:4px;color:var(--success);">${icon(
-      "check"
-    )}Yes</span>`;
+    valueHtml = `<span style="font-weight:var(--weight-semibold);color:var(--success);">Yes</span>`;
   } else if (value === false) {
-    valueHtml = `<span style="display:inline-flex;align-items:center;gap:4px;color:var(--danger);">${icon(
-      "x"
-    )}No</span>`;
+    valueHtml = `<span style="color:var(--text-tertiary);">No</span>`;
   } else {
     valueHtml = `<span style="color:var(--text-tertiary);">—</span>`;
   }

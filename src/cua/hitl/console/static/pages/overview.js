@@ -127,7 +127,7 @@ function interventionBanner(store) {
           }
         </p>
       </div>
-      <button class="btn btn-primary" data-goto="interventions">${icon("hand")} Go to interventions</button>
+      <button class="btn btn-primary" data-goto="interventions">Go to interventions</button>
     </div>`;
 }
 

@@ -34,11 +34,7 @@ evidence file formats; those have their own conventions documented elsewhere (se
 
 ## Current state vs. target
 
-The console (`src/cua/hitl/console/static/styles/tokens.css`) currently uses a blue-violet accent
-(`#4f5bd5` light / `#8992ff` dark). That predates this guideline and **does not match it** — this
-guideline's accent is defined in [design-tokens.md](design-tokens.md) and is deliberately not blue
-or purple. The site (`site/index.html`) is closer already: its base is neutral ink/graphite with
-mint/emerald used for one semantic status. Migrating the console's accent to match is tracked as
-follow-up work, not done as a side effect of writing this document — a design system is
-authoritative for what comes next; it does not silently repaint what already shipped and was
-reviewed under a different brief.
+The console (`src/cua/hitl/console/static/styles/tokens.css`) now uses the emerald accent
+(`#0f7a5c` light / `#3fd6a0` dark) defined in [design-tokens.md](design-tokens.md), matching this
+guideline. The site (`site/index.html`) is closer already: its base is neutral ink/graphite with
+mint/emerald used for one semantic status.

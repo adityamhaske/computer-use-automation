@@ -27,14 +27,13 @@ export async function render(container, ctx) {
     <div class="split-view">
       <div class="viewport-frame">
         <div class="viewport-header">
-          <span class="viewport-conn" id="iv-conn" data-live="false">${icon("wifiOff")}<span>idle</span></span>
+          <span class="viewport-conn" id="iv-conn" data-live="false"><span class="status-dot" style="background:var(--text-tertiary);width:6px;height:6px;border-radius:50%;"></span><span>idle</span></span>
           <span class="viewport-url" id="iv-url">no live session</span>
           <span class="viewport-owner" id="iv-owner" hidden></span>
         </div>
         <div class="viewport-stage">
           <img id="iv-screen" alt="Live session" hidden />
           <div class="viewport-empty" id="iv-empty">
-            ${icon("monitor")}
             <p id="iv-empty-text">Automation owns the session. Nothing is escalated right now —
             this panel goes live the moment an operator claims control.</p>
           </div>
@@ -87,9 +86,7 @@ function paint(container, ctx, store) {
   const state = store.state;
 
   if (!store.connected || !state) {
-    rail.innerHTML = `<div class="card card-pad" style="display:flex;gap:10px;align-items:center;color:var(--text-secondary);">${icon(
-      "wifiOff"
-    )} Console offline — retrying…</div>`;
+    rail.innerHTML = `<div class="card card-pad" style="display:flex;gap:10px;align-items:center;color:var(--text-secondary);"><span class="status-dot" style="background:var(--text-muted);width:6px;height:6px;border-radius:50%;flex:none;"></span> Console offline — retrying…</div>`;
     return;
   }
 
@@ -119,9 +116,7 @@ function paint(container, ctx, store) {
     "Automation owns the session. Nothing is escalated right now — this panel goes live the moment an operator claims control.";
 
   if (!store.interventions.length) {
-    rail.innerHTML = `<div class="card card-pad" style="display:flex;gap:10px;align-items:flex-start;">${icon(
-      "check"
-    )}<div><strong style="font-size:var(--text-sm);">No open interventions</strong><p style="margin-top:4px;color:var(--text-secondary);font-size:var(--text-sm);">Automation is running normally — nothing needs a person right now.</p></div></div>`;
+    rail.innerHTML = `<div class="card card-pad"><div><strong style="font-size:var(--text-sm);">No open interventions</strong><p style="margin-top:4px;color:var(--text-secondary);font-size:var(--text-sm);">Automation is running normally — nothing needs a person right now.</p></div></div>`;
     return;
   }
 
@@ -137,7 +132,7 @@ function updateViewportChrome(container, state) {
   const live = state.state === "human_control";
 
   conn.dataset.live = String(live);
-  conn.innerHTML = `${icon(live ? "wifi" : "wifiOff")}<span>${live ? "live" : "idle"}</span>`;
+  conn.innerHTML = `<span class="status-dot" style="background:${live ? "var(--danger)" : "var(--text-tertiary)"};width:6px;height:6px;border-radius:50%;"></span><span>${live ? "live" : "idle"}</span>`;
   url.textContent = `session ${truncate(state.session || "—", 28)}`;
   owner.hidden = false;
   owner.dataset.owner = state.holder;
@@ -176,9 +171,7 @@ function railHuman(state, card) {
       </div>
     </div>
     ${detail}
-    <button class="btn btn-human" id="iv-release-btn" style="width:100%;">${icon(
-      "hand"
-    )} Release to automation</button>
+    <button class="btn btn-human" id="iv-release-btn" style="width:100%;">Release to automation</button>
     <p style="font-size:var(--text-2xs);color:var(--text-tertiary);text-align:center;">Click the
     viewport to send a click. Type to send characters. Both travel through the same policy chokepoint
     as automation, tagged <code class="mono">actor=human</code>.</p>`;
@@ -203,7 +196,7 @@ function railQueue(list) {
       <div style="padding:0 var(--space-5) var(--space-5);">
         <button class="btn btn-primary" style="width:100%;" data-claim="${escapeHtml(
           c.intervention
-        )}">${icon("hand")} Take control</button>
+        )}">Take control</button>
       </div>
     </div>`
       )

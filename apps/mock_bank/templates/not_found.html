@@ -2,9 +2,14 @@
 {# "No records found" is a BUSINESS OUTCOME, not an error. The page renders normally -- no error
    styling, HTTP 200 -- because that is what the real thing does, and conflating it with a failure
    is the mistake the brief singles out. #}
-<table class="{{ v.css_data_table }}" cellpadding="4" cellspacing="0" border="0">
-  <tr><td><b>{{ v.search_heading }}</b></td></tr>
-  <tr><td>No records found for member number {{ member_id }}.</td></tr>
-  <tr><td><a href="/search">Return to search</a></td></tr>
+<table class="{{ v.css_data_table }}" cellpadding="4" cellspacing="0" border="0" width="560">
+  <tr><td><b>{{ v.search_heading }} &mdash; Result</b></td></tr>
+  <tr><td style="padding: 16px 18px; color: #475569;">No records found for member number {{ member_id }}.</td></tr>
 </table>
+
+<div style="margin-top: 16px;">
+  <a href="/search" class="{{ v.css_button }}" style="text-decoration: none;">
+    &larr; Return to search
+  </a>
+</div>
 {% endblock %}

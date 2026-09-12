@@ -134,7 +134,7 @@ function summarySection(record) {
     <div class="card">
       <div class="card-header"><span class="card-title">Summary</span></div>
       <dl class="kv-grid card-pad">
-        <div><dt>Capability</dt><dd>${escapeHtml(record?.capability_ref || "—")}</dd></div>
+        <div class="kv-grid-col-2"><dt>Capability</dt><dd class="mono">${escapeHtml(record?.capability_ref || "—")}</dd></div>
         <div><dt>Status</dt><dd>${status ? statusPill(status) : "—"}</dd></div>
         <div><dt>Started</dt><dd>${fmtDate(record?.started_at)}</dd></div>
         <div><dt>Duration</dt><dd>${fmtDuration(record?.duration_ms)}</dd></div>
@@ -148,7 +148,6 @@ function traceSection(events) {
   const rows = events
     .map((e) => {
       const { seq, at, event, actor, ...rest } = e;
-      const actorIcon = actor === "human" ? icon("user") : icon("bot");
       return `
       <details style="border:1px solid var(--border);border-radius:var(--radius-md);background:var(--surface);padding:var(--space-2) var(--space-3);">
         <summary style="cursor:pointer;display:flex;align-items:center;gap:var(--space-3);font-size:var(--text-sm);">
@@ -156,9 +155,7 @@ function traceSection(events) {
             seq ?? "—"
           }</span>
           <span class="badge">${escapeHtml(event || "—")}</span>
-          <span style="display:inline-flex;align-items:center;gap:4px;color:var(--text-tertiary);">${actorIcon}<span>${escapeHtml(
-        actor || "—"
-      )}</span></span>
+          <span class="badge" style="font-family:var(--font-mono);">${escapeHtml(actor || "—")}</span>
           <span style="margin-left:auto;color:var(--text-tertiary);font-size:var(--text-xs);">${fmtDate(
             at
           )}</span>

@@ -1,15 +1,15 @@
 {% extends "_shell.html" %}{% block content %}
 <table class="{{ v.css_form_table }}" cellpadding="4" cellspacing="0" border="0">
-  <tr><td colspan="2"><b>Sign On</b></td></tr>
+  <tr><td colspan="2"><b>Sign On &mdash; Teller Access</b></td></tr>
   {% if error %}<tr><td colspan="2"><font color="#cc0000">{{ error }}</font></td></tr>{% endif %}
   <form method="post" action="/login">
   <tr>
     <td class="{{ v.css_label_cell }}">Operator ID</td>
-    <td><input type="text" name="user" class="{{ v.css_input }}" title="Operator ID" size="20"></td>
+    <td><input type="text" name="user" class="{{ v.css_input }}" title="Operator ID" size="20" placeholder="e.g. teller01"></td>
   </tr>
   <tr>
     <td class="{{ v.css_label_cell }}">Password</td>
-    <td><input type="password" name="pw" class="{{ v.css_input }}" title="Password" size="20"></td>
+    <td><input type="password" name="pw" class="{{ v.css_input }}" title="Password" size="20" placeholder="••••••••••••"></td>
   </tr>
   <tr>
     <td></td>
@@ -17,4 +17,19 @@
   </tr>
   </form>
 </table>
+
+<div style="margin-top: 16px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px; max-width: 540px; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);">
+  <div style="font-weight: 600; color: #0f172a; font-size: 12px; margin-bottom: 4px;">
+    Quick Sign-On for Evaluators &amp; Testers
+  </div>
+  <div style="color: #64748b; font-size: 11px; margin-bottom: 10px;">
+    Operator ID: <code style="background:#e2e8f0; padding:1px 5px; border-radius:3px; color:#0f172a; font-family:ui-monospace, monospace;">teller01</code> &nbsp;&middot;&nbsp;
+    Password: <code style="background:#e2e8f0; padding:1px 5px; border-radius:3px; color:#0f172a; font-family:ui-monospace, monospace;">not-a-real-password</code>
+  </div>
+  <div>
+    <button type="button" onclick="document.forms[0].user.value='teller01';document.forms[0].pw.value='not-a-real-password';document.forms[0].elements[2].focus();" style="background: #0f766e; color: #ffffff; border: 1px solid #0d9488; padding: 6px 14px; font-size: 12px; font-weight: 600; border-radius: 6px; cursor: pointer; transition: all 0.15s; font-family: inherit;">
+      Auto-fill credentials &rarr;
+    </button>
+  </div>
+</div>
 {% endblock %}

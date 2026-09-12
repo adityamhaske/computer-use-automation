@@ -151,7 +151,7 @@ function renderDetail(detailEl, result) {
       ${statusPill(state)}
     </div>
     <dl class="kv-grid" style="margin-bottom:var(--space-6);">
-      <div><dt>ID</dt><dd class="mono">${escapeHtml(capability.id)}</dd></div>
+      <div class="kv-grid-col-2"><dt>ID</dt><dd class="mono">${escapeHtml(capability.id)}</dd></div>
       <div><dt>Version</dt><dd>${escapeHtml(capability.version)}</dd></div>
       <div><dt>Vendor / product</dt><dd>${escapeHtml(app.vendor || "—")} / ${escapeHtml(app.product || "—")}</dd></div>
       <div><dt>Driver capabilities</dt><dd>${escapeHtml(driverCaps)}</dd></div>

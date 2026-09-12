@@ -9,7 +9,7 @@
   <tr>
     <td class="{{ v.css_label_cell }}">{{ v.label_member_no }}</td>
     <td><input type="text" name="{{ v.field_member_no }}" class="{{ v.css_input }}"
-               title="{{ v.label_member_no }}" size="14" maxlength="10"></td>
+               title="{{ v.label_member_no }}" size="16" maxlength="10" placeholder="e.g. 12345"></td>
   </tr>
   <tr>
     <td></td>
@@ -17,6 +17,24 @@
   </tr>
   </form>
 </table>
-<img src="/static/spacer.gif" width="1" height="10" border="0"><br>
-<font size="1">Enter a member number to retrieve the member record.</font>
+
+<div style="margin-top: 16px; max-width: 540px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);">
+  <div style="font-weight: 600; color: #0f172a; font-size: 12px; margin-bottom: 4px;">
+    Quick Select Demo Member
+  </div>
+  <div style="font-size: 11px; color: #64748b; margin-bottom: 10px;">
+    Click any scenario below to populate the search query instantly:
+  </div>
+  <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+    <button type="button" onclick="document.forms[0].elements['{{ v.field_member_no }}'].value='12345';document.forms[0].elements['{{ v.field_member_no }}'].focus();" style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 6px 12px; font-size: 12px; border-radius: 6px; cursor: pointer; color: #0f172a; transition: all 0.15s; font-family: inherit;">
+      <span style="color: #059669; font-weight: bold;">&bull;</span> <b>12345</b> (Ada Lovelace &middot; Active)
+    </button>
+    <button type="button" onclick="document.forms[0].elements['{{ v.field_member_no }}'].value='12346';document.forms[0].elements['{{ v.field_member_no }}'].focus();" style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 6px 12px; font-size: 12px; border-radius: 6px; cursor: pointer; color: #0f172a; transition: all 0.15s; font-family: inherit;">
+      <span style="color: #d97706; font-weight: bold;">&bull;</span> <b>12346</b> (Restricted Account)
+    </button>
+    <button type="button" onclick="document.forms[0].elements['{{ v.field_member_no }}'].value='99999';document.forms[0].elements['{{ v.field_member_no }}'].focus();" style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 6px 12px; font-size: 12px; border-radius: 6px; cursor: pointer; color: #0f172a; transition: all 0.15s; font-family: inherit;">
+      <span style="color: #94a3b8; font-weight: bold;">&bull;</span> <b>99999</b> (Not Found Outcome)
+    </button>
+  </div>
+</div>
 {% endblock %}

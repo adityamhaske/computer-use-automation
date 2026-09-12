@@ -1,13 +1,149 @@
 {# Navigation. Inline onclick rather than hrefs, because legacy apps do this and it means a
    naive "find the link" strategy has nothing to hold on to. #}
 <html>
-<head><link rel="stylesheet" href="/static/{{ v.key }}.css"></head>
-<body bgcolor="#e8e8e8">
-<table width="100%" cellpadding="3" cellspacing="0" border="0">
-  <tr><td><b>Functions</b></td></tr>
-  <tr><td><a href="#" onclick="parent.content.location='/search';return false;">{{ v.search_heading }}</a></td></tr>
-  <tr><td><a href="#" onclick="parent.content.location='/reports';return false;">Reports</a></td></tr>
-  <tr><td><a href="#" onclick="parent.content.location='/admin';return false;">Administration</a></td></tr>
-</table>
+<head>
+  <link rel="stylesheet" href="/static/{{ v.key }}.css?v=4">
+  <style>
+    body {
+      margin: 0;
+      padding: 12px 10px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 12px;
+      color: #334155;
+      background: #f8fafc;
+      border-right: 1px solid #e2e8f0;
+      height: 100vh;
+      box-sizing: border-box;
+    }
+    .nav-brand {
+      padding: 4px 6px 12px 6px;
+      border-bottom: 1px solid #e2e8f0;
+      margin-bottom: 12px;
+    }
+    .nav-brand-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.01em;
+    }
+    .nav-brand-sub {
+      font-size: 10px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+    .nav-section-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 700;
+      color: #94a3b8;
+      margin: 10px 4px 6px 4px;
+    }
+    .nav-link-btn {
+      display: block;
+      padding: 7px 10px;
+      margin-bottom: 4px;
+      border-radius: 6px;
+      text-decoration: none;
+      color: #0f172a;
+      font-weight: 600;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-left: 3px solid #0f766e;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+      transition: all 0.15s ease;
+    }
+    .nav-link-btn:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+      border-left-color: #0d9488;
+      text-decoration: none;
+    }
+    .nav-link-disabled {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 10px;
+      margin-bottom: 3px;
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 11px;
+      border-radius: 4px;
+      transition: background 0.15s;
+    }
+    .nav-link-disabled:hover {
+      background: #f1f5f9;
+      color: #64748b;
+      text-decoration: none;
+    }
+    .nav-guide-card {
+      margin-top: 14px;
+      padding: 10px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 11px;
+      line-height: 1.45;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+    .nav-quick-btn {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      padding: 5px 8px;
+      margin-top: 4px;
+      font-size: 11px;
+      color: #1e293b;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+    .nav-quick-btn:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      color: #0f172a;
+    }
+  </style>
+</head>
+<body>
+  <div class="nav-brand">
+    <div class="nav-brand-title">MemberDesk</div>
+    <div class="nav-brand-sub">Core Banking System v2.4</div>
+  </div>
+
+  <div class="nav-section-title">Workflows</div>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr><td><a class="nav-link-btn" href="#" onclick="parent.content.location='/search';return false;">{{ v.search_heading }}</a></td></tr>
+    <tr><td><a class="nav-link-disabled" href="#" onclick="alert('Reports module is disabled in this mock fixture.');return false;"><span>Reports</span> <span style="font-size:9px; background:#f1f5f9; padding:1px 4px; border-radius:3px;">Core</span></a></td></tr>
+    <tr><td><a class="nav-link-disabled" href="#" onclick="alert('Administration module is disabled in this mock fixture.');return false;"><span>Administration</span> <span style="font-size:9px; background:#f1f5f9; padding:1px 4px; border-radius:3px;">Core</span></a></td></tr>
+  </table>
+
+  <div class="nav-guide-card">
+    <div style="font-weight: 700; color: #0f172a; font-size: 11px; margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
+      <span>Sample Accounts</span>
+    </div>
+    <button type="button" class="nav-quick-btn" onclick="parent.content.location='/member/12345';return false;">
+      <b>12345</b> &middot; Ada Lovelace
+    </button>
+    <button type="button" class="nav-quick-btn" onclick="parent.content.location='/member/12346';return false;">
+      <b>12346</b> &middot; Restricted
+    </button>
+    <button type="button" class="nav-quick-btn" onclick="parent.content.location='/search';return false;">
+      <b>99999</b> &middot; Not Found
+    </button>
+
+    <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #f1f5f9;">
+      <a href="http://127.0.0.1:8812/#/overview" target="_blank" style="display: block; text-align: center; background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; padding: 4px; border-radius: 4px; font-weight: 600; font-size: 10px; text-decoration: none;">
+        Operator Console (:8812) &nearr;
+      </a>
+    </div>
+  </div>
+
+  <div style="margin-top: 16px; padding: 0 4px; font-size: 10px; color: #64748b;">
+    <span style="color: #10b981; font-weight: bold;">&bull;</span> Online &middot; Fixture Ready
+  </div>
 </body>
 </html>

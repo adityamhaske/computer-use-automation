@@ -1,9 +1,12 @@
 {# The frameset shell. A snapshot has to traverse into named frames to see anything at all --
    which is exactly the legacy-web case the brief describes. #}
 <html>
-<head><title>{{ v.app_title }}</title></head>
-<frameset cols="180,*" border="1" frameborder="1">
-  <frame name="nav" src="/nav" scrolling="no">
+<head>
+  <title>{{ v.app_title }}</title>
+  <script>if (window.top !== window.self) { window.top.location.href = window.self.location.href; }</script>
+</head>
+<frameset cols="220,*" border="0" frameborder="0" framespacing="0">
+  <frame name="nav" src="/nav" scrolling="auto" noresize="noresize">
   <frame name="content" src="{{ content_src }}">
 </frameset>
 <noframes><body>This application requires frame support.</body></noframes>
