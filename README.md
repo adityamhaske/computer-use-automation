@@ -2,13 +2,14 @@
 
 > **Discovery is probabilistic. Execution is deterministic.**
 
+🌐 **Live Documentation & Interactive Demo:** [https://adityamhaske.github.io/interface.ai/](https://adityamhaske.github.io/interface.ai/)
+
 An LLM works out how to accomplish a goal in a legacy application that has no API — once. That run
 is compiled into a typed, versioned **capability artifact**. From then on the artifact is replayed
 deterministically, with no model in the decision loop, and invoked by AI agents as a normal typed
 function.
 
-Built as a take-home for interface.ai. Target domain: back-office applications at banks and credit
-unions, where the only way in is to drive the UI the way a human operator would.
+Built for back-office applications at banks and credit unions, where the only way in is to drive the UI the way a human operator would.
 
 ```
 goal + target ──► LLM discovery run ──► capability artifact ──► deterministic replay ──► typed outputs
@@ -158,6 +159,7 @@ Run `make invariants` to check them. Break one on purpose to watch it fail — t
 src/cua/          domain · perception · surfaces · targeting · policy · runtime
                   agent · recorder · replay · hitl · evidence · cli
 apps/mock_bank/   the hostile target application (+ a "second tenant" variant)
+site/             interactive documentation & architecture website (GitHub Pages)
 docs/             ADRs (why) · design (how) · prd (what, in what order) · runbooks
 tests/            unit · integration · contract · invariants · e2e(live)
 evidence/         proof that the end-to-end thread actually ran  (start here)
@@ -168,6 +170,7 @@ evidence/         proof that the end-to-end thread actually ran  (start here)
 
 | Read this | For |
 |---|---|
+| [**Interactive Docs & Demo Portal**](https://adityamhaske.github.io/interface.ai/) | **Live documentation website, interactive execution pipeline, and guides** |
 | [`REPORT.md`](REPORT.md) | The design write-up and the trade-offs — **read this first** |
 | [`evidence/README.md`](evidence/README.md) | What each committed run proves, and how to read one |
 | [`AGENTS.md`](AGENTS.md) | Working agreement, architecture map, the nine invariants |
