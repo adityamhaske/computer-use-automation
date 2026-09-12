@@ -1,0 +1,21 @@
+{# The UNDECLARED interstitial.
+   The entire point is that no capability declares this screen. A replay that lands here must
+   classify it UNEXPECTED_STATE and fail closed -- NOT click "Continue" and carry on.
+   It is styled as a routine notice precisely because the dangerous case is the one that looks
+   harmless. #}
+<html>
+<head><title>{{ v.app_title }}</title><link rel="stylesheet" href="/static/{{ v.key }}.css"></head>
+<body bgcolor="#ffffff">
+<table class="{{ v.css_data_table }}" cellpadding="6" cellspacing="1" border="0" width="460">
+  <tr><td><b>System Notice</b></td></tr>
+  <tr><td>
+    A scheduled core maintenance window has been announced for this weekend.
+    Some account functions may be unavailable. Contact your administrator for details.
+  </td></tr>
+  <tr><td>
+    <input type="submit" class="{{ v.css_button }}" value="Continue"
+           onclick="location='{{ next_url }}';return false;">
+  </td></tr>
+</table>
+</body>
+</html>

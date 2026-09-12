@@ -1,0 +1,10 @@
+{% extends "_shell.html" %}{% block content %}
+{# "No records found" is a BUSINESS OUTCOME, not an error. The page renders normally -- no error
+   styling, HTTP 200 -- because that is what the real thing does, and conflating it with a failure
+   is the mistake the brief singles out. #}
+<table class="{{ v.css_data_table }}" cellpadding="4" cellspacing="0" border="0">
+  <tr><td><b>{{ v.search_heading }}</b></td></tr>
+  <tr><td>No records found for member number {{ member_id }}.</td></tr>
+  <tr><td><a href="/search">Return to search</a></td></tr>
+</table>
+{% endblock %}

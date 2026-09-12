@@ -1,0 +1,22 @@
+{% extends "_shell.html" %}{% block content %}
+{# The member-number input carries a `title`, which is how a lot of legacy apps end up with an
+   accessible name at all. Base says "Member Number"; variant_b says "Member #". That difference is
+   what makes the resolution ladder visibly descend across tenants. #}
+<table class="{{ v.css_form_table }}" cellpadding="4" cellspacing="0" border="0">
+  <tr><td colspan="2"><b>{{ v.search_heading }}</b></td></tr>
+  {% if error %}<tr><td colspan="2"><font color="#cc0000">{{ error }}</font></td></tr>{% endif %}
+  <form method="post" action="/search">
+  <tr>
+    <td class="{{ v.css_label_cell }}">{{ v.label_member_no }}</td>
+    <td><input type="text" name="{{ v.field_member_no }}" class="{{ v.css_input }}"
+               title="{{ v.label_member_no }}" size="14" maxlength="10"></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td><input type="submit" class="{{ v.css_button }}" value="{{ v.label_search_btn }}"></td>
+  </tr>
+  </form>
+</table>
+<img src="/static/spacer.gif" width="1" height="10" border="0"><br>
+<font size="1">Enter a member number to retrieve the member record.</font>
+{% endblock %}

@@ -1,0 +1,213 @@
+# Reference capability, hand-authored against the mock back-office.
+#
+# This is the shape the Phase 07 compiler must produce from a discovery trace. Written by hand first
+# so that the schema is designed against a real flow rather than against the compiler's convenience.
+#
+# Read it top to bottom: it should be obvious what this does, what it needs, what it returns, and
+# what can go wrong, without opening any other file.
+
+schema_version: "1.0.0"
+id: corebank.member.savings_balance
+version: 1.0.0
+title: Look up a member's savings balance
+description: >-
+  Given a member number, retrieve the member record and return the current savings account balance
+  and its as-of date. Returns a business outcome when the member does not exist, has no savings
+  account, or the operator lacks rights to view the record.
+
+surface:
+  kind: legacy_web
+  # What a driver must be able to DO -- not which library does it. A Windows UIA driver that
+  # provides these could execute this artifact unchanged.
+  driver_capabilities: [semantic_tree, screenshot]
+  app:
+    vendor: acme-core
+    product: MemberDesk
+    version_range: ">=4.2 <5"
+
+entrypoint:
+  # The frameset shell, not the bare /search page. This app is only ever used through its frameset:
+  # navigation lives in one frame and the working area in another, which is why every descriptor
+  # below scopes itself to `frame: content`. Entering at /search directly would load the form
+  # outside any frame -- a state a real operator never sees, and one where the recorded scopes would
+  # not apply.
+  url_pattern: "{base_url}/"
+
+inputs:
+  - name: member_id
+    type: string
+    required: true
+    description: The member number as printed on the member's statement.
+    pattern: "^[0-9]{4,10}$"
+    example: "12345"
+
+outputs:
+  - name: savings_balance
+    type: money
+    description: Current balance of the member's savings account.
+    source: {step: read_balance}
+  - name: account_status
+    type: string
+    description: Status of that savings account, e.g. Active or Closed.
+    source: {step: read_status}
+  - name: as_of
+    type: date
+    description: The date the balance is stated as of.
+    source: {step: read_as_of}
+
+steps:
+  - id: enter_member_id
+    description: Type the member number into the search field.
+    action:
+      type: type
+      value: {$input: member_id}
+      target:
+        role: textbox
+        name: {value: Member Number, match: exact}
+        scope: {frame: content}
+        # Recorded even though semantic_exact won, so the ladder has a rung to fall back to when a
+        # tenant restyles the page. Costs nothing now; saves a re-record later.
+        anchor: {relation: row_of, text: Member Number}
+        # The selector the driver actually caches for this control on the base tenant.
+        # Tenant B renames the form field, so this is dead there -- which is the point.
+        hints: {css: 'input[name="memno"]'}
+        recorded_strategy: semantic_exact
+    precondition:
+      assert: node_exists
+      query: {role: textbox, name: Member Number, scope: {frame: content}}
+    wait: {for: snapshot_stable, timeout_ms: 3000}
+    postcondition:
+      assert: node_has_value
+      query: {role: textbox, name: Member Number}
+      value: {$input: member_id}
+    risk: safe
+
+  - id: submit_search
+    description: Submit the search.
+    action:
+      type: click
+      target:
+        role: button
+        name: {value: Search, match: exact}
+        scope: {frame: content}
+        recorded_strategy: semantic_exact
+    wait: {for: navigation, timeout_ms: 8000}
+    risk: elevated
+
+  - id: read_balance
+    description: Read the savings balance from the cell beside its label.
+    # Assert we are actually on the member record before reading a number off it. Without this, an
+    # unexpected interstitial would be diagnosed as "could not find the cell" rather than "this is
+    # not a screen I understand" -- both stop the run, but only the second says why.
+    precondition:
+      assert: node_exists
+      query: {role: cell, name_contains: Savings Balance, scope: {frame: content}}
+    action:
+      type: extract
+      into: savings_balance
+      transform: money
+      # No id, no class, no accessible name on the value cell -- the only way in is structural.
+      target:
+        role: cell
+        anchor: {relation: adjacent_to, text: Savings Balance}
+        scope: {frame: content}
+        recorded_strategy: structural_anchor
+    risk: safe
+
+  - id: read_status
+    description: Read the account status from the cell beside its label.
+    precondition:
+      assert: node_exists
+      query: {role: cell, name: Status, scope: {frame: content}}
+    action:
+      type: extract
+      into: account_status
+      target:
+        role: cell
+        anchor: {relation: adjacent_to, text: Status}
+        scope: {frame: content}
+        recorded_strategy: structural_anchor
+    risk: safe
+
+  - id: read_as_of
+    description: Read the as-of date.
+    precondition:
+      assert: node_exists
+      query: {role: cell, name: As Of, scope: {frame: content}}
+    action:
+      type: extract
+      into: as_of
+      target:
+        role: cell
+        anchor: {relation: adjacent_to, text: As Of}
+        scope: {frame: content}
+        recorded_strategy: structural_anchor
+    risk: safe
+
+# Did we actually reach the state we wanted? Asserts something goal-specific -- a currency-shaped
+# value -- rather than merely "a page loaded", which would pass on almost anything.
+checkpoint:
+  assert: all_of
+  of:
+    - assert: node_exists
+      query: {role: cell, name_contains: Savings Balance}
+    - assert: node_exists
+      query: {role: cell, name_matches: '^\$[0-9,]+\.[0-9]{2}$'}
+
+# Legitimate answers the caller needs. NOT failures: `cua replay` exits 0 for each of these.
+outcomes:
+  - code: member_not_found
+    description: No member exists with that number.
+    detect: {assert: text_present, value: No records found}
+    returns: {member_id: {$input: member_id}}
+
+  - code: no_savings_account
+    description: The member exists but holds no savings account.
+    detect: {assert: text_present, value: No savings account on file}
+    returns: {member_id: {$input: member_id}}
+
+  - code: permission_denied
+    description: The signed-in operator may not view this member record.
+    detect: {assert: text_present, value: not authorized}
+    returns: {member_id: {$input: member_id}}
+
+# Bounded, declared remediation. Every rule has a max_attempts -- unbounded recovery is how one
+# transient 502 becomes a thousand retries against a struggling core.
+recovery:
+  - id: transient_load
+    description: The app server returned a gateway error. Re-fetch and continue.
+    detect: {assert: http_status_in, codes: [502, 503, 504]}
+    remedy:
+      - {type: reload}
+    max_attempts: 3
+    backoff: exponential
+    scope: any_step
+
+  - id: session_expired
+    description: The session timed out and we were bounced to the sign-on screen.
+    detect:
+      assert: all_of
+      of:
+        - {assert: url_matches, pattern: "/login"}
+        - {assert: node_exists, query: {role: button, name: Sign On}}
+    remedy:
+      - type: run_capability
+        capability_id: corebank.auth.sign_on
+    max_attempts: 1
+    backoff: none
+    scope: any_step
+
+escalation:
+  triggers: [target_ambiguous, target_not_found, checkpoint_failed, recovery_exhausted, unexpected_state]
+  policy: pause_and_request_human
+
+policy:
+  allowed_domains: ["{base_url}"]
+  allowed_actions: [click, type, select, navigate, extract, press_key, wait_for, assert, reload]
+  max_steps: 20
+  max_duration_ms: 60000
+
+provenance:
+  notes: >-
+    Hand-authored as the reference artifact for schema design. The Phase 07 compiler must be able to
+    produce this shape from a discovery trace.

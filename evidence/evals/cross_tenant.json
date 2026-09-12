@@ -1,0 +1,320 @@
+{
+  "capability": "corebank.member.savings_balance@1.0.0",
+  "content_hash": "sha256:cc19f732193aaf2e8f70f3c9e0c37c7ff01afb79362894a9e993d8805806d1d6",
+  "metrics": {
+    "determinism_holds": true,
+    "escalations": 0,
+    "fallback_rate": 0.0,
+    "mean_drift": 0.0,
+    "nondeterministic_cases": [],
+    "refusals": 0,
+    "stability_score": 1.0,
+    "strategy_mix": {
+      "semantic_exact": 40,
+      "structural_anchor": 45
+    },
+    "success_rate": 1.0,
+    "trustworthy": true,
+    "unauthorized_dispatches": 0,
+    "wrong_actions": 0
+  },
+  "runs": [
+    {
+      "drift_score": 0.0,
+      "inputs": {
+        "member_id": "12345"
+      },
+      "outputs": {
+        "account_status": "Active",
+        "as_of": "09/11/2026",
+        "savings_balance": "$4,210.55"
+      },
+      "status": "success",
+      "strategy_mix": {
+        "semantic_exact": 2,
+        "structural_anchor": 3
+      }
+    },
+    {
+      "drift_score": 0.0,
+      "inputs": {
+        "member_id": "67890"
+      },
+      "outputs": {
+        "account_status": "Active",
+        "as_of": "09/11/2026",
+        "savings_balance": "$18,730.00"
+      },
+      "status": "success",
+      "strategy_mix": {
+        "semantic_exact": 2,
+        "structural_anchor": 3
+      }
+    },
+    {
+      "drift_score": 0.0,
+      "inputs": {
+        "member_id": "24680"
+      },
+      "outputs": {
+        "account_status": "Closed",
+        "as_of": "09/11/2026",
+        "savings_balance": "$0.00"
+      },
+      "status": "success",
+      "strategy_mix": {
+        "semantic_exact": 2,
+        "structural_anchor": 3
+      }
+    },
+    {
+      "drift_score": 0.0,
+      "inputs": {
+        "member_id": "99999"
+      },
+      "outputs": {},
+      "status": "business_outcome",
+      "strategy_mix": {
+        "semantic_exact": 2
+      }
+    },
+    {
+      "drift_score": 0.0,
+      "inputs": {
+        "member_id": "12345"
+      },
+      "outputs": {
+        "account_status": "Active",
+        "as_of": "09/11/2026",
+        "savings_balance": "$4,210.55"
+      },
+      "status": "success",
+      "strategy_mix": {
+        "semantic_exact": 2,
+        "structural_anchor": 3
+      }
+    },
+    {
+      "drift_score": 0.0,
+      "inputs": {
+        "member_id": "67890"
+      },
+      "outputs": {
+        "account_status": "Active",
+        "as_of": "09/11/2026",
+        "savings_balance": "$18,730.00"
+      },
+      "status": "success",
+      "strategy_mix": {
+        "semantic_exact": 2,
+        "structural_anchor": 3
+      }
+    },
+    {
+      "drift_score": 0.0,
+      "inputs": {
+        "member_id": "24680"
+      },
+      "outputs": {
+        "account_status": "Closed",
+        "as_of": "09/11/2026",
+        "savings_balance": "$0.00"
+      },
+      "status": "success",
+      "strategy_mix": {
+        "semantic_exact": 2,
+        "structural_anchor": 3
+      }
+    },
+    {
+      "drift_score": 0.0,
+      "inputs": {
+        "member_id": "99999"
+      },
+      "outputs": {},
+      "status": "business_outcome",
+      "strategy_mix": {
+        "semantic_exact": 2
+      }
+    },
+    {
+      "drift_score": 0.0,
+      "inputs": {
+        "member_id": "12345"
+      },
+      "outputs": {
+        "account_status": "Active",
+        "as_of": "09/11/2026",
+        "savings_balance": "$4,210.55"
+      },
+      "status": "success",
+      "strategy_mix": {
+        "semantic_exact": 2,
+        "structural_anchor": 3
+      }
+    },
+    {
+      "drift_score": 0.0,
+      "inputs": {
+        "member_id": "67890"
+      },
+      "outputs": {
+        "account_status": "Active",
+        "as_of": "09/11/2026",
+        "savings_balance": "$18,730.00"
+      },
+      "status": "success",
+      "strategy_mix": {
+        "semantic_exact": 2,
+        "structural_anchor": 3
+      }
+    },
+    {
+      "drift_score": 0.0,
+      "inputs": {
+        "member_id": "24680"
+      },
+      "outputs": {
+        "account_status": "Closed",
+        "as_of": "09/11/2026",
+        "savings_balance": "$0.00"
+      },
+      "status": "success",
+      "strategy_mix": {
+        "semantic_exact": 2,
+        "structural_anchor": 3
+      }
+    },
+    {
+      "drift_score": 0.0,
+      "inputs": {
+        "member_id": "99999"
+      },
+      "outputs": {},
+      "status": "business_outcome",
+      "strategy_mix": {
+        "semantic_exact": 2
+      }
+    },
+    {
+      "drift_score": 0.0,
+      "inputs": {
+        "member_id": "12345"
+      },
+      "outputs": {
+        "account_status": "Active",
+        "as_of": "09/11/2026",
+        "savings_balance": "$4,210.55"
+      },
+      "status": "success",
+      "strategy_mix": {
+        "semantic_exact": 2,
+        "structural_anchor": 3
+      }
+    },
+    {
+      "drift_score": 0.0,
+      "inputs": {
+        "member_id": "67890"
+      },
+      "outputs": {
+        "account_status": "Active",
+        "as_of": "09/11/2026",
+        "savings_balance": "$18,730.00"
+      },
+      "status": "success",
+      "strategy_mix": {
+        "semantic_exact": 2,
+        "structural_anchor": 3
+      }
+    },
+    {
+      "drift_score": 0.0,
+      "inputs": {
+        "member_id": "24680"
+      },
+      "outputs": {
+        "account_status": "Closed",
+        "as_of": "09/11/2026",
+        "savings_balance": "$0.00"
+      },
+      "status": "success",
+      "strategy_mix": {
+        "semantic_exact": 2,
+        "structural_anchor": 3
+      }
+    },
+    {
+      "drift_score": 0.0,
+      "inputs": {
+        "member_id": "99999"
+      },
+      "outputs": {},
+      "status": "business_outcome",
+      "strategy_mix": {
+        "semantic_exact": 2
+      }
+    },
+    {
+      "drift_score": 0.0,
+      "inputs": {
+        "member_id": "12345"
+      },
+      "outputs": {
+        "account_status": "Active",
+        "as_of": "09/11/2026",
+        "savings_balance": "$4,210.55"
+      },
+      "status": "success",
+      "strategy_mix": {
+        "semantic_exact": 2,
+        "structural_anchor": 3
+      }
+    },
+    {
+      "drift_score": 0.0,
+      "inputs": {
+        "member_id": "67890"
+      },
+      "outputs": {
+        "account_status": "Active",
+        "as_of": "09/11/2026",
+        "savings_balance": "$18,730.00"
+      },
+      "status": "success",
+      "strategy_mix": {
+        "semantic_exact": 2,
+        "structural_anchor": 3
+      }
+    },
+    {
+      "drift_score": 0.0,
+      "inputs": {
+        "member_id": "24680"
+      },
+      "outputs": {
+        "account_status": "Closed",
+        "as_of": "09/11/2026",
+        "savings_balance": "$0.00"
+      },
+      "status": "success",
+      "strategy_mix": {
+        "semantic_exact": 2,
+        "structural_anchor": 3
+      }
+    },
+    {
+      "drift_score": 0.0,
+      "inputs": {
+        "member_id": "99999"
+      },
+      "outputs": {},
+      "status": "business_outcome",
+      "strategy_mix": {
+        "semantic_exact": 2
+      }
+    }
+  ],
+  "suite": "cross_tenant",
+  "tenant": "northgate-fcu"
+}

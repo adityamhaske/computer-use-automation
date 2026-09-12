@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# Tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Secrets — never commit these
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Generated run evidence.
+# evidence/ IS a deliverable, so the committed reference runs are force-added
+# (see evidence/README.md). Everything else a local run produces is ignored.
+evidence/discovery/*
+evidence/replay/*
+evidence/escalation/*
+# The eval REPORTS are the deliverable and are committed. The per-run traces behind them are
+# working evidence -- dozens of directories that would bury the two files anyone reads.
+evidence/evals-runs/
+!evidence/**/.gitkeep
+
+# Playwright
+test-results/
+playwright-report/
+trace.zip
+
+# OS
+.DS_Store

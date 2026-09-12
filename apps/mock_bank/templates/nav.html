@@ -1,0 +1,13 @@
+{# Navigation. Inline onclick rather than hrefs, because legacy apps do this and it means a
+   naive "find the link" strategy has nothing to hold on to. #}
+<html>
+<head><link rel="stylesheet" href="/static/{{ v.key }}.css"></head>
+<body bgcolor="#e8e8e8">
+<table width="100%" cellpadding="3" cellspacing="0" border="0">
+  <tr><td><b>Functions</b></td></tr>
+  <tr><td><a href="#" onclick="parent.content.location='/search';return false;">{{ v.search_heading }}</a></td></tr>
+  <tr><td><a href="#" onclick="parent.content.location='/reports';return false;">Reports</a></td></tr>
+  <tr><td><a href="#" onclick="parent.content.location='/admin';return false;">Administration</a></td></tr>
+</table>
+</body>
+</html>

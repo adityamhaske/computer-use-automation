@@ -1,0 +1,70 @@
+{
+  "run_id": "demo-discovery",
+  "kind": "discovery",
+  "capability_ref": null,
+  "capability_content_hash": null,
+  "tenant": null,
+  "goal": "Look up member 12345 and read their current savings balance",
+  "inputs": {},
+  "steps": [
+    {
+      "index": 0,
+      "step_id": "type",
+      "action_type": "type",
+      "actor": "automation",
+      "lease_epoch": 1,
+      "authorized": true,
+      "policy_decision": "safe (default)",
+      "observation": null,
+      "resolution": {
+        "target_description": "textbox named exact \"Member Number\" row_of \"Member Number\" in frame content",
+        "strategy_recorded": null,
+        "strategy_used": "semantic_exact",
+        "resolved_node_id": "content:/row[16]/cell[1]/textbox[0]",
+        "candidates_considered": 1,
+        "ambiguity_score": null,
+        "fingerprint_matched": null
+      },
+      "started_at": "2026-09-12T12:31:13.264184Z",
+      "duration_ms": 7,
+      "recovery_rule_applied": null,
+      "error_code": null,
+      "snapshot_ref": null,
+      "screenshot_ref": null
+    },
+    {
+      "index": 1,
+      "step_id": "click",
+      "action_type": "click",
+      "actor": "automation",
+      "lease_epoch": 1,
+      "authorized": true,
+      "policy_decision": "safe (default)",
+      "observation": null,
+      "resolution": {
+        "target_description": "button named exact \"Search\" row_of \"Search\" in frame content",
+        "strategy_recorded": null,
+        "strategy_used": "semantic_exact",
+        "resolved_node_id": "content:/row[17]/cell[1]/button[0]",
+        "candidates_considered": 1,
+        "ambiguity_score": null,
+        "fingerprint_matched": null
+      },
+      "started_at": "2026-09-12T12:31:13.336996Z",
+      "duration_ms": 4,
+      "recovery_rule_applied": null,
+      "error_code": null,
+      "snapshot_ref": null,
+      "screenshot_ref": null
+    }
+  ],
+  "result": null,
+  "started_at": "2026-09-12T12:31:13.225525Z",
+  "duration_ms": 394,
+  "evidence_ref": "evidence/discovery/demo-discovery",
+  "model_name": "fake/scripted",
+  "tokens_used": null,
+  "resolver_config_hash": null,
+  "human_actions": 0,
+  "lease_transitions": []
+}

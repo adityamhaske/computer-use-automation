@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+# CI runs entirely offline after dependency installation. No API key is
+# configured here on purpose: if any test needs the LLM, CI must fail.
+env:
+  PYTHONUNBUFFERED: "1"
+  CUA_HEADLESS: "true"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Install dependencies
+        run: |
+          uv venv --python 3.11 .venv
+          uv pip install --python .venv/bin/python -e ".[dev]"
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pyproject.toml') }}
+
+      - name: Install Chromium
+        run: .venv/bin/python -m playwright install chromium --with-deps
+
+      # Every step below calls the same target a contributor runs locally. These were
+      # hand-copied commands until they drifted twice in one change: the lint paths still
+      # named a package that had moved, and the invariants step called `lint-imports`
+      # directly, so the traceability checker added to `make invariants` never ran here at
+      # all. `make check` is documented as "what CI runs" -- so CI has to actually run it.
+      # Separate steps, so a failure still names its stage in the CI UI.
+      - name: Lint and format
+        run: make lint
+
+      - name: Type check (strict)
+        run: make typecheck
+
+      - name: Architectural invariants
+        run: make invariants
+
+      - name: Tests (offline; live tests deselected)
+        run: make test

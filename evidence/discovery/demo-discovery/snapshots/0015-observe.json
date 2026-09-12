@@ -1,0 +1,2411 @@
+{
+  "snapshot_id": "snap-c2a170853a",
+  "url": "http://127.0.0.1:42101/",
+  "title": "MemberDesk",
+  "nodes": [
+    {
+      "node_id": "main:/document[0]",
+      "role": "document",
+      "name": "MemberDesk",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": null,
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "99"
+      },
+      "fingerprint": "34942f57acae2b27"
+    },
+    {
+      "node_id": "main:/frame[1]",
+      "role": "frame",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": null,
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "108"
+      },
+      "fingerprint": "dac0da6641c0fbca"
+    },
+    {
+      "node_id": "main:/frame[2]",
+      "role": "frame",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": null,
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "109"
+      },
+      "fingerprint": "dac0da6641c0fbca"
+    },
+    {
+      "node_id": "nav:/document[3]",
+      "role": "document",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "102"
+      },
+      "fingerprint": "d3a596dc8cf2c44a"
+    },
+    {
+      "node_id": "nav:/table[4]",
+      "role": "table",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "115"
+      },
+      "fingerprint": "71449859354b6cef"
+    },
+    {
+      "node_id": "nav:/row[5]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/row[5]/cell[0]"
+      ],
+      "hints": {
+        "native": "117"
+      },
+      "fingerprint": "fa1f5bbbdad001d1"
+    },
+    {
+      "node_id": "nav:/row[5]/cell[0]",
+      "role": "cell",
+      "name": "Functions",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[5]",
+      "child_ids": [
+        "nav:/row[5]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "118"
+      },
+      "fingerprint": "a6860dcb7608e989"
+    },
+    {
+      "node_id": "nav:/row[5]/cell[0]/text[0]",
+      "role": "text",
+      "name": "Functions",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[5]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "129"
+      },
+      "fingerprint": "e4dad854fe14f36d"
+    },
+    {
+      "node_id": "nav:/row[6]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/row[6]/cell[0]"
+      ],
+      "hints": {
+        "native": "120"
+      },
+      "fingerprint": "fa1f5bbbdad001d1"
+    },
+    {
+      "node_id": "nav:/row[6]/cell[0]",
+      "role": "cell",
+      "name": "Member Search",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[6]",
+      "child_ids": [
+        "nav:/row[6]/cell[0]/link[0]"
+      ],
+      "hints": {
+        "native": "121"
+      },
+      "fingerprint": "d50d2553ca8865ec"
+    },
+    {
+      "node_id": "nav:/row[6]/cell[0]/link[0]",
+      "role": "link",
+      "name": "Member Search",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[6]/cell[0]",
+      "child_ids": [
+        "nav:/row[6]/cell[0]/link[0]/text[0]"
+      ],
+      "hints": {
+        "css": "a[href=\"#\"]",
+        "native": "122"
+      },
+      "fingerprint": "c5ec08a2c78d2403"
+    },
+    {
+      "node_id": "nav:/row[6]/cell[0]/link[0]/text[0]",
+      "role": "text",
+      "name": "Member Search",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[6]/cell[0]/link[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "130"
+      },
+      "fingerprint": "46ba5b490b98688e"
+    },
+    {
+      "node_id": "nav:/row[7]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/row[7]/cell[0]"
+      ],
+      "hints": {
+        "native": "123"
+      },
+      "fingerprint": "fa1f5bbbdad001d1"
+    },
+    {
+      "node_id": "nav:/row[7]/cell[0]",
+      "role": "cell",
+      "name": "Reports",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[7]",
+      "child_ids": [
+        "nav:/row[7]/cell[0]/link[0]"
+      ],
+      "hints": {
+        "native": "124"
+      },
+      "fingerprint": "c7133279a03177da"
+    },
+    {
+      "node_id": "nav:/row[7]/cell[0]/link[0]",
+      "role": "link",
+      "name": "Reports",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[7]/cell[0]",
+      "child_ids": [
+        "nav:/row[7]/cell[0]/link[0]/text[0]"
+      ],
+      "hints": {
+        "css": "a[href=\"#\"]",
+        "native": "125"
+      },
+      "fingerprint": "eea752b2f3040250"
+    },
+    {
+      "node_id": "nav:/row[7]/cell[0]/link[0]/text[0]",
+      "role": "text",
+      "name": "Reports",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[7]/cell[0]/link[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "131"
+      },
+      "fingerprint": "e9b643b64b9fb7bf"
+    },
+    {
+      "node_id": "nav:/row[8]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/row[8]/cell[0]"
+      ],
+      "hints": {
+        "native": "126"
+      },
+      "fingerprint": "fa1f5bbbdad001d1"
+    },
+    {
+      "node_id": "nav:/row[8]/cell[0]",
+      "role": "cell",
+      "name": "Administration",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[8]",
+      "child_ids": [
+        "nav:/row[8]/cell[0]/link[0]"
+      ],
+      "hints": {
+        "native": "127"
+      },
+      "fingerprint": "72fe99457961cc31"
+    },
+    {
+      "node_id": "nav:/row[8]/cell[0]/link[0]",
+      "role": "link",
+      "name": "Administration",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[8]/cell[0]",
+      "child_ids": [
+        "nav:/row[8]/cell[0]/link[0]/text[0]"
+      ],
+      "hints": {
+        "css": "a[href=\"#\"]",
+        "native": "128"
+      },
+      "fingerprint": "3e0ca16cb2e51805"
+    },
+    {
+      "node_id": "nav:/row[8]/cell[0]/link[0]/text[0]",
+      "role": "text",
+      "name": "Administration",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[8]/cell[0]/link[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "132"
+      },
+      "fingerprint": "c28b3d03a05cec35"
+    },
+    {
+      "node_id": "content:/document[9]",
+      "role": "document",
+      "name": "MemberDesk",
+      "value": null,
+      "states": [
+        "focused"
+      ],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "183"
+      },
+      "fingerprint": "eba30ff83962866f"
+    },
+    {
+      "node_id": "content:/table[10]",
+      "role": "table",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "189"
+      },
+      "fingerprint": "f6d07955fec5f341"
+    },
+    {
+      "node_id": "content:/row[11]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[11]/cell[0]"
+      ],
+      "hints": {
+        "native": "191"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[11]/cell[0]",
+      "role": "cell",
+      "name": "First Valley Credit Union \u2014 MemberDesk Teller: teller01 | Sign Off",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[11]",
+      "child_ids": [
+        "content:/row[11]/cell[0]/table[0]"
+      ],
+      "hints": {
+        "native": "192"
+      },
+      "fingerprint": "bb5923d22e1419a1"
+    },
+    {
+      "node_id": "content:/row[11]/cell[0]/table[0]",
+      "role": "table",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[11]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "193"
+      },
+      "fingerprint": "db0f241a64a7611f"
+    },
+    {
+      "node_id": "content:/row[12]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[12]/cell[0]"
+      ],
+      "hints": {
+        "native": "200"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[12]/cell[0]",
+      "role": "cell",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[12]",
+      "child_ids": [
+        "content:/row[12]/cell[0]/image[0]"
+      ],
+      "hints": {
+        "native": "201"
+      },
+      "fingerprint": "1bd1205026807024"
+    },
+    {
+      "node_id": "content:/row[12]/cell[0]/image[0]",
+      "role": "image",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[12]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "202"
+      },
+      "fingerprint": "db9aeb6548d5447b"
+    },
+    {
+      "node_id": "content:/row[13]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[13]/cell[0]"
+      ],
+      "hints": {
+        "native": "203"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[13]/cell[0]",
+      "role": "cell",
+      "name": "Accounts Account Type Balance Status <redacted:account_number> Savings $4,210.55 Active <redacted:account_number> Checking $812.30 Active Open Sub-Account | New Search",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[13]",
+      "child_ids": [
+        "content:/row[13]/cell[0]/table[0]"
+      ],
+      "hints": {
+        "native": "204"
+      },
+      "fingerprint": "d09f3158b434d105"
+    },
+    {
+      "node_id": "content:/row[13]/cell[0]/table[0]",
+      "role": "table",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[13]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "205"
+      },
+      "fingerprint": "db0f241a64a7611f"
+    },
+    {
+      "node_id": "content:/row[14]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[14]/cell[0]",
+        "content:/row[14]/cell[1]"
+      ],
+      "hints": {
+        "native": "195"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[14]/cell[0]",
+      "role": "cell",
+      "name": "First Valley Credit Union \u2014 MemberDesk",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[14]",
+      "child_ids": [
+        "content:/row[14]/cell[0]/text[0]",
+        "content:/row[14]/cell[0]/text[1]"
+      ],
+      "hints": {
+        "native": "196"
+      },
+      "fingerprint": "db3531c999a9d575"
+    },
+    {
+      "node_id": "content:/row[14]/cell[0]/text[0]",
+      "role": "text",
+      "name": "First Valley Credit Union",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[14]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "268"
+      },
+      "fingerprint": "ddb193202da1e4c9"
+    },
+    {
+      "node_id": "content:/row[14]/cell[0]/text[1]",
+      "role": "text",
+      "name": "\u2014 MemberDesk",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[14]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "269"
+      },
+      "fingerprint": "e0bbb5ae6b8cabc8"
+    },
+    {
+      "node_id": "content:/row[14]/cell[1]",
+      "role": "cell",
+      "name": "Teller: teller01 | Sign Off",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[14]",
+      "child_ids": [
+        "content:/row[14]/cell[1]/text[0]",
+        "content:/row[14]/cell[1]/link[0]"
+      ],
+      "hints": {
+        "native": "198"
+      },
+      "fingerprint": "4284a156d8302fc6"
+    },
+    {
+      "node_id": "content:/row[14]/cell[1]/text[0]",
+      "role": "text",
+      "name": "Teller: teller01 |",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[14]/cell[1]",
+      "child_ids": [],
+      "hints": {
+        "native": "270"
+      },
+      "fingerprint": "e444e004a08dfb4c"
+    },
+    {
+      "node_id": "content:/row[14]/cell[1]/link[0]",
+      "role": "link",
+      "name": "Sign Off",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[14]/cell[1]",
+      "child_ids": [
+        "content:/row[14]/cell[1]/link[0]/text[0]"
+      ],
+      "hints": {
+        "css": "a[href=\"/logout\"]",
+        "native": "199"
+      },
+      "fingerprint": "b56cffb08b23a60c"
+    },
+    {
+      "node_id": "content:/row[14]/cell[1]/link[0]/text[0]",
+      "role": "text",
+      "name": "Sign Off",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[14]/cell[1]/link[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "271"
+      },
+      "fingerprint": "c508d2200d4b1e2c"
+    },
+    {
+      "node_id": "content:/row[15]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[15]/cell[0]"
+      ],
+      "hints": {
+        "native": "207"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[15]/cell[0]",
+      "role": "cell",
+      "name": "Accounts Account Type Balance Status <redacted:account_number> Savings $4,210.55 Active <redacted:account_number> Checking $812.30 Active Open Sub-Account | New Search",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[15]",
+      "child_ids": [
+        "content:/row[15]/cell[0]/table[0]",
+        "content:/row[15]/cell[0]/image[0]",
+        "content:/row[15]/cell[0]/table[1]",
+        "content:/row[15]/cell[0]/image[1]",
+        "content:/row[15]/cell[0]/table[2]",
+        "content:/row[15]/cell[0]/image[2]",
+        "content:/row[15]/cell[0]/link[0]",
+        "content:/row[15]/cell[0]/text[0]",
+        "content:/row[15]/cell[0]/link[1]"
+      ],
+      "hints": {
+        "native": "208"
+      },
+      "fingerprint": "d09f3158b434d105"
+    },
+    {
+      "node_id": "content:/row[15]/cell[0]/table[0]",
+      "role": "table",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[15]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "209"
+      },
+      "fingerprint": "db0f241a64a7611f"
+    },
+    {
+      "node_id": "content:/row[15]/cell[0]/image[0]",
+      "role": "image",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[15]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "226"
+      },
+      "fingerprint": "db9aeb6548d5447b"
+    },
+    {
+      "node_id": "content:/row[15]/cell[0]/table[1]",
+      "role": "table",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[15]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "228"
+      },
+      "fingerprint": "db0f241a64a7611f"
+    },
+    {
+      "node_id": "content:/row[15]/cell[0]/image[1]",
+      "role": "image",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[15]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "248"
+      },
+      "fingerprint": "db9aeb6548d5447b"
+    },
+    {
+      "node_id": "content:/row[15]/cell[0]/table[2]",
+      "role": "table",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[15]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "250"
+      },
+      "fingerprint": "db0f241a64a7611f"
+    },
+    {
+      "node_id": "content:/row[15]/cell[0]/image[2]",
+      "role": "image",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[15]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "264"
+      },
+      "fingerprint": "db9aeb6548d5447b"
+    },
+    {
+      "node_id": "content:/row[15]/cell[0]/link[0]",
+      "role": "link",
+      "name": "Open Sub-Account",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[15]/cell[0]",
+      "child_ids": [
+        "content:/row[15]/cell[0]/link[0]/text[0]"
+      ],
+      "hints": {
+        "css": "a[href=\"#\"]",
+        "native": "266"
+      },
+      "fingerprint": "aaa6125ab4d538fd"
+    },
+    {
+      "node_id": "content:/row[15]/cell[0]/link[0]/text[0]",
+      "role": "text",
+      "name": "Open Sub-Account",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[15]/cell[0]/link[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "301"
+      },
+      "fingerprint": "7acc01ff295435e3"
+    },
+    {
+      "node_id": "content:/row[15]/cell[0]/text[0]",
+      "role": "text",
+      "name": "|",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[15]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "302"
+      },
+      "fingerprint": "501fcbbbd30bd5c6"
+    },
+    {
+      "node_id": "content:/row[15]/cell[0]/link[1]",
+      "role": "link",
+      "name": "New Search",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[15]/cell[0]",
+      "child_ids": [
+        "content:/row[15]/cell[0]/link[1]/text[0]"
+      ],
+      "hints": {
+        "css": "a[href=\"/search\"]",
+        "native": "267"
+      },
+      "fingerprint": "c51a4064b3f9c93a"
+    },
+    {
+      "node_id": "content:/row[15]/cell[0]/link[1]/text[0]",
+      "role": "text",
+      "name": "New Search",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[15]/cell[0]/link[1]",
+      "child_ids": [],
+      "hints": {
+        "native": "303"
+      },
+      "fingerprint": "fca2f76b34c4ddfe"
+    },
+    {
+      "node_id": "content:/row[16]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[16]/cell[0]"
+      ],
+      "hints": {
+        "native": "211"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[16]/cell[0]",
+      "role": "cell",
+      "name": "Member Detail",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[16]",
+      "child_ids": [
+        "content:/row[16]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "212"
+      },
+      "fingerprint": "ed8f8d1984c3110a"
+    },
+    {
+      "node_id": "content:/row[16]/cell[0]/text[0]",
+      "role": "text",
+      "name": "Member Detail",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[16]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "272"
+      },
+      "fingerprint": "f03b3ac615f1b4ba"
+    },
+    {
+      "node_id": "content:/row[17]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[17]/cell[0]",
+        "content:/row[17]/cell[1]"
+      ],
+      "hints": {
+        "native": "214"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[17]/cell[0]",
+      "role": "cell",
+      "name": "Member Number",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[17]",
+      "child_ids": [
+        "content:/row[17]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "215"
+      },
+      "fingerprint": "604a7eb9b7dddc29"
+    },
+    {
+      "node_id": "content:/row[17]/cell[0]/text[0]",
+      "role": "text",
+      "name": "Member Number",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[17]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "273"
+      },
+      "fingerprint": "66914960d53ab108"
+    },
+    {
+      "node_id": "content:/row[17]/cell[1]",
+      "role": "cell",
+      "name": "12345",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[17]",
+      "child_ids": [
+        "content:/row[17]/cell[1]/text[0]"
+      ],
+      "hints": {
+        "native": "216"
+      },
+      "fingerprint": "aadbc78a4b5e8a37"
+    },
+    {
+      "node_id": "content:/row[17]/cell[1]/text[0]",
+      "role": "text",
+      "name": "12345",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[17]/cell[1]",
+      "child_ids": [],
+      "hints": {
+        "native": "274"
+      },
+      "fingerprint": "7957d5178857f20c"
+    },
+    {
+      "node_id": "content:/row[18]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[18]/cell[0]",
+        "content:/row[18]/cell[1]"
+      ],
+      "hints": {
+        "native": "217"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[18]/cell[0]",
+      "role": "cell",
+      "name": "Name",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[18]",
+      "child_ids": [
+        "content:/row[18]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "218"
+      },
+      "fingerprint": "b496b1ecab5217bf"
+    },
+    {
+      "node_id": "content:/row[18]/cell[0]/text[0]",
+      "role": "text",
+      "name": "Name",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[18]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "275"
+      },
+      "fingerprint": "d2a5a35b122597b9"
+    },
+    {
+      "node_id": "content:/row[18]/cell[1]",
+      "role": "cell",
+      "name": "Ada Lovelace",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[18]",
+      "child_ids": [
+        "content:/row[18]/cell[1]/text[0]"
+      ],
+      "hints": {
+        "native": "219"
+      },
+      "fingerprint": "204aefb1d1861b43"
+    },
+    {
+      "node_id": "content:/row[18]/cell[1]/text[0]",
+      "role": "text",
+      "name": "Ada Lovelace",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[18]/cell[1]",
+      "child_ids": [],
+      "hints": {
+        "native": "276"
+      },
+      "fingerprint": "f5b54e7437de8b22"
+    },
+    {
+      "node_id": "content:/row[19]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[19]/cell[0]",
+        "content:/row[19]/cell[1]"
+      ],
+      "hints": {
+        "native": "220"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[19]/cell[0]",
+      "role": "cell",
+      "name": "Member Since",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[19]",
+      "child_ids": [
+        "content:/row[19]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "221"
+      },
+      "fingerprint": "f1166ca24c9ce6e8"
+    },
+    {
+      "node_id": "content:/row[19]/cell[0]/text[0]",
+      "role": "text",
+      "name": "Member Since",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[19]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "277"
+      },
+      "fingerprint": "4ebefdb122ffce03"
+    },
+    {
+      "node_id": "content:/row[19]/cell[1]",
+      "role": "cell",
+      "name": "03/14/2009",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[19]",
+      "child_ids": [
+        "content:/row[19]/cell[1]/text[0]"
+      ],
+      "hints": {
+        "native": "222"
+      },
+      "fingerprint": "835c5fcb788ed45d"
+    },
+    {
+      "node_id": "content:/row[19]/cell[1]/text[0]",
+      "role": "text",
+      "name": "03/14/2009",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[19]/cell[1]",
+      "child_ids": [],
+      "hints": {
+        "native": "278"
+      },
+      "fingerprint": "f1ab92e02dcd8aa8"
+    },
+    {
+      "node_id": "content:/row[20]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[20]/cell[0]",
+        "content:/row[20]/cell[1]"
+      ],
+      "hints": {
+        "native": "223"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[20]/cell[0]",
+      "role": "cell",
+      "name": "Branch",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[20]",
+      "child_ids": [
+        "content:/row[20]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "224"
+      },
+      "fingerprint": "34d2a09d5460311b"
+    },
+    {
+      "node_id": "content:/row[20]/cell[0]/text[0]",
+      "role": "text",
+      "name": "Branch",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[20]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "279"
+      },
+      "fingerprint": "5d654a9f337b60a7"
+    },
+    {
+      "node_id": "content:/row[20]/cell[1]",
+      "role": "cell",
+      "name": "Downtown",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[20]",
+      "child_ids": [
+        "content:/row[20]/cell[1]/text[0]"
+      ],
+      "hints": {
+        "native": "225"
+      },
+      "fingerprint": "849a4305785edef3"
+    },
+    {
+      "node_id": "content:/row[20]/cell[1]/text[0]",
+      "role": "text",
+      "name": "Downtown",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[20]/cell[1]",
+      "child_ids": [],
+      "hints": {
+        "native": "280"
+      },
+      "fingerprint": "51fa89086937db9c"
+    },
+    {
+      "node_id": "content:/row[21]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[21]/cell[0]"
+      ],
+      "hints": {
+        "native": "230"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[21]/cell[0]",
+      "role": "cell",
+      "name": "Accounts",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[21]",
+      "child_ids": [
+        "content:/row[21]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "231"
+      },
+      "fingerprint": "24e1dc5fbdc5f5dc"
+    },
+    {
+      "node_id": "content:/row[21]/cell[0]/text[0]",
+      "role": "text",
+      "name": "Accounts",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[21]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "281"
+      },
+      "fingerprint": "a9a3737f08ffd60a"
+    },
+    {
+      "node_id": "content:/row[22]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[22]/cell[0]",
+        "content:/row[22]/cell[1]",
+        "content:/row[22]/cell[2]",
+        "content:/row[22]/cell[3]"
+      ],
+      "hints": {
+        "native": "233"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[22]/cell[0]",
+      "role": "cell",
+      "name": "Account",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[22]",
+      "child_ids": [
+        "content:/row[22]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "234"
+      },
+      "fingerprint": "b617c62a07aa2026"
+    },
+    {
+      "node_id": "content:/row[22]/cell[0]/text[0]",
+      "role": "text",
+      "name": "Account",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[22]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "282"
+      },
+      "fingerprint": "7f01e35f83e90c9e"
+    },
+    {
+      "node_id": "content:/row[22]/cell[1]",
+      "role": "cell",
+      "name": "Type",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[22]",
+      "child_ids": [
+        "content:/row[22]/cell[1]/text[0]"
+      ],
+      "hints": {
+        "native": "235"
+      },
+      "fingerprint": "99182f50f89ddedc"
+    },
+    {
+      "node_id": "content:/row[22]/cell[1]/text[0]",
+      "role": "text",
+      "name": "Type",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[22]/cell[1]",
+      "child_ids": [],
+      "hints": {
+        "native": "283"
+      },
+      "fingerprint": "b92e4f34b21d5831"
+    },
+    {
+      "node_id": "content:/row[22]/cell[2]",
+      "role": "cell",
+      "name": "Balance",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[22]",
+      "child_ids": [
+        "content:/row[22]/cell[2]/text[0]"
+      ],
+      "hints": {
+        "native": "236"
+      },
+      "fingerprint": "f97f90bbadecdb59"
+    },
+    {
+      "node_id": "content:/row[22]/cell[2]/text[0]",
+      "role": "text",
+      "name": "Balance",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[22]/cell[2]",
+      "child_ids": [],
+      "hints": {
+        "native": "284"
+      },
+      "fingerprint": "d8af325497a896a1"
+    },
+    {
+      "node_id": "content:/row[22]/cell[3]",
+      "role": "cell",
+      "name": "Status",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[22]",
+      "child_ids": [
+        "content:/row[22]/cell[3]/text[0]"
+      ],
+      "hints": {
+        "native": "237"
+      },
+      "fingerprint": "812fc872872ec31c"
+    },
+    {
+      "node_id": "content:/row[22]/cell[3]/text[0]",
+      "role": "text",
+      "name": "Status",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[22]/cell[3]",
+      "child_ids": [],
+      "hints": {
+        "native": "285"
+      },
+      "fingerprint": "9869608d2eb0a40b"
+    },
+    {
+      "node_id": "content:/row[23]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[23]/cell[0]",
+        "content:/row[23]/cell[1]",
+        "content:/row[23]/cell[2]",
+        "content:/row[23]/cell[3]"
+      ],
+      "hints": {
+        "native": "238"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[23]/cell[0]",
+      "role": "cell",
+      "name": "<redacted:account_number>",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[23]",
+      "child_ids": [
+        "content:/row[23]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "239"
+      },
+      "fingerprint": "4a9e9e8d98a9827b"
+    },
+    {
+      "node_id": "content:/row[23]/cell[0]/text[0]",
+      "role": "text",
+      "name": "<redacted:account_number>",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[23]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "286"
+      },
+      "fingerprint": "a1702d96163b5e2d"
+    },
+    {
+      "node_id": "content:/row[23]/cell[1]",
+      "role": "cell",
+      "name": "Savings",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[23]",
+      "child_ids": [
+        "content:/row[23]/cell[1]/text[0]"
+      ],
+      "hints": {
+        "native": "240"
+      },
+      "fingerprint": "777f1288799ce1c8"
+    },
+    {
+      "node_id": "content:/row[23]/cell[1]/text[0]",
+      "role": "text",
+      "name": "Savings",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[23]/cell[1]",
+      "child_ids": [],
+      "hints": {
+        "native": "287"
+      },
+      "fingerprint": "1a6b0c242789e1bf"
+    },
+    {
+      "node_id": "content:/row[23]/cell[2]",
+      "role": "cell",
+      "name": "$4,210.55",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[23]",
+      "child_ids": [
+        "content:/row[23]/cell[2]/text[0]"
+      ],
+      "hints": {
+        "native": "241"
+      },
+      "fingerprint": "<redacted:card_pan>"
+    },
+    {
+      "node_id": "content:/row[23]/cell[2]/text[0]",
+      "role": "text",
+      "name": "$4,210.55",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[23]/cell[2]",
+      "child_ids": [],
+      "hints": {
+        "native": "288"
+      },
+      "fingerprint": "42b578abb65505ef"
+    },
+    {
+      "node_id": "content:/row[23]/cell[3]",
+      "role": "cell",
+      "name": "Active",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[23]",
+      "child_ids": [
+        "content:/row[23]/cell[3]/text[0]"
+      ],
+      "hints": {
+        "native": "242"
+      },
+      "fingerprint": "a565b77dfbd0bf06"
+    },
+    {
+      "node_id": "content:/row[23]/cell[3]/text[0]",
+      "role": "text",
+      "name": "Active",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[23]/cell[3]",
+      "child_ids": [],
+      "hints": {
+        "native": "289"
+      },
+      "fingerprint": "301ca2b496407c62"
+    },
+    {
+      "node_id": "content:/row[24]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[24]/cell[0]",
+        "content:/row[24]/cell[1]",
+        "content:/row[24]/cell[2]",
+        "content:/row[24]/cell[3]"
+      ],
+      "hints": {
+        "native": "243"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[24]/cell[0]",
+      "role": "cell",
+      "name": "<redacted:account_number>",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[24]",
+      "child_ids": [
+        "content:/row[24]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "244"
+      },
+      "fingerprint": "260f1db546aab5f3"
+    },
+    {
+      "node_id": "content:/row[24]/cell[0]/text[0]",
+      "role": "text",
+      "name": "<redacted:account_number>",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[24]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "290"
+      },
+      "fingerprint": "94468da07623475b"
+    },
+    {
+      "node_id": "content:/row[24]/cell[1]",
+      "role": "cell",
+      "name": "Checking",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[24]",
+      "child_ids": [
+        "content:/row[24]/cell[1]/text[0]"
+      ],
+      "hints": {
+        "native": "245"
+      },
+      "fingerprint": "1a85da2a064c2368"
+    },
+    {
+      "node_id": "content:/row[24]/cell[1]/text[0]",
+      "role": "text",
+      "name": "Checking",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[24]/cell[1]",
+      "child_ids": [],
+      "hints": {
+        "native": "291"
+      },
+      "fingerprint": "999e12f05f18d641"
+    },
+    {
+      "node_id": "content:/row[24]/cell[2]",
+      "role": "cell",
+      "name": "$812.30",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[24]",
+      "child_ids": [
+        "content:/row[24]/cell[2]/text[0]"
+      ],
+      "hints": {
+        "native": "246"
+      },
+      "fingerprint": "cd8934ef680aaab0"
+    },
+    {
+      "node_id": "content:/row[24]/cell[2]/text[0]",
+      "role": "text",
+      "name": "$812.30",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[24]/cell[2]",
+      "child_ids": [],
+      "hints": {
+        "native": "292"
+      },
+      "fingerprint": "3d2be088eb23c08b"
+    },
+    {
+      "node_id": "content:/row[24]/cell[3]",
+      "role": "cell",
+      "name": "Active",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[24]",
+      "child_ids": [
+        "content:/row[24]/cell[3]/text[0]"
+      ],
+      "hints": {
+        "native": "247"
+      },
+      "fingerprint": "a565b77dfbd0bf06"
+    },
+    {
+      "node_id": "content:/row[24]/cell[3]/text[0]",
+      "role": "text",
+      "name": "Active",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[24]/cell[3]",
+      "child_ids": [],
+      "hints": {
+        "native": "293"
+      },
+      "fingerprint": "301ca2b496407c62"
+    },
+    {
+      "node_id": "content:/row[25]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[25]/cell[0]",
+        "content:/row[25]/cell[1]"
+      ],
+      "hints": {
+        "native": "252"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[25]/cell[0]",
+      "role": "cell",
+      "name": "Savings Balance",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[25]",
+      "child_ids": [
+        "content:/row[25]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "253"
+      },
+      "fingerprint": "f6f86bdf7b2e03a7"
+    },
+    {
+      "node_id": "content:/row[25]/cell[0]/text[0]",
+      "role": "text",
+      "name": "Savings Balance",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[25]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "294"
+      },
+      "fingerprint": "f086031c1e59f020"
+    },
+    {
+      "node_id": "content:/row[25]/cell[1]",
+      "role": "cell",
+      "name": "$4,210.55",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[25]",
+      "child_ids": [
+        "content:/row[25]/cell[1]/text[0]"
+      ],
+      "hints": {
+        "native": "254"
+      },
+      "fingerprint": "<redacted:card_pan>"
+    },
+    {
+      "node_id": "content:/row[25]/cell[1]/text[0]",
+      "role": "text",
+      "name": "$4,210.55",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[25]/cell[1]",
+      "child_ids": [],
+      "hints": {
+        "native": "295"
+      },
+      "fingerprint": "42b578abb65505ef"
+    },
+    {
+      "node_id": "content:/row[26]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[26]/cell[0]",
+        "content:/row[26]/cell[1]"
+      ],
+      "hints": {
+        "native": "255"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[26]/cell[0]",
+      "role": "cell",
+      "name": "Status",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[26]",
+      "child_ids": [
+        "content:/row[26]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "256"
+      },
+      "fingerprint": "812fc872872ec31c"
+    },
+    {
+      "node_id": "content:/row[26]/cell[0]/text[0]",
+      "role": "text",
+      "name": "Status",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[26]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "296"
+      },
+      "fingerprint": "9869608d2eb0a40b"
+    },
+    {
+      "node_id": "content:/row[26]/cell[1]",
+      "role": "cell",
+      "name": "Active",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[26]",
+      "child_ids": [
+        "content:/row[26]/cell[1]/text[0]"
+      ],
+      "hints": {
+        "native": "257"
+      },
+      "fingerprint": "a565b77dfbd0bf06"
+    },
+    {
+      "node_id": "content:/row[26]/cell[1]/text[0]",
+      "role": "text",
+      "name": "Active",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[26]/cell[1]",
+      "child_ids": [],
+      "hints": {
+        "native": "297"
+      },
+      "fingerprint": "301ca2b496407c62"
+    },
+    {
+      "node_id": "content:/row[27]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[27]/cell[0]",
+        "content:/row[27]/cell[1]"
+      ],
+      "hints": {
+        "native": "258"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[27]/cell[0]",
+      "role": "cell",
+      "name": "As Of",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[27]",
+      "child_ids": [
+        "content:/row[27]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "259"
+      },
+      "fingerprint": "6542799081d07901"
+    },
+    {
+      "node_id": "content:/row[27]/cell[0]/text[0]",
+      "role": "text",
+      "name": "As Of",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[27]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "298"
+      },
+      "fingerprint": "d91117474a3aa479"
+    },
+    {
+      "node_id": "content:/row[27]/cell[1]",
+      "role": "cell",
+      "name": "09/11/2026",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[27]",
+      "child_ids": [
+        "content:/row[27]/cell[1]/text[0]"
+      ],
+      "hints": {
+        "native": "260"
+      },
+      "fingerprint": "2ff3d53e4486a110"
+    },
+    {
+      "node_id": "content:/row[27]/cell[1]/text[0]",
+      "role": "text",
+      "name": "09/11/2026",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[27]/cell[1]",
+      "child_ids": [],
+      "hints": {
+        "native": "299"
+      },
+      "fingerprint": "e9a43d7918ef5abc"
+    },
+    {
+      "node_id": "content:/row[28]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[28]/cell[0]",
+        "content:/row[28]/cell[1]"
+      ],
+      "hints": {
+        "native": "261"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[28]/cell[0]",
+      "role": "cell",
+      "name": "Passbook Ref",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[28]",
+      "child_ids": [
+        "content:/row[28]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "262"
+      },
+      "fingerprint": "05f6d582f59f4899"
+    },
+    {
+      "node_id": "content:/row[28]/cell[0]/text[0]",
+      "role": "text",
+      "name": "Passbook Ref",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[28]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "300"
+      },
+      "fingerprint": "9ff97ca9749fdd0e"
+    },
+    {
+      "node_id": "content:/row[28]/cell[1]",
+      "role": "cell",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[28]",
+      "child_ids": [],
+      "hints": {
+        "native": "263"
+      },
+      "fingerprint": "1bd1205026807024"
+    }
+  ],
+  "captured_at": "2026-09-12T12:31:13.453484Z",
+  "http_status": 303
+}

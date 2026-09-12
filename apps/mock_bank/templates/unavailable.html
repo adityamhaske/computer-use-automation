@@ -1,0 +1,11 @@
+{# The transient 502. Served with a real 502 status so the recovery rule's
+   `detect: {http_status_in: [502,503,504]}` has something honest to match on. #}
+<html>
+<head><title>Service Unavailable</title></head>
+<body bgcolor="#ffffff">
+<table cellpadding="6" cellspacing="0" border="0">
+  <tr><td><b>502 &mdash; Service Temporarily Unavailable</b></td></tr>
+  <tr><td>The application server did not respond. Please try again.</td></tr>
+</table>
+</body>
+</html>
