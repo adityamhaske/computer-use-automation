@@ -28,7 +28,7 @@ make setup          # venv, dependencies, Chromium
 make demo           # the whole story, one command
 ```
 
-`make demo` boots the mock back-office and runs eleven stages end to end, writing everything to
+`make demo` boots the mock back-office and runs twelve stages end to end, writing everything to
 [`evidence/`](evidence/):
 
 ```
@@ -43,6 +43,7 @@ make demo           # the whole story, one command
   9. Undeclared screen — failed closed and escalated       NEEDS_HUMAN(unexpected_state)
  10. Operator drove the same live session, handed it back  actor=human, lease epoch 3
  11. Re-anchored after the handoff                         resumes at the right step, not step 1
+ 12. An agent called it by name                            typed args, declared outcomes, no model
 ```
 
 **It works without an API key.** Stage 2 falls back to a recorded transcript and says so, in the
@@ -98,6 +99,11 @@ cua replay <artifact> --base-url http://localhost:8811 --input member_id=67890  
 cua replay <artifact> --base-url http://localhost:8811 --input member_id=99999   # BUSINESS_OUTCOME, exits 0
 
 cua console --target http://localhost:8811    # operator console: claim, act, release
+
+cua catalog list                              # what an agent can call, with typed signatures
+cua catalog show <id> --tool-schema           # the agent-facing tool contract
+cua catalog invoke <id> --input member_id=12345 --base-url http://localhost:8811
+cua agent-demo --base-url http://localhost:8811   # a caller handling all four statuses
 ```
 
 Exit codes are part of the contract: `0` success **and** business outcome, `1` failed, `2` needs a
@@ -121,9 +127,10 @@ Available faults: `transient_load`, `session_timeout`, `undeclared_dialog`, `val
 make check          # lint + strict typecheck + architectural invariants + tests  (what CI runs)
 make test           # offline suite; no API key, no network
 make invariants     # just the architectural contracts
+make eval           # stability + cross-tenant measurement -> evidence/evals/
 ```
 
-219 tests, `mypy --strict` clean, five enforced import contracts. The whole suite runs **offline
+244 tests, `mypy --strict` clean, five enforced import contracts. The whole suite runs **offline
 with no API key** — the fake-LLM harness replays recorded transcripts, so a reviewer with no
 credentials can run everything except the one live-model test (`make test-live`).
 
@@ -154,6 +161,7 @@ apps/mock_bank/   the hostile target application (+ a "second tenant" variant)
 docs/             ADRs (why) · design (how) · prd (what, in what order) · runbooks
 tests/            unit · integration · contract · invariants · e2e(live)
 evidence/         proof that the end-to-end thread actually ran  (start here)
+                  including evals/ — the measured numbers behind the claims
 ```
 
 ## Documentation

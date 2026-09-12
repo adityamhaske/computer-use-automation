@@ -27,7 +27,9 @@ htmlcov/
 evidence/discovery/*
 evidence/replay/*
 evidence/escalation/*
-evidence/evals/*
+# The eval REPORTS are the deliverable and are committed. The per-run traces behind them are
+# working evidence -- dozens of directories that would bury the two files anyone reads.
+evidence/evals-runs/
 !evidence/**/.gitkeep
 
 # Playwright

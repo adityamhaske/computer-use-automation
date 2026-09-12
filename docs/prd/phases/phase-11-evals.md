@@ -1,4 +1,4 @@
-# Phase 11 — Evals & cross-tenant demo *(stretch)*
+# Phase 11 — Evals & cross-tenant demo *(stretch — built)*
 
 **Objective.** Measure what the write-up claims. Brief §8, stretch goals "multi-run stability" and
 "cross-tenant reuse".
@@ -36,3 +36,40 @@ CSS selectors" falsifiable — if it did, Variant B would fail.
 - [ ] One artifact proven to replay on **both** variants
 - [ ] Ladder descent measured and reported, not asserted
 - [ ] `CapabilityEvaluation` emitted as a document separate from the capability
+
+## What was actually built
+
+Engine under `src/cua/evals/`, **not** at the repository root as this spec assumed. A harness that
+drives a real browser has to live where the invariants reach it: `.importlinter` is rooted at `cua`,
+the chokepoint AST scan walks `src/cua`, and mypy's strict mode covers the `cua` package. At the
+root it would have escaped all three, and a harness that can reach around the chokepoint invalidates
+the measurements it produces. The scan was extended to `scripts/` and `apps/` at the same time, to
+catch the next module that tries.
+
+The `discovery` suite was cut as planned -- it spends tokens to measure something the single
+required live run already demonstrates.
+
+## What the suites found
+
+Three real defects, which is the argument for building measurement rather than asserting quality:
+
+1. **The tenant overlay could not restate assertions.** `StepOverride` could retarget a control but
+   not re-express the step's `precondition`, and `TenantBinding` could not replace the capability's
+   `checkpoint`. Both assert the *recorded* institution's vocabulary, so every rebranded-tenant run
+   failed closed on an assertion written for a different bank. The earlier test had only checked
+   that the retargeted control resolved -- which it did. Fixed; cross-tenant replay is now 100%.
+2. **Determinism was being judged across the whole suite** rather than per input set, so member
+   12345's run was compared against member 99999's. They are supposed to differ. A healthy system
+   was reported non-deterministic.
+3. **Evidence directories were being reused without clearing**, so traces from a previous invocation
+   concatenated onto the current one and runs appeared to have more steps than happened. The same
+   mistake had already been made once in `make demo`; clearing now lives in `runtime/wiring.py`
+   behind `fresh_run_dir()`, which is the seam both paths go through.
+
+## Exit criteria
+
+- [x] Reports generated into `evidence/evals/`
+- [x] One artifact proven to replay on **both** variants
+- [x] Ladder descent measured and reported, not asserted
+- [x] `CapabilityEvaluation` emitted as a document separate from the capability
+- [x] Wrong-action rate reported as 0, separately from refusal rate

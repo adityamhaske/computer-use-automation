@@ -16,7 +16,6 @@ cannot run at all. Every other stage is model-free by construction.
 
 from __future__ import annotations
 
-import shutil
 import socket
 import threading
 import time
@@ -174,11 +173,9 @@ class Demo:
         host = base_url.removeprefix("http://")
         # Stable ids, not timestamps: re-running the demo overwrites the same directories, so the
         # evidence committed to this repository is exactly what `make demo` regenerates and a
-        # reviewer can diff the two. The trace is opened for append, so a stale one from a previous
-        # run would silently concatenate -- clear it rather than accumulate.
-        stale = EVIDENCE / kind / run_id
-        if stale.exists():
-            shutil.rmtree(stale)
+        # reviewer can diff the two. Clearing the stale directory is `build_rig`'s job now -- it was
+        # done here first, and the eval harness then made the same mistake independently, which is
+        # the argument for it living at the seam rather than at each call site.
         return build_rig(
             run_id=run_id,
             kind=kind,
@@ -344,6 +341,9 @@ class Demo:
             # 8-10. Fail closed, hand to a human, resume.
             ok = self.escalation(reference, base_url)
 
+            # 11. The other half of the thesis: an agent calls it by name.
+            ok = self.calling_agent(base_url) and ok
+
         self.summary()
         return 0 if ok else 1
 
@@ -351,7 +351,18 @@ class Demo:
         """The hand-authored capability, bound to this run's port."""
         from cua.domain.serde import load_capability
 
-        text = Path("tests/fixtures/capabilities/savings_balance.yaml").read_text(encoding="utf-8")
+        source = Path("tests/fixtures/capabilities/savings_balance.yaml")
+        text = source.read_text(encoding="utf-8")
+
+        # Publish it to the catalog next to the compiled draft. The two side by side *are* the
+        # draft -> approved gate: same flow, but this one declares the outcomes and recovery rules a
+        # single happy-path discovery run could not have observed. Its own provenance says it was
+        # hand-authored, so nothing here is passing review work off as discovery.
+        catalog = EVIDENCE / "capabilities"
+        catalog.mkdir(parents=True, exist_ok=True)
+        reviewed = load_capability(text)
+        (catalog / f"{reviewed.id}@{reviewed.version}.yaml").write_text(text, encoding="utf-8")
+
         return TenantBinding.model_validate(
             {
                 "capability_ref": "corebank.member.savings_balance@1.0.0",
@@ -470,6 +481,38 @@ class Demo:
             return True
         finally:
             rig.close()
+
+    def calling_agent(self, base_url: str) -> bool:
+        """What a production caller does with all this.
+
+        Discovery and replay produce a capability that can be trusted; this is the consumer that
+        makes it worth producing. It looks the capability up by name, reads its typed signature from
+        the artifact itself, calls it, and branches on the result -- with no model involved, because
+        by this point none is needed.
+        """
+        from cua.catalog.store import CapabilityStore
+        from cua.cli.agent_demo import interpret
+
+        store = CapabilityStore()
+        entries = store.list()
+        capability = store.load("corebank.member.savings_balance")
+
+        bound = TenantBinding(
+            capability_ref=capability.ref, tenant="demo", vars={"base_url": base_url}
+        ).apply(capability)
+
+        # A real answer and a negative one, both handled without a model and without an incident.
+        found = interpret(self.replay(base_url, bound, {"member_id": "12345"}, "agent-found"))
+        missing = interpret(self.replay(base_url, bound, {"member_id": "99999"}, "agent-missing"))
+
+        self.say(
+            "An agent called it by name — typed args, declared outcomes",
+            f"catalog: {len(entries)} capability(ies) · "
+            f"{found.disposition}: {found.payload.get('savings_balance')} · "
+            f'{missing.disposition}: "{missing.message}"',
+            ok=found.disposition == "answered" and missing.disposition == "answered_negative",
+        )
+        return found.disposition == "answered" and missing.disposition == "answered_negative"
 
     def summary(self) -> None:
         typer.echo()

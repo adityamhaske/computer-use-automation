@@ -2,7 +2,7 @@
   "run_id": "demo-input-rejected",
   "kind": "replay",
   "capability_ref": "corebank.member.savings_balance@1.0.0",
-  "capability_content_hash": "sha256:3da3e1a6650b59fbcfa80e776dd612186aeb9474361a1a317b3ffba749da4973",
+  "capability_content_hash": "sha256:5c11d3c912ef44b53edf4cd5fea5a14d83da9a7622764ab9f6d5e21d8193f7d1",
   "tenant": null,
   "goal": null,
   "inputs": {
@@ -13,7 +13,7 @@
     "status": "failed",
     "capability_id": "corebank.member.savings_balance",
     "capability_version": "1.0.0",
-    "run_id": "rep-647c2e2d86",
+    "run_id": "rep-741129887c",
     "outputs": {},
     "outcome": null,
     "error": {
@@ -33,7 +33,7 @@
     "recovery_attempts": 0,
     "evidence_ref": "evidence/replay/demo-input-rejected"
   },
-  "started_at": "2026-09-11T21:23:31.935519Z",
+  "started_at": "2026-09-12T02:39:37.549540Z",
   "duration_ms": 0,
   "evidence_ref": "evidence/replay/demo-input-rejected",
   "model_name": null,

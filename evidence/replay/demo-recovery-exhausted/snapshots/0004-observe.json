@@ -1,6 +1,6 @@
 {
-  "snapshot_id": "snap-fb37b47261",
-  "url": "http://127.0.0.1:52775/",
+  "snapshot_id": "snap-efe48b92ed",
+  "url": "http://127.0.0.1:36553/",
   "title": "MemberDesk",
   "nodes": [
     {
@@ -543,6 +543,6 @@
       "fingerprint": "faaa60e7413fd03b"
     }
   ],
-  "captured_at": "2026-09-11T21:23:30.957601Z",
+  "captured_at": "2026-09-12T02:39:36.818223Z",
   "http_status": 502
 }

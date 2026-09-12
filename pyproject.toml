@@ -57,7 +57,6 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["ANN"]
 "apps/**" = ["ANN"]
-"evals/**" = ["ANN"]
 
 [tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "parents"
@@ -73,7 +72,7 @@ mypy_path = "src"
 packages = ["cua"]
 
 [[tool.mypy.overrides]]
-module = ["tests.*", "apps.*", "evals.*"]
+module = ["tests.*", "apps.*"]
 disallow_untyped_defs = false
 
 # ---------------------------------------------------------------- pytest

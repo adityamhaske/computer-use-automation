@@ -40,6 +40,7 @@ source_modules =
     cua.policy
     cua.catalog
     cua.cli
+    cua.evals
     cua.evidence
     cua.perception
 forbidden_modules =
@@ -104,6 +105,7 @@ name = Package layering
 type = layers
 layers =
     cua.cli
+    cua.evals
     cua.agent | cua.replay | cua.recorder | cua.catalog
     cua.runtime
     cua.hitl

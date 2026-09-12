@@ -17,6 +17,7 @@ to argue about. Moving a module is cheaper than that.
 from __future__ import annotations
 
 import os
+import shutil
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -46,8 +47,63 @@ class Rig:
     config: PolicyConfig
     run_dir: Path
 
+    owns_driver: bool = True
+    """False for a rig that borrows another's browser. `close()` is then a no-op, so a borrowed rig
+    cannot shut down a session its owner is still using."""
+
     def close(self) -> None:
-        self.driver.close()
+        if self.owns_driver:
+            self.driver.close()
+
+    def rebind_evidence(self, *, run_id: str, kind: str) -> Rig:
+        """A second rig over the *same* live browser, writing to a fresh evidence directory.
+
+        Measuring stability means replaying the same capability many times, and a browser launch
+        costs more than the replay does. But the runs must stay separately evidenced: the trace is
+        opened for append, so sharing one bus would concatenate every run into a single file and
+        make the determinism comparison meaningless -- it would be comparing a run against itself
+        plus its predecessors.
+
+        Everything that decides anything -- policy, resolver, redaction -- is rebuilt from the same
+        config, so a borrowed rig is not a weaker rig. Only the evidence sink differs.
+        """
+        run_dir = fresh_run_dir(kind, run_id)
+        evidence = EvidenceBus(run_dir, self.redactor, run_id=run_id)
+        return Rig(
+            dispatcher=Dispatcher(
+                driver=self.driver,
+                policy=PolicyEngine(self.config),
+                resolver=TargetResolver(allow_vision=False),
+                evidence=evidence,
+                secrets=self.secrets,
+            ),
+            driver=self.driver,
+            evidence=evidence,
+            redactor=self.redactor,
+            secrets=self.secrets,
+            config=self.config,
+            run_dir=run_dir,
+            owns_driver=False,
+        )
+
+
+def fresh_run_dir(kind: str, run_id: str) -> Path:
+    """An empty evidence directory for this run.
+
+    Cleared, not merely created. The trace is opened for append, so reusing a run id without
+    clearing silently concatenates this run onto the last one -- and the result still looks like a
+    valid trace, just with more steps than actually happened. That mistake has now been made twice:
+    once in `make demo`, and once in the eval harness, where it surfaced as four cases reported
+    non-deterministic when replay had in fact decided identically every time.
+
+    A run id identifies one run. Enforcing that here rather than at each call site is the difference
+    between a rule and a habit.
+    """
+    run_dir = EVIDENCE_ROOT / kind / run_id
+    if run_dir.exists():
+        shutil.rmtree(run_dir)
+    run_dir.mkdir(parents=True, exist_ok=True)
+    return run_dir
 
 
 def load_policy(path: Path | None = None) -> PolicyConfig:
@@ -81,8 +137,7 @@ def build_rig(
     redactor = Redactor(config.redaction)
     secrets = SecretResolver()
 
-    run_dir = EVIDENCE_ROOT / kind / run_id
-    run_dir.mkdir(parents=True, exist_ok=True)
+    run_dir = fresh_run_dir(kind, run_id)
     evidence = EvidenceBus(run_dir, redactor, run_id=run_id)
 
     if headless is None:
@@ -141,8 +196,7 @@ def build_supervised_session(
 
     config = load_policy(policy_path)
     redactor = Redactor(config.redaction)
-    run_dir = EVIDENCE_ROOT / "escalation" / run_id
-    run_dir.mkdir(parents=True, exist_ok=True)
+    run_dir = fresh_run_dir("escalation", run_id)
     evidence = EvidenceBus(run_dir, redactor, run_id=run_id)
 
     thread = SessionThread(name="cua-console-session")

@@ -29,6 +29,7 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field
 
 from cua.domain.capability import Capability, RecoveryRule, WaitPolicy
+from cua.domain.predicates import Predicate
 from cua.domain.snapshot import NodeScope
 from cua.domain.target import Anchor, NameMatch
 
@@ -47,10 +48,24 @@ class TargetOverride(BaseModel):
 
 
 class StepOverride(BaseModel):
+    """What one institution may change about one step.
+
+    `precondition` and `postcondition` are here because retargeting a control is not enough on its
+    own. A step both *finds* a control and *asserts the screen is the right one*, and a tenant that
+    rebrands a label breaks both. An overlay that could only retarget left the step resolving
+    correctly and then failing its own precondition -- fail-closed behaving exactly as designed, on
+    an assertion written for a different institution's vocabulary.
+
+    Found by the cross-tenant eval suite, which replayed end to end where the earlier test had only
+    checked that the retargeted control resolved.
+    """
+
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     target: TargetOverride | None = None
     wait: WaitPolicy | None = None
+    precondition: Predicate | None = None
+    postcondition: Predicate | None = None
 
 
 class TenantBinding(BaseModel):
@@ -72,6 +87,15 @@ class TenantBinding(BaseModel):
     overrides: dict[str, StepOverride] = Field(default_factory=dict)
     recovery_extra: tuple[RecoveryRule, ...] = ()
     """Tenant-specific interstitials. Some institutions add their own banners and notices."""
+
+    checkpoint: Predicate | None = None
+    """Replaces the capability's success condition for this tenant.
+
+    The checkpoint asserts what a correct final screen looks like, in the vocabulary of the
+    institution that was recorded. A tenant that renames "Savings Balance" to "Savings Bal." needs
+    to restate it, or every run fails its own success check on the last step. Replaced wholesale
+    rather than patched: a success condition is the one thing that should never be half-inherited.
+    """
 
     def apply(self, capability: Capability) -> Capability:
         """Produce the effective capability for this tenant.
@@ -110,6 +134,15 @@ class TenantBinding(BaseModel):
                 target.update(patch)
             if override.wait is not None:
                 step["wait"] = override.wait.model_dump(by_alias=True, mode="json")
+            if override.precondition is not None:
+                step["precondition"] = override.precondition.model_dump(by_alias=True, mode="json")
+            if override.postcondition is not None:
+                step["postcondition"] = override.postcondition.model_dump(
+                    by_alias=True, mode="json"
+                )
+
+        if self.checkpoint is not None:
+            payload["checkpoint"] = self.checkpoint.model_dump(by_alias=True, mode="json")
 
         if self.recovery_extra:
             payload["recovery"] = list(payload.get("recovery", [])) + [

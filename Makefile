@@ -38,13 +38,13 @@ endif
 
 .PHONY: fmt
 fmt: ## Auto-format and auto-fix
-	$(PY) -m ruff format src tests apps evals scripts
-	$(PY) -m ruff check --fix src tests apps evals scripts
+	$(PY) -m ruff format src tests apps scripts
+	$(PY) -m ruff check --fix src tests apps scripts
 
 .PHONY: lint
 lint: ## Lint (no fixes)
-	$(PY) -m ruff check src tests apps evals scripts
-	$(PY) -m ruff format --check src tests apps evals scripts
+	$(PY) -m ruff check src tests apps scripts
+	$(PY) -m ruff format --check src tests apps scripts
 
 .PHONY: typecheck
 typecheck: ## Strict type check
@@ -85,11 +85,8 @@ demo: ## THE GRADING STORY: discover -> artifact -> replay -> outcome -> fault -
 	$(PY) -m cua.cli.main demo
 
 .PHONY: eval
-eval: ## Evaluation suites -- CUT, see REPORT.md section 7
-	@echo "The eval suites were cut. REPORT.md section 7 says why and what is lost."
-	@echo "The deterministic assertions they would have made are tests: make test."
-	@echo "  cross-tenant ladder descent  -> tests/integration/test_variant_b.py"
-	@echo "  fault taxonomy               -> tests/integration/test_fault_matrix.py"
+eval: ## Stability + cross-tenant measurement -> evidence/evals/
+	$(PY) -m cua.cli.main eval
 
 # ------------------------------------------------------------------ housekeeping
 
@@ -100,4 +97,4 @@ clean: ## Remove caches and build artifacts (keeps evidence/)
 
 .PHONY: clean-evidence
 clean-evidence: ## Delete generated run evidence (NOT the committed reference runs)
-	rm -rf evidence/discovery/* evidence/replay/* evidence/escalation/* evidence/evals/*
+	rm -rf evidence/discovery/* evidence/replay/* evidence/escalation/* evidence/evals/* evidence/evals-runs

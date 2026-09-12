@@ -1,6 +1,6 @@
 {
-  "snapshot_id": "snap-759197c7d6",
-  "url": "http://127.0.0.1:52775/",
+  "snapshot_id": "snap-749f8aa3d7",
+  "url": "http://127.0.0.1:36553/",
   "title": "MemberDesk",
   "nodes": [
     {
@@ -37,7 +37,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "108"
+        "native": "109"
       },
       "fingerprint": "dac0da6641c0fbca"
     },
@@ -55,7 +55,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "109"
+        "native": "110"
       },
       "fingerprint": "dac0da6641c0fbca"
     },
@@ -91,7 +91,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "115"
+        "native": "116"
       },
       "fingerprint": "71449859354b6cef"
     },
@@ -111,7 +111,7 @@
         "nav:/row[5]/cell[0]"
       ],
       "hints": {
-        "native": "117"
+        "native": "118"
       },
       "fingerprint": "fa1f5bbbdad001d1"
     },
@@ -131,7 +131,7 @@
         "nav:/row[5]/cell[0]/text[0]"
       ],
       "hints": {
-        "native": "118"
+        "native": "119"
       },
       "fingerprint": "a6860dcb7608e989"
     },
@@ -169,7 +169,7 @@
         "nav:/row[6]/cell[0]"
       ],
       "hints": {
-        "native": "120"
+        "native": "121"
       },
       "fingerprint": "fa1f5bbbdad001d1"
     },
@@ -189,7 +189,7 @@
         "nav:/row[6]/cell[0]/link[0]"
       ],
       "hints": {
-        "native": "121"
+        "native": "122"
       },
       "fingerprint": "d50d2553ca8865ec"
     },
@@ -210,7 +210,7 @@
       ],
       "hints": {
         "css": "a[href=\"#\"]",
-        "native": "122"
+        "native": "123"
       },
       "fingerprint": "c5ec08a2c78d2403"
     },
@@ -248,7 +248,7 @@
         "nav:/row[7]/cell[0]"
       ],
       "hints": {
-        "native": "123"
+        "native": "124"
       },
       "fingerprint": "fa1f5bbbdad001d1"
     },
@@ -268,7 +268,7 @@
         "nav:/row[7]/cell[0]/link[0]"
       ],
       "hints": {
-        "native": "124"
+        "native": "125"
       },
       "fingerprint": "c7133279a03177da"
     },
@@ -289,7 +289,7 @@
       ],
       "hints": {
         "css": "a[href=\"#\"]",
-        "native": "125"
+        "native": "126"
       },
       "fingerprint": "eea752b2f3040250"
     },
@@ -327,7 +327,7 @@
         "nav:/row[8]/cell[0]"
       ],
       "hints": {
-        "native": "126"
+        "native": "127"
       },
       "fingerprint": "fa1f5bbbdad001d1"
     },
@@ -347,7 +347,7 @@
         "nav:/row[8]/cell[0]/link[0]"
       ],
       "hints": {
-        "native": "127"
+        "native": "128"
       },
       "fingerprint": "72fe99457961cc31"
     },
@@ -368,7 +368,7 @@
       ],
       "hints": {
         "css": "a[href=\"#\"]",
-        "native": "128"
+        "native": "104"
       },
       "fingerprint": "3e0ca16cb2e51805"
     },
@@ -1069,6 +1069,6 @@
       "fingerprint": "55399652a926d8e4"
     }
   ],
-  "captured_at": "2026-09-11T21:23:29.551423Z",
+  "captured_at": "2026-09-12T02:39:35.754241Z",
   "http_status": 303
 }

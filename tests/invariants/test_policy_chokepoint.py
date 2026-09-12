@@ -24,7 +24,15 @@ from cua.domain.actor import Actor
 from cua.domain.target import TargetDescriptor
 from cua.policy.authorized import MINT_TOKEN, AuthorizedAction, UnauthorizedActionError
 
-SRC = Path(__file__).resolve().parents[2] / "src/cua"
+ROOT = Path(__file__).resolve().parents[2]
+SRC = ROOT / "src/cua"
+
+# Root-level Python that is not part of the `cua` package, and so is invisible to `.importlinter`
+# (rooted at `cua`) and to mypy (`packages = ["cua"]`). The eval harness was almost written here for
+# exactly that reason -- it drives a real browser, and at the root it would have escaped all three
+# enforcement layers. It lives under `src/cua/evals/` instead. This list is what catches the next
+# module that tries.
+OUTSIDE = ("scripts", "apps")
 
 
 # ------------------------------------------------------- 1. the import rule
@@ -67,6 +75,16 @@ def test_only_runtime_imports_surfaces() -> None:
             continue
         if any(name.startswith("cua.surfaces") for name in _imports_of(path)):
             offenders.append(str(relative))
+
+    # Root-level packages too: they are outside `.importlinter`'s root package, so this scan is
+    # the only thing standing between them and a driver.
+    for directory in OUTSIDE:
+        base = ROOT / directory
+        if not base.exists():
+            continue
+        for path in base.rglob("*.py"):
+            if any(name.startswith("cua.surfaces") for name in _imports_of(path)):
+                offenders.append(str(path.relative_to(ROOT)))
 
     assert not offenders, (
         f"{offenders} import cua.surfaces directly, bypassing the policy chokepoint. "

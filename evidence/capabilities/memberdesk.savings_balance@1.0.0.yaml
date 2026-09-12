@@ -163,8 +163,8 @@ policy:
 provenance:
   discovered_by:
     model: fake/scripted
-    run_id: disc-12de4870f0
-    at: '2026-09-11T21:23:26.693823+00:00'
+    run_id: disc-d106a2d96e
+    at: '2026-09-12T02:39:33.430009+00:00'
   transcript_ref: evidence/discovery/demo-discovery/trace.jsonl
   notes: "Compiled from a single discovery run. Before approving, a reviewer should confirm:\n\n  1. Outcomes.\
     \ This run saw only the successful path, so NO business outcomes are declared. Every\n     legitimate\
@@ -177,4 +177,4 @@ provenance:
     \ Checkpoint. It asserts the shape of the extracted outputs. Confirm that is genuinely specific\n\
     \     to this goal rather than true of any page in the application.\n\nThese are gaps, not omissions:\
     \ inventing detectors a run never observed would produce a capability\nwhose error handling is fiction."
-content_hash: sha256:811bb58272668ba2298448cdba99910a30ea65a2664af8c7b2b3cb158e814686
+content_hash: sha256:4241b7de3d3b39212b924d2b876ceafc967d60e70f1fcb5eea84fb8dbe7c3654

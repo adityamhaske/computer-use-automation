@@ -1,0 +1,19 @@
+{
+  "capability_ref": "corebank.member.savings_balance@1.0.0",
+  "content_hash": "sha256:41fb696ea2aee3ea040ad12bebeefe95f2f7124deb93a4bf051e8d1532a1e08f",
+  "tenant": "northgate-fcu",
+  "runs": 20,
+  "successes": 15,
+  "business_outcomes": 5,
+  "needs_human": 0,
+  "failures": 0,
+  "wrong_actions": 0,
+  "ambiguity_refusals": 0,
+  "determinism_holds": true,
+  "mean_drift": 0.0,
+  "strategy_mix": {
+    "semantic_exact": 40,
+    "structural_anchor": 45
+  },
+  "fallback_rate": 0.0
+}
