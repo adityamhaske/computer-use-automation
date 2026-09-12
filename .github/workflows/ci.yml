@@ -39,17 +39,20 @@ jobs:
       - name: Install Chromium
         run: .venv/bin/python -m playwright install chromium --with-deps
 
-      - name: Lint
-        run: .venv/bin/python -m ruff check src tests apps evals scripts
-
-      - name: Format check
-        run: .venv/bin/python -m ruff format --check src tests apps evals scripts
+      # Every step below calls the same target a contributor runs locally. These were
+      # hand-copied commands until they drifted twice in one change: the lint paths still
+      # named a package that had moved, and the invariants step called `lint-imports`
+      # directly, so the traceability checker added to `make invariants` never ran here at
+      # all. `make check` is documented as "what CI runs" -- so CI has to actually run it.
+      # Separate steps, so a failure still names its stage in the CI UI.
+      - name: Lint and format
+        run: make lint
 
       - name: Type check (strict)
-        run: .venv/bin/python -m mypy
+        run: make typecheck
 
       - name: Architectural invariants
-        run: .venv/bin/lint-imports
+        run: make invariants
 
       - name: Tests (offline; live tests deselected)
-        run: .venv/bin/python -m pytest
+        run: make test
