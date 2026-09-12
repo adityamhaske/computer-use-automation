@@ -30,9 +30,10 @@ class SecretNotFoundError(RuntimeError):
 class SecretResolver:
     """Resolves secret references from the environment at dispatch time.
 
-    Environment variables here because this is a take-home; the seam to a real secret manager is a
-    single method. What matters architecturally is that resolution happens *at dispatch*, inside the
-    action, and the value is never returned to anything that writes to disk.
+    Environment variables are used here for standard reference runtime; the seam to an enterprise secret
+    manager (e.g. HashiCorp Vault, AWS Secrets Manager) is a single method. What matters architecturally
+    is that resolution happens *at dispatch*, inside the action, and the value is never returned to anything
+    that writes to disk.
     """
 
     prefix: str = "CUA_SECRET_"

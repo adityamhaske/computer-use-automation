@@ -1,178 +1,189 @@
-# Computer-Use Automation System
+# Computer-Use Automation System (CUA)
+### Deterministic Execution Engine for Regulated Banking Applications
 
 > **Discovery is probabilistic. Execution is deterministic.**
 
-🌐 **Live Documentation & Interactive Demo:** [https://adityamhaske.github.io/interface.ai/](https://adityamhaske.github.io/interface.ai/)
+🌐 **Live Documentation & Interactive Demo:** [https://adityamhaske.github.io/interface.ai/](https://adityamhaske.github.io/interface.ai/)  
+🔒 **Confidential & Proprietary** — All Rights Reserved. *(Not an open-source project)*
 
-An LLM works out how to accomplish a goal in a legacy application that has no API — once. That run
-is compiled into a typed, versioned **capability artifact**. From then on the artifact is replayed
-deterministically, with no model in the decision loop, and invoked by AI agents as a normal typed
-function.
+---
 
-Built for back-office applications at banks and credit unions, where the only way in is to drive the UI the way a human operator would.
+An LLM works out how to accomplish a goal in a legacy application that has no API — **once**. That discovery run is compiled into a typed, versioned **capability artifact**. From then on the artifact is replayed deterministically, with **no model in the decision loop**, and invoked by AI agents as a normal typed function.
+
+Built for mission-critical back-office applications at banks and credit unions, where the only path to automation is driving the live UI with strict regulatory compliance, complete auditability, and zero data leakage.
 
 ```
-goal + target ──► LLM discovery run ──► capability artifact ──► deterministic replay ──► typed outputs
-                        (once)           (reviewed, versioned)      (every time after)
+Goal + Target ──► LLM Discovery Run ──► Capability Artifact ──► Deterministic Replay ──► Typed Outputs
+                       (once)             (reviewed, sealed)        (every time after)
                                                                             │
-                                                              stuck? ───────┴──► human takes the
+                                                              stuck? ───────┴──► Human takes the
                                                                                  live session, acts,
                                                                                  hands it back
 ```
 
 ---
 
-## Try it
+## Unified Entrypoint (`./start.sh`)
+
+The repository includes a unified orchestrator script [`./start.sh`](start.sh) to run every mode end to end:
 
 ```bash
-make setup          # venv, dependencies, Chromium
-make demo           # the whole story, one command
+./start.sh                 # Default: setup venv + run the full 12-stage demo
+./start.sh ui              # Launch the full Human-in-the-Loop Web Console + Mock Back-Office
+./start.sh ui --headed     # Run the console with visible (headed) Chromium browser
+./start.sh app             # Run just the hostile mock back-office application (port 8811)
+./start.sh app-b           # Run the rebranded / restyled second-tenant variant (port 8811)
+./start.sh check           # Run CI checks: lint + strict typecheck + invariants + tests
+./start.sh test            # Run offline test suite (no API keys, no external network)
+./start.sh eval            # Run stability and cross-tenant drift evaluations
 ```
-
-`make demo` boots the mock back-office and runs twelve stages end to end, writing everything to
-[`evidence/`](evidence/):
-
-```
-  1. Mock back-office running                              hostile frameset app, no test ids
-  2. Discovery                                             the model drives the live UI to the goal
-  3. Capability compiled and sealed                        typed I/O, semantic targets, content hash
-  4. Deterministic replay, new inputs                      SUCCESS  — no model in the loop
-  5. Business outcome (exit 0 — an answer, not a crash)    BUSINESS_OUTCOME(member_not_found)
-  6. Injected 502 — declared recovery cleared it           SUCCESS  recovery_attempts=1
-  7. Same fault past its declared budget                   NEEDS_HUMAN(recovery_exhausted)
-  8. Malformed input rejected before acting                FAILED — the browser never moved
-  9. Undeclared screen — failed closed and escalated       NEEDS_HUMAN(unexpected_state)
- 10. Operator drove the same live session, handed it back  actor=human, lease epoch 3
- 11. Re-anchored after the handoff                         resumes at the right step, not step 1
- 12. An agent called it by name                            typed args, declared outcomes, no model
-```
-
-**It works without an API key.** Stage 2 falls back to a recorded transcript and says so, in the
-output and in the evidence. Everything after it is model-free by construction, so the demo is not
-pretending. Set `OPENROUTER_API_KEY` and re-run for a genuine LLM-driven discovery.
-
-Takes about a minute. Then read [`REPORT.md`](REPORT.md) and
-[`evidence/README.md`](evidence/README.md).
 
 ---
 
-## Setup
+## 12-Stage Verified Execution Story
+
+Run the full end-to-end demonstration locally with:
 
 ```bash
-make setup          # venv, dependencies, Chromium
+make setup          # venv, dependencies, Playwright Chromium
+make demo           # the complete 12-stage story in ~60 seconds
 ```
 
-Requires Python 3.11+. `uv` is used if present, otherwise `venv` + `pip`.
+`make demo` boots the mock back-office and executes all 12 stages sequentially, writing evidence to [`evidence/`](evidence/):
 
-### Configuration
+| # | Stage | Observable Behavior | Contract / Result |
+|---|---|---|---|
+| **1** | Mock Back-Office Running | Hostile frameset application, zero test IDs | `READY` |
+| **2** | LLM Discovery | Agent drives live UI to goal, discovering path | `TRACE` |
+| **3** | Capability Compiled | Typed I/O, semantic descriptors, content hash | `SEALED` |
+| **4** | Deterministic Replay | New member inputs, 0 model calls in loop | `SUCCESS` |
+| **5** | Business Outcome | `member_not_found` — valid answer, not a crash | `EXIT 0` |
+| **6** | Injected 502 Fault | Declared recovery rule remediates and retries | `SUCCESS` (`recovery_attempts=1`) |
+| **7** | Fault Past Budget | Recovery exhausted → escalates to human queue | `NEEDS_HUMAN(recovery_exhausted)` |
+| **8** | Malformed Input | Input schema guard rejects before dispatch | `FAILED` (browser never moved) |
+| **9** | Undeclared Screen | Unrecognized state fails closed and escalates | `NEEDS_HUMAN(unexpected_state)` |
+| **10** | Human Takeover | Operator drives same session with Lease lock | `actor=human, epoch=3` |
+| **11** | Re-Anchor Resume | Resumes at the right step without replaying | `SUCCESS` |
+| **12** | Agent Tool Call | Exposed to caller agents as a typed tool | `SUCCESS` |
 
-```bash
-cp .env.example .env
-```
-
-**The only thing that needs an API key is the live discovery run.** Replay, escalation, the full
-test suite, and the demo all work without one — the demo falls back to a recorded transcript and
-says so explicitly. CI is configured with no key on purpose: if a test needs the model, CI fails.
-
-| Variable | Purpose |
-|---|---|
-| `OPENROUTER_API_KEY` | Discovery only. Any OpenAI-compatible gateway works. |
-| `CUA_LLM_BASE_URL` | Defaults to OpenRouter |
-| `CUA_LLM_MODEL` | Model id for discovery |
-| `CUA_POLICY_FILE` | Allowlist and risk policy — defaults to `config/policy.yaml` |
+> **Offline Verifiability:** Works 100% offline without an API key — discovery falls back to a verified recorded transcript. Set `OPENROUTER_API_KEY` in `.env` for live LLM exploration.
 
 ---
 
-## The commands underneath
+## Human-in-the-Loop (HITL) Web Console
 
-`make demo` is orchestration, not a second implementation — every stage is a command you can run on
-its own:
+The system includes a production operator console built for supervisors and bank operators (`cua.hitl.console`):
+
+* **Launch:** `./start.sh ui` (starts mock bank on `:8811` and console on `:8812`)
+* **Live Dashboard:** Real-time run tracking, active intervention queue, and session health.
+* **Live Screen & Control:** Operator claims session via exclusive lease token (`Lease`), drives the UI through the policy chokepoint, and releases control back to automation.
+* **Re-Anchor Architecture:** When the human finishes intervening, the engine reconciles the current screen state and resumes at the appropriate step, avoiding re-running past mutations.
+* **Audit Trail:** Every keystroke, click, and state change made by a human is recorded on the evidence bus under `actor="human"` with complete redaction.
+
+---
+
+## CLI Reference
+
+Every capability is accessible directly via the `cua` CLI:
 
 ```bash
-make app                                      # the hostile mock back-office, on :8811
-make app-variant-b                            # the same product, rebranded and restyled: a second tenant
-
+# 1. Discover a new workflow against a live application surface (requires LLM key)
 cua discover --goal "Look up member 12345 and read their current savings balance" \
              --target http://localhost:8811 \
-             --out evidence/capabilities/     # needs OPENROUTER_API_KEY
+             --out evidence/capabilities/
 
-cua replay <artifact> --base-url http://localhost:8811 --input member_id=67890   # SUCCESS
-cua replay <artifact> --base-url http://localhost:8811 --input member_id=99999   # BUSINESS_OUTCOME, exits 0
+# 2. Replay the compiled capability deterministically (zero model calls)
+cua replay evidence/capabilities/lookup_member@1.0.0.json \
+           --base-url http://localhost:8811 \
+           --input member_id=67890
 
-cua console --target http://localhost:8811    # operator console: claim, act, release
+# 3. Supervise and claim sessions in the operator console
+cua console --target http://localhost:8811
 
-cua catalog list                              # what an agent can call, with typed signatures
-cua catalog show <id> --tool-schema           # the agent-facing tool contract
-cua catalog invoke <id> --input member_id=12345 --base-url http://localhost:8811
-cua agent-demo --base-url http://localhost:8811   # a caller handling all four statuses
+# 4. Capability Catalog management and tool execution
+cua catalog list                                    # List available frozen capabilities
+cua catalog show lookup_member --tool-schema        # Export JSON Schema tool contract
+cua catalog invoke lookup_member --input member_id=12345 --base-url http://localhost:8811
 ```
 
-Exit codes are part of the contract: `0` success **and** business outcome, `1` failed, `2` needs a
-human. A business outcome is an answer, not an incident.
-
-Faults are injected into the mock app rather than passed to the replay engine — the executor must
-not know a fault is coming, or the error-handling demonstration would be staged:
-
-```bash
-curl -X POST localhost:8811/_control/arm -d '{"fault":"transient_load","count":1}' -H 'content-type: application/json'
-curl -X POST localhost:8811/_control/reset
-```
-
-Available faults: `transient_load`, `session_timeout`, `undeclared_dialog`, `validation_error`.
+### Exit Code Contract
+* `0`: Success **and** valid business outcome (`member_not_found`, `account_closed`).
+* `1`: Hard failure / defect (`target_not_found`, `checkpoint_failed`).
+* `2`: Escalation required (`unexpected_state`, `recovery_exhausted`).
 
 ---
 
-## Development
+## Architectural Invariants
 
-```bash
-make check          # lint + strict typecheck + architectural invariants + tests  (what CI runs)
-make test           # offline suite; no API key, no network
-make invariants     # just the architectural contracts
-make eval           # stability + cross-tenant measurement -> evidence/evals/
-```
+The architecture enforces ten mechanical invariants. These are verified by import linter rules and continuous contract tests:
 
-244 tests, `mypy --strict` clean, five enforced import contracts. The whole suite runs **offline
-with no API key** — the fake-LLM harness replays recorded transcripts, so a reviewer with no
-credentials can run everything except the one live-model test (`make test-live`).
-
-### The invariants
-
-The value of this system is almost entirely in a handful of properties, so they are enforced
-mechanically rather than by convention. [`AGENTS.md`](AGENTS.md) documents all nine; the load-bearing
-ones:
-
-| Invariant | Enforced by |
-|---|---|
-| Replay never calls or imports the LLM | `.importlinter` + a test that replays with the client patched to raise |
-| No action reaches a driver without policy authorization | import rule + a type only `PolicyEngine` can mint + an authorize↔dispatch reconciliation test |
-| Target identity is semantic, never a CSS selector | import rule + a "second tenant" variant that invalidates every cached selector |
-| Human input cannot bypass policy or evidence | the console submits actions; it never injects them |
-| Unknown UI states fail closed | the executor stops rather than assuming the click worked |
-
-Run `make invariants` to check them. Break one on purpose to watch it fail — that is the point.
+1. **Replay never calls or imports the LLM:** `cua.replay` has zero imports of `cua.agent` or model clients. Replay is 100% deterministic and auditable.
+2. **No action reaches a driver without policy authorization:** Every action must pass through `TargetResolver` and receive an `AuthorizedAction` token from `PolicyEngine` before dispatch.
+3. **Target identity is semantic, never raw CSS selectors:** Controls are defined by role, accessible name, and structural anchors. CSS selectors are only unverified caches.
+4. **Human input cannot bypass policy or evidence:** Operator inputs pass through the same policy chokepoint and evidence bus under the `HUMAN` policy profile.
+5. **Unknown UI states fail closed:** Unmatched screens raise `UNEXPECTED_STATE` and halt execution immediately.
+6. **Every sink is redacted:** PII, account numbers, and secrets are stripped from logs, traces, screenshots, and LLM prompts.
+7. **Business outcomes are not failures:** Application-level responses are classified separately from execution crashes.
+8. **Automation may only act while holding the session lease:** If an operator claims the session, automation dispatch is refused with `LEASE_LOST`.
+9. **Capabilities are immutable:** Sealed artifacts are content-hashed (SHA-256) and frozen.
+10. **Domain layer is pure:** `cua.domain` has zero I/O, network, or external dependencies.
 
 ---
 
-## Layout
+## Multi-Tenant Adaptation & Overlays
+
+In enterprise banking, different tenant institutions often run the same core back-office software with customized labels, headers, and CSS.
+
+* **TenantBinding Overlays:** Rather than re-recording workflows for every tenant, a four-line overlay document maps tenant-specific labels.
+* **Drift Measurement:** `make eval` runs cross-tenant evaluation against variant applications (`apps/mock_bank/tenant_b.py`) and quantifies drift score before replays fail.
+
+---
+
+## Repository Structure
 
 ```
-src/cua/          domain · perception · surfaces · targeting · policy · runtime
-                  agent · recorder · replay · hitl · evidence · cli
-apps/mock_bank/   the hostile target application (+ a "second tenant" variant)
-site/             interactive documentation & architecture website (GitHub Pages)
-docs/             ADRs (why) · design (how) · prd (what, in what order) · runbooks
-tests/            unit · integration · contract · invariants · e2e(live)
-evidence/         proof that the end-to-end thread actually ran  (start here)
-                  including evals/ — the measured numbers behind the claims
+site/                  Interactive documentation and architecture portal (GitHub Pages)
+src/cua/
+  domain/              Pure domain types: Capability, Action, TargetDescriptor, RunRecord
+  perception/          Surface normalization into UiSnapshot and accessibility trees
+  targeting/           6-rung semantic target resolution ladder and ambiguity detector
+  policy/              Policy chokepoint, allowlist, risk tiers, and zero-leak redactor
+  hitl/                SessionBroker, Lease protocol, and Operator Web Console
+  runtime/             Dispatcher: exclusive importer of surface drivers
+  surfaces/            SurfaceDriver implementations (Playwright / CDP driver)
+  agent/               LLM discovery loop, vision/DOM navigation, prompt compiler
+  replay/              Deterministic replay engine (strictly no LLM imports)
+  recorder/            Trace-to-capability compilation and content-hashing
+  evidence/            Structured audit bus and redacted run records
+  catalog/             Capability catalog, tenant overlays, and tool export
+  cli/                 CLI entrypoints (discover, replay, console, catalog)
+apps/mock_bank/        Hostile banking target application (framesets, no test IDs) + Variant B
+docs/                  Architecture specs, ADRs (0001-0005), PRD, runbooks, and traceability
+evidence/              Committed execution evidence, traces, evaluations, and artifacts
+tests/                 Unit, integration, contract, invariant, and fault matrix test suites
 ```
 
-## Documentation
+---
 
-| Read this | For |
+## Documentation Index
+
+| Resource | Purpose |
 |---|---|
-| [**Interactive Docs & Demo Portal**](https://adityamhaske.github.io/interface.ai/) | **Live documentation website, interactive execution pipeline, and guides** |
-| [`REPORT.md`](REPORT.md) | The design write-up and the trade-offs — **read this first** |
-| [`evidence/README.md`](evidence/README.md) | What each committed run proves, and how to read one |
-| [`AGENTS.md`](AGENTS.md) | Working agreement, architecture map, the nine invariants |
-| [`docs/README.md`](docs/README.md) | Full documentation map |
-| [`docs/design/artifact-schema.md`](docs/design/artifact-schema.md) | The centerpiece: the capability artifact |
+| [**Interactive Documentation Portal**](https://adityamhaske.github.io/interface.ai/) | **Complete web documentation, interactive execution pipeline, and guides** |
+| [`REPORT.md`](REPORT.md) | Architectural trade-offs, design rationale, and technical retrospective |
+| [`AGENTS.md`](AGENTS.md) | Working agreement, invariant specifications, and test contracts |
+| [`evidence/README.md`](evidence/README.md) | What each committed run proves and how to read evidence traces |
+| [`docs/README.md`](docs/README.md) | Full documentation index across ADRs, design, and runbooks |
+| [`docs/design/artifact-schema.md`](docs/design/artifact-schema.md) | Complete Capability artifact schema and specification |
+| [`docs/design/target-resolution.md`](docs/design/target-resolution.md) | Six-rung semantic target resolution ladder |
+| [`docs/prd/01-requirements-traceability.md`](docs/prd/01-requirements-traceability.md) | Requirements traceability matrix (R1–R10) |
+
+---
+
+## Proprietary Notice & License
+
+**PROPRIETARY AND CONFIDENTIAL**
+
+Copyright © 2026 Aditya Mhaske / interface.ai. All rights reserved.
+
+This software, its source code, documentation, specifications, and associated assets are proprietary and confidential. **This is not an open-source project.** Unauthorized copying, modification, distribution, transmission, reverse engineering, or disclosure of this software, in whole or in part, via any medium is strictly prohibited without prior written authorization from the copyright holder.

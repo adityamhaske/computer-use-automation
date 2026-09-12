@@ -564,7 +564,17 @@ make setup</code></pre>
 make demo</code></pre>
   <p>Takes about a minute. Works without an API key — discovery falls back to a recorded transcript and says so explicitly.</p>
 
-  <h2>Development commands</h2>
+  <h2>Unified Orchestrator (<code>./start.sh</code>)</h2>
+  <pre><code>./start.sh                 <span class="comment"># Default: setup venv + run the full 12-stage demo</span>
+./start.sh ui              <span class="comment"># Launch Human-in-the-Loop Web Console + Mock Bank</span>
+./start.sh ui --headed     <span class="comment"># Run the console with visible (headed) Chromium</span>
+./start.sh app             <span class="comment"># Run hostile mock back-office app (port 8811)</span>
+./start.sh app-b           <span class="comment"># Run rebranded second-tenant variant (port 8811)</span>
+./start.sh check           <span class="comment"># Run CI checks: lint + typecheck + invariants + tests</span>
+./start.sh test            <span class="comment"># Run offline test suite (no API keys, no network)</span>
+./start.sh eval            <span class="comment"># Run stability and cross-tenant drift evaluations</span></code></pre>
+
+  <h2>Development commands (Makefile)</h2>
   <pre><code>make check          <span class="comment"># lint + typecheck + invariants + tests (CI)</span>
 make test           <span class="comment"># offline suite; no API key, no network</span>
 make invariants     <span class="comment"># just the architectural contracts</span>
@@ -1383,6 +1393,10 @@ cua replay &lt;artifact&gt; --fault session_timeout           <span class="comme
   </ul>
 </div>
 
+  <footer style="margin-top: 64px; padding-top: 24px; padding-bottom: 24px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+    <span>CUA &middot; Computer-Use Automation &middot; Proprietary and Confidential &middot; All Rights Reserved</span>
+    <a href="https://github.com/adityamhaske/interface.ai" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: none; font-weight: 500;">GitHub Repository &rarr;</a>
+  </footer>
 </main>
 </div>
 
