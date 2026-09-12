@@ -4,7 +4,6 @@
 > **Discovery is probabilistic. Execution is deterministic.**
 
 🌐 **Live Documentation & Interactive Demo:** [https://adityamhaske.github.io/interface.ai/](https://adityamhaske.github.io/interface.ai/)  
-🔒 **Confidential & Proprietary** — All Rights Reserved. *(Not an open-source project)*
 
 ---
 
