@@ -25,7 +25,7 @@ from collections import Counter
 from dataclasses import dataclass, field
 from typing import Any
 
-from cua.domain.action import ActionRisk, Navigate
+from cua.domain.action import ActionRisk, Extract, Navigate
 from cua.domain.actor import Actor
 from cua.domain.approval import CapabilityApproval
 from cua.domain.capability import Capability, RecoveryRule, RunCapability, Step
@@ -74,7 +74,71 @@ class ReplayExecutor:
     it without depending on its type."""
 
     session_id: str = field(default_factory=lambda: f"replay-{uuid.uuid4().hex[:8]}")
-    lease_epoch: int = 1
+
+    max_recovery_attempts_total: int = 6
+    """Recovery attempts allowed across the whole run, independent of any one rule's budget.
+
+    Mirrors `limits.max_recovery_attempts_total` in `config/policy.yaml`, which was parsed and read
+    by nothing. Defaulted rather than required so an executor built without a policy config is still
+    bounded -- an unbounded default is how this kind of cap quietly stops existing.
+    """
+
+    lease_epoch: int | None = None
+    """The epoch this run is authorized under.
+
+    Left unset, a supervised run adopts the broker's epoch when it starts, so a run resumed after a
+    handoff is authorized under the epoch the resume produced rather than a stale one.
+    """
+
+    def _duration_exceeded(self, state: _State) -> str | None:
+        """Whether this run has outlived the budget its own artifact declares."""
+        budget = state.capability.policy.max_duration_ms
+        if budget <= 0:
+            return None
+        elapsed = int((time.monotonic() - state.started) * 1000)
+        if elapsed <= budget:
+            return None
+        return f"run exceeded the declared budget of {budget}ms (elapsed {elapsed}ms)"
+
+    def _epochs(self) -> tuple[int, int | None]:
+        """The epoch this run holds, and the lease epoch to check it against.
+
+        The second value is read **fresh at every dispatch**, never cached: noticing that control
+        changed hands *since this run was authorized* is the entire purpose. Cache it and the check
+        degenerates into comparing a value with itself -- which is what it was before, and why the
+        dispatcher could refuse a stale epoch while nothing on the automation path ever handed it
+        one.
+
+        Unsupervised runs return `None`: with no lease there is no operator, and therefore no race
+        to close. The check is skipped because it is meaningless, not because it is inconvenient.
+        """
+        held = self.lease_epoch if self.lease_epoch is not None else 1
+        if self.broker is None:
+            return held, None
+        return held, int(self.broker.lease.epoch)
+
+    def _lease_available(self) -> str | None:
+        """Why automation may not act right now, or None if it may.
+
+        The epoch check alone is not enough, and assuming it was is what left the race open. An
+        epoch catches control changing hands *during* a run; it cannot catch a run that *starts*
+        while an operator already holds the session, because such a run would simply adopt the
+        operator's epoch and match itself.
+
+        Both questions have to be asked, and they are different: *who holds this session* and
+        *has it changed hands since I was authorized*.
+        """
+        if self.broker is None:
+            return None
+        lease = self.broker.lease
+        if lease.holder is not Actor.AUTOMATION:
+            return (
+                f"{lease.holder.value} holds session {self.session_id} "
+                f"(state: {lease.state.value}) -- automation may not act"
+            )
+        if lease.expired:
+            return f"the automation hold on session {self.session_id} has expired"
+        return None
 
     def run(self, capability: Capability, supplied: dict[str, Any]) -> RunResult:
         """Execute the capability and leave a `run_record.json` behind, whichever way it ends.
@@ -88,6 +152,8 @@ class ReplayExecutor:
             write_run_record(
                 build_run_record(self.evidence.run_dir, kind=RunKind.REPLAY, result=result),
                 self.evidence.run_dir,
+                redactor=self.evidence.redactor,
+                sensitive_keys=self.evidence.sensitive_keys,
             )
         except OSError as exc:  # pragma: no cover -- evidence must not mask the run's own outcome
             self.evidence.emit(
@@ -98,6 +164,14 @@ class ReplayExecutor:
     def _execute(self, capability: Capability, supplied: dict[str, Any]) -> RunResult:
         run_id = f"rep-{uuid.uuid4().hex[:10]}"
         started = time.monotonic()
+
+        if self.lease_epoch is None and self.broker is not None:
+            self.lease_epoch = int(self.broker.lease.epoch)
+
+        # Tell the evidence sinks what this capability considers sensitive, before the first write.
+        # The bus has always accepted this and nothing ever supplied it, so `sensitive: true` masked
+        # nothing anywhere -- `config/policy.yaml` promises otherwise.
+        self.evidence.sensitive_keys = capability.sensitive_names
 
         self.evidence.emit(
             EventType.RUN_START,
@@ -110,6 +184,21 @@ class ReplayExecutor:
 
         state = _State(capability=capability, run_id=run_id, started=started)
 
+        if (unavailable := self._lease_available()) is not None:
+            return self._fail(state, FailureCode.LEASE_LOST, unavailable)
+
+        # A capability declaring more steps than its own budget allows is a contract violation, and
+        # the cheapest place to catch it is before the browser moves. `policy.max_steps` and
+        # `max_duration_ms` sat in the schema being read by nothing: a reviewer opening the artifact
+        # reasonably concluded replay was bounded, and it was not.
+        if len(capability.steps) > capability.policy.max_steps:
+            return self._fail(
+                state,
+                FailureCode.POLICY_DENIED,
+                f"{capability.ref} declares {len(capability.steps)} steps but its own policy "
+                f"allows {capability.policy.max_steps}",
+            )
+
         try:
             state.inputs = validate_inputs(capability, supplied)
         except InputValidationError as exc:
@@ -119,12 +208,14 @@ class ReplayExecutor:
             return self._fail(state, FailureCode.POLICY_DENIED, gate)
 
         if capability.entrypoint.url_pattern.startswith(("http://", "https://")):
+            held, current = self._epochs()
             outcome = self.dispatcher.execute(
                 Navigate(url=capability.entrypoint.url_pattern),
                 snapshot=self.dispatcher.observe(),
                 actor=Actor.AUTOMATION,
                 session_id=self.session_id,
-                lease_epoch=self.lease_epoch,
+                lease_epoch=held,
+                expected_epoch=current,
                 capability=capability,
             )
             if not outcome.ok:
@@ -148,6 +239,11 @@ class ReplayExecutor:
         attempts = 0
 
         while True:
+            # Checked inside the loop, not around it: a recovery rule that keeps clearing and
+            # re-detecting is exactly the shape that consumes wall-clock without consuming steps.
+            if (overrun := self._duration_exceeded(state)) is not None:
+                return self._fail(state, FailureCode.TIMEOUT, overrun, step=step)
+
             snapshot = self.dispatcher.observe()
 
             verdict = classify(
@@ -203,12 +299,14 @@ class ReplayExecutor:
                 state, FailureCode.INPUT_VALIDATION_FAILED, str(exc), step=step, snapshot=snapshot
             )
 
+        held, current = self._epochs()
         outcome = self.dispatcher.execute(
             action,
             snapshot=snapshot,
             actor=Actor.AUTOMATION,
             session_id=self.session_id,
-            lease_epoch=self.lease_epoch,
+            lease_epoch=held,
+            expected_epoch=current,
             capability=state.capability,
             declared_risk=step.risk,
         )
@@ -220,13 +318,31 @@ class ReplayExecutor:
             if outcome.drifted:
                 state.drifted += 1
 
-        # `extract` never reaches a driver: it reads from the snapshot the executor already has.
-        if action.type == "extract" and outcome.resolution is not None:
+        # `extract` reads from the snapshot the executor already holds; it never reaches a driver,
+        # so the dispatcher refuses it and its `status` says nothing about whether the read worked.
+        # That check is skipped for extract -- and *only* that check. It used to return here
+        # outright, which also skipped this step's own `wait` and `postcondition`: assertions the
+        # schema accepts and the engine silently never evaluated.
+        extracted = isinstance(action, Extract) and outcome.resolution is not None
+        if isinstance(action, Extract) and outcome.resolution is not None:
             node = outcome.resolution.node
-            state.outputs[action.into] = node.value or node.name or ""
-            return None
+            value = node.value or node.name or ""
+            if not value.strip():
+                # A node that resolved but reads as nothing is not a successful extraction. Storing
+                # "" here let a run report SUCCESS with an empty output, which is the worst kind of
+                # failure: confident, and wrong in a direction nobody checks.
+                return self._fail(
+                    state,
+                    FailureCode.ACTION_FAILED,
+                    f"step {step.id!r} resolved {node.node_id!r} for output "
+                    f"{action.into!r}, but it has no readable value",
+                    step=step,
+                    snapshot=snapshot,
+                    resolution=outcome.resolution,
+                )
+            state.outputs[action.into] = value
 
-        if outcome.status is not DispatchStatus.OK:
+        if not extracted and outcome.status is not DispatchStatus.OK:
             return self._fail(
                 state,
                 outcome.failure_code or FailureCode.ACTION_FAILED,
@@ -272,6 +388,18 @@ class ReplayExecutor:
         """Apply a declared remedy. Returns a terminal result if recovery is exhausted."""
         state.recovery_attempts += 1
 
+        # Per-step budgets bound each rule; this bounds the run. Without it, five steps at three
+        # attempts each is fifteen recovery cycles against a configured total of six -- every
+        # individual rule inside its budget, and the run as a whole far outside it.
+        if state.recovery_attempts > self.max_recovery_attempts_total:
+            return self._fail(
+                state,
+                FailureCode.RECOVERY_EXHAUSTED,
+                f"this run has attempted recovery {state.recovery_attempts} time(s), over the "
+                f"configured total of {self.max_recovery_attempts_total}",
+                snapshot=snapshot,
+            )
+
         if attempts > rule.max_attempts:
             return self._fail(
                 state,
@@ -301,12 +429,14 @@ class ReplayExecutor:
                     f"{remedy.capability_id!r}, which is not implemented",
                     snapshot=snapshot,
                 )
+            held, current = self._epochs()
             outcome = self.dispatcher.execute(
                 remedy,
                 snapshot=self.dispatcher.observe(),
                 actor=Actor.AUTOMATION,
                 session_id=self.session_id,
-                lease_epoch=self.lease_epoch,
+                lease_epoch=held,
+                expected_epoch=current,
                 capability=state.capability,
             )
             if not outcome.ok:

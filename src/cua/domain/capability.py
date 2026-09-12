@@ -441,6 +441,21 @@ class Capability(_Doc):
         return next((s for s in self.steps if s.id == step_id), None)
 
     @property
+    def sensitive_names(self) -> frozenset[str]:
+        """Input and output names this capability declared `sensitive: true`.
+
+        Lives on the capability because the capability is what declares it. Two places need it --
+        masking evidence and blurring screenshot regions -- and deriving it independently in each
+        is how one of them ends up not doing it. That is exactly what happened: screenshot blurring
+        read these declarations, and nothing told the evidence bus about them, so `sensitive: true`
+        blurred a region in an image while the value sat in the clear in the run record.
+        """
+        return frozenset(
+            {spec.name for spec in self.inputs if spec.sensitive}
+            | {spec.name for spec in self.outputs if spec.sensitive}
+        )
+
+    @property
     def max_risk(self) -> ActionRisk:
         """The riskiest thing this capability does. Drives the approval gate."""
         order = [ActionRisk.SAFE, ActionRisk.ELEVATED, ActionRisk.IRREVERSIBLE]

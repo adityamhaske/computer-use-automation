@@ -24,6 +24,7 @@ from apps.mock_bank.server import VALID_PW, VALID_USER, create_app
 from cua.domain.capability import Capability
 from cua.domain.result import FailureCode, RunStatus
 from cua.domain.serde import load_capability
+from cua.domain.target import Anchor, AnchorRelation
 from cua.domain.tenant_binding import TenantBinding
 from cua.evidence.bus import EvidenceBus
 from cua.policy.config import parse_policy
@@ -322,3 +323,120 @@ def test_repeated_replays_produce_identical_decisions(
     assert {run.status for run in runs} == {RunStatus.SUCCESS}
     assert len({tuple(sorted(run.outputs.items())) for run in runs}) == 1
     assert len({tuple(sorted(run.strategy_mix.items())) for run in runs}) == 1
+
+
+# ============================================ the budgets the artifact declares
+
+# Three bounds sat in the schema and in config/policy.yaml, parsed and read by nothing. A reviewer
+# opening the artifact and seeing `policy: {max_steps: 40, max_duration_ms: 120000}` reasonably
+# concluded replay was bounded. It was not. These assert that it now is.
+
+
+def test_a_capability_declaring_more_steps_than_its_budget_is_refused(
+    replay: ReplayExecutor, capability: Capability
+) -> None:
+    """Caught before the browser moves -- the cheapest place to reject a contract violation."""
+    over = capability.model_copy(
+        update={"policy": capability.policy.model_copy(update={"max_steps": 2})}
+    )
+    result = replay.run(over, {"member_id": "12345"})
+
+    assert result.status is RunStatus.FAILED
+    assert result.error is not None
+    assert result.error.code is FailureCode.POLICY_DENIED
+    assert "allows 2" in result.error.message
+    assert result.steps_executed == 0, "nothing should have run"
+
+
+def test_a_run_that_outlives_its_declared_duration_is_stopped(
+    replay: ReplayExecutor, capability: Capability
+) -> None:
+    """A budget of zero-plus-one millisecond cannot be met, so the first check trips.
+
+    The point is not the number: it is that the declared budget is consulted at all, and that
+    exceeding it terminates the run rather than being recorded and ignored.
+    """
+    impatient = capability.model_copy(
+        update={"policy": capability.policy.model_copy(update={"max_duration_ms": 1})}
+    )
+    result = replay.run(impatient, {"member_id": "12345"})
+
+    assert result.status is RunStatus.FAILED
+    assert result.error is not None
+    assert result.error.code is FailureCode.TIMEOUT
+    assert "declared budget" in result.error.message
+
+
+def test_recovery_is_bounded_across_the_run_not_only_per_rule(
+    replay: ReplayExecutor, capability: Capability, app: tuple[str, int]
+) -> None:
+    """Per-rule budgets bound each rule; this bounds the run.
+
+    Without a run-level cap, five steps at three attempts each is fifteen recovery cycles with every
+    individual rule still inside its own budget -- and a configured total of six meaning nothing.
+    """
+    replay.max_recovery_attempts_total = 2
+    arm(app, "transient_load", count=9)
+    try:
+        result = replay.run(capability, {"member_id": "12345"})
+    finally:
+        reset(app)
+
+    assert result.recovery_attempts <= 3, "the run-level cap must bite before the per-rule one"
+    assert result.status in {RunStatus.FAILED, RunStatus.NEEDS_HUMAN}
+    summary = (result.error.message if result.error else "") + (
+        result.intervention.reason if result.intervention else ""
+    )
+    assert "configured total" in summary
+
+
+# ====================================== an extraction that reads nothing is not success
+
+
+def test_an_extraction_with_no_readable_value_fails_rather_than_returning_empty(
+    replay: ReplayExecutor, capability: Capability
+) -> None:
+    """The worst kind of failure is the confident one.
+
+    `node.value or node.name or ""` meant a target that resolved but read as nothing produced an
+    empty output, the run continued, and it could report SUCCESS. Nothing downstream checks an
+    output for emptiness, so it would have travelled as a real answer.
+    """
+    # "Passbook Ref" is a field the mock core system renders and never populates -- the kind of
+    # dead column a real legacy screen accumulates. It resolves cleanly and reads as nothing, which
+    # is exactly the case this guard exists for. Retargeting to something that does *not* resolve
+    # would test target resolution instead, and pass without the guard.
+    blank = Anchor(relation=AnchorRelation.ADJACENT_TO, text="Passbook Ref")
+    retargeted = capability.model_copy(
+        update={
+            "steps": tuple(
+                step.model_copy(
+                    update={
+                        "action": step.action.model_copy(
+                            update={
+                                "target": step.action.target.model_copy(
+                                    update={"name": None, "anchor": blank}
+                                )
+                            }
+                        ),
+                        "precondition": None,
+                    }
+                )
+                if step.id == "read_balance"
+                else step
+                for step in capability.steps
+            )
+        }
+    )
+    result = replay.run(retargeted, {"member_id": "12345"})
+
+    assert result.status is not RunStatus.SUCCESS, "an empty extraction must never read as success"
+    # Asserted on the code, not merely on "not success". This capability's checkpoint happens to
+    # assert the shape of the extracted money value, so it would have caught the empty output a
+    # step later anyway -- which is precisely why a weaker assertion here would pass without the
+    # guard and prove nothing. A capability whose checkpoint did not pin the value would have
+    # returned SUCCESS with an empty answer.
+    assert result.error is not None
+    assert result.error.code is FailureCode.ACTION_FAILED, result.error.message
+    assert "no readable value" in result.error.message
+    assert result.error.step_id == "read_balance"

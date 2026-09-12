@@ -22,7 +22,7 @@ you are probably about to make the system's core claim untrue. Stop and raise it
 
 ---
 
-## The nine invariants
+## The ten invariants
 
 Each is mechanically enforced. The enforcing test is named so you can see it fail on purpose.
 
@@ -32,9 +32,11 @@ Each is mechanically enforced. The enforcing test is named so you can see it fai
 *Why:* it is the whole thesis. A replay that can quietly ask a model for help is not deterministic,
 is not cheap, and is not auditable.
 
-*Enforced by:* `.importlinter` contract `no-llm-in-replay`;
-`tests/invariants/test_no_llm_in_replay.py` also replays a real artifact with the LLM client
-monkeypatched to raise, proving the import rule isn't being routed around at runtime.
+*Enforced by:* `.importlinter` contract `no-llm-in-replay` (with indirect imports disallowed);
+`tests/invariants/test_import_contracts.py` asserts the contract is still *declared*, so deleting it
+to make the suite green takes a deliberate edit; and
+`tests/integration/test_fault_matrix.py::test_replay_uses_no_model` replays a real artifact with no
+model wired at all, proving the rule isn't being routed around at runtime.
 
 ### 2. No action reaches a driver without policy authorization
 The only path to a surface, for every actor, is:
@@ -85,7 +87,8 @@ still apply.
 
 *Why:* the moment a person takes over is exactly when a regulated system most needs an audit trail.
 
-*Enforced by:* `tests/invariants/test_human_control_safety.py`.
+*Enforced by:* `tests/invariants/test_human_control_safety.py`,
+`tests/integration/test_handoff.py::test_human_input_goes_through_policy`.
 
 ### 5. Unknown states fail closed
 If the observed UI matches no declared precondition, checkpoint, outcome, or recovery rule, it is
@@ -95,13 +98,20 @@ with `TARGET_AMBIGUOUS`. Never proceed on the assumption that the click probably
 *Why:* in a bank, guessing is the expensive outcome. A system that stops is recoverable; a system
 that acts on a screen it doesn't understand is an incident.
 
-*Enforced by:* `tests/integration/test_fail_closed.py`, `tests/unit/test_resolver_ambiguity.py`.
+*Enforced by:* `tests/integration/test_fault_matrix.py::test_an_undeclared_screen_fails_closed`,
+`tests/unit/test_resolver.py::test_ambiguity_is_refused_not_tiebroken`.
 
 ### 6. Every sink is redacted
 Logs, artifacts, evidence files, screenshots, **and outbound LLM prompts**. Secrets are
-`{$secret: ref}` references resolved at dispatch time and never written anywhere.
+`{$secret: ref}` references resolved at dispatch time and never written anywhere. A capability's
+`sensitive: true` declarations reach every sink through `Capability.sensitive_names`.
 
 *Why:* regulated financial data should not leave the process because a model asked for context.
+
+*Watch for:* a writer that takes its own path to disk. `write_run_record` did, and for a while the
+evidence directory held two files for the same run under different rules. It now **requires** a
+redactor rather than accepting one, which is the difference between a sink that is redacted and a
+sink that can be. Prefer signatures that make the unredacted path unrepresentable.
 
 *Enforced by:* `tests/invariants/test_redaction.py` (seeded PII and secrets must appear in zero
 sinks).
@@ -123,16 +133,38 @@ shrug.
 
 *Enforced by:* `tests/integration/test_fault_matrix.py`.
 
-### 8. Capabilities are immutable
+### 8. Automation may only act while it holds the session
+Every automation dispatch asks the lease two questions: **who holds this session**, and **has it
+changed hands since this run was authorized**. Either answer can refuse the dispatch with
+`LEASE_LOST`.
+
+Both, because the epoch alone is not enough. An epoch catches control changing hands *during* a
+run; it cannot catch a run that *starts* while an operator already holds the session, because such
+a run adopts the current epoch and matches itself.
+
+*Why:* this is the race the lease exists for -- an in-flight step acting on a screen a person is
+working in.
+
+*Watch for:* an optional check. `Dispatcher.execute(expected_epoch=...)` defaults to `None`, and
+for a long time the replay executor never passed it, so `LEASE_LOST` was unreachable on the
+automation path while two tests calling the dispatcher directly made it look covered. A guarantee
+that a caller can silently decline is not a guarantee.
+
+*Enforced by:* `tests/integration/test_handoff.py`
+`::test_automation_cannot_act_after_a_human_claims_the_live_session`,
+`::test_a_run_authorized_before_the_handoff_cannot_resume_on_its_old_epoch`.
+
+### 9. Capabilities are immutable
 A `Capability` at `id@version` is frozen and content-hashed. Anything that changes because you *ran*
 it lives in a separate document: `RunRecord`, `CapabilityEvaluation`, `CapabilityApproval`.
 
 *Why:* a definition that accumulates telemetry stops being reviewable, and "which version actually
 ran?" stops being answerable.
 
-*Enforced by:* `tests/contract/test_capability_immutability.py`.
+*Enforced by:* `tests/contract/test_capability_schema.py::test_capability_is_frozen`,
+`::test_tampering_is_detected`, and `tests/integration/test_catalog.py``::test_an_artifact_edited_in_place_is_refused` -- the catalog refuses to serve one.
 
-### 9. `domain/` is pure
+### 10. `domain/` is pure
 No I/O, no network, no browser, no clock. `cua.domain` imports nothing else from `cua`.
 
 *Why:* the artifact schema is the centerpiece of this system. It has to be reasonable about, and

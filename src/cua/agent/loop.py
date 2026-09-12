@@ -186,6 +186,8 @@ class DiscoveryAgent:
                     model_name=self.llm.model_name,
                 ),
                 self.evidence.run_dir,
+                redactor=self.evidence.redactor,
+                sensitive_keys=self.evidence.sensitive_keys,
             )
         except OSError as exc:  # pragma: no cover -- evidence must not mask the run's own outcome
             self.evidence.emit(

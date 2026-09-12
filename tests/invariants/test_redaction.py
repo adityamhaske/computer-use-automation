@@ -17,8 +17,11 @@ from pathlib import Path
 import pytest
 
 from cua.domain.actor import Actor
+from cua.domain.result import FailureCode, FailureDetail, RunResult, RunStatus
+from cua.domain.run_record import RunKind, RunRecord
 from cua.domain.snapshot import NodeScope, UiNode, UiSnapshot
 from cua.evidence.bus import EventType, EvidenceBus
+from cua.evidence.record import write_run_record
 from cua.policy.config import parse_policy
 from cua.policy.redact import Redactor
 from cua.policy.secrets import SecretResolver
@@ -93,6 +96,35 @@ def test_no_sink_retains_seeded_secrets(bus: EvidenceBus, tmp_path: Path) -> Non
         typed=f"signing on with {PASSWORD}",
     )
     bus.emit(EventType.LLM_CALL, actor=Actor.AUTOMATION, prompt=f"The page shows SSN {SSN}.")
+
+    # The run record is a sink too, and for a long time it was the one this test could not see:
+    # every write above goes through the bus, so the assertion below proved "every sink the bus
+    # writes is clean" rather than "every sink is clean". `write_run_record` wrote straight to disk.
+    write_run_record(
+        RunRecord(
+            run_id="run-redaction",
+            kind=RunKind.REPLAY,
+            capability_ref="corebank.member.savings_balance@1.0.0",
+            inputs={"member_id": "12345", "password": PASSWORD},
+            result=RunResult(
+                status=RunStatus.FAILED,
+                capability_id="corebank.member.savings_balance",
+                capability_version="1.0.0",
+                run_id="run-redaction",
+                outputs={"ssn_on_file": SSN, "account_number": ACCOUNT},
+                error=FailureDetail(
+                    code=FailureCode.PRECONDITION_FAILED,
+                    step_id="read_balance",
+                    message=f"expected the row for {EMAIL}",
+                    expected=f"cell containing {ACCOUNT}",
+                    observed=f"cell containing SSN {SSN}",
+                ),
+            ),
+        ),
+        tmp_path,
+        redactor=bus.redactor,
+        sensitive_keys=bus.sensitive_keys,
+    )
 
     written = _all_written_text(tmp_path)
     assert written, "the test wrote nothing -- it would pass vacuously"
@@ -179,3 +211,38 @@ def test_capability_references_survive_redaction(redactor: Redactor) -> None:
     # ...and the tightening did not cost us real addresses.
     for address in (EMAIL, "jane.doe+tag@mail.example.co.uk", "ops@bank-internal.org"):
         assert address not in redactor.text(f"contact {address} about it")
+
+
+def test_a_capability_declaring_an_output_sensitive_masks_it_in_the_record(
+    tmp_path: Path, redactor: Redactor
+) -> None:
+    """`sensitive: true` has to do something, in every sink.
+
+    `config/policy.yaml` promises that fields a capability marks sensitive are "always masked,
+    excluded from evidence, and blurred in screenshots". Screenshot blurring read the declaration;
+    nothing told the evidence bus about it, so the promise held for pixels and not for text. The
+    value here is a plain string no pattern could recognise -- only the declaration identifies it,
+    which is the whole reason the declaration exists.
+    """
+    bus = EvidenceBus(tmp_path, redactor, run_id="r", sensitive_keys=frozenset({"ssn_on_file"}))
+    write_run_record(
+        RunRecord(
+            run_id="r",
+            kind=RunKind.REPLAY,
+            result=RunResult(
+                status=RunStatus.SUCCESS,
+                capability_id="c",
+                capability_version="1.0.0",
+                run_id="r",
+                outputs={"ssn_on_file": "AB-9931-QQ", "branch": "Downtown"},
+            ),
+        ),
+        tmp_path,
+        redactor=bus.redactor,
+        sensitive_keys=bus.sensitive_keys,
+    )
+
+    written = (tmp_path / "run_record.json").read_text(encoding="utf-8")
+    assert "AB-9931-QQ" not in written, "a declared-sensitive output reached the record"
+    assert "<redacted:" in written, "it should be masked by shape, not simply dropped"
+    assert "Downtown" in written, "an output nobody declared sensitive must stay readable"

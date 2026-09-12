@@ -472,6 +472,8 @@ class Demo:
             write_run_record(
                 build_run_record(rig.run_dir, kind=RunKind.INTERVENTION, result=result),
                 rig.run_dir,
+                redactor=rig.redactor,
+                sensitive_keys=rig.evidence.sensitive_keys,
             )
             self.say(
                 "Re-anchored after the handoff",

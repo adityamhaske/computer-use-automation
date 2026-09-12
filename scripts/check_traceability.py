@@ -20,6 +20,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MATRIX = ROOT / "docs/prd/01-requirements-traceability.md"
 
+# AGENTS.md is checked for the same reason and is arguably the more important of the two: it is the
+# document that *defines* the invariants and claims each one is enforced. Four of its nine "Enforced
+# by" references pointed at test files that had never existed -- so a reviewer clicking through the
+# repository's own statement of its guarantees would have found half of them fictional.
+CHECKED = (MATRIX, ROOT / "AGENTS.md")
+
 TEST_DIRS = ("unit/", "integration/", "contract/", "invariants/", "e2e/")
 SOURCE_DIRS = (
     "cli/",
@@ -49,7 +55,10 @@ def resolves(reference: str) -> bool:
                 f"def {test_name}(" in path.read_text(encoding="utf-8")
                 for path in (ROOT / "tests").rglob("test_*.py")
             )
-        path = ROOT / "tests" / file_part
+        # The matrix writes paths relative to `tests/` ("integration/test_x.py"); AGENTS.md writes
+        # them from the repository root ("tests/integration/test_x.py"). Both are natural in their
+        # own document, so accept either rather than forcing one to read awkwardly.
+        path = ROOT / file_part if file_part.startswith("tests/") else ROOT / "tests" / file_part
         if not path.is_file():
             return False
         return f"def {test_name}(" in path.read_text(encoding="utf-8")
@@ -75,7 +84,14 @@ def resolves(reference: str) -> bool:
 
 
 def main() -> int:
-    text = MATRIX.read_text(encoding="utf-8")
+    failures = 0
+    for document in CHECKED:
+        failures += _check(document)
+    return 1 if failures else 0
+
+
+def _check(document: Path) -> int:
+    text = document.read_text(encoding="utf-8")
     # Everything in backticks, plus the markdown links in the deliverables table.
     references = set(re.findall(r"`([^`\n]+)`", text)) - {"file::test"}
 
@@ -90,16 +106,16 @@ def main() -> int:
 
     broken = sorted(r for r in checkable if not resolves(r))
     if broken:
-        print(f"{MATRIX.relative_to(ROOT)}: {len(broken)} reference(s) do not resolve:\n")
+        print(f"{document.relative_to(ROOT)}: {len(broken)} reference(s) do not resolve:\n")
         for reference in broken:
             print(f"  {reference}")
         print(
-            "\nThe matrix must describe what exists. Fix the reference, or build the thing it "
-            "promises."
+            "\nThese documents must describe what exists. Fix the reference, or build the thing "
+            "it promises."
         )
         return 1
 
-    print(f"traceability: {len(checkable)} reference(s) resolve")
+    print(f"{document.relative_to(ROOT)}: {len(checkable)} reference(s) resolve")
     return 0
 
 

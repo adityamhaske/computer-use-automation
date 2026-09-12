@@ -1,6 +1,6 @@
 {
-  "snapshot_id": "snap-c069bafb9f",
-  "url": "http://127.0.0.1:36553/",
+  "snapshot_id": "snap-ce157bc23d",
+  "url": "http://127.0.0.1:42101/",
   "title": "MemberDesk",
   "nodes": [
     {
@@ -17,7 +17,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "229"
+        "native": "182"
       },
       "fingerprint": "34942f57acae2b27"
     },
@@ -35,7 +35,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "238"
+        "native": "191"
       },
       "fingerprint": "dac0da6641c0fbca"
     },
@@ -53,7 +53,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "239"
+        "native": "192"
       },
       "fingerprint": "dac0da6641c0fbca"
     },
@@ -71,7 +71,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "232"
+        "native": "185"
       },
       "fingerprint": "d3a596dc8cf2c44a"
     },
@@ -89,7 +89,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "245"
+        "native": "198"
       },
       "fingerprint": "71449859354b6cef"
     },
@@ -109,7 +109,7 @@
         "nav:/row[5]/cell[0]"
       ],
       "hints": {
-        "native": "247"
+        "native": "200"
       },
       "fingerprint": "fa1f5bbbdad001d1"
     },
@@ -129,7 +129,7 @@
         "nav:/row[5]/cell[0]/text[0]"
       ],
       "hints": {
-        "native": "248"
+        "native": "201"
       },
       "fingerprint": "a6860dcb7608e989"
     },
@@ -147,7 +147,7 @@
       "parent_id": "nav:/row[5]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "259"
+        "native": "212"
       },
       "fingerprint": "e4dad854fe14f36d"
     },
@@ -167,7 +167,7 @@
         "nav:/row[6]/cell[0]"
       ],
       "hints": {
-        "native": "250"
+        "native": "203"
       },
       "fingerprint": "fa1f5bbbdad001d1"
     },
@@ -187,7 +187,7 @@
         "nav:/row[6]/cell[0]/link[0]"
       ],
       "hints": {
-        "native": "251"
+        "native": "204"
       },
       "fingerprint": "d50d2553ca8865ec"
     },
@@ -208,7 +208,7 @@
       ],
       "hints": {
         "css": "a[href=\"#\"]",
-        "native": "252"
+        "native": "205"
       },
       "fingerprint": "c5ec08a2c78d2403"
     },
@@ -226,7 +226,7 @@
       "parent_id": "nav:/row[6]/cell[0]/link[0]",
       "child_ids": [],
       "hints": {
-        "native": "260"
+        "native": "213"
       },
       "fingerprint": "46ba5b490b98688e"
     },
@@ -246,7 +246,7 @@
         "nav:/row[7]/cell[0]"
       ],
       "hints": {
-        "native": "253"
+        "native": "206"
       },
       "fingerprint": "fa1f5bbbdad001d1"
     },
@@ -266,7 +266,7 @@
         "nav:/row[7]/cell[0]/link[0]"
       ],
       "hints": {
-        "native": "254"
+        "native": "207"
       },
       "fingerprint": "c7133279a03177da"
     },
@@ -287,7 +287,7 @@
       ],
       "hints": {
         "css": "a[href=\"#\"]",
-        "native": "255"
+        "native": "208"
       },
       "fingerprint": "eea752b2f3040250"
     },
@@ -305,7 +305,7 @@
       "parent_id": "nav:/row[7]/cell[0]/link[0]",
       "child_ids": [],
       "hints": {
-        "native": "261"
+        "native": "214"
       },
       "fingerprint": "e9b643b64b9fb7bf"
     },
@@ -325,7 +325,7 @@
         "nav:/row[8]/cell[0]"
       ],
       "hints": {
-        "native": "256"
+        "native": "209"
       },
       "fingerprint": "fa1f5bbbdad001d1"
     },
@@ -345,7 +345,7 @@
         "nav:/row[8]/cell[0]/link[0]"
       ],
       "hints": {
-        "native": "257"
+        "native": "210"
       },
       "fingerprint": "72fe99457961cc31"
     },
@@ -366,7 +366,7 @@
       ],
       "hints": {
         "css": "a[href=\"#\"]",
-        "native": "258"
+        "native": "211"
       },
       "fingerprint": "3e0ca16cb2e51805"
     },
@@ -384,7 +384,7 @@
       "parent_id": "nav:/row[8]/cell[0]/link[0]",
       "child_ids": [],
       "hints": {
-        "native": "262"
+        "native": "215"
       },
       "fingerprint": "c28b3d03a05cec35"
     },
@@ -404,7 +404,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "313"
+        "native": "266"
       },
       "fingerprint": "eba30ff83962866f"
     },
@@ -422,7 +422,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "319"
+        "native": "272"
       },
       "fingerprint": "f6d07955fec5f341"
     },
@@ -442,7 +442,7 @@
         "content:/row[11]/cell[0]"
       ],
       "hints": {
-        "native": "321"
+        "native": "274"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -462,7 +462,7 @@
         "content:/row[11]/cell[0]/table[0]"
       ],
       "hints": {
-        "native": "322"
+        "native": "275"
       },
       "fingerprint": "bb5923d22e1419a1"
     },
@@ -480,7 +480,7 @@
       "parent_id": "content:/row[11]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "323"
+        "native": "276"
       },
       "fingerprint": "db0f241a64a7611f"
     },
@@ -500,7 +500,7 @@
         "content:/row[12]/cell[0]"
       ],
       "hints": {
-        "native": "330"
+        "native": "283"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -520,7 +520,7 @@
         "content:/row[12]/cell[0]/image[0]"
       ],
       "hints": {
-        "native": "331"
+        "native": "284"
       },
       "fingerprint": "1bd1205026807024"
     },
@@ -538,7 +538,7 @@
       "parent_id": "content:/row[12]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "332"
+        "native": "285"
       },
       "fingerprint": "db9aeb6548d5447b"
     },
@@ -558,14 +558,14 @@
         "content:/row[13]/cell[0]"
       ],
       "hints": {
-        "native": "333"
+        "native": "286"
       },
       "fingerprint": "13ca239244183fe8"
     },
     {
       "node_id": "content:/row[13]/cell[0]",
       "role": "cell",
-      "name": "Accounts Account Type Balance Status <redacted:account_number> Savings $4,210.55 Active <redacted:account_number> Checking $812.30 Active Open Sub-Account | New Search",
+      "name": "Accounts Account Type Balance Status <redacted:account_number> Savings $18,730.00 Active <redacted:account_number> Certificate $25,000.00 Active Open Sub-Account | New Search",
       "value": null,
       "states": [],
       "bounds": null,
@@ -578,9 +578,9 @@
         "content:/row[13]/cell[0]/table[0]"
       ],
       "hints": {
-        "native": "334"
+        "native": "287"
       },
-      "fingerprint": "d09f3158b434d105"
+      "fingerprint": "ef223b0b1a135412"
     },
     {
       "node_id": "content:/row[13]/cell[0]/table[0]",
@@ -596,7 +596,7 @@
       "parent_id": "content:/row[13]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "335"
+        "native": "288"
       },
       "fingerprint": "db0f241a64a7611f"
     },
@@ -617,7 +617,7 @@
         "content:/row[14]/cell[1]"
       ],
       "hints": {
-        "native": "325"
+        "native": "278"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -638,7 +638,7 @@
         "content:/row[14]/cell[0]/text[1]"
       ],
       "hints": {
-        "native": "326"
+        "native": "279"
       },
       "fingerprint": "db3531c999a9d575"
     },
@@ -656,7 +656,7 @@
       "parent_id": "content:/row[14]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "395"
+        "native": "351"
       },
       "fingerprint": "ddb193202da1e4c9"
     },
@@ -674,7 +674,7 @@
       "parent_id": "content:/row[14]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "396"
+        "native": "352"
       },
       "fingerprint": "e0bbb5ae6b8cabc8"
     },
@@ -695,7 +695,7 @@
         "content:/row[14]/cell[1]/link[0]"
       ],
       "hints": {
-        "native": "328"
+        "native": "281"
       },
       "fingerprint": "4284a156d8302fc6"
     },
@@ -713,7 +713,7 @@
       "parent_id": "content:/row[14]/cell[1]",
       "child_ids": [],
       "hints": {
-        "native": "397"
+        "native": "353"
       },
       "fingerprint": "e444e004a08dfb4c"
     },
@@ -734,7 +734,7 @@
       ],
       "hints": {
         "css": "a[href=\"/logout\"]",
-        "native": "329"
+        "native": "282"
       },
       "fingerprint": "b56cffb08b23a60c"
     },
@@ -752,7 +752,7 @@
       "parent_id": "content:/row[14]/cell[1]/link[0]",
       "child_ids": [],
       "hints": {
-        "native": "398"
+        "native": "354"
       },
       "fingerprint": "c508d2200d4b1e2c"
     },
@@ -772,14 +772,14 @@
         "content:/row[15]/cell[0]"
       ],
       "hints": {
-        "native": "337"
+        "native": "290"
       },
       "fingerprint": "13ca239244183fe8"
     },
     {
       "node_id": "content:/row[15]/cell[0]",
       "role": "cell",
-      "name": "Accounts Account Type Balance Status <redacted:account_number> Savings $4,210.55 Active <redacted:account_number> Checking $812.30 Active Open Sub-Account | New Search",
+      "name": "Accounts Account Type Balance Status <redacted:account_number> Savings $18,730.00 Active <redacted:account_number> Certificate $25,000.00 Active Open Sub-Account | New Search",
       "value": null,
       "states": [],
       "bounds": null,
@@ -800,9 +800,9 @@
         "content:/row[15]/cell[0]/link[1]"
       ],
       "hints": {
-        "native": "338"
+        "native": "291"
       },
-      "fingerprint": "d09f3158b434d105"
+      "fingerprint": "ef223b0b1a135412"
     },
     {
       "node_id": "content:/row[15]/cell[0]/table[0]",
@@ -818,7 +818,7 @@
       "parent_id": "content:/row[15]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "339"
+        "native": "292"
       },
       "fingerprint": "db0f241a64a7611f"
     },
@@ -836,7 +836,7 @@
       "parent_id": "content:/row[15]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "356"
+        "native": "309"
       },
       "fingerprint": "db9aeb6548d5447b"
     },
@@ -854,7 +854,7 @@
       "parent_id": "content:/row[15]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "358"
+        "native": "311"
       },
       "fingerprint": "db0f241a64a7611f"
     },
@@ -872,7 +872,7 @@
       "parent_id": "content:/row[15]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "378"
+        "native": "331"
       },
       "fingerprint": "db9aeb6548d5447b"
     },
@@ -890,7 +890,7 @@
       "parent_id": "content:/row[15]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "380"
+        "native": "333"
       },
       "fingerprint": "db0f241a64a7611f"
     },
@@ -908,7 +908,7 @@
       "parent_id": "content:/row[15]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "391"
+        "native": "347"
       },
       "fingerprint": "db9aeb6548d5447b"
     },
@@ -929,7 +929,7 @@
       ],
       "hints": {
         "css": "a[href=\"#\"]",
-        "native": "393"
+        "native": "349"
       },
       "fingerprint": "aaa6125ab4d538fd"
     },
@@ -947,7 +947,7 @@
       "parent_id": "content:/row[15]/cell[0]/link[0]",
       "child_ids": [],
       "hints": {
-        "native": "427"
+        "native": "384"
       },
       "fingerprint": "7acc01ff295435e3"
     },
@@ -965,7 +965,7 @@
       "parent_id": "content:/row[15]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "428"
+        "native": "385"
       },
       "fingerprint": "501fcbbbd30bd5c6"
     },
@@ -986,7 +986,7 @@
       ],
       "hints": {
         "css": "a[href=\"/search\"]",
-        "native": "394"
+        "native": "350"
       },
       "fingerprint": "c51a4064b3f9c93a"
     },
@@ -1004,7 +1004,7 @@
       "parent_id": "content:/row[15]/cell[0]/link[1]",
       "child_ids": [],
       "hints": {
-        "native": "429"
+        "native": "386"
       },
       "fingerprint": "fca2f76b34c4ddfe"
     },
@@ -1024,7 +1024,7 @@
         "content:/row[16]/cell[0]"
       ],
       "hints": {
-        "native": "341"
+        "native": "294"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -1044,7 +1044,7 @@
         "content:/row[16]/cell[0]/text[0]"
       ],
       "hints": {
-        "native": "342"
+        "native": "295"
       },
       "fingerprint": "ed8f8d1984c3110a"
     },
@@ -1062,7 +1062,7 @@
       "parent_id": "content:/row[16]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "399"
+        "native": "355"
       },
       "fingerprint": "f03b3ac615f1b4ba"
     },
@@ -1083,7 +1083,7 @@
         "content:/row[17]/cell[1]"
       ],
       "hints": {
-        "native": "344"
+        "native": "297"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -1103,7 +1103,7 @@
         "content:/row[17]/cell[0]/text[0]"
       ],
       "hints": {
-        "native": "345"
+        "native": "298"
       },
       "fingerprint": "604a7eb9b7dddc29"
     },
@@ -1121,14 +1121,14 @@
       "parent_id": "content:/row[17]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "400"
+        "native": "356"
       },
       "fingerprint": "66914960d53ab108"
     },
     {
       "node_id": "content:/row[17]/cell[1]",
       "role": "cell",
-      "name": "12345",
+      "name": "67890",
       "value": null,
       "states": [],
       "bounds": null,
@@ -1141,14 +1141,14 @@
         "content:/row[17]/cell[1]/text[0]"
       ],
       "hints": {
-        "native": "346"
+        "native": "299"
       },
-      "fingerprint": "aadbc78a4b5e8a37"
+      "fingerprint": "1d1f6d3376e804d9"
     },
     {
       "node_id": "content:/row[17]/cell[1]/text[0]",
       "role": "text",
-      "name": "12345",
+      "name": "67890",
       "value": null,
       "states": [],
       "bounds": null,
@@ -1159,9 +1159,9 @@
       "parent_id": "content:/row[17]/cell[1]",
       "child_ids": [],
       "hints": {
-        "native": "401"
+        "native": "357"
       },
-      "fingerprint": "7957d5178857f20c"
+      "fingerprint": "c27d62c54ba24c1e"
     },
     {
       "node_id": "content:/row[18]",
@@ -1180,7 +1180,7 @@
         "content:/row[18]/cell[1]"
       ],
       "hints": {
-        "native": "347"
+        "native": "300"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -1200,7 +1200,7 @@
         "content:/row[18]/cell[0]/text[0]"
       ],
       "hints": {
-        "native": "348"
+        "native": "301"
       },
       "fingerprint": "b496b1ecab5217bf"
     },
@@ -1218,14 +1218,14 @@
       "parent_id": "content:/row[18]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "402"
+        "native": "358"
       },
       "fingerprint": "d2a5a35b122597b9"
     },
     {
       "node_id": "content:/row[18]/cell[1]",
       "role": "cell",
-      "name": "Ada Lovelace",
+      "name": "Grace Hopper",
       "value": null,
       "states": [],
       "bounds": null,
@@ -1238,14 +1238,14 @@
         "content:/row[18]/cell[1]/text[0]"
       ],
       "hints": {
-        "native": "349"
+        "native": "302"
       },
-      "fingerprint": "204aefb1d1861b43"
+      "fingerprint": "435fe339f7caf59b"
     },
     {
       "node_id": "content:/row[18]/cell[1]/text[0]",
       "role": "text",
-      "name": "Ada Lovelace",
+      "name": "Grace Hopper",
       "value": null,
       "states": [],
       "bounds": null,
@@ -1256,9 +1256,9 @@
       "parent_id": "content:/row[18]/cell[1]",
       "child_ids": [],
       "hints": {
-        "native": "403"
+        "native": "359"
       },
-      "fingerprint": "f5b54e7437de8b22"
+      "fingerprint": "6b13f52f6157428a"
     },
     {
       "node_id": "content:/row[19]",
@@ -1277,7 +1277,7 @@
         "content:/row[19]/cell[1]"
       ],
       "hints": {
-        "native": "350"
+        "native": "303"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -1297,7 +1297,7 @@
         "content:/row[19]/cell[0]/text[0]"
       ],
       "hints": {
-        "native": "351"
+        "native": "304"
       },
       "fingerprint": "f1166ca24c9ce6e8"
     },
@@ -1315,14 +1315,14 @@
       "parent_id": "content:/row[19]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "404"
+        "native": "360"
       },
       "fingerprint": "4ebefdb122ffce03"
     },
     {
       "node_id": "content:/row[19]/cell[1]",
       "role": "cell",
-      "name": "03/14/2009",
+      "name": "11/02/1997",
       "value": null,
       "states": [],
       "bounds": null,
@@ -1335,14 +1335,14 @@
         "content:/row[19]/cell[1]/text[0]"
       ],
       "hints": {
-        "native": "352"
+        "native": "305"
       },
-      "fingerprint": "835c5fcb788ed45d"
+      "fingerprint": "9b69150d3a3f6675"
     },
     {
       "node_id": "content:/row[19]/cell[1]/text[0]",
       "role": "text",
-      "name": "03/14/2009",
+      "name": "11/02/1997",
       "value": null,
       "states": [],
       "bounds": null,
@@ -1353,9 +1353,9 @@
       "parent_id": "content:/row[19]/cell[1]",
       "child_ids": [],
       "hints": {
-        "native": "405"
+        "native": "361"
       },
-      "fingerprint": "f1ab92e02dcd8aa8"
+      "fingerprint": "a9004bcec0e199bc"
     },
     {
       "node_id": "content:/row[20]",
@@ -1374,7 +1374,7 @@
         "content:/row[20]/cell[1]"
       ],
       "hints": {
-        "native": "353"
+        "native": "306"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -1394,7 +1394,7 @@
         "content:/row[20]/cell[0]/text[0]"
       ],
       "hints": {
-        "native": "354"
+        "native": "307"
       },
       "fingerprint": "34d2a09d5460311b"
     },
@@ -1412,14 +1412,14 @@
       "parent_id": "content:/row[20]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "406"
+        "native": "362"
       },
       "fingerprint": "5d654a9f337b60a7"
     },
     {
       "node_id": "content:/row[20]/cell[1]",
       "role": "cell",
-      "name": "Downtown",
+      "name": "Riverside",
       "value": null,
       "states": [],
       "bounds": null,
@@ -1432,14 +1432,14 @@
         "content:/row[20]/cell[1]/text[0]"
       ],
       "hints": {
-        "native": "355"
+        "native": "308"
       },
-      "fingerprint": "849a4305785edef3"
+      "fingerprint": "037df693005e8458"
     },
     {
       "node_id": "content:/row[20]/cell[1]/text[0]",
       "role": "text",
-      "name": "Downtown",
+      "name": "Riverside",
       "value": null,
       "states": [],
       "bounds": null,
@@ -1450,9 +1450,9 @@
       "parent_id": "content:/row[20]/cell[1]",
       "child_ids": [],
       "hints": {
-        "native": "407"
+        "native": "363"
       },
-      "fingerprint": "51fa89086937db9c"
+      "fingerprint": "bf80ca3519744b34"
     },
     {
       "node_id": "content:/row[21]",
@@ -1470,7 +1470,7 @@
         "content:/row[21]/cell[0]"
       ],
       "hints": {
-        "native": "360"
+        "native": "313"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -1490,7 +1490,7 @@
         "content:/row[21]/cell[0]/text[0]"
       ],
       "hints": {
-        "native": "361"
+        "native": "314"
       },
       "fingerprint": "24e1dc5fbdc5f5dc"
     },
@@ -1508,7 +1508,7 @@
       "parent_id": "content:/row[21]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "408"
+        "native": "364"
       },
       "fingerprint": "a9a3737f08ffd60a"
     },
@@ -1531,7 +1531,7 @@
         "content:/row[22]/cell[3]"
       ],
       "hints": {
-        "native": "363"
+        "native": "316"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -1551,7 +1551,7 @@
         "content:/row[22]/cell[0]/text[0]"
       ],
       "hints": {
-        "native": "364"
+        "native": "317"
       },
       "fingerprint": "b617c62a07aa2026"
     },
@@ -1569,7 +1569,7 @@
       "parent_id": "content:/row[22]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "409"
+        "native": "365"
       },
       "fingerprint": "7f01e35f83e90c9e"
     },
@@ -1589,7 +1589,7 @@
         "content:/row[22]/cell[1]/text[0]"
       ],
       "hints": {
-        "native": "365"
+        "native": "318"
       },
       "fingerprint": "99182f50f89ddedc"
     },
@@ -1607,7 +1607,7 @@
       "parent_id": "content:/row[22]/cell[1]",
       "child_ids": [],
       "hints": {
-        "native": "410"
+        "native": "366"
       },
       "fingerprint": "b92e4f34b21d5831"
     },
@@ -1627,7 +1627,7 @@
         "content:/row[22]/cell[2]/text[0]"
       ],
       "hints": {
-        "native": "366"
+        "native": "319"
       },
       "fingerprint": "f97f90bbadecdb59"
     },
@@ -1645,7 +1645,7 @@
       "parent_id": "content:/row[22]/cell[2]",
       "child_ids": [],
       "hints": {
-        "native": "411"
+        "native": "367"
       },
       "fingerprint": "d8af325497a896a1"
     },
@@ -1665,7 +1665,7 @@
         "content:/row[22]/cell[3]/text[0]"
       ],
       "hints": {
-        "native": "367"
+        "native": "320"
       },
       "fingerprint": "812fc872872ec31c"
     },
@@ -1683,7 +1683,7 @@
       "parent_id": "content:/row[22]/cell[3]",
       "child_ids": [],
       "hints": {
-        "native": "412"
+        "native": "368"
       },
       "fingerprint": "9869608d2eb0a40b"
     },
@@ -1706,7 +1706,7 @@
         "content:/row[23]/cell[3]"
       ],
       "hints": {
-        "native": "368"
+        "native": "321"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -1726,9 +1726,9 @@
         "content:/row[23]/cell[0]/text[0]"
       ],
       "hints": {
-        "native": "369"
+        "native": "322"
       },
-      "fingerprint": "4a9e9e8d98a9827b"
+      "fingerprint": "a8b2fb3accd7d77b"
     },
     {
       "node_id": "content:/row[23]/cell[0]/text[0]",
@@ -1744,9 +1744,9 @@
       "parent_id": "content:/row[23]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "413"
+        "native": "369"
       },
-      "fingerprint": "a1702d96163b5e2d"
+      "fingerprint": "2cdaf9cfeec6376d"
     },
     {
       "node_id": "content:/row[23]/cell[1]",
@@ -1764,7 +1764,7 @@
         "content:/row[23]/cell[1]/text[0]"
       ],
       "hints": {
-        "native": "370"
+        "native": "323"
       },
       "fingerprint": "777f1288799ce1c8"
     },
@@ -1782,14 +1782,14 @@
       "parent_id": "content:/row[23]/cell[1]",
       "child_ids": [],
       "hints": {
-        "native": "414"
+        "native": "370"
       },
       "fingerprint": "1a6b0c242789e1bf"
     },
     {
       "node_id": "content:/row[23]/cell[2]",
       "role": "cell",
-      "name": "$4,210.55",
+      "name": "$18,730.00",
       "value": null,
       "states": [],
       "bounds": null,
@@ -1802,14 +1802,14 @@
         "content:/row[23]/cell[2]/text[0]"
       ],
       "hints": {
-        "native": "371"
+        "native": "324"
       },
-      "fingerprint": "<redacted:card_pan>"
+      "fingerprint": "8d2b1d18a80118ef"
     },
     {
       "node_id": "content:/row[23]/cell[2]/text[0]",
       "role": "text",
-      "name": "$4,210.55",
+      "name": "$18,730.00",
       "value": null,
       "states": [],
       "bounds": null,
@@ -1820,9 +1820,9 @@
       "parent_id": "content:/row[23]/cell[2]",
       "child_ids": [],
       "hints": {
-        "native": "415"
+        "native": "371"
       },
-      "fingerprint": "42b578abb65505ef"
+      "fingerprint": "69f50968053c0835"
     },
     {
       "node_id": "content:/row[23]/cell[3]",
@@ -1840,7 +1840,7 @@
         "content:/row[23]/cell[3]/text[0]"
       ],
       "hints": {
-        "native": "372"
+        "native": "325"
       },
       "fingerprint": "a565b77dfbd0bf06"
     },
@@ -1858,7 +1858,7 @@
       "parent_id": "content:/row[23]/cell[3]",
       "child_ids": [],
       "hints": {
-        "native": "416"
+        "native": "372"
       },
       "fingerprint": "301ca2b496407c62"
     },
@@ -1881,7 +1881,7 @@
         "content:/row[24]/cell[3]"
       ],
       "hints": {
-        "native": "373"
+        "native": "326"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -1901,9 +1901,9 @@
         "content:/row[24]/cell[0]/text[0]"
       ],
       "hints": {
-        "native": "374"
+        "native": "327"
       },
-      "fingerprint": "260f1db546aab5f3"
+      "fingerprint": "bd72f590327726bb"
     },
     {
       "node_id": "content:/row[24]/cell[0]/text[0]",
@@ -1919,14 +1919,14 @@
       "parent_id": "content:/row[24]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "417"
+        "native": "373"
       },
-      "fingerprint": "94468da07623475b"
+      "fingerprint": "69a7f8cc6251d0f2"
     },
     {
       "node_id": "content:/row[24]/cell[1]",
       "role": "cell",
-      "name": "Checking",
+      "name": "Certificate",
       "value": null,
       "states": [],
       "bounds": null,
@@ -1939,14 +1939,14 @@
         "content:/row[24]/cell[1]/text[0]"
       ],
       "hints": {
-        "native": "375"
+        "native": "328"
       },
-      "fingerprint": "1a85da2a064c2368"
+      "fingerprint": "12aa8f28b81cb543"
     },
     {
       "node_id": "content:/row[24]/cell[1]/text[0]",
       "role": "text",
-      "name": "Checking",
+      "name": "Certificate",
       "value": null,
       "states": [],
       "bounds": null,
@@ -1957,14 +1957,14 @@
       "parent_id": "content:/row[24]/cell[1]",
       "child_ids": [],
       "hints": {
-        "native": "418"
+        "native": "374"
       },
-      "fingerprint": "999e12f05f18d641"
+      "fingerprint": "c410fe893bea60cc"
     },
     {
       "node_id": "content:/row[24]/cell[2]",
       "role": "cell",
-      "name": "$812.30",
+      "name": "$25,000.00",
       "value": null,
       "states": [],
       "bounds": null,
@@ -1977,14 +1977,14 @@
         "content:/row[24]/cell[2]/text[0]"
       ],
       "hints": {
-        "native": "376"
+        "native": "329"
       },
-      "fingerprint": "cd8934ef680aaab0"
+      "fingerprint": "efe7795eac12e24e"
     },
     {
       "node_id": "content:/row[24]/cell[2]/text[0]",
       "role": "text",
-      "name": "$812.30",
+      "name": "$25,000.00",
       "value": null,
       "states": [],
       "bounds": null,
@@ -1995,9 +1995,9 @@
       "parent_id": "content:/row[24]/cell[2]",
       "child_ids": [],
       "hints": {
-        "native": "419"
+        "native": "375"
       },
-      "fingerprint": "3d2be088eb23c08b"
+      "fingerprint": "9ec78b6f3a716610"
     },
     {
       "node_id": "content:/row[24]/cell[3]",
@@ -2015,7 +2015,7 @@
         "content:/row[24]/cell[3]/text[0]"
       ],
       "hints": {
-        "native": "377"
+        "native": "330"
       },
       "fingerprint": "a565b77dfbd0bf06"
     },
@@ -2033,7 +2033,7 @@
       "parent_id": "content:/row[24]/cell[3]",
       "child_ids": [],
       "hints": {
-        "native": "420"
+        "native": "376"
       },
       "fingerprint": "301ca2b496407c62"
     },
@@ -2054,7 +2054,7 @@
         "content:/row[25]/cell[1]"
       ],
       "hints": {
-        "native": "382"
+        "native": "335"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -2074,7 +2074,7 @@
         "content:/row[25]/cell[0]/text[0]"
       ],
       "hints": {
-        "native": "383"
+        "native": "336"
       },
       "fingerprint": "f6f86bdf7b2e03a7"
     },
@@ -2092,14 +2092,14 @@
       "parent_id": "content:/row[25]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "421"
+        "native": "377"
       },
       "fingerprint": "f086031c1e59f020"
     },
     {
       "node_id": "content:/row[25]/cell[1]",
       "role": "cell",
-      "name": "$4,210.55",
+      "name": "$18,730.00",
       "value": null,
       "states": [],
       "bounds": null,
@@ -2112,14 +2112,14 @@
         "content:/row[25]/cell[1]/text[0]"
       ],
       "hints": {
-        "native": "384"
+        "native": "337"
       },
-      "fingerprint": "<redacted:card_pan>"
+      "fingerprint": "8d2b1d18a80118ef"
     },
     {
       "node_id": "content:/row[25]/cell[1]/text[0]",
       "role": "text",
-      "name": "$4,210.55",
+      "name": "$18,730.00",
       "value": null,
       "states": [],
       "bounds": null,
@@ -2130,9 +2130,9 @@
       "parent_id": "content:/row[25]/cell[1]",
       "child_ids": [],
       "hints": {
-        "native": "422"
+        "native": "378"
       },
-      "fingerprint": "42b578abb65505ef"
+      "fingerprint": "69f50968053c0835"
     },
     {
       "node_id": "content:/row[26]",
@@ -2151,7 +2151,7 @@
         "content:/row[26]/cell[1]"
       ],
       "hints": {
-        "native": "385"
+        "native": "338"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -2171,7 +2171,7 @@
         "content:/row[26]/cell[0]/text[0]"
       ],
       "hints": {
-        "native": "386"
+        "native": "339"
       },
       "fingerprint": "812fc872872ec31c"
     },
@@ -2189,7 +2189,7 @@
       "parent_id": "content:/row[26]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "423"
+        "native": "379"
       },
       "fingerprint": "9869608d2eb0a40b"
     },
@@ -2209,7 +2209,7 @@
         "content:/row[26]/cell[1]/text[0]"
       ],
       "hints": {
-        "native": "387"
+        "native": "340"
       },
       "fingerprint": "a565b77dfbd0bf06"
     },
@@ -2227,7 +2227,7 @@
       "parent_id": "content:/row[26]/cell[1]",
       "child_ids": [],
       "hints": {
-        "native": "424"
+        "native": "380"
       },
       "fingerprint": "301ca2b496407c62"
     },
@@ -2248,7 +2248,7 @@
         "content:/row[27]/cell[1]"
       ],
       "hints": {
-        "native": "388"
+        "native": "341"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -2268,7 +2268,7 @@
         "content:/row[27]/cell[0]/text[0]"
       ],
       "hints": {
-        "native": "389"
+        "native": "342"
       },
       "fingerprint": "6542799081d07901"
     },
@@ -2286,7 +2286,7 @@
       "parent_id": "content:/row[27]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "425"
+        "native": "381"
       },
       "fingerprint": "d91117474a3aa479"
     },
@@ -2306,7 +2306,7 @@
         "content:/row[27]/cell[1]/text[0]"
       ],
       "hints": {
-        "native": "390"
+        "native": "343"
       },
       "fingerprint": "2ff3d53e4486a110"
     },
@@ -2324,11 +2324,88 @@
       "parent_id": "content:/row[27]/cell[1]",
       "child_ids": [],
       "hints": {
-        "native": "426"
+        "native": "382"
       },
       "fingerprint": "e9a43d7918ef5abc"
+    },
+    {
+      "node_id": "content:/row[28]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[28]/cell[0]",
+        "content:/row[28]/cell[1]"
+      ],
+      "hints": {
+        "native": "344"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[28]/cell[0]",
+      "role": "cell",
+      "name": "Passbook Ref",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[28]",
+      "child_ids": [
+        "content:/row[28]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "345"
+      },
+      "fingerprint": "05f6d582f59f4899"
+    },
+    {
+      "node_id": "content:/row[28]/cell[0]/text[0]",
+      "role": "text",
+      "name": "Passbook Ref",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[28]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "383"
+      },
+      "fingerprint": "9ff97ca9749fdd0e"
+    },
+    {
+      "node_id": "content:/row[28]/cell[1]",
+      "role": "cell",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[28]",
+      "child_ids": [],
+      "hints": {
+        "native": "346"
+      },
+      "fingerprint": "1bd1205026807024"
     }
   ],
-  "captured_at": "2026-09-12T02:39:36.123202Z",
+  "captured_at": "2026-09-12T12:31:14.853385Z",
   "http_status": 200
 }

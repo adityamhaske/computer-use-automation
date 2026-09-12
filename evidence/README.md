@@ -103,8 +103,20 @@ and they are fixed in different places.
 
 ## On redaction
 
-Every file here has passed through the `Redactor` — traces, snapshots, and screenshots alike, with
-sensitive regions painted out of the images before they are written. The mock application is seeded
+Every file here has passed through the `Redactor` — traces, snapshots, screenshots **and run
+records** alike, with sensitive regions painted out of the images before they are written.
+
+"And run records" is recent, and was a real gap. `run_record.json` was written straight to disk, so
+this directory held two files for the same run under different rules: the trace masked everything
+and emitted output *names* only, while the record beside it carried the values. The redaction
+invariant test could not see it, because every write it made went through the evidence bus — it was
+proving "every sink the bus writes is clean" rather than "every sink is clean". `write_run_record`
+now requires a redactor rather than accepting one, so there is no unredacted path left to take.
+
+The values below are visible because this capability declares none of its outputs `sensitive: true`.
+Redaction applies to the record now; it simply has nothing to mask here. A capability that does
+declare one has it masked in both files — asserted by
+`tests/invariants/test_redaction.py::test_a_capability_declaring_an_output_sensitive_masks_it_in_the_record`. The mock application is seeded
 with fabricated data; no real credentials or personal information exist anywhere in this repository.
 
 Over-redaction is a failure too. Capability references (`id@version`) once matched the email

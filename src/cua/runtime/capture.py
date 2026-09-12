@@ -54,9 +54,7 @@ class FailureCapture:
         if capability is None:
             return ()
 
-        sensitive_names = {spec.name for spec in capability.inputs if spec.sensitive} | {
-            spec.name for spec in capability.outputs if spec.sensitive
-        }
+        sensitive_names = capability.sensitive_names
         if not sensitive_names:
             return ()
 

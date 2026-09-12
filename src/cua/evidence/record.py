@@ -22,6 +22,7 @@ from cua.domain.result import ObservationClass, RunResult
 from cua.domain.run_record import ResolutionRecord, RunKind, RunRecord, StepRecord
 from cua.domain.target import ResolutionStrategy
 from cua.evidence.bus import EventType
+from cua.policy.redact import Redactor
 
 RECORD_FILENAME = "run_record.json"
 
@@ -163,8 +164,26 @@ def build_run_record(
     )
 
 
-def write_run_record(record: RunRecord, run_dir: Path) -> Path:
-    """Write the record next to the trace it was derived from."""
+def write_run_record(
+    record: RunRecord,
+    run_dir: Path,
+    *,
+    redactor: Redactor,
+    sensitive_keys: frozenset[str] = frozenset(),
+) -> Path:
+    """Write the record next to the trace it was derived from, redacted the same way.
+
+    The redactor is required rather than optional, and that is the point of the signature. This
+    function wrote `model_dump_json()` straight to disk, so the evidence directory held two sinks
+    for the same run with different rules: `trace.jsonl` emitted output *names* only and masked
+    everything through the bus, while `run_record.json` beside it carried the values in the clear.
+
+    `result` is where that mattered. It is passed in live by the executor rather than read back from
+    the redacted trace, so `outputs`, `outcome.data` and `error.expected/observed` -- all built from
+    page content -- had never been through a redactor at all. An output declared `sensitive: true`
+    was masked in one file and printed in the other.
+    """
     path = run_dir / RECORD_FILENAME
-    path.write_text(record.model_dump_json(indent=2), encoding="utf-8")
+    payload = redactor.structure(record.model_dump(mode="json"), sensitive_keys=sensitive_keys)
+    path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     return path

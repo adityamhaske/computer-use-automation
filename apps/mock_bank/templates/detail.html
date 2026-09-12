@@ -62,6 +62,16 @@
     <td class="{{ v.css_label_cell }}">As Of</td>
     <td>{{ as_of }}</td>
   </tr>
+  {# A labelled field the core system never populates. Legacy detail screens are full of these --
+     a column added for a product the institution never launched, still rendered, always blank.
+     It exists here so a test can target something that *resolves* and *reads as nothing*, which
+     is the one case where an extraction can succeed at finding a control and still return no
+     answer. Anchoring that test to an accidental empty cell would break with the next markup
+     change; this one is empty on purpose. #}
+  <tr>
+    <td class="{{ v.css_label_cell }}">Passbook Ref</td>
+    <td></td>
+  </tr>
   {% else %}
   <tr><td colspan="2">No savings account on file for this member.</td></tr>
   {% endif %}

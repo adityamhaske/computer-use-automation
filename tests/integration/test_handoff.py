@@ -24,6 +24,7 @@ from apps.mock_bank.server import VALID_PW, VALID_USER, create_app
 from cua.domain.action import Click, RawInput, RawInputKind
 from cua.domain.actor import Actor
 from cua.domain.capability import Capability
+from cua.domain.result import FailureCode, RunStatus
 from cua.domain.serde import load_capability
 from cua.domain.snapshot import NodeScope
 from cua.domain.target import NameMatch, TargetDescriptor
@@ -36,6 +37,7 @@ from cua.hitl.reanchor import reconcile
 from cua.policy.config import parse_policy
 from cua.policy.engine import PolicyEngine
 from cua.policy.redact import Redactor
+from cua.replay.executor import ReplayExecutor
 from cua.runtime.dispatcher import Dispatcher, DispatchStatus
 from cua.surfaces.playwright_cdp.driver import PlaywrightCdpDriver
 from cua.targeting.resolver import TargetResolver
@@ -391,3 +393,86 @@ def test_a_replay_escalation_opens_a_real_intervention(
     card = request.context_card()
     assert card["because"]
     assert card["screenshot"], "the brief asks for a richer signal on failure"
+
+
+# ================================================ the race the design claims to kill
+
+
+def test_automation_cannot_act_after_a_human_claims_the_live_session(
+    rig: tuple, capability: Capability, app: tuple[str, int]
+) -> None:
+    """AGENTS.md invariant 8, asserted against the path that actually runs.
+
+    `tests/integration/test_dispatcher.py` already proves the dispatcher *can* reject a stale
+    epoch -- it constructs one by hand. That is a different claim from the one the design makes,
+    which is that a **replay in flight** cannot act once an operator has taken the session. This
+    test drives the real executor.
+
+    The distinction matters because the dispatcher's epoch check is opt-in (`expected_epoch`
+    defaults to None). A caller that never passes it is never checked, and a test that calls the
+    dispatcher directly cannot notice.
+    """
+    broker, _, driver, evidence = rig
+    base_url, _ = app
+
+    executor = ReplayExecutor(
+        dispatcher=broker.dispatch,
+        evidence=evidence,
+        broker=broker,
+    )
+
+    # An operator takes the live session mid-flight. Every transition bumps the epoch, so the
+    # epoch the executor was authorized under is now stale.
+    request = _escalate(broker, driver, capability)
+    broker.claim(request.intervention_id, "operator-1")
+    assert broker.lease.state is ControlState.HUMAN_CONTROL
+
+    bound = TenantBinding(
+        capability_ref=capability.ref, tenant="race", vars={"base_url": base_url}
+    ).apply(capability)
+
+    result = executor.run(bound, {"member_id": "12345"})
+
+    assert result.status is RunStatus.FAILED, (
+        f"automation ran to {result.status.value} while a human held the live session -- "
+        "this is the race the lease exists to close"
+    )
+    assert result.error is not None
+    assert result.error.code is FailureCode.LEASE_LOST, (
+        f"expected the dispatch to be refused as stale, got {result.error.code.value}"
+    )
+
+
+def test_a_run_authorized_before_the_handoff_cannot_resume_on_its_old_epoch(
+    rig: tuple, capability: Capability, app: tuple[str, int]
+) -> None:
+    """The other half of the guard, and the one an epoch is actually for.
+
+    After an operator takes the session and hands it back, control belongs to automation again --
+    so a holder check alone would wave this through. But a run authorized *before* the handoff has
+    no idea what the operator did, and resuming it blindly would replay steps against a screen it
+    never saw. The epoch is what distinguishes "automation may act" from "*this* run may act".
+    """
+    broker, _, driver, evidence = rig
+    base_url, _ = app
+
+    request = _escalate(broker, driver, capability)
+    stale = broker.lease.epoch  # what a run in flight at this moment would hold
+
+    broker.claim(request.intervention_id, "operator-1")
+    broker.release(snapshot_after=driver.observe())
+    broker.resume()
+
+    assert broker.lease.holder is Actor.AUTOMATION, "control is automation's again"
+    assert broker.lease.epoch > stale, "but every transition moved the epoch on"
+
+    bound = TenantBinding(
+        capability_ref=capability.ref, tenant="stale", vars={"base_url": base_url}
+    ).apply(capability)
+    result = ReplayExecutor(
+        dispatcher=broker.dispatch, evidence=evidence, broker=broker, lease_epoch=stale
+    ).run(bound, {"member_id": "12345"})
+
+    assert result.status is RunStatus.FAILED
+    assert result.error is not None
+    assert result.error.code is FailureCode.LEASE_LOST

@@ -168,9 +168,18 @@ rewritten. The honest claim is narrower than the one I started with: structural 
 architectural rather than bolted on.
 
 The operator works the **same live session**, and the handoff is guarded by a `Lease{holder, epoch}`
-with monotonic epochs. Every dispatch asserts the lease; a dispatch carrying a stale epoch is
-rejected with `LEASE_LOST`. This kills the real race: an in-flight automation step acting *after* a
-human has taken over.
+with monotonic epochs. Automation consults it twice on every dispatch, and the two questions are
+different: **who holds this session**, and **has it changed hands since this run was authorized**.
+The first refuses a run that starts while an operator is working; the second refuses a run that was
+authorized before a handoff and tries to carry on afterwards. Either returns `LEASE_LOST`.
+
+Both checks, because the epoch alone is not enough — and assuming it was is how this stayed broken.
+The dispatcher's epoch comparison is opt-in, and the replay executor passed a static field and never
+asked for the comparison, so `LEASE_LOST` was unreachable on the automation path: the two tests
+covering it constructed a stale epoch by hand and called the dispatcher directly. They proved the
+dispatcher *could* refuse one; nothing ever handed it one. The regression test now drives the real
+executor, and before the fix it ran a **complete replay to `SUCCESS`, reading a member's balance,
+while an operator held the session**.
 
 **Human input does not bypass policy.** The console never injects events into the page. It submits
 `raw_input` actions to the broker, which runs them through the same
@@ -205,7 +214,14 @@ capability **and** an explicit caller opt-in — two independent gates, because 
 accident away from a wire transfer.
 
 **Redaction at every sink, including outbound LLM prompts.** Regulated data should not leave the
-process because a model asked for context. Secrets are `{$secret: ref}`, resolved at dispatch, and
+process because a model asked for context. "Every sink" is load-bearing and was briefly untrue:
+`run_record.json` was written with `model_dump_json()` straight to disk, so the evidence directory
+held two files for the same run under different rules — the trace masked everything and emitted
+output *names* only, while the record beside it carried the values. `write_run_record` now requires
+a redactor rather than accepting one, so there is no unredacted path left to take. Separately, a
+capability's `sensitive: true` declarations were read for screenshot blurring and never handed to
+the evidence bus, so the flag masked pixels and not text; `Capability.sensitive_names` is now the
+single source both read. Secrets are `{$secret: ref}`, resolved at dispatch, and
 registered with the redactor by literal — no pattern can recognise an arbitrary password.
 
 Over-redaction is also a failure, which this phase demonstrated: `id@version` matched the email
