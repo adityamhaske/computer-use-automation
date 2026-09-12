@@ -22,6 +22,18 @@ design write-up. This tree is the supporting detail.
 | [error-taxonomy.md](design/error-taxonomy.md) | Observation classes, run statuses, failure codes, the fault matrix |
 | [control-transfer.md](design/control-transfer.md) | The lease, escalation, policed human input, re-anchoring resume |
 
+## Design system — *how it should look*
+
+| Document | Covers |
+|---|---|
+| [UIUX/README.md](UIUX/README.md) | The design system for every web surface (console, site) — start here |
+| [UIUX/principles.md](UIUX/principles.md) | What "good" means here, and the four rules that follow |
+| [UIUX/design-tokens.md](UIUX/design-tokens.md) | Exact colors, type scale, spacing, radius, motion |
+| [UIUX/components.md](UIUX/components.md) | Buttons, cards, tables, forms, status, dialogs, toasts |
+| [UIUX/patterns.md](UIUX/patterns.md) | Page shells, navigation, responsive rules, live data |
+| [UIUX/accessibility.md](UIUX/accessibility.md) | The non-negotiable minimum, checked before shipping |
+| [UIUX/workflow.md](UIUX/workflow.md) | Where UI files live, how to add/fix a page, the review checklist |
+
 ## Plan — *what we are building, in what order*
 
 | Document | Covers |
