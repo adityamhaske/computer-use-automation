@@ -92,19 +92,45 @@ cua discover --goal "Look up member 12345 and read their current savings balance
              --target http://localhost:8811 \
              --out evidence/capabilities/
 
-# 2. Replay the compiled capability deterministically (zero model calls)
-cua replay evidence/capabilities/lookup_member@1.0.0.json \
+# 2. Replay the compiled capability deterministically (zero model calls).
+#    --sign-in is required against a freshly booted `make app`: this capability's entrypoint is
+#    the app's authenticated frameset, not the bare sign-on page, so without it the run correctly
+#    fails closed at its first precondition instead of guessing (see "Why --sign-in" below).
+cua replay evidence/capabilities/corebank.member.savings_balance@1.0.0.yaml \
            --base-url http://localhost:8811 \
-           --input member_id=67890
+           --input member_id=67890 \
+           --sign-in
+#   -> SUCCESS - 3 output(s)   outputs: {"savings_balance": "$18,730.00", ...}
+
+cua replay evidence/capabilities/corebank.member.savings_balance@1.0.0.yaml \
+           --base-url http://localhost:8811 \
+           --input member_id=99999 \
+           --sign-in
+#   -> BUSINESS OUTCOME - member_not_found   (exit 0 -- a real answer, not a crash)
 
 # 3. Supervise and claim sessions in the operator console
 cua console --target http://localhost:8811
 
 # 4. Capability Catalog management and tool execution
 cua catalog list                                    # List available frozen capabilities
-cua catalog show lookup_member --tool-schema        # Export JSON Schema tool contract
-cua catalog invoke lookup_member --input member_id=12345 --base-url http://localhost:8811
+cua catalog show corebank.member.savings_balance --tool-schema   # Export JSON Schema tool contract
+cua catalog invoke corebank.member.savings_balance \
+                   --input member_id=12345 --base-url http://localhost:8811 --sign-in
+
+# 5. Call a capability the way an AI agent would (typed args, no model in the loop)
+cua agent-demo --base-url http://localhost:8811 --sign-in
 ```
+
+**Why `--sign-in`:** every capability recorded against `apps.mock_bank` assumes an already
+authenticated session -- its entrypoint is the app's frameset, which the sign-on page is outside
+of. `make demo`/`make eval` never hit this because they seed the session themselves before
+replaying. A standalone `cua replay`/`catalog invoke`/`agent-demo` against a bare `make app` has no
+such session, so it correctly fails closed at the capability's first precondition
+(`NEEDS_HUMAN(unexpected_state)`, exit 2) rather than acting on a screen it doesn't recognize --
+exactly invariant 5 doing its job. `--sign-in` drives the mock app's login form directly as
+demo-fixture setup (fixed mock credentials, not a general "any target" mechanism, and it never
+touches `PolicyEngine` -- see `src/cua/cli/mock_login.py`) before the capability's own, policed
+steps begin.
 
 ### Exit Code Contract
 

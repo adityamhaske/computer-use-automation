@@ -116,10 +116,31 @@ def replay(
         bool, typer.Option(help="Caller opt-in for an irreversible capability.")
     ] = False,
     headless: Annotated[bool, typer.Option(help="Run the browser headless.")] = True,
+    sign_in: Annotated[
+        bool,
+        typer.Option(
+            "--sign-in",
+            help=(
+                "Sign in to the mock back-office before replaying. This capability's entrypoint is "
+                "the app's authenticated frameset, not the bare sign-on page -- a freshly booted "
+                "`make app` has no session, so without this the run correctly fails closed at its "
+                "first precondition (AGENTS.md invariant 5) instead of guessing. Demo-fixture "
+                "setup only: fixed mock credentials, drives the browser directly, does not go "
+                "through policy (AGENTS.md invariant 2) -- see cua.cli.mock_login. "
+                "Requires --base-url."
+            ),
+        ),
+    ] = False,
 ) -> None:
     """Execute a saved capability deterministically. No model is involved."""
     from cua.domain.serde import load_capability
     from cua.domain.tenant_binding import TenantBinding
+
+    if sign_in and not base_url:
+        typer.secho(
+            "--sign-in requires --base-url (where to sign in).", fg=typer.colors.RED, err=True
+        )
+        raise typer.Exit(code=2)
 
     capability = load_capability(artifact.read_text(encoding="utf-8"))
     if base_url:
@@ -142,6 +163,12 @@ def replay(
         headless=headless,
         run_id=run_id,
         allow_irreversible=allow_irreversible,
+        # NOT base_url=base_url here: the binding above already applied it to `capability`, and
+        # _replay_once would apply it a second time given the chance. sign_in_url is a separate,
+        # narrower parameter that only ever drives the browser to a login page -- it never touches
+        # TenantBinding, so it carries no risk of a double-apply.
+        sign_in=sign_in,
+        sign_in_url=base_url,
     )
 
     colour = {
@@ -174,12 +201,20 @@ def _replay_once(
     headless: bool = True,
     base_url: str | None = None,
     allow_irreversible: bool = False,
+    sign_in: bool = False,
+    sign_in_url: str | None = None,
 ) -> tuple[RunResult, Path]:
     """Execute one capability and return its result and evidence directory.
 
     Shared by `cua replay` and the calling-agent demo so the two cannot drift apart. A demo that
     took a different path to the executor would be demonstrating something other than what the CLI
     does, which is the failure mode of most "example" code.
+
+    `sign_in_url` is deliberately independent of `base_url`: the latter drives `TenantBinding`
+    (applied here, or already applied by a caller that pre-bound the capability itself -- applying
+    it twice would be a bug, not a no-op, so this function must never assume it owns that step).
+    Signing in is not tenant binding -- it is demo-fixture setup that happens to need a URL, and
+    every caller already has one in scope regardless of who applied the binding.
     """
     from cua.domain.tenant_binding import TenantBinding
     from cua.replay.executor import ReplayExecutor
@@ -192,6 +227,11 @@ def _replay_once(
 
     rig = build_rig(run_id=run_id, kind="replay", headless=headless, allow_vision=False)
     try:
+        if sign_in:
+            assert sign_in_url is not None, "sign_in requires sign_in_url"
+            from cua.cli.mock_login import sign_in as sign_in_to_mock_app
+
+            sign_in_to_mock_app(rig, sign_in_url)
         result = ReplayExecutor(
             dispatcher=rig.dispatcher,
             evidence=rig.evidence,
@@ -379,6 +419,16 @@ def catalog_invoke(
         str | None, typer.Option(help="Bind {base_url} for this deployment.")
     ] = None,
     headless: Annotated[bool, typer.Option(help="Run the browser headless.")] = True,
+    sign_in: Annotated[
+        bool,
+        typer.Option(
+            "--sign-in",
+            help=(
+                "Sign in to the mock back-office first -- see `cua replay --help` for why a fresh "
+                "`make app` needs this. Demo-fixture setup only; requires --base-url."
+            ),
+        ),
+    ] = False,
 ) -> None:
     """Call a capability by name, the way an agent would.
 
@@ -386,6 +436,12 @@ def catalog_invoke(
     and hash-verified rather than pointed at by path.
     """
     from cua.catalog.store import CapabilityStore
+
+    if sign_in and not base_url:
+        typer.secho(
+            "--sign-in requires --base-url (where to sign in).", fg=typer.colors.RED, err=True
+        )
+        raise typer.Exit(code=2)
 
     store = CapabilityStore()
     try:
@@ -408,6 +464,8 @@ def catalog_invoke(
         base_url=base_url,
         headless=headless,
         run_id=f"invoke-{uuid.uuid4().hex[:8]}",
+        sign_in=sign_in,
+        sign_in_url=base_url,
     )
     typer.secho(f"\n{result.summary}")
     if result.outputs:
@@ -424,6 +482,16 @@ def agent_demo(
     ] = "corebank.member.savings_balance",
     member_id: Annotated[str, typer.Option(help="The argument to call it with.")] = "12345",
     headless: Annotated[bool, typer.Option(help="Run the browser headless.")] = True,
+    sign_in: Annotated[
+        bool,
+        typer.Option(
+            "--sign-in",
+            help=(
+                "Sign in to the mock back-office first -- see `cua replay --help` for why a fresh "
+                "`make app` needs this. Demo-fixture setup only."
+            ),
+        ),
+    ] = False,
 ) -> None:
     """Call a capability the way an AI agent would: by name, with typed arguments.
 
@@ -435,7 +503,11 @@ def agent_demo(
 
     raise typer.Exit(
         code=run_agent_demo(
-            capability_ref=ref, member_id=member_id, base_url=base_url, headless=headless
+            capability_ref=ref,
+            member_id=member_id,
+            base_url=base_url,
+            headless=headless,
+            sign_in=sign_in,
         )
     )
 

@@ -91,7 +91,9 @@ def interpret(result: RunResult) -> AgentTurn:
     )
 
 
-def run_agent_demo(*, capability_ref: str, member_id: str, base_url: str, headless: bool) -> int:
+def run_agent_demo(
+    *, capability_ref: str, member_id: str, base_url: str, headless: bool, sign_in: bool = False
+) -> int:
     """Look a capability up by name and invoke it, as an agent would."""
     from cua.cli.main import _replay_once
 
@@ -113,6 +115,8 @@ def run_agent_demo(*, capability_ref: str, member_id: str, base_url: str, headle
         base_url=base_url,
         headless=headless,
         run_id=f"agent-demo-{member_id}",
+        sign_in=sign_in,
+        sign_in_url=base_url,
     )
     turn = interpret(result)
 
