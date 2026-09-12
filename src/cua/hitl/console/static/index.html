@@ -1,0 +1,71 @@
+<title>cua · Operator console</title>
+<script>
+  // Inline and synchronous so the theme is correct on first paint (no flash of the wrong theme).
+  try {
+    var saved = localStorage.getItem("cua-theme");
+    if (saved === "light" || saved === "dark") {
+      document.documentElement.setAttribute("data-theme", saved);
+    }
+  } catch (e) {}
+</script>
+<link rel="stylesheet" href="/styles/tokens.css" />
+<link rel="stylesheet" href="/styles/base.css" />
+<link rel="stylesheet" href="/styles/components.css" />
+<link rel="stylesheet" href="/styles/pages.css" />
+
+<div class="app-shell" id="app-shell" data-sidebar="expanded">
+  <div class="drawer-backdrop" id="drawer-backdrop"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-mark">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 8 12 3 3 8l9 5 9-5Z" /><path d="M3 8v8l9 5 9-5V8" /><path d="M12 13v8" />
+        </svg>
+      </div>
+      <div class="sidebar-brand-text">
+        <span class="sidebar-brand-name">Operator console</span>
+        <span class="sidebar-brand-sub">cua · computer-use automation</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav" id="sidebar-nav" aria-label="Primary"></nav>
+
+    <div class="sidebar-footer" id="sidebar-footer"></div>
+
+    <button class="sidebar-toggle" id="sidebar-toggle" title="Collapse sidebar" aria-label="Collapse sidebar"></button>
+  </aside>
+
+  <div class="app-main">
+    <header class="topbar">
+      <button class="topbar-menu-btn" id="topbar-menu-btn" aria-label="Open navigation"></button>
+      <span class="topbar-title" id="topbar-title">Overview</span>
+      <div class="topbar-spacer"></div>
+
+      <button class="btn btn-human btn-sm" id="topbar-release-btn" hidden>Hand back to automation</button>
+
+      <span class="topbar-status" id="topbar-status" data-tone="neutral">
+        <span class="status-dot"></span><span id="topbar-status-text">connecting…</span>
+      </span>
+
+      <button class="topbar-icon-btn" id="theme-toggle" title="Toggle theme" aria-label="Toggle theme"></button>
+    </header>
+
+    <main id="view" class="view" role="main"></main>
+  </div>
+</div>
+
+<div class="toast-container" id="toast-root" aria-live="polite"></div>
+
+<dialog class="confirm-dialog" id="confirm-dialog">
+  <div class="dialog-body">
+    <div class="dialog-title" id="confirm-title">Are you sure?</div>
+    <div class="dialog-message" id="confirm-message"></div>
+  </div>
+  <div class="dialog-actions">
+    <button class="btn btn-secondary" id="confirm-cancel">Cancel</button>
+    <button class="btn btn-primary" id="confirm-ok">Confirm</button>
+  </div>
+</dialog>
+
+<script type="module" src="/app.js"></script>

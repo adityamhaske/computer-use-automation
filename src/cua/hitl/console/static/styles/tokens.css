@@ -1,0 +1,195 @@
+/* Design tokens — the single source of truth for color, type, space, radius, motion.
+ *
+ * Light values live on bare :root. Dark values are redefined twice, on purpose:
+ * once under prefers-color-scheme (the "system" default) and once under
+ * [data-theme="dark"] (an explicit user choice), so an explicit choice always wins
+ * over the OS setting. Never give a token its only definition inside either block.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* ---- surfaces & structure ---- */
+  --bg: #f6f7fa;
+  --surface: #ffffff;
+  --surface-2: #f0f1f5;
+  --surface-raised: #ffffff;
+  --border: #e2e4ea;
+  --border-strong: #cfd2db;
+  --overlay: rgba(15, 17, 23, 0.42);
+
+  /* ---- text ---- */
+  --text: #14161c;
+  --text-secondary: #575c68;
+  --text-tertiary: #8a8fa0;
+  --text-on-accent: #ffffff;
+
+  /* ---- brand / accent (restrained blue-violet) ---- */
+  --accent: #4f5bd5;
+  --accent-hover: #3f4ac0;
+  --accent-active: #333db0;
+  --accent-soft: #edeeff;
+  --accent-soft-strong: #dee0ff;
+  --accent-text: #4048c9;
+  --focus-ring: #4f5bd5;
+
+  /* ---- semantic status ---- */
+  --success: #157a53;
+  --success-soft: #e6f6ee;
+  --running: #2864d6;
+  --running-soft: #e8f0ff;
+  --human: #7440d6;
+  --human-soft: #f1eaff;
+  --warning: #96660a;
+  --warning-soft: #fdf1de;
+  --danger: #b0293d;
+  --danger-soft: #fbe9ec;
+  --neutral-soft: #eceef2;
+
+  /* ---- typography ---- */
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+  --font-mono:
+    ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+
+  --text-2xs: 11px;
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-md: 14px;
+  --text-lg: 16px;
+  --text-xl: 20px;
+  --text-2xl: 26px;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+
+  /* ---- space scale ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 48px;
+  --space-10: 64px;
+
+  /* ---- radius ---- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-full: 999px;
+
+  /* ---- shadow (light mode only; dark relies on borders + surface contrast) ---- */
+  --shadow-sm: 0 1px 2px rgba(20, 22, 28, 0.06);
+  --shadow-md: 0 4px 16px rgba(20, 22, 28, 0.10), 0 1px 3px rgba(20, 22, 28, 0.08);
+  --shadow-lg: 0 12px 36px rgba(20, 22, 28, 0.16), 0 2px 6px rgba(20, 22, 28, 0.08);
+
+  /* ---- motion ---- */
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --duration-fast: 120ms;
+  --duration-base: 180ms;
+  --duration-slow: 260ms;
+
+  /* ---- layout ---- */
+  --sidebar-width: 236px;
+  --sidebar-collapsed-width: 64px;
+  --topbar-height: 56px;
+  --content-max: 1240px;
+}
+
+/* System preference (no explicit choice made) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --bg: #0c0d11;
+    --surface: #14161c;
+    --surface-2: #1a1d25;
+    --surface-raised: #1c1f28;
+    --border: #262a35;
+    --border-strong: #343948;
+    --overlay: rgba(4, 5, 8, 0.6);
+
+    --text: #eceef3;
+    --text-secondary: #a2a7b5;
+    --text-tertiary: #6d7284;
+    --text-on-accent: #ffffff;
+
+    --accent: #8992ff;
+    --accent-hover: #9ba2ff;
+    --accent-active: #a6adff;
+    --accent-soft: rgba(137, 146, 255, 0.14);
+    --accent-soft-strong: rgba(137, 146, 255, 0.22);
+    --accent-text: #a4aaff;
+    --focus-ring: #8992ff;
+
+    --success: #3fd193;
+    --success-soft: rgba(63, 209, 147, 0.13);
+    --running: #6ba2ff;
+    --running-soft: rgba(107, 162, 255, 0.14);
+    --human: #b699ff;
+    --human-soft: rgba(182, 153, 255, 0.15);
+    --warning: #f0b23f;
+    --warning-soft: rgba(240, 178, 63, 0.13);
+    --danger: #ff7a89;
+    --danger-soft: rgba(255, 122, 137, 0.13);
+    --neutral-soft: #21242e;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Explicit user choice always wins, in both directions */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #0c0d11;
+  --surface: #14161c;
+  --surface-2: #1a1d25;
+  --surface-raised: #1c1f28;
+  --border: #262a35;
+  --border-strong: #343948;
+  --overlay: rgba(4, 5, 8, 0.6);
+
+  --text: #eceef3;
+  --text-secondary: #a2a7b5;
+  --text-tertiary: #6d7284;
+  --text-on-accent: #ffffff;
+
+  --accent: #8992ff;
+  --accent-hover: #9ba2ff;
+  --accent-active: #a6adff;
+  --accent-soft: rgba(137, 146, 255, 0.14);
+  --accent-soft-strong: rgba(137, 146, 255, 0.22);
+  --accent-text: #a4aaff;
+  --focus-ring: #8992ff;
+
+  --success: #3fd193;
+  --success-soft: rgba(63, 209, 147, 0.13);
+  --running: #6ba2ff;
+  --running-soft: rgba(107, 162, 255, 0.14);
+  --human: #b699ff;
+  --human-soft: rgba(182, 153, 255, 0.15);
+  --warning: #f0b23f;
+  --warning-soft: rgba(240, 178, 63, 0.13);
+  --danger: #ff7a89;
+  --danger-soft: rgba(255, 122, 137, 0.13);
+  --neutral-soft: #21242e;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}

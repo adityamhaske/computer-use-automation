@@ -13,17 +13,35 @@ the same URL.
 from __future__ import annotations
 
 import base64
+import json
+import os
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import partial
+from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
+from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
 
+from cua.catalog.store import CapabilityNotFoundError, CapabilityStore
 from cua.domain.action import RawInput, RawInputKind
+from cua.domain.run_record import RunKind
+from cua.evidence.record import build_run_record
 from cua.hitl.broker import SessionBroker
 from cua.hitl.session_thread import SessionThread
+from cua.policy.config import parse_policy
+
+STATIC_DIR = Path(__file__).resolve().parent / "static"
+
+# URL segment -> the directory it reads under evidence_root, and the RunKind to derive a record
+# under (only used as a fallback when a run has no committed run_record.json yet).
+RUN_KIND_DIRS: dict[str, RunKind] = {
+    "discovery": RunKind.DISCOVERY,
+    "replay": RunKind.REPLAY,
+    "escalation": RunKind.INTERVENTION,
+}
 
 
 @dataclass
@@ -44,6 +62,19 @@ class ConsoleDeps:
     `greenlet.error: Cannot switch to a different thread`.
     """
 
+    catalog_root: Path = field(default_factory=lambda: Path("evidence/capabilities"))
+    """Where the Capabilities page reads the catalog from. Read-only -- the console never writes
+    here, matching `CapabilityStore`'s own contract (list/resolve/load, never save)."""
+
+    evidence_root: Path = field(default_factory=lambda: Path("evidence"))
+    """Where the Runs and Evidence pages read committed run evidence from. Read-only."""
+
+    policy_path: Path = field(
+        default_factory=lambda: Path(os.environ.get("CUA_POLICY_FILE", "config/policy.yaml"))
+    )
+    """What the Settings page displays. Read-only -- a UI settings toggle can never write here;
+    see `/api/settings`."""
+
     def on_session(self, work: Callable[[], Any]) -> Any:
         """Run something that touches the surface, on the thread entitled to."""
         return self.session.call(work) if self.session is not None else work()
@@ -52,9 +83,21 @@ class ConsoleDeps:
 def create_console(deps: ConsoleDeps) -> FastAPI:
     app = FastAPI(title="cua operator console", docs_url=None, redoc_url=None)
 
+    @app.middleware("http")
+    async def no_heuristic_caching(request: Request, call_next: Any) -> Any:
+        """`StaticFiles` sends `ETag`/`Last-Modified` but no `Cache-Control`, which leaves a
+        browser free to serve a page, script, or stylesheet from its own heuristic cache without
+        ever revalidating -- so an edit here can silently not appear for a viewer who already
+        loaded the console once. `no-cache` still lets the browser keep a local copy; it just makes
+        every load a conditional GET (a 304 when nothing changed), which is effectively free."""
+        response = await call_next(request)
+        if request.method == "GET" and not request.url.path.startswith("/api/"):
+            response.headers["Cache-Control"] = "no-cache"
+        return response
+
     @app.get("/", response_class=HTMLResponse)
     def index() -> str:
-        return CONSOLE_HTML
+        return (STATIC_DIR / "index.html").read_text("utf-8")
 
     @app.get("/api/interventions")
     def interventions() -> list[dict[str, Any]]:
@@ -98,12 +141,21 @@ def create_console(deps: ConsoleDeps) -> FastAPI:
         """
         await socket.accept()
         cdp = deps.driver._cdp
-        cdp.send("Page.startScreencast", {"format": "jpeg", "quality": 60, "everyNthFrame": 2})
+        # Both calls touch the CDP session, which is bound to the thread that created the driver
+        # (see session_thread.py) -- not this coroutine's asyncio thread. Unmarshalled, the first
+        # WebSocket connection ever made to this endpoint raised
+        # `greenlet.error: Cannot switch to a different thread` before a single frame could be
+        # requested, which the original test suite never caught because none of its console tests
+        # actually opened a WebSocket. `on_frame` below is left as-is: Playwright delivers CDP
+        # events through the same thread's own dispatcher, so marshalling it too would submit work
+        # to a thread that is, at that moment, itself inside this callback -- a deadlock, not a fix.
+        screencast_opts = {"format": "jpeg", "quality": 60, "everyNthFrame": 2}
+        deps.on_session(lambda: cdp.send("Page.startScreencast", screencast_opts))
 
         def on_frame(event: dict[str, Any]) -> None:
             cdp.send("Page.screencastFrameAck", {"sessionId": event["sessionId"]})
 
-        cdp.on("Page.screencastFrame", on_frame)
+        deps.on_session(lambda: cdp.on("Page.screencastFrame", on_frame))
         try:
             while True:
                 message = await socket.receive_json()
@@ -127,7 +179,189 @@ def create_console(deps: ConsoleDeps) -> FastAPI:
         except WebSocketDisconnect:
             pass
         finally:
-            cdp.send("Page.stopScreencast")
+            deps.on_session(lambda: cdp.send("Page.stopScreencast"))
+
+    # ------------------------------------------------------- read-only additions
+    #
+    # Everything below is new surface for the redesigned console (Runs, Capabilities, Evidence,
+    # Settings pages). All of it is read-only: it projects data the system already produces on
+    # disk (`CapabilityStore`, `build_run_record`, `policy.yaml`) rather than adding a second way
+    # to write it, so the UI cannot drift from -- or bypass -- what those modules already enforce.
+
+    @app.get("/api/runs")
+    def list_runs() -> list[dict[str, Any]]:
+        """Every run under `evidence_root`, newest first. The Runs page's table."""
+        out: list[dict[str, Any]] = []
+        for kind_name, run_kind in RUN_KIND_DIRS.items():
+            base = deps.evidence_root / kind_name
+            if not base.exists():
+                continue
+            for run_dir in sorted(base.iterdir()):
+                if not run_dir.is_dir() or not (run_dir / "trace.jsonl").exists():
+                    continue
+                record = _read_or_build_record(run_dir, run_kind)
+                if record is None:
+                    continue
+                result = record.get("result") or {}
+                out.append(
+                    {
+                        "run_id": record.get("run_id", run_dir.name),
+                        "kind": kind_name,
+                        "capability_ref": record.get("capability_ref"),
+                        "goal": record.get("goal"),
+                        "status": result.get("status"),
+                        "started_at": record.get("started_at"),
+                        "duration_ms": record.get("duration_ms"),
+                        "steps": len(record.get("steps") or []),
+                        "drift_score": result.get("drift_score", 0.0),
+                        "human_actions": record.get("human_actions", 0),
+                        "evidence_ref": record.get("evidence_ref") or str(run_dir),
+                    }
+                )
+        out.sort(key=lambda r: r.get("started_at") or "", reverse=True)
+        return out
+
+    @app.get("/api/runs/{kind}/{run_id}")
+    def run_detail(kind: str, run_id: str) -> dict[str, Any]:
+        """The full record plus the raw trace and evidence file listing. The Runs/Evidence detail
+        view."""
+        run_dir = _run_dir(deps, kind, run_id)
+        record = _read_or_build_record(run_dir, RUN_KIND_DIRS[kind])
+        if record is None:
+            raise HTTPException(404, "run has no evidence")
+        trace_path = run_dir / "trace.jsonl"
+        events = (
+            [
+                json.loads(line)
+                for line in trace_path.read_text("utf-8").splitlines()
+                if line.strip()
+            ]
+            if trace_path.exists()
+            else []
+        )
+        snapshots = (
+            sorted(p.name for p in (run_dir / "snapshots").glob("*.json"))
+            if (run_dir / "snapshots").exists()
+            else []
+        )
+        screenshots = (
+            sorted(p.name for p in (run_dir / "screenshots").glob("*.png"))
+            if (run_dir / "screenshots").exists()
+            else []
+        )
+        return {
+            "record": record,
+            "events": events,
+            "snapshots": snapshots,
+            "screenshots": screenshots,
+        }
+
+    @app.get("/api/runs/{kind}/{run_id}/file/{name:path}")
+    def run_file(kind: str, run_id: str, name: str) -> Any:
+        """One evidence file (trace or a saved snapshot), parsed. Confined to the run's own
+        directory -- `name` is caller-supplied, so it is resolved and checked against it before
+        anything is read."""
+        run_dir = _run_dir(deps, kind, run_id)
+        target = (run_dir / name).resolve()
+        if run_dir != target and run_dir not in target.parents:
+            raise HTTPException(404, "file not found")
+        if not target.is_file():
+            raise HTTPException(404, "file not found")
+        if target.suffix == ".jsonl":
+            return [
+                json.loads(line) for line in target.read_text("utf-8").splitlines() if line.strip()
+            ]
+        if target.suffix == ".json":
+            return json.loads(target.read_text("utf-8"))
+        raise HTTPException(415, f"unsupported evidence file type: {target.suffix}")
+
+    @app.get("/api/runs/{kind}/{run_id}/screenshot/{name}")
+    def run_screenshot(kind: str, run_id: str, name: str) -> FileResponse:
+        run_dir = _run_dir(deps, kind, run_id)
+        shots = (run_dir / "screenshots").resolve()
+        target = (shots / name).resolve()
+        if shots not in target.parents or not target.is_file():
+            raise HTTPException(404, "screenshot not found")
+        return FileResponse(target, media_type="image/png")
+
+    @app.get("/api/capabilities")
+    def list_capabilities() -> list[dict[str, Any]]:
+        """The catalog, as the Capabilities page's list. Same source `cua catalog list` reads."""
+        store = CapabilityStore(root=deps.catalog_root)
+        evals = _load_evals(deps.evidence_root)
+        out = []
+        for entry in store.list():
+            cap = entry.capability
+            out.append(
+                {
+                    "ref": entry.ref,
+                    "id": cap.id,
+                    "version": cap.version,
+                    "title": cap.title,
+                    "description": cap.description,
+                    "state": entry.state,
+                    "signature": entry.signature,
+                    "surface": {
+                        "vendor": cap.surface.app.vendor,
+                        "product": cap.surface.app.product,
+                        "version_range": cap.surface.app.version_range,
+                    },
+                    "inputs": len(cap.inputs),
+                    "outputs": len(cap.outputs),
+                    "steps": len(cap.steps),
+                    "outcomes": [o.code for o in cap.outcomes],
+                    "max_risk": cap.max_risk.value,
+                    "stability": evals.get(entry.ref),
+                }
+            )
+        for path, why in store.unreadable:
+            out.append({"ref": path.name, "state": "unreadable", "error": why})
+        return out
+
+    @app.get("/api/capabilities/{ref:path}")
+    def capability_detail(ref: str) -> dict[str, Any]:
+        """The full artifact -- typed inputs/outputs/steps/policy/recovery/provenance -- the way
+        the Capabilities detail view makes the schema visible to a reviewer."""
+        store = CapabilityStore(root=deps.catalog_root)
+        try:
+            entry = store.resolve(ref)
+        except CapabilityNotFoundError as exc:
+            raise HTTPException(404, str(exc)) from exc
+        cap = entry.capability
+        return {
+            "capability": cap.model_dump(mode="json"),
+            "state": entry.state,
+            "tool_schema": cap.tool_schema(),
+            "stability": _load_evals(deps.evidence_root).get(entry.ref, {}),
+        }
+
+    @app.get("/api/settings")
+    def settings() -> dict[str, Any]:
+        """A read-only snapshot for the Settings page. The UI can never write through this path --
+        there is no corresponding POST, and nothing here feeds back into `PolicyEngine`."""
+        policy = None
+        if deps.policy_path.exists():
+            policy = parse_policy(deps.policy_path.read_text("utf-8")).model_dump(mode="json")
+        return {
+            "policy_file": str(deps.policy_path),
+            "policy": policy,
+            "llm": {
+                "base_url": os.environ.get("CUA_LLM_BASE_URL", "https://openrouter.ai/api/v1"),
+                "model": os.environ.get("CUA_LLM_MODEL", "anthropic/claude-sonnet-4.5"),
+                "api_key_configured": bool(os.environ.get("OPENROUTER_API_KEY")),
+                "max_steps": int(os.environ.get("CUA_LLM_MAX_STEPS", "40")),
+                "max_tokens": int(os.environ.get("CUA_LLM_MAX_TOKENS", "200000")),
+                "timeout_s": float(os.environ.get("CUA_LLM_TIMEOUT_S", "120")),
+            },
+            "session": {
+                "session_id": deps.broker.session_id,
+                "default_hold_minutes": 30,
+            },
+        }
+
+    # Static assets last: every explicit route above wins on an exact match; anything unmatched
+    # (styles/*, pages/*, app.js, ...) falls through to the files on disk.
+    app.mount("/", StaticFiles(directory=STATIC_DIR), name="static")
 
     return app
 
@@ -146,79 +380,50 @@ def _to_action(message: dict[str, Any]) -> RawInput | None:
     )
 
 
-CONSOLE_HTML = """\
-<!doctype html>
-<title>cua operator console</title>
-<style>
-  body { font: 13px system-ui, sans-serif; margin: 0; background: #14161a; color: #e6e6e6; }
-  header { padding: 10px 14px; background: #1e2228; display: flex; gap: 18px; align-items: center; }
-  .pill { padding: 2px 8px; border-radius: 10px; background: #2c333c; }
-  main { display: grid; grid-template-columns: 340px 1fr; height: calc(100vh - 44px); }
-  aside { padding: 12px; overflow: auto; border-right: 1px solid #2c333c; }
-  .card { background: #1e2228; padding: 10px; border-radius: 6px; margin-bottom: 10px; }
-  .card b { color: #8fc7ff; }
-  button { background: #2f6feb; color: #fff; border: 0; padding: 6px 10px; border-radius: 4px;
-           cursor: pointer; }
-  #screen { width: 100%; height: 100%; object-fit: contain; background: #000; }
-  #log { position: fixed; bottom: 0; right: 0; max-width: 50%; padding: 8px;
-         background: rgba(0,0,0,.7); font-family: ui-monospace, monospace; font-size: 11px; }
-</style>
-<header>
-  <b>Operator console</b>
-  <span class="pill" id="state">…</span>
-  <span class="pill" id="epoch"></span>
-  <button onclick="release()">Hand back to automation</button>
-</header>
-<main>
-  <aside id="queue"></aside>
-  <div><img id="screen" onclick="click_at(event)"></div>
-</main>
-<div id="log"></div>
-<script>
-  let ws;
-  const log = m => document.getElementById('log').textContent = m;
+def _run_dir(deps: ConsoleDeps, kind: str, run_id: str) -> Path:
+    """Resolve `kind`/`run_id` to a directory under `evidence_root`, refusing anything that would
+    escape it. `run_id` is caller-supplied (it comes off the URL), so this is the one seam a path
+    traversal attempt would go through."""
+    if kind not in RUN_KIND_DIRS:
+        raise HTTPException(404, f"unknown run kind {kind!r}")
+    base = (deps.evidence_root / kind).resolve()
+    run_dir = (base / run_id).resolve()
+    if base != run_dir and base not in run_dir.parents:
+        raise HTTPException(404, "run not found")
+    if not run_dir.is_dir():
+        raise HTTPException(404, "run not found")
+    return run_dir
 
-  async function refresh() {
-    const s = await (await fetch('/api/state')).json();
-    document.getElementById('state').textContent = s.state + ' · ' + s.holder;
-    document.getElementById('epoch').textContent = 'epoch ' + s.epoch;
-    const q = await (await fetch('/api/interventions')).json();
-    document.getElementById('queue').innerHTML = q.length ? q.map(card).join('') :
-      '<div class=card>No open interventions.</div>';
-  }
-  const card = c => `<div class=card>
-      <b>${c.capability}</b><br>${c.goal || ''}<br><br>
-      stopped at <b>${c.stopped_at || '?'}</b><br>${c.because}<br><br>
-      <button onclick="claim('${c.intervention}')">Take control</button></div>`;
 
-  async function claim(id) {
-    await fetch('/api/claim/' + id, {method: 'POST'});
-    ws = new WebSocket(`ws://${location.host}/ws`);
-    ws.onmessage = e => {
-      const d = JSON.parse(e.data);
-      if (d.frame) document.getElementById('screen').src = 'data:image/png;base64,' + d.frame;
-      if (d.status && d.status !== 'ok') log(d.status + ': ' + (d.message || ''));
-      if (d.error) log(d.error);
-    };
-    refresh();
-  }
-  function click_at(e) {
-    if (!ws) return;
-    const r = e.target.getBoundingClientRect();
-    ws.send(JSON.stringify({kind: 'mouse_click',
-      x: Math.round((e.clientX - r.left) * (e.target.naturalWidth / r.width)),
-      y: Math.round((e.clientY - r.top) * (e.target.naturalHeight / r.height))}));
-  }
-  document.addEventListener('keydown', e => {
-    if (!ws || e.key.length !== 1) return;
-    ws.send(JSON.stringify({kind: 'text', text: e.key}));
-  });
-  async function release() {
-    const r = await (await fetch('/api/release', {method: 'POST'})).json();
-    log('handed back — ' + r.human_delta);
-    ws && ws.close(); ws = null;
-    refresh();
-  }
-  refresh(); setInterval(refresh, 3000);
-</script>
-"""
+def _read_or_build_record(run_dir: Path, kind: RunKind) -> dict[str, Any] | None:
+    """The committed `run_record.json` if one exists, else the same projection `cua eval` and the
+    CLI use, built live from `trace.jsonl` (see `cua.evidence.record.build_run_record`). Never a
+    third, UI-only shape -- the record IS `RunRecord`, serialized."""
+    record_path = run_dir / "run_record.json"
+    if record_path.exists():
+        try:
+            return dict(json.loads(record_path.read_text("utf-8")))
+        except Exception:
+            pass
+    try:
+        return build_run_record(run_dir, kind=kind).model_dump(mode="json")
+    except Exception:
+        return None
+
+
+def _load_evals(evidence_root: Path) -> dict[str, dict[str, Any]]:
+    """`evidence/evals/*.evaluation.json`, keyed by the capability ref each measured. Backs the
+    "stability score" shown on the Capabilities page -- the same numbers `make eval` writes."""
+    out: dict[str, dict[str, Any]] = {}
+    evals_dir = evidence_root / "evals"
+    if not evals_dir.exists():
+        return out
+    for path in evals_dir.glob("*.evaluation.json"):
+        try:
+            data = json.loads(path.read_text("utf-8"))
+        except Exception:
+            continue
+        ref = data.get("capability_ref")
+        if ref:
+            out.setdefault(ref, {})[path.stem.replace(".evaluation", "")] = data
+    return out

@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentation — CUA</title>
+  <meta name="description" content="Full documentation for the Computer-Use Automation system: architecture, design, ADRs, runbooks, testing, and requirements traceability.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Financial Ledger / Bullion Gold Palette (Zero Green, Zero Blue, Zero Purple) */
+      --bg: #fcfbf9;
+      --bg-warm: #f7f5ef;
+      --bg-card: #ffffff;
+      --bg-code: #f6f3eb;
+      --bg-highlight: #f0ece1;
+      --bg-sidebar: #f8f6f0;
+
+      --text: #191816;
+      --text-secondary: #4d4942;
+      --text-muted: #7d786e;
+      --text-faint: #aba69b;
+
+      /* Bullion Gold & Warm Amber Accents */
+      --accent: #b45309;          /* Deep rich financial gold / amber */
+      --accent-light: #d97706;    /* Warm gold */
+      --accent-glow: #f59e0b;     /* Bright gold */
+      --accent-bg: #fef3c7;       /* Soft gold tint */
+      --accent-border: #fcd34d;   /* Subtle gold border */
+      --accent-subtle: #fffbeb;   /* Warm parchment glow */
+
+      --border: #e6e1d5;
+      --border-strong: #d2cbbe;
+
+      --success: #b45309;
+      --warning: #d97706;
+      --danger: #b91c1c;
+      --info: #78716c;
+
+      --radius: 8px;
+      --radius-sm: 6px;
+
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      --font-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+      --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+
+      --nav-height: 58px;
+      --sidebar-width: 260px;
+    }
+
+    /* Dark Mode - Obsidian Vault & Burnished Bullion Gold */
+    [data-theme="dark"] {
+      --bg: #111113;
+      --bg-warm: #17171a;
+      --bg-card: #1c1c21;
+      --bg-code: #161619;
+      --bg-highlight: #26252d;
+      --bg-sidebar: #151518;
+
+      --text: #f4f3f0;
+      --text-secondary: #b6b3ab;
+      --text-muted: #7e7a72;
+      --text-faint: #4f4c45;
+
+      --accent: #f59e0b;          /* Radiant bullion gold */
+      --accent-light: #fbbf24;
+      --accent-glow: #fcd34d;
+      --accent-bg: rgba(245, 158, 11, 0.12);
+      --accent-border: rgba(245, 158, 11, 0.3);
+      --accent-subtle: rgba(245, 158, 11, 0.05);
+
+      --border: #2c2b33;
+      --border-strong: #3f3d48;
+
+      --success: #f59e0b;
+      --warning: #fbbf24;
+      --danger: #ef4444;
+      --info: #a8a29e;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: var(--nav-height);
+      background: rgba(252, 251, 249, 0.90);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      padding: 0 clamp(24px, 4vw, 56px);
+      transition: background 0.2s ease;
+    }
+    [data-theme="dark"] nav {
+      background: rgba(17, 17, 19, 0.90);
+    }
+    .nav-inner {
+      max-width: 1240px; width: 100%;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-brand-group {
+      display: flex; align-items: center; gap: 10px; text-decoration: none;
+    }
+    .brand-logo-wrap {
+      display: flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; border-radius: 7px;
+      background: var(--accent-bg); border: 1px solid var(--accent-border);
+      flex-shrink: 0;
+    }
+    .nav-brand-text {
+      display: flex; align-items: baseline; gap: 8px;
+    }
+    .nav-brand-title {
+      font-weight: 700; font-size: 15px; color: var(--text);
+      letter-spacing: -0.02em;
+    }
+    .nav-brand-subtitle {
+      color: var(--text-muted); font-weight: 400; font-size: 13px;
+    }
+    .nav-right {
+      display: flex; gap: 16px; align-items: center;
+    }
+    .nav-link {
+      font-size: 13px; color: var(--text-secondary); text-decoration: none;
+      font-weight: 500; transition: color 0.15s;
+    }
+    .nav-link:hover { color: var(--text); }
+    .nav-link.active {
+      color: var(--accent); font-weight: 600;
+      border-bottom: 2px solid var(--accent); padding-bottom: 2px;
+    }
+    .nav-github-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      border: 1px solid var(--border-strong); padding: 5px 12px;
+      border-radius: 6px; font-size: 12px; font-weight: 600;
+      color: var(--text); background: var(--bg-card);
+      text-decoration: none; transition: all 0.15s;
+    }
+    .nav-github-btn:hover {
+      border-color: var(--accent); color: var(--accent);
+      background: var(--accent-subtle);
+    }
+    .theme-toggle {
+      background: transparent; border: 1px solid var(--border);
+      border-radius: 6px; width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-secondary);
+      transition: all 0.15s;
+    }
+    .theme-toggle:hover {
+      border-color: var(--border-strong); color: var(--text);
+    }
+
+    /* LAYOUT: Centered with balanced side space */
+    .layout {
+      display: flex;
+      padding-top: var(--nav-height);
+      min-height: 100vh;
+      max-width: 1240px;
+      margin: 0 auto;
+      padding-left: clamp(20px, 3.5vw, 48px);
+      padding-right: clamp(20px, 3.5vw, 48px);
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: var(--sidebar-width);
+      flex-shrink: 0;
+      position: sticky;
+      top: var(--nav-height);
+      height: calc(100vh - var(--nav-height));
+      overflow-y: auto;
+      border-right: 1px solid var(--border);
+      background: var(--bg-sidebar);
+      padding: 24px 20px;
+    }
+    .sidebar-filter {
+      width: 100%; padding: 8px 12px;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-size: 13px; font-family: var(--font-sans);
+      background: var(--bg-card); color: var(--text);
+      outline: none; margin-bottom: 24px;
+      transition: border-color 0.15s;
+    }
+    .sidebar-filter:focus { border-color: var(--accent); }
+    .sidebar-filter::placeholder { color: var(--text-faint); }
+    .sidebar-group { margin-bottom: 24px; }
+    .sidebar-group-label {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--text-muted);
+      padding-left: 4px; margin-bottom: 8px;
+    }
+    .sidebar-link {
+      display: block; padding: 5px 12px; margin: 1px 0;
+      font-size: 13px; color: var(--text-secondary);
+      text-decoration: none; border-radius: 4px;
+      transition: all 0.1s; cursor: pointer;
+    }
+    .sidebar-link:hover { background: var(--bg-highlight); color: var(--text); }
+    .sidebar-link.active { background: var(--accent-bg); color: var(--accent); font-weight: 500; }
+
+    /* MOBILE TOGGLE */
+    .sidebar-toggle {
+      display: none; position: fixed; bottom: 20px; left: 20px; z-index: 200;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--accent); color: #fff; border: none;
+      font-size: 20px; cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    /* MAIN CONTENT */
+    .content {
+      flex: 1; min-width: 0;
+      padding: 40px clamp(24px, 4vw, 56px) 80px;
+      max-width: 800px;
+    }
+
+    /* BREADCRUMB */
+    .breadcrumb {
+      font-size: 11px; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .breadcrumb a { color: var(--text-muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--accent); }
+
+    /* ARTICLE CONTENT */
+    .article { display: none; }
+    .article.active { display: block; }
+
+    .article h1 {
+      font-family: var(--font-serif); font-size: 32px;
+      font-weight: 600; line-height: 1.2; letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+    .article .lead {
+      font-size: 16px; color: var(--text-secondary); line-height: 1.6;
+      margin-bottom: 40px;
+    }
+    .article h2 {
+      font-size: 20px; font-weight: 700; margin: 48px 0 16px;
+      padding-top: 20px; border-top: 1px solid var(--border);
+      letter-spacing: -0.01em;
+    }
+    .article h2:first-of-type { border-top: none; padding-top: 0; margin-top: 32px; }
+    .article h3 { font-size: 15px; font-weight: 600; margin: 28px 0 10px; }
+    .article p { margin-bottom: 16px; color: var(--text-secondary); }
+    .article strong { color: var(--text); font-weight: 600; }
+    .article ul, .article ol { margin: 0 0 16px 20px; color: var(--text-secondary); }
+    .article li { margin-bottom: 6px; }
+
+    .article code {
+      font-family: var(--font-mono); font-size: 0.88em;
+      background: var(--bg-code); padding: 2px 6px; border-radius: 3px;
+      color: var(--accent);
+    }
+
+    .article pre {
+      background: #1e1e1e; color: #d4d4d4; border-radius: var(--radius);
+      padding: 20px 24px; font-family: var(--font-mono); font-size: 13px;
+      line-height: 1.7; overflow-x: auto; margin: 16px 0 24px;
+    }
+    .article pre code {
+      background: none; padding: 0; color: inherit; font-size: inherit;
+    }
+    .article pre .comment { color: #6a9955; }
+    .article pre .keyword { color: #c586c0; }
+    .article pre .string { color: #ce9178; }
+    .article pre .type { color: #4ec9b0; }
+
+    .article table {
+      width: 100%; border-collapse: collapse; margin: 16px 0 24px;
+      font-size: 13px;
+    }
+    .article th {
+      text-align: left; padding: 10px 14px;
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--text-muted); background: var(--bg-warm);
+      border-bottom: 2px solid var(--border);
+    }
+    .article td {
+      padding: 10px 14px; border-bottom: 1px solid var(--border);
+      vertical-align: top; color: var(--text-secondary);
+    }
+    .article tr:last-child td { border-bottom: none; }
+
+    .article blockquote {
+      border-left: 3px solid var(--accent); padding: 12px 20px;
+      margin: 16px 0 24px; background: var(--accent-bg);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      font-size: 14px; color: var(--text-secondary);
+    }
+    .article blockquote strong { color: var(--accent); }
+
+    .callout {
+      padding: 16px 20px; border-radius: var(--radius-sm);
+      margin: 16px 0 24px; font-size: 13px;
+    }
+    .callout-info { background: var(--bg-highlight); border-left: 3px solid var(--info); }
+    .callout-warn { background: var(--accent-bg); border-left: 3px solid var(--accent); }
+
+    /* DOC INDEX TABLE */
+    .doc-index {
+      list-style: none; margin: 0 0 24px; padding: 0;
+    }
+    .doc-index li {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 16px; border: 1px solid var(--border);
+      border-radius: var(--radius-sm); margin-bottom: 8px;
+      cursor: pointer; transition: all 0.15s;
+      background: var(--bg-card);
+    }
+    .doc-index li:hover { border-color: var(--accent-border); background: var(--accent-bg); }
+    .doc-index .doc-title { font-weight: 500; font-size: 14px; color: var(--text); }
+    .doc-index .doc-path { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
+
+    .status-badge {
+      font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+      padding: 2px 8px; border-radius: 4px; white-space: nowrap;
+    }
+    .badge-success { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent-border); }
+    .badge-outcome { background: var(--bg-warm); color: var(--text); border: 1px solid var(--border-strong); }
+    .badge-human { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent-border); }
+    .badge-failed { background: #fee2e2; color: var(--danger); border: 1px solid #fca5a5; }
+    [data-theme="dark"] .badge-failed { background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.3); }
+    .badge-info { background: var(--bg-highlight); color: var(--text-secondary); border: 1px solid var(--border); }
+
+    @media (max-width: 860px) {
+      .sidebar {
+        position: fixed; left: -100%; width: 280px;
+        z-index: 150; transition: left 0.25s;
+        box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+      }
+      .sidebar.open { left: 0; }
+      .sidebar-toggle { display: flex; align-items: center; justify-content: center; }
+      .content { padding: 32px 20px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+  <a href="../index.html" class="nav-brand-group" aria-label="CUA Home">
+    <div class="brand-logo-wrap">
+      <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="16,2.5 28.5,9.5 28.5,22.5 16,29.5 3.5,22.5 3.5,9.5" fill="var(--accent)" fill-opacity="0.18" stroke="var(--accent)" stroke-width="2.2" stroke-linejoin="round"/>
+        <polygon points="16,7.5 23.5,16 16,24.5 8.5,16" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="16" cy="16" r="3.2" fill="var(--accent)"/>
+      </svg>
+    </div>
+    <div class="nav-brand-text">
+      <span class="nav-brand-title">CUA</span>
+      <span class="nav-brand-subtitle">Documentation</span>
+    </div>
+  </a>
+
+  <div class="nav-right">
+    <a href="index.html" class="nav-link active">Docs</a>
+    <a href="https://github.com/adityamhaske/interface.ai" class="nav-github-btn" target="_blank" rel="noopener" aria-label="GitHub Repository">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+      </svg>
+      <span>GitHub</span>
+    </a>
+    <button class="theme-toggle" id="themeToggle" title="Toggle color theme" aria-label="Toggle theme">
+      <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"></circle>
+        <line x1="12" y1="1" x2="12" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="23"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+        <line x1="1" y1="12" x2="3" y2="12"></line>
+        <line x1="21" y1="12" x2="23" y2="12"></line>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+      </svg>
+    </button>
+  </div>
+  </div>
+</nav>
+
+<!-- MOBILE TOGGLE -->
+<button class="sidebar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')" aria-label="Toggle navigation menu">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="3" y1="12" x2="21" y2="12"></line>
+    <line x1="3" y1="6" x2="21" y2="6"></line>
+    <line x1="3" y1="18" x2="21" y2="18"></line>
+  </svg>
+</button>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <input type="text" class="sidebar-filter" placeholder="Filter…" oninput="filterSidebar(this.value)">
+
+  <div class="sidebar-group">
+    <div class="sidebar-group-label">Overview</div>
+    <a class="sidebar-link active" onclick="show('overview')">Documentation Index</a>
+    <a class="sidebar-link" onclick="show('quickstart')">Quick Start</a>
+    <a class="sidebar-link" onclick="show('demo')">Demo Walkthrough</a>
+    <a class="sidebar-link" onclick="show('cli')">CLI Reference</a>
+  </div>
+
+  <div class="sidebar-group">
+    <div class="sidebar-group-label">Architecture</div>
+    <a class="sidebar-link" onclick="show('architecture')">System Architecture</a>
+    <a class="sidebar-link" onclick="show('pipeline')">Execution Pipeline</a>
+    <a class="sidebar-link" onclick="show('invariants')">Ten Invariants</a>
+  </div>
+
+  <div class="sidebar-group">
+    <div class="sidebar-group-label">Design</div>
+    <a class="sidebar-link" onclick="show('artifact-schema')">Capability Artifact</a>
+    <a class="sidebar-link" onclick="show('target-resolution')">Target Resolution</a>
+    <a class="sidebar-link" onclick="show('error-taxonomy')">Error Taxonomy</a>
+    <a class="sidebar-link" onclick="show('control-transfer')">Control Transfer (HITL)</a>
+  </div>
+
+  <div class="sidebar-group">
+    <div class="sidebar-group-label">Decisions (ADRs)</div>
+    <a class="sidebar-link" onclick="show('adr-0001')">ADR 0001 — UiSnapshot</a>
+    <a class="sidebar-link" onclick="show('adr-0002')">ADR 0002 — Immutable Artifacts</a>
+    <a class="sidebar-link" onclick="show('adr-0003')">ADR 0003 — Observation Taxonomy</a>
+    <a class="sidebar-link" onclick="show('adr-0004')">ADR 0004 — Policy Chokepoint</a>
+    <a class="sidebar-link" onclick="show('adr-0005')">ADR 0005 — Tenant Overlays</a>
+  </div>
+
+  <div class="sidebar-group">
+    <div class="sidebar-group-label">Product</div>
+    <a class="sidebar-link" onclick="show('prd')">Product Requirements</a>
+    <a class="sidebar-link" onclick="show('requirements')">Requirements Traceability</a>
+  </div>
+
+  <div class="sidebar-group">
+    <div class="sidebar-group-label">Testing</div>
+    <a class="sidebar-link" onclick="show('testing')">Testing Strategy</a>
+  </div>
+
+  <div class="sidebar-group">
+    <div class="sidebar-group-label">Runbooks</div>
+    <a class="sidebar-link" onclick="show('runbook-discovery')">Run a Discovery</a>
+    <a class="sidebar-link" onclick="show('runbook-replay')">Run a Replay</a>
+    <a class="sidebar-link" onclick="show('runbook-escalation')">Handle an Escalation</a>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="content">
+
+<!-- ================================ OVERVIEW ================================ -->
+<div class="article active" id="overview">
+  <div class="breadcrumb">DOCS</div>
+  <h1>Documentation</h1>
+  <p class="lead">Documentation for the Computer-Use Automation system. Every statement describes what is built, or is marked explicitly as planned. New here? Start with <a href="#" onclick="show('quickstart'); return false" style="color: var(--accent)">Quick Start</a>, then <a href="#" onclick="show('demo'); return false" style="color: var(--accent)">Demo Walkthrough</a>.</p>
+
+  <h2>Getting Started</h2>
+  <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">What this is, how to run it, and how to configure a model — including a local one.</p>
+  <ul class="doc-index">
+    <li onclick="show('quickstart')"><span class="doc-title">Quick Start</span><span class="doc-path">setup + dependencies</span></li>
+    <li onclick="show('demo')"><span class="doc-title">Demo Walkthrough</span><span class="doc-path">12 stages, end to end</span></li>
+    <li onclick="show('cli')"><span class="doc-title">CLI Reference</span><span class="doc-path">every command</span></li>
+  </ul>
+
+  <h2>Architecture</h2>
+  <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">How the system is put together, and why the boundaries fall where they do.</p>
+  <ul class="doc-index">
+    <li onclick="show('architecture')"><span class="doc-title">System Architecture</span><span class="doc-path">package map + dependency rules</span></li>
+    <li onclick="show('pipeline')"><span class="doc-title">Execution Pipeline</span><span class="doc-path">Action → Resolver → Policy → Driver</span></li>
+    <li onclick="show('invariants')"><span class="doc-title">Ten Invariants</span><span class="doc-path">mechanically enforced contracts</span></li>
+  </ul>
+
+  <h2>Design</h2>
+  <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">Detailed design documents — the artifact schema, target resolution, error taxonomy, and human-in-the-loop control transfer.</p>
+  <ul class="doc-index">
+    <li onclick="show('artifact-schema')"><span class="doc-title">Capability Artifact</span><span class="doc-path">design/artifact-schema</span></li>
+    <li onclick="show('target-resolution')"><span class="doc-title">Target Resolution</span><span class="doc-path">design/target-resolution</span></li>
+    <li onclick="show('error-taxonomy')"><span class="doc-title">Error Taxonomy</span><span class="doc-path">design/error-taxonomy</span></li>
+    <li onclick="show('control-transfer')"><span class="doc-title">Control Transfer (HITL)</span><span class="doc-path">design/control-transfer</span></li>
+  </ul>
+
+  <h2>Decisions (ADRs)</h2>
+  <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">Why it is this way — the architectural decision records.</p>
+  <ul class="doc-index">
+    <li onclick="show('adr-0001')"><span class="doc-title">ADR 0001 — UiSnapshot as cross-surface abstraction</span><span class="doc-path">accepted</span></li>
+    <li onclick="show('adr-0002')"><span class="doc-title">ADR 0002 — Immutable content-addressed capability</span><span class="doc-path">accepted</span></li>
+    <li onclick="show('adr-0003')"><span class="doc-title">ADR 0003 — Four-class observation taxonomy</span><span class="doc-path">accepted</span></li>
+    <li onclick="show('adr-0004')"><span class="doc-title">ADR 0004 — Single policy chokepoint</span><span class="doc-path">accepted</span></li>
+    <li onclick="show('adr-0005')"><span class="doc-title">ADR 0005 — Tenant overlay, not fork</span><span class="doc-path">accepted</span></li>
+  </ul>
+
+  <h2>Product</h2>
+  <ul class="doc-index">
+    <li onclick="show('prd')"><span class="doc-title">Product Requirements</span><span class="doc-path">prd/00-prd</span></li>
+    <li onclick="show('requirements')"><span class="doc-title">Requirements Traceability</span><span class="doc-path">prd/01-requirements-traceability</span></li>
+  </ul>
+
+  <h2>Testing</h2>
+  <ul class="doc-index">
+    <li onclick="show('testing')"><span class="doc-title">Testing Strategy</span><span class="doc-path">claim → test table</span></li>
+  </ul>
+
+  <h2>Runbooks</h2>
+  <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">Step-by-step operating procedures.</p>
+  <ul class="doc-index">
+    <li onclick="show('runbook-discovery')"><span class="doc-title">Run a Discovery</span><span class="doc-path">runbooks/run-a-discovery</span></li>
+    <li onclick="show('runbook-replay')"><span class="doc-title">Run a Replay</span><span class="doc-path">runbooks/run-a-replay</span></li>
+    <li onclick="show('runbook-escalation')"><span class="doc-title">Handle an Escalation</span><span class="doc-path">runbooks/handle-an-escalation</span></li>
+  </ul>
+</div>
+
+<!-- ================================ QUICKSTART ================================ -->
+<div class="article" id="quickstart">
+  <div class="breadcrumb"><a href="#" onclick="show('overview'); return false">DOCS</a> / GETTING STARTED</div>
+  <h1>Quick Start</h1>
+  <p class="lead">Get the system running in under a minute.</p>
+
+  <h2>Prerequisites</h2>
+  <ul>
+    <li>Python 3.11+</li>
+    <li><code>uv</code> (optional, used if present; otherwise <code>venv</code> + <code>pip</code>)</li>
+  </ul>
+
+  <h2>Setup</h2>
+  <pre><code><span class="comment"># Clone and enter the project</span>
+git clone https://github.com/adityamhaske/interface.ai.git
+cd interface.ai
+
+<span class="comment"># Install everything: venv, dependencies, Chromium</span>
+make setup</code></pre>
+
+  <h2>Configuration</h2>
+  <pre><code>cp .env.example .env</code></pre>
+  <p><strong>The only thing that needs an API key is the live discovery run.</strong> Replay, escalation, the full test suite, and the demo all work without one.</p>
+
+  <table>
+    <thead><tr><th>Variable</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>OPENROUTER_API_KEY</code></td><td>Discovery only. Any OpenAI-compatible gateway works.</td></tr>
+      <tr><td><code>CUA_LLM_BASE_URL</code></td><td>Defaults to OpenRouter</td></tr>
+      <tr><td><code>CUA_LLM_MODEL</code></td><td>Model ID for discovery</td></tr>
+      <tr><td><code>CUA_POLICY_FILE</code></td><td>Allowlist and risk policy — defaults to <code>config/policy.yaml</code></td></tr>
+    </tbody>
+  </table>
+
+  <h2>Run the demo</h2>
+  <pre><code><span class="comment"># The whole story, one command — twelve stages end to end</span>
+make demo</code></pre>
+  <p>Takes about a minute. Works without an API key — discovery falls back to a recorded transcript and says so explicitly.</p>
+
+  <h2>Development commands</h2>
+  <pre><code>make check          <span class="comment"># lint + typecheck + invariants + tests (CI)</span>
+make test           <span class="comment"># offline suite; no API key, no network</span>
+make invariants     <span class="comment"># just the architectural contracts</span>
+make eval           <span class="comment"># stability + cross-tenant measurement</span></code></pre>
+  <p>244 tests, <code>mypy --strict</code> clean, five enforced import contracts. The whole suite runs offline with no API key.</p>
+</div>
+
+<!-- ================================ DEMO ================================ -->
+<div class="article" id="demo">
+  <div class="breadcrumb"><a href="#" onclick="show('overview'); return false">DOCS</a> / GETTING STARTED</div>
+  <h1>Demo Walkthrough</h1>
+  <p class="lead"><code>make demo</code> boots the mock back-office and runs twelve stages end to end, writing everything to <code>evidence/</code>.</p>
+
+  <table>
+    <thead><tr><th>#</th><th>Stage</th><th>What happens</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Mock back-office running</td><td>Hostile frameset app, no test IDs</td><td><span class="status-badge badge-info">READY</span></td></tr>
+      <tr><td>2</td><td>Discovery</td><td>The model drives the live UI to the goal</td><td><span class="status-badge badge-info">TRACE</span></td></tr>
+      <tr><td>3</td><td>Capability compiled and sealed</td><td>Typed I/O, semantic targets, content hash</td><td><span class="status-badge badge-success">SEALED</span></td></tr>
+      <tr><td>4</td><td>Deterministic replay, new inputs</td><td>No model in the loop</td><td><span class="status-badge badge-success">SUCCESS</span></td></tr>
+      <tr><td>5</td><td>Business outcome</td><td><code>member_not_found</code> — an answer, not a crash</td><td><span class="status-badge badge-outcome">EXIT 0</span></td></tr>
+      <tr><td>6</td><td>Injected 502</td><td>Declared recovery cleared it</td><td><span class="status-badge badge-success">SUCCESS</span></td></tr>
+      <tr><td>7</td><td>Fault past budget</td><td>Recovery exhausted → escalate</td><td><span class="status-badge badge-human">NEEDS_HUMAN</span></td></tr>
+      <tr><td>8</td><td>Malformed input</td><td>Rejected before acting</td><td><span class="status-badge badge-failed">FAILED</span></td></tr>
+      <tr><td>9</td><td>Undeclared screen</td><td>Failed closed and escalated</td><td><span class="status-badge badge-human">NEEDS_HUMAN</span></td></tr>
+      <tr><td>10</td><td>Operator took over</td><td>Drove the same live session, handed it back</td><td><span class="status-badge badge-info">EPOCH 3</span></td></tr>
+      <tr><td>11</td><td>Re-anchored after handoff</td><td>Resumes at the right step, not step 1</td><td><span class="status-badge badge-success">SUCCESS</span></td></tr>
+      <tr><td>12</td><td>Agent invocation</td><td>Called by name with typed args and declared outcomes</td><td><span class="status-badge badge-success">SUCCESS</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-info">
+    <strong>No API key required.</strong> Stage 2 falls back to a recorded transcript and says so, in the output and in the evidence. Everything after it is model-free by construction. Set <code>OPENROUTER_API_KEY</code> for a genuine LLM-driven discovery.
+  </div>
+
+  <h2>Fault injection</h2>
+  <p>Faults are injected into the <strong>mock app</strong>, not the replay engine — the executor must not know a fault is coming:</p>
+  <pre><code><span class="comment"># Arm a fault</span>
+curl -X POST localhost:8811/_control/arm \
+  -d '{"fault":"transient_load","count":1}' \
+  -H 'content-type: application/json'
+
+<span class="comment"># Reset</span>
+curl -X POST localhost:8811/_control/reset</code></pre>
+  <p>Available faults: <code>transient_load</code>, <code>session_timeout</code>, <code>undeclared_dialog</code>, <code>validation_error</code>.</p>
+
+  <h2>Exit codes</h2>
+  <table>
+    <thead><tr><th>Status</th><th>Exit</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>SUCCESS</code></td><td>0</td><td>Checkpoint verified, typed outputs returned</td></tr>
+      <tr><td><code>BUSINESS_OUTCOME</code></td><td>0</td><td>A legitimate answer — "no such member" is <strong>not</strong> a failure</td></tr>
+      <tr><td><code>NEEDS_HUMAN</code></td><td>2</td><td>Stopped safely; an intervention is queued</td></tr>
+      <tr><td><code>FAILED</code></td><td>1</td><td>A defect. Carries step, expected, observed.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ================================ CLI ================================ -->
+<div class="article" id="cli">
+  <div class="breadcrumb"><a href="#" onclick="show('overview'); return false">DOCS</a> / REFERENCE</div>
+  <h1>CLI Reference</h1>
+  <p class="lead"><code>make demo</code> is orchestration, not a second implementation — every stage is a command you can run on its own.</p>
+
+  <h2>Discovery</h2>
+  <pre><code>cua discover \
+  --goal "Look up member 12345 and read their current savings balance" \
+  --target http://localhost:8811 \
+  --out evidence/capabilities/</code></pre>
+  <p>Requires <code>OPENROUTER_API_KEY</code>. The model drives a live UI, the run is compiled into a capability artifact.</p>
+
+  <h2>Replay</h2>
+  <pre><code><span class="comment"># Success case</span>
+cua replay &lt;artifact&gt; --base-url http://localhost:8811 --input member_id=67890
+
+<span class="comment"># Business outcome (exit 0)</span>
+cua replay &lt;artifact&gt; --base-url http://localhost:8811 --input member_id=99999</code></pre>
+
+  <h2>Operator Console</h2>
+  <pre><code>cua console --target http://localhost:8811    <span class="comment"># claim, act, release</span></code></pre>
+
+  <h2>Catalog</h2>
+  <pre><code>cua catalog list                              <span class="comment"># typed signatures</span>
+cua catalog show &lt;id&gt; --tool-schema           <span class="comment"># agent-facing contract</span>
+cua catalog invoke &lt;id&gt; --input member_id=12345 --base-url http://localhost:8811</code></pre>
+
+  <h2>Agent Demo</h2>
+  <pre><code>cua agent-demo --base-url http://localhost:8811   <span class="comment"># caller handling all four statuses</span></code></pre>
+
+  <h2>Mock App</h2>
+  <pre><code>make app                  <span class="comment"># hostile back-office on :8811</span>
+make app-variant-b        <span class="comment"># second tenant variant</span></code></pre>
+</div>
+
+<!-- ================================ ARCHITECTURE ================================ -->
+<div class="article" id="architecture">
+  <div class="breadcrumb"><a href="#" onclick="show('overview'); return false">DOCS</a> / ARCHITECTURE</div>
+  <h1>System Architecture</h1>
+  <p class="lead">How the pieces fit together, and why the boundaries fall where they do.</p>
+
+  <h2>Package map</h2>
+  <table>
+    <thead><tr><th>Package</th><th>Owns</th><th>May import</th></tr></thead>
+    <tbody>
+      <tr><td><code>cua/domain</code></td><td>Types: Capability, TargetDescriptor, Action, UiSnapshot, RunRecord, taxonomy</td><td>nothing from <code>cua</code></td></tr>
+      <tr><td><code>cua/perception</code></td><td>Normalizing raw surface observation into UiSnapshot; fingerprinting</td><td><code>domain</code></td></tr>
+      <tr><td><code>cua/targeting</code></td><td>Resolution ladder, scoring, ambiguity, drift</td><td><code>domain</code>, <code>perception</code></td></tr>
+      <tr><td><code>cua/policy</code></td><td>Allowlist, risk tiers, redaction, secrets, AuthorizedAction</td><td><code>domain</code>, <code>targeting</code></td></tr>
+      <tr><td><code>cua/hitl</code></td><td>Lease, SessionBroker, intervention queue, operator console</td><td><code>domain</code>, <code>policy</code></td></tr>
+      <tr><td><code>cua/runtime</code></td><td><strong>dispatcher.py — the sole importer of surfaces</strong></td><td>everything below</td></tr>
+      <tr><td><code>cua/surfaces</code></td><td>SurfaceDriver port; Playwright/CDP driver; desktop stub</td><td><code>domain</code>, <code>perception</code></td></tr>
+      <tr><td><code>cua/agent</code></td><td>LlmPort, prompts, the discovery loop</td><td><code>runtime</code> and below</td></tr>
+      <tr><td><code>cua/replay</code></td><td>The deterministic executor</td><td><code>runtime</code> and below — <strong>never agent</strong></td></tr>
+      <tr><td><code>cua/recorder</code></td><td>Compiling a discovery trace into a Capability</td><td><code>domain</code>, <code>targeting</code></td></tr>
+      <tr><td><code>cua/evidence</code></td><td>Structured, redacted, actor-tagged run records</td><td><code>domain</code>, <code>policy</code></td></tr>
+      <tr><td><code>cua/catalog</code></td><td>Capability store, tenant overlays, tool-spec export</td><td><code>domain</code></td></tr>
+      <tr><td><code>cua/cli</code></td><td>Entry points</td><td>everything</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Project layout</h2>
+  <pre><code>src/cua/          domain · perception · surfaces · targeting · policy · runtime
+                  agent · recorder · replay · hitl · evidence · cli
+apps/mock_bank/   the hostile target application (+ a "second tenant" variant)
+docs/             ADRs (why) · design (how) · prd (what, in what order) · runbooks
+tests/            unit · integration · contract · invariants · e2e(live)
+evidence/         proof that the end-to-end thread actually ran
+                  including evals/ — the measured numbers behind the claims</code></pre>
+</div>
+
+<!-- ================================ PIPELINE ================================ -->
+<div class="article" id="pipeline">
+  <div class="breadcrumb"><a href="#" onclick="show('overview'); return false">DOCS</a> / ARCHITECTURE</div>
+  <h1>Execution Pipeline</h1>
+  <p class="lead">One path to a surface, for every actor. Discovery, replay, and human intervention all take the same path.</p>
+
+  <pre><code>Action ──► TargetResolver ──► PolicyEngine ──► SurfaceDriver
+       (resolve or refuse)    (authorize)      (dispatch)</code></pre>
+
+  <p>Enforced three independent ways:</p>
+  <ol>
+    <li><strong>Import rule.</strong> <code>cua.runtime.dispatcher</code> is the only module allowed to import <code>cua.surfaces</code> (<code>.importlinter</code> contract <code>policy-chokepoint</code>).</li>
+    <li><strong>Type rule.</strong> <code>SurfaceDriver.dispatch()</code> accepts only an <code>AuthorizedAction</code>, which carries a token instance held exclusively by <code>PolicyEngine</code>.</li>
+    <li><strong>Reconciliation test.</strong> Every <code>dispatch</code> event in a run record must have a matching <code>authorize</code> event with the same action ID.</li>
+  </ol>
+
+  <h2>Human input is policed, not injected</h2>
+  <p>The console submits <code>raw_input</code> actions which traverse the same path under a distinct <strong>HUMAN policy profile</strong>:</p>
+  <table>
+    <thead><tr><th></th><th>AUTOMATION</th><th>HUMAN (during intervention)</th></tr></thead>
+    <tbody>
+      <tr><td>Domain allowlist</td><td>enforced</td><td><strong>enforced</strong></td></tr>
+      <tr><td><code>safe</code> actions</td><td>allow</td><td>allow</td></tr>
+      <tr><td><code>elevated</code> actions</td><td>allow if declared</td><td>allow, recorded</td></tr>
+      <tr><td><code>irreversible</code> actions</td><td>block → escalate</td><td>allow <strong>with confirmation</strong>, recorded</td></tr>
+      <tr><td>Off-artifact navigation</td><td>NAVIGATION_BLOCKED</td><td>allowed within allowlist, recorded</td></tr>
+      <tr><td>Evidence redaction</td><td>applied</td><td><strong>applied</strong></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ================================ INVARIANTS ================================ -->
+<div class="article" id="invariants">
+  <div class="breadcrumb"><a href="#" onclick="show('overview'); return false">DOCS</a> / ARCHITECTURE</div>
+  <h1>The Ten Invariants</h1>
+  <p class="lead">The value of this system is almost entirely in a handful of properties. Each is mechanically enforced — the test is named so you can see it fail on purpose.</p>
+
+  <h3>1. Replay never calls or imports the LLM</h3>
+  <p><code>cua.replay</code> may not import <code>cua.agent</code>, <code>httpx</code>, or any model client — directly or transitively. A replay that can quietly ask a model for help is not deterministic, not cheap, and not auditable.</p>
+
+  <h3>2. No action reaches a driver without policy authorization</h3>
+  <p><code>cua.runtime.dispatcher</code> is the <strong>only</strong> module permitted to call <code>dispatch()</code>. <code>SurfaceDriver.dispatch()</code> accepts only an <code>AuthorizedAction</code>, which carries a token that only <code>PolicyEngine</code> can mint.</p>
+
+  <h3>3. Target identity is a semantic TargetDescriptor, never a raw CSS selector</h3>
+  <p>Artifacts describe controls by role, accessible name, scope, structural anchor, and ordinal. Surface-specific data may appear <strong>only</strong> inside <code>TargetDescriptor.hints</code>, and a hint is an unverified cache.</p>
+
+  <h3>4. Human input cannot bypass policy or evidence</h3>
+  <p>The operator console never injects into the page. It submits <code>raw_input</code> actions to the <code>SessionBroker</code>, which runs them through the same chokepoint under the <strong>HUMAN</strong> policy profile.</p>
+
+  <h3>5. Unknown states fail closed</h3>
+  <p>If the observed UI matches no declared precondition, checkpoint, outcome, or recovery rule, it is <code>UNEXPECTED_STATE</code> and the run <strong>stops</strong>. If a target resolves ambiguously, the resolver <strong>refuses</strong> with <code>TARGET_AMBIGUOUS</code>.</p>
+
+  <h3>6. Every sink is redacted</h3>
+  <p>Logs, artifacts, evidence files, screenshots, <strong>and outbound LLM prompts</strong>. Secrets are <code>{$secret: ref}</code> references resolved at dispatch time and never written anywhere.</p>
+
+  <h3>7. Business outcomes are not failures</h3>
+  <p>"No such member" is a legitimate answer the caller needs, not a crash. <code>BUSINESS_OUTCOME</code> exits 0.</p>
+
+  <h3>8. Automation may only act while it holds the session</h3>
+  <p>Every dispatch asks the lease: <strong>who holds this session</strong>, and <strong>has it changed hands since this run was authorized</strong>. Either answer can refuse the dispatch with <code>LEASE_LOST</code>.</p>
+
+  <h3>9. Capabilities are immutable</h3>
+  <p>A <code>Capability</code> at <code>id@version</code> is frozen and content-hashed. Anything that changes because you <em>ran</em> it lives in a separate document: <code>RunRecord</code>, <code>CapabilityEvaluation</code>, <code>CapabilityApproval</code>.</p>
+
+  <h3>10. <code>domain/</code> is pure</h3>
+  <p>No I/O, no network, no browser, no clock. <code>cua.domain</code> imports nothing else from <code>cua</code>.</p>
+</div>
+
+<!-- ================================ ARTIFACT SCHEMA ================================ -->
+<div class="article" id="artifact-schema">
+  <div class="breadcrumb"><a href="#" onclick="show('overview'); return false">DOCS</a> / DESIGN</div>
+  <h1>The Capability Artifact</h1>
+  <p class="lead">The unit of reuse in this system. What the LLM's discovery run compiles down to, what a human reviews, and what an AI agent invokes in production.</p>
+
+  <blockquote>Decision rationale lives in ADR 0002. This document is the reference for what the schema <em>is</em>.</blockquote>
+
+  <h2>Three readers, one artifact</h2>
+  <table>
+    <thead><tr><th>Reader</th><th>Needs</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Replay engine</strong></td><td>Unambiguous, executable steps with explicit success and failure conditions</td></tr>
+      <tr><td><strong>Human reviewer</strong></td><td>To understand what it does, what it touches, and what could go wrong — without running it</td></tr>
+      <tr><td><strong>Calling AI agent</strong></td><td>A typed contract: what to pass, what comes back, what can happen</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Document family</h2>
+  <p>Only the first is the capability. The rest exist so the capability can stay immutable.</p>
+  <pre><code>cua.capability/v1             frozen, content-hashed — the contract
+cua.tenant_binding/v1         per-tenant vars + step overrides (base ⊕ overlay)
+cua.run_record/v1             one execution: trace, resolutions, drift, evidence refs
+cua.capability_evaluation/v1  aggregate over runs: stability, strategy mix, drift trend
+cua.capability_approval/v1    draft → approved, approver, scope</code></pre>
+
+  <h2>Identity</h2>
+  <pre><code>capability:
+  id: "corebank.member.savings_balance"   <span class="comment"># &lt;vendor-product&gt;.&lt;domain&gt;.&lt;operation&gt;</span>
+  version: "1.2.0"
+  content_hash: "sha256:…"</code></pre>
+  <p><code>id</code> is namespaced by <strong>vendor product, never tenant</strong> — the precondition for cross-tenant reuse.</p>
+
+  <h2>Typed contract</h2>
+  <pre><code>inputs:
+  - { name: member_id, type: string, required: true, pattern: "^[0-9]{4,10}$",
+      sensitive: false, example: "12345" }
+outputs:
+  - { name: savings_balance, type: money, source: { step: read_balance } }</code></pre>
+  <p>These emit JSON Schema directly, so <strong>the artifact is the agent tool contract</strong> — there is no second source of truth to drift. <code>sensitive: true</code> propagates everywhere.</p>
+
+  <h2>Steps</h2>
+  <pre><code>steps:
+  - id: enter_member_id
+    action: { type: type, value: { $input: member_id } }
+    target:
+      role: textbox
+      name: { match: exact, value: "Member Number" }
+      scope: { frame: content, region: search_form }
+      anchor: { relation: row_of, cell_text: "Member Number" }
+      hints: { css: "...", node_path: "..." }   <span class="comment"># unverified cache</span>
+      fingerprint: "sha256:…"
+      recorded_strategy: semantic_exact
+    precondition:  { assert: node_exists, role: textbox, name: "Member Number" }
+    wait:          { for: snapshot_stable, timeout_ms: 5000 }
+    postcondition: { assert: node_has_value, value: { $input: member_id } }
+    risk: safe</code></pre>
+  <p>Every step asserts both before and after. A step that only acts is a step that assumes the click worked.</p>
+
+  <h2>Success, outcomes, recovery</h2>
+  <pre><code><span class="comment"># Did we actually reach the state we wanted?</span>
+checkpoint:
+  all_of:
+    - { assert: node_exists, role: heading, name_contains: "Member Detail" }
+    - { assert: node_matches, role: cell, name_matches: '^\\$[0-9,]+\\.[0-9]{2}$' }
+
+<span class="comment"># Legitimate answers — NOT failures</span>
+outcomes:
+  - { code: member_not_found, detect: { text_present: "No records found" },
+      terminal: true, returns: { member_id: { $input: member_id } } }
+
+<span class="comment"># Bounded, declared remediation — never open-ended</span>
+recovery:
+  - { id: transient_load, detect: { http_status_in: [502,503,504] },
+      remedy: [ { reload: {} } ], max_attempts: 3, backoff: exponential }</code></pre>
+</div>
+
+<!-- ================================ TARGET RESOLUTION ================================ -->
+<div class="article" id="target-resolution">
+  <div class="breadcrumb"><a href="#" onclick="show('overview'); return false">DOCS</a> / DESIGN</div>
+  <h1>Target Resolution</h1>
+  <p class="lead">Resolution is where determinism is won or lost. Turning a semantic TargetDescriptor into a concrete UiNode in the current snapshot.</p>
+
+  <h2>The resolution ladder</h2>
+  <p>Strategies are tried in fixed order. The first that yields exactly one candidate wins.</p>
+  <table>
+    <thead><tr><th>#</th><th>Strategy</th><th>Matches on</th><th>Survives</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><code>semantic_exact</code></td><td>role + accessible name, exact, unique in scope</td><td>most things</td></tr>
+      <tr><td>2</td><td><code>semantic_normalized</code></td><td>same, case/whitespace/punctuation folded</td><td>cosmetic label edits</td></tr>
+      <tr><td>3</td><td><code>structural_anchor</code></td><td>position relative to nearby text</td><td><strong>controls with no usable name at all</strong></td></tr>
+      <tr><td>4</td><td><code>hint_cached</code></td><td>stored CSS/node-path hint</td><td>nothing structural; speed optimization</td></tr>
+      <tr><td>5</td><td><code>ordinal_in_region</code></td><td>Nth control of a role within a scope</td><td>rebranding; last resort before refusal</td></tr>
+      <tr><td>6</td><td><code>vision</code></td><td>OCR / bounding box</td><td><strong>discovery only — hard-disabled in replay</strong></td></tr>
+    </tbody>
+  </table>
+
+  <p>Rung 3 is what makes legacy enterprise apps tractable. Those apps are full of controls with no name, no label, and no test ID, sitting in a table cell next to the text that identifies them.</p>
+  <p>Rung 4 is a <strong>cache, not an identity</strong>. A hint is accepted only if the node it resolves to also satisfies the semantic assertion.</p>
+
+  <h2>Ambiguity is refusal</h2>
+  <p>If two or more candidates survive above the ambiguity threshold, the resolver raises <code>TARGET_AMBIGUOUS</code> and the run stops. It does <strong>not</strong> pick the first, the topmost, or the highest-scoring.</p>
+  <p>Two plausible "Submit" buttons mean the screen is not what we think it is, and acting on either is how an automation posts a transaction to the wrong account. A refusal is recoverable — a wrong click may not be.</p>
+
+  <h2>Drift</h2>
+  <p>Resolving via a lower-priority strategy than the one recorded at discovery is <strong>drift</strong> — a signal, not a silent success. Per-step drift aggregates into a run-level <code>drift_score</code>.</p>
+  <p>This is the mechanism behind the multi-tenant story: a tenant whose UI has diverged shows rising drift <em>before</em> replays begin to fail.</p>
+
+  <h2>Variant B: two kinds of divergence</h2>
+  <h3>Case A — markup churn, same vocabulary (the ladder handles this)</h3>
+  <table>
+    <thead><tr><th></th><th>Base</th><th>Variant B</th></tr></thead>
+    <tbody>
+      <tr><td>accessible name</td><td><code>Member Number</code></td><td><code>Member Number</code> — <strong>same</strong></td></tr>
+      <tr><td>form field name</td><td><code>memno</code></td><td><code>member_num</code> — changed</td></tr>
+      <tr><td>CSS class</td><td><code>frmfld</code></td><td><code>ng-inp</code> — changed</td></tr>
+    </tbody>
+  </table>
+  <p><code>semantic_exact</code> resolves it on both. <strong>This is the falsifiable form of "this system does not depend on CSS selectors."</strong></p>
+
+  <h3>Case B — rebranding, different vocabulary (this needs an overlay)</h3>
+  <table>
+    <thead><tr><th></th><th>Base</th><th>Variant B</th></tr></thead>
+    <tbody>
+      <tr><td>balance label</td><td><code>Savings Balance</code></td><td><code>Savings Bal.</code></td></tr>
+      <tr><td>account type</td><td><code>Account Type</code></td><td><code>Type of Account</code></td></tr>
+    </tbody>
+  </table>
+  <p>No automatic recovery here — and that is correct. Inferring that "Savings Bal." means "Savings Balance" is a fuzzy guess, and a system that guesses which row holds a balance will eventually read the wrong one.</p>
+</div>
+
+<!-- ================================ ERROR TAXONOMY ================================ -->
+<div class="article" id="error-taxonomy">
+  <div class="breadcrumb"><a href="#" onclick="show('overview'); return false">DOCS</a> / DESIGN</div>
+  <h1>Error Taxonomy</h1>
+  <p class="lead">Two distinct type families — what we observed, and how the run ended — because they are not the same axis.</p>
+
+  <h2>What we observed (a classification of a moment)</h2>
+  <pre><code><span class="type">ObservationClass</span> = EXPECTED | BUSINESS_OUTCOME | RECOVERABLE | HARD_FAILURE | UNEXPECTED_STATE</code></pre>
+
+  <h2>How the run ended (a terminal status)</h2>
+  <pre><code><span class="type">RunStatus</span> = SUCCESS | BUSINESS_OUTCOME | NEEDS_HUMAN | FAILED</code></pre>
+
+  <h2>The decision procedure</h2>
+  <p>At every observation point the executor asks, in this order:</p>
+  <pre><code>1. Does the state satisfy the step precondition / checkpoint?   → EXPECTED, proceed
+2. Does it match a declared `outcomes` detector?                → BUSINESS_OUTCOME, return
+3. Does it match a declared `recovery` detector?                → RECOVERABLE, remediate
+4. Is it a known hard-failure condition?                        → HARD_FAILURE, stop
+5. Otherwise                                                    → UNEXPECTED_STATE, FAIL CLOSED</code></pre>
+
+  <h2>Failure codes</h2>
+  <table>
+    <thead><tr><th>Code</th><th>Means</th><th>Typical cause</th></tr></thead>
+    <tbody>
+      <tr><td><code>TARGET_NOT_FOUND</code></td><td>No candidate matched</td><td>Screen isn't what we expect</td></tr>
+      <tr><td><code>TARGET_AMBIGUOUS</code></td><td>Multiple candidates; refused</td><td>Ambiguous UI or loose descriptor</td></tr>
+      <tr><td><code>PRECONDITION_FAILED</code></td><td>Step entry condition unmet</td><td>Prior step didn't land</td></tr>
+      <tr><td><code>CHECKPOINT_FAILED</code></td><td>Flow complete, success false</td><td>Happy path not reached</td></tr>
+      <tr><td><code>ACTION_FAILED</code></td><td>Driver couldn't perform action</td><td>Control disabled, obscured</td></tr>
+      <tr><td><code>TIMEOUT</code></td><td>Wait never satisfied</td><td>Slow load or impossible condition</td></tr>
+      <tr><td><code>NAVIGATION_BLOCKED</code></td><td>Allowlist violation</td><td>Off-domain redirect</td></tr>
+      <tr><td><code>POLICY_DENIED</code></td><td>Policy refused the action</td><td>Irreversible without approval</td></tr>
+      <tr><td><code>RECOVERY_EXHAUSTED</code></td><td>Outlived max_attempts</td><td>Persistent, not transient</td></tr>
+      <tr><td><code>INPUT_VALIDATION_FAILED</code></td><td>Inputs failed declared schema</td><td>Caught before touching UI</td></tr>
+      <tr><td><code>UNEXPECTED_STATE</code></td><td>Matched nothing declared</td><td>Fail-closed default</td></tr>
+      <tr><td><code>LEASE_LOST</code></td><td>Stale lease epoch</td><td>Automation after human takeover</td></tr>
+    </tbody>
+  </table>
+
+  <h2>The fault matrix</h2>
+  <table>
+    <thead><tr><th>Injected fault</th><th>Expected RunStatus</th><th>Expected code</th></tr></thead>
+    <tbody>
+      <tr><td>member_id with no record</td><td><code>BUSINESS_OUTCOME</code></td><td><code>member_not_found</code></td></tr>
+      <tr><td>transient_load (502 once)</td><td><code>SUCCESS</code></td><td>recovered after retry</td></tr>
+      <tr><td>transient_load (502 always)</td><td><code>FAILED</code></td><td><code>RECOVERY_EXHAUSTED</code></td></tr>
+      <tr><td>session_timeout</td><td><code>SUCCESS</code> or <code>NEEDS_HUMAN</code></td><td>re-auth or escalate</td></tr>
+      <tr><td>undeclared interstitial</td><td><code>NEEDS_HUMAN</code></td><td><code>UNEXPECTED_STATE</code></td></tr>
+      <tr><td>validation_error on submit</td><td><code>BUSINESS_OUTCOME</code></td><td><code>validation_rejected</code></td></tr>
+      <tr><td>permission-denied account</td><td><code>BUSINESS_OUTCOME</code></td><td><code>permission_denied</code></td></tr>
+      <tr><td>off-allowlist redirect</td><td><code>FAILED</code></td><td><code>NAVIGATION_BLOCKED</code></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ================================ CONTROL TRANSFER ================================ -->
+<div class="article" id="control-transfer">
+  <div class="breadcrumb"><a href="#" onclick="show('overview'); return false">DOCS</a> / DESIGN</div>
+  <h1>Control Transfer (Human-in-the-Loop)</h1>
+  <p class="lead">A human takes control of the same live session the automation was using — not a fresh one — does the manual work, and hands it back so the run can finish.</p>
+
+  <h2>State machine</h2>
+  <pre><code>RUNNING ──escalate──► PAUSED ──human_claim──► HUMAN_CONTROL
+   ▲                  (epoch++)               (epoch++)
+   │                                                │
+   └── RESUMING ◄── re-anchor + reconcile ◄── human_release (epoch++)</code></pre>
+
+  <h2>The lease</h2>
+  <pre><code><span class="type">Lease</span>(holder: Actor, epoch: int, expires_at: datetime)</code></pre>
+  <p><code>holder ∈ {AUTOMATION, HUMAN, NONE}</code>. Every transition increments <code>epoch</code> monotonically. Every <code>dispatch()</code> asserts <code>lease.held_by(actor, epoch)</code>.</p>
+
+  <h2>Escalation triggers</h2>
+  <table>
+    <thead><tr><th>Trigger</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>TARGET_AMBIGUOUS</code></td><td>Resolver refused to guess</td></tr>
+      <tr><td><code>TARGET_NOT_FOUND</code></td><td>Ladder exhausted</td></tr>
+      <tr><td><code>CHECKPOINT_FAILED</code></td><td>Reached the end, didn't reach the state</td></tr>
+      <tr><td><code>RECOVERY_EXHAUSTED</code></td><td>A transient condition wasn't transient</td></tr>
+      <tr><td><code>UNEXPECTED_STATE</code></td><td>Fail-closed default</td></tr>
+      <tr><td><code>risky_action_unapproved</code></td><td>Irreversible action needs human approval</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Re-anchoring after handoff</h2>
+  <p>On <code>human_release</code> the executor:</p>
+  <ol>
+    <li><strong>Snapshot-diffs</strong> pre-handoff against post-handoff → records <code>human_delta</code></li>
+    <li><strong>Re-evaluates preconditions</strong> from the current step forward</li>
+    <li><strong>Skips forward</strong> to the first step whose precondition isn't satisfied — doesn't redo human work</li>
+    <li>If the state matches <strong>no</strong> step's precondition → <code>UNEXPECTED_STATE</code>, <strong>fails closed</strong></li>
+  </ol>
+  <p>Step 4 is the fail-closed rule applied to the handoff seam. "The human left the session somewhere I don't recognize" is exactly the moment not to improvise.</p>
+</div>
+
+<!-- ================================ ADR 0001 ================================ -->
+<div class="article" id="adr-0001">
+  <div class="breadcrumb"><a href="#" onclick="show('overview'); return false">DOCS</a> / DECISIONS</div>
+  <h1>ADR 0001 — UiSnapshot as the cross-surface abstraction</h1>
+  <p class="lead">Status: <strong>Accepted</strong> · 2026-09-11</p>
+
+  <h2>Context</h2>
+  <p>We must perceive and act on three very different kinds of surface: modern web apps, legacy server-rendered web apps (framesets, nested tables, non-semantic markup, no test IDs), and native desktop applications.</p>
+  <p>Three candidates: DOM/CSS first (breaks on desktop), pure vision (pixel coordinates are the least stable thing you can persist), and semantic/accessibility tree.</p>
+
+  <h2>Decision</h2>
+  <p><strong>Perception normalizes every surface into a <code>UiSnapshot</code>: a tree of <code>UiNode {node_id, role, name, value, states, bounds, scope, parent, hints}</code>.</strong></p>
+  <p>The artifact schema and targeting system depend <strong>only</strong> on <code>UiSnapshot</code> and <code>TargetDescriptor</code>. Neither knows what an accessibility tree, a CDP session, or a DOM is.</p>
+  <table>
+    <thead><tr><th>Driver</th><th>Populates UiSnapshot from</th></tr></thead>
+    <tbody>
+      <tr><td><code>PlaywrightCdpDriver</code> (built)</td><td>CDP <code>Accessibility.getFullAXTree</code> + box model, enriched with DOM-derived hints</td></tr>
+      <tr><td><code>DesktopUiaDriver</code> (stubbed)</td><td>Windows UI Automation element tree</td></tr>
+      <tr><td>Future OCR driver</td><td>Vision model + OCR over a screenshot</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Consequences</h2>
+  <p><strong>Good.</strong> The same artifact can replay on a desktop driver, because <code>role: button, name: "Search"</code> means the same thing in UIA as in ARIA.</p>
+  <p><strong>Bad.</strong> Accessibility trees on genuinely hostile legacy apps can be thin. Mitigated by driver-level enrichment and the <code>structural_anchor</code> resolution strategy.</p>
+</div>
+
+<!-- ================================ ADR 0002 ================================ -->
+<div class="article" id="adr-0002">
+  <div class="breadcrumb"><a href="#" onclick="show('overview'); return false">DOCS</a> / DECISIONS</div>
+  <h1>ADR 0002 — Immutable content-addressed capability</h1>
+  <p class="lead">Status: <strong>Accepted</strong> · 2026-09-11</p>
+
+  <h2>Context</h2>
+  <p>A capability artifact accumulates pressure to hold more: run counts, stability scores, approval state, last-run timestamps. An earlier draft put telemetry inside the capability. Two problems surfaced:</p>
+  <ol>
+    <li>The definition mutates every time you run it — git diffs become noise</li>
+    <li>"Which version produced that run?" becomes unanswerable</li>
+  </ol>
+
+  <h2>Decision</h2>
+  <p><strong>A <code>Capability</code> at <code>id@version</code> is frozen and content-hashed.</strong> Nothing that changes as a result of executing it may live inside it. Runtime state moves into separate documents.</p>
+
+  <h2>Consequences</h2>
+  <p><strong>Good.</strong> Reviewing a capability is reviewing a contract. A <code>RunRecord</code> can name exactly what it executed.</p>
+  <p><strong>Also good.</strong> Immutability makes the multi-tenant story cleaner: a tenant cannot "drift" a shared capability by using it.</p>
+</div>
+
+<!-- ================================ ADR 0003 ================================ -->
+<div class="article" id="adr-0003">
+  <div class="breadcrumb"><a href="#" onclick="show('overview'); return false">DOCS</a> / DECISIONS</div>
+  <h1>ADR 0003 — Four-class observation taxonomy</h1>
+  <p class="lead">Status: <strong>Accepted</strong> · 2026-09-11</p>
+
+  <h2>Context</h2>
+  <p>A replay observes a screen and must decide what it means. The brief asks us to distinguish business outcomes, recoverable conditions, and hard failures. Working through the mock app exposed a fourth case: <strong>a state this capability does not understand.</strong></p>
+  <p>A system without this category has to force it into one of the other three. The tempting choice is "keep going and see." That is precisely the behaviour that causes incidents.</p>
+
+  <h2>Decision</h2>
+  <p><strong>Two distinct type families:</strong></p>
+  <pre><code><span class="type">ObservationClass</span> = EXPECTED | BUSINESS_OUTCOME | RECOVERABLE | HARD_FAILURE | UNEXPECTED_STATE
+<span class="type">RunStatus</span> = SUCCESS | BUSINESS_OUTCOME | NEEDS_HUMAN | FAILED</code></pre>
+
+  <h2>Consequences</h2>
+  <p><strong>Good.</strong> The caller's contract is honest: <code>BUSINESS_OUTCOME(member_not_found)</code> exits 0 and returns data. A <code>FAILED</code> carries enough detail to fix without reproducing.</p>
+  <p><strong>Bad.</strong> Authoring a capability requires declaring outcomes and recovery rules explicitly — more work than letting the executor improvise. That is the point.</p>
+</div>
+
+<!-- ================================ ADR 0004 ================================ -->
+<div class="article" id="adr-0004">
+  <div class="breadcrumb"><a href="#" onclick="show('overview'); return false">DOCS</a> / DECISIONS</div>
+  <h1>ADR 0004 — A single, type-enforced policy chokepoint</h1>
+  <p class="lead">Status: <strong>Accepted</strong> · 2026-09-11</p>
+
+  <h2>Context</h2>
+  <p>Three different actors want to act on the live session. An earlier draft forwarded human clicks directly via CDP — which meant the moment a human took over, the allowlist, risk classification, and evidence trail all stopped applying.</p>
+
+  <h2>Decision</h2>
+  <p><strong>One path to a surface, for every actor:</strong> <code>Action → TargetResolver → PolicyEngine → SurfaceDriver</code>.</p>
+  <p>Enforced three independent ways (import rule, type rule, reconciliation test), because an invariant everyone agrees with is weaker than one nobody can violate.</p>
+
+  <h2>Consequences</h2>
+  <p><strong>Good.</strong> Discovery, replay, and human intervention are the same code path, differing only in who originates the action — so the guardrails we test are the guardrails that run.</p>
+  <p><strong>Bad.</strong> <code>raw_input</code> is awkward to police semantically. We evaluate on coarse attributes and say so as a stated limit.</p>
+</div>
+
+<!-- ================================ ADR 0005 ================================ -->
+<div class="article" id="adr-0005">
+  <div class="breadcrumb"><a href="#" onclick="show('overview'); return false">DOCS</a> / DECISIONS</div>
+  <h1>ADR 0005 — Tenants overlay a capability; they never fork it</h1>
+  <p class="lead">Status: <strong>Accepted</strong> · 2026-09-11</p>
+
+  <h2>Context</h2>
+  <p>The economics of this system: if automating a flow for one credit union means re-recording it for the next 200, the product does not work.</p>
+
+  <h2>Decision</h2>
+  <p><strong>Capabilities are namespaced by vendor product, not by tenant.</strong> Per-tenant differences are expressed as overlay documents.</p>
+  <pre><code><span class="comment"># cua.tenant_binding/v1</span>
+capability_ref: "corebank.member.savings_balance@1.2.0"
+tenant: first-valley-cu
+vars: { base_url: "https://fvcu.internal" }
+overrides:
+  steps:
+    enter_member_id:
+      target: { name: { match: exact, value: "Member #" } }</code></pre>
+  <p><strong>Drift is measured, not assumed.</strong> Descending the resolution ladder at replay is a drift signal, not a silent success.</p>
+
+  <h2>Consequences</h2>
+  <p><strong>Good.</strong> A rebranded label costs a four-line overlay, not a re-record. The drift score tells us which tenants are diverging before replays start failing.</p>
+</div>
+
+<!-- ================================ PRD ================================ -->
+<div class="article" id="prd">
+  <div class="breadcrumb"><a href="#" onclick="show('overview'); return false">DOCS</a> / PRODUCT</div>
+  <h1>Product Requirements</h1>
+  <p class="lead">Problem, users, requirements, success criteria, and scope.</p>
+
+  <blockquote><strong>Thesis: discovery is probabilistic; execution is deterministic.</strong></blockquote>
+
+  <h2>Problem</h2>
+  <p>Banks and credit unions run a long tail of back-office applications with <strong>no API</strong>: core banking screens, servicing tools, admin consoles. When an AI agent needs to get real work done, the only way in is to drive the UI the way a human operator would.</p>
+  <p>Doing that with an LLM on every invocation is slow, expensive, non-deterministic, and unauditable — three of which are disqualifying in a regulated environment.</p>
+
+  <h2>Users</h2>
+  <table>
+    <thead><tr><th>User</th><th>Needs</th></tr></thead>
+    <tbody>
+      <tr><td><strong>A calling AI agent</strong></td><td>Invoke a capability by name with typed arguments and get a typed result back</td></tr>
+      <tr><td><strong>A human reviewer</strong></td><td>Read a capability and understand what it does, without running it</td></tr>
+      <tr><td><strong>A human operator</strong></td><td>Take a stuck session, control it, and hand it back</td></tr>
+      <tr><td><strong>An engineer on call</strong></td><td>Read a failure and know: what step, what was expected, what was observed</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Requirements</h2>
+  <table>
+    <thead><tr><th>#</th><th>Requirement</th></tr></thead>
+    <tbody>
+      <tr><td>R1</td><td>Accept a natural-language goal + target; run an LLM observe→decide→act loop against a live UI</td></tr>
+      <tr><td>R2</td><td>Emit a typed, versioned, serializable artifact: ordered steps, typed I/O, success checkpoint</td></tr>
+      <tr><td>R3</td><td>Replay that artifact deterministically with no LLM in the decision loop</td></tr>
+      <tr><td>R4</td><td>Distinguish business outcomes from recoverable conditions from hard failures</td></tr>
+      <tr><td>R5</td><td>Enforce a configurable allowlist; classify risky actions; never persist secrets or raw PII</td></tr>
+      <tr><td>R6</td><td>Produce evidence: a structured log of what happened and why</td></tr>
+      <tr><td>R7</td><td>Detect "stuck", route an intervention, let a human take the live session and hand it back</td></tr>
+      <tr><td>R8</td><td>Design a credible answer for heterogeneous surfaces and multi-tenant reuse</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Success criteria</h2>
+  <ol>
+    <li>A real LLM discovery run exists in <code>/evidence/</code></li>
+    <li>The artifact schema is genuinely good — typed I/O, semantic targeting, asserted checkpoint</li>
+    <li>Replay demonstrably never touches the LLM, and a fault matrix shows the taxonomy working</li>
+    <li>A human really takes over the live session and the run resumes</li>
+    <li><code>REPORT.md</code> defends the trade-offs under the seven mandated headings</li>
+  </ol>
+</div>
+
+<!-- ================================ REQUIREMENTS ================================ -->
+<div class="article" id="requirements">
+  <div class="breadcrumb"><a href="#" onclick="show('overview'); return false">DOCS</a> / PRODUCT</div>
+  <h1>Requirements Traceability</h1>
+  <p class="lead">Every requirement mapped to the module that satisfies it, the test that proves it, and the evidence that demonstrates it.</p>
+
+  <div class="callout callout-info">
+    <strong>A row with no test is a claim. A row with no evidence is a demo that never ran.</strong>
+  </div>
+
+  <h2>3.1 — Capability discovery</h2>
+  <table>
+    <thead><tr><th>Requirement</th><th>Module</th><th>Test</th></tr></thead>
+    <tbody>
+      <tr><td>Accept a goal + target surface</td><td><code>cli/main.py</code>, <code>agent/loop.py</code></td><td><code>test_the_loop_completes_a_real_goal</code></td></tr>
+      <tr><td>Observe → decide → act against live surface</td><td><code>agent/loop.py</code></td><td><code>test_the_loop_completes_a_real_goal</code></td></tr>
+      <tr><td>Model sees semantic view, not raw HTML</td><td><code>agent/render.py</code></td><td><code>test_the_model_is_shown_a_snapshot_not_raw_html</code></td></tr>
+      <tr><td>Discovery obeys same guardrails as replay</td><td><code>runtime/dispatcher.py</code></td><td><code>test_discovery_actions_pass_through_the_chokepoint</code></td></tr>
+    </tbody>
+  </table>
+
+  <h2>3.2 — The capability artifact</h2>
+  <table>
+    <thead><tr><th>Requirement</th><th>Module</th><th>Test</th></tr></thead>
+    <tbody>
+      <tr><td>Ordered steps</td><td><code>domain/capability.py</code></td><td><code>test_reference_artifact_validates</code></td></tr>
+      <tr><td>Typed input parameters</td><td><code>domain/capability.py</code></td><td><code>test_the_literal_from_the_goal_becomes_a_parameter</code></td></tr>
+      <tr><td>Typed outputs</td><td><code>replay/executor.py</code></td><td><code>test_outputs_are_typed_from_what_was_observed</code></td></tr>
+      <tr><td>Versioned, immutable, reviewable</td><td><code>domain/capability.py</code></td><td><code>test_capability_is_frozen</code>, <code>test_tampering_is_detected</code></td></tr>
+      <tr><td>Callable by agent as typed function</td><td><code>domain/capability.py</code></td><td><code>test_exports_an_agent_callable_tool_schema</code></td></tr>
+    </tbody>
+  </table>
+
+  <h2>3.3 — Deterministic replay</h2>
+  <table>
+    <thead><tr><th>Requirement</th><th>Module</th><th>Test</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Replay without the LLM</strong></td><td><code>replay/</code></td><td><code>test_replay_uses_no_model</code> + <code>.importlinter</code></td></tr>
+      <tr><td>Ambiguity is refused, never guessed</td><td><code>targeting/resolver.py</code></td><td><code>test_ambiguity_is_refused_not_tiebroken</code></td></tr>
+      <tr><td><strong>Business outcome ≠ failure</strong></td><td><code>replay/classify.py</code></td><td><code>test_business_outcomes_are_answers_not_failures</code></td></tr>
+      <tr><td><strong>Unknown states fail closed</strong></td><td><code>replay/classify.py</code></td><td><code>test_an_undeclared_screen_fails_closed</code></td></tr>
+      <tr><td>Determinism</td><td><code>replay/executor.py</code></td><td><code>test_repeated_replays_produce_identical_decisions</code></td></tr>
+    </tbody>
+  </table>
+
+  <h2>3.4 — Safety & data handling</h2>
+  <table>
+    <thead><tr><th>Requirement</th><th>Module</th><th>Test</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Allowlist, enforced for every actor</strong></td><td><code>policy/allowlist.py</code></td><td><code>test_allowlist_decisions</code></td></tr>
+      <tr><td><strong>Nothing reaches a surface unauthorized</strong></td><td><code>runtime/dispatcher.py</code></td><td><code>invariants/test_policy_chokepoint.py</code></td></tr>
+      <tr><td><strong>Never persist secrets or raw PII</strong></td><td><code>policy/redact.py</code></td><td><code>invariants/test_redaction.py</code></td></tr>
+    </tbody>
+  </table>
+
+  <h2>3.6 — Human-in-the-loop escalation</h2>
+  <table>
+    <thead><tr><th>Requirement</th><th>Module</th><th>Test</th></tr></thead>
+    <tbody>
+      <tr><td><strong>A human takes the live session</strong></td><td><code>hitl/broker.py</code></td><td><code>test_a_human_takes_over_acts_and_hands_back</code></td></tr>
+      <tr><td>Human input cannot bypass policy</td><td><code>hitl/broker.py</code></td><td><code>test_human_input_goes_through_policy</code></td></tr>
+      <tr><td>Stale automation cannot act after takeover</td><td><code>hitl/lease.py</code></td><td><code>test_stale_automation_cannot_act_after_a_takeover</code></td></tr>
+      <tr><td><strong>Automation cannot act while human holds session</strong></td><td><code>replay/executor.py</code></td><td><code>test_automation_cannot_act_after_a_human_claims_the_live_session</code></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ================================ TESTING ================================ -->
+<div class="article" id="testing">
+  <div class="breadcrumb"><a href="#" onclick="show('overview'); return false">DOCS</a> / TESTING</div>
+  <h1>Testing Strategy</h1>
+  <p class="lead">Every architectural claim has a test that fails when the claim stops being true.</p>
+
+  <blockquote>A design document that asserts an invariant is a wish. A contract in <code>.importlinter</code> plus a test that breaks on violation is an invariant.</blockquote>
+
+  <h2>Claim → test</h2>
+  <table>
+    <thead><tr><th>Claim</th><th>Test</th><th>Kind</th></tr></thead>
+    <tbody>
+      <tr><td>Replay never calls the LLM</td><td><code>invariants/test_no_llm_in_replay.py</code> + <code>.importlinter</code></td><td>static + runtime</td></tr>
+      <tr><td>Policy chokepoint unbypassable</td><td><code>invariants/test_policy_chokepoint.py</code></td><td>static + runtime</td></tr>
+      <tr><td>Human control cannot bypass policy</td><td><code>invariants/test_human_control_safety.py</code></td><td>runtime</td></tr>
+      <tr><td>Stale automation refused</td><td><code>unit/test_lease.py</code></td><td>unit</td></tr>
+      <tr><td>Ambiguous targets refused</td><td><code>unit/test_resolver_ambiguity.py</code></td><td>unit</td></tr>
+      <tr><td>Unknown states fail closed</td><td><code>integration/test_fail_closed.py</code></td><td>integration</td></tr>
+      <tr><td>Replay is deterministic</td><td><code>invariants/test_determinism.py</code></td><td>integration</td></tr>
+      <tr><td>Every sink is redacted</td><td><code>invariants/test_redaction.py</code></td><td>integration</td></tr>
+      <tr><td>Business outcomes ≠ failures</td><td><code>integration/test_fault_matrix.py</code></td><td>integration</td></tr>
+      <tr><td>Targeting is surface-neutral</td><td><code>integration/test_variant_b.py</code></td><td>integration</td></tr>
+      <tr><td>Capabilities immutable</td><td><code>contract/test_capability_immutability.py</code></td><td>contract</td></tr>
+      <tr><td><code>domain/</code> is pure</td><td><code>.importlinter:pure-domain</code></td><td>static</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Test layers</h2>
+  <table>
+    <thead><tr><th>Layer</th><th>Proves</th><th>Cost</th></tr></thead>
+    <tbody>
+      <tr><td><code>unit/</code></td><td>Pure logic: schema, resolver, scoring, policy, redaction, lease, taxonomy</td><td>free</td></tr>
+      <tr><td><code>integration/</code></td><td>Full discovery → artifact → replay against mock app, via fake LLM</td><td>free, deterministic</td></tr>
+      <tr><td><code>contract/</code></td><td>Schema stability: every artifact validates; JSON Schema export is golden</td><td>free</td></tr>
+      <tr><td><code>invariants/</code></td><td>The architectural claims above</td><td>free</td></tr>
+      <tr><td><code>e2e/</code></td><td>One real LLM run against a live browser</td><td><code>@pytest.mark.live</code>, opt-in</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Offline by default</h2>
+  <p>Everything except <code>e2e/</code> runs with <strong>no API key and no network</strong>. 244 tests, <code>mypy --strict</code> clean. CI configures no API key on purpose — if a test needs the model, CI must fail rather than silently skip.</p>
+
+  <h2>The fake LLM</h2>
+  <p><code>agent/fake.py</code> implements <code>LlmPort</code> by replaying a recorded transcript. This exercises the real discovery loop — same policy, same resolver, same evidence bus — for free.</p>
+  <p>Risk: fixture drift. Mitigated by regenerating fixtures from a live run via script, plus a contract test asserting fixture shape matches the live <code>LlmPort</code> schema.</p>
+</div>
+
+<!-- ================================ RUNBOOK: DISCOVERY ================================ -->
+<div class="article" id="runbook-discovery">
+  <div class="breadcrumb"><a href="#" onclick="show('overview'); return false">DOCS</a> / RUNBOOKS</div>
+  <h1>Run a Discovery</h1>
+  <p class="lead">Discovery is the probabilistic half: an LLM drives a live UI to a goal and we record what it did. It is the expensive path, run once per capability.</p>
+
+  <h2>Prerequisites</h2>
+  <pre><code>cp .env.example .env     <span class="comment"># set OPENROUTER_API_KEY</span>
+make app                 <span class="comment"># the mock back-office on :8811</span></code></pre>
+
+  <h2>Run</h2>
+  <pre><code>cua discover \
+  --goal "Look up member 12345 and read their current savings balance" \
+  --target http://localhost:8811 \
+  --out evidence/capabilities/</code></pre>
+
+  <h2>What happens</h2>
+  <ol>
+    <li>The driver observes the surface and normalizes it into a <code>UiSnapshot</code></li>
+    <li>The snapshot is rendered for the model — not raw HTML, and redacted on the way out</li>
+    <li>The model emits a tool call from the closed action space. It cannot invent an action</li>
+    <li><code>PolicyEngine</code> authorizes it. Off-allowlist or irreversible actions are blocked</li>
+    <li>The resolver resolves the target; the dispatcher dispatches; the bus records everything</li>
+    <li>Loop until the goal is met or a stop condition fires</li>
+    <li>On success, the compiler emits a <strong>draft</strong> Capability</li>
+  </ol>
+
+  <h2>Output</h2>
+  <pre><code>evidence/discovery/&lt;run_id&gt;/
+  trace.jsonl        authorize / resolve / dispatch / observe, actor-tagged
+  llm_calls.jsonl    full model exchange, redacted
+  snapshots/         UiSnapshot per step
+  screenshots/       redacted
+  run_record.json    status, timings, budget
+evidence/capabilities/&lt;id&gt;@&lt;version&gt;.yaml</code></pre>
+
+  <h2>If it fails</h2>
+  <table>
+    <thead><tr><th>Symptom</th><th>Look at</th></tr></thead>
+    <tbody>
+      <tr><td>Stops at <code>max_steps</code></td><td><code>llm_calls.jsonl</code> — is it looping on one screen?</td></tr>
+      <tr><td><code>POLICY_DENIED</code></td><td>Expected if the goal needs an irreversible action</td></tr>
+      <tr><td><code>TARGET_AMBIGUOUS</code></td><td>The screen genuinely has two matching controls. Good — it refused.</td></tr>
+      <tr><td>Model can't find a control</td><td>Check the <code>UiSnapshot</code> in <code>snapshots/</code></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ================================ RUNBOOK: REPLAY ================================ -->
+<div class="article" id="runbook-replay">
+  <div class="breadcrumb"><a href="#" onclick="show('overview'); return false">DOCS</a> / RUNBOOKS</div>
+  <h1>Run a Replay</h1>
+  <p class="lead">Replay is the deterministic half: the production execution path. No model, no decisions, no surprises.</p>
+
+  <pre><code>make app
+cua replay evidence/capabilities/corebank.member.savings_balance@1.0.0.yaml \
+  --input member_id=67890</code></pre>
+
+  <h2>Exercising error paths</h2>
+  <pre><code>cua replay &lt;artifact&gt; --input member_id=99999           <span class="comment"># BUSINESS_OUTCOME(member_not_found)</span>
+cua replay &lt;artifact&gt; --fault transient_load            <span class="comment"># RECOVERABLE → SUCCESS</span>
+cua replay &lt;artifact&gt; --fault transient_load --always   <span class="comment"># RECOVERY_EXHAUSTED</span>
+cua replay &lt;artifact&gt; --fault undeclared_dialog         <span class="comment"># UNEXPECTED_STATE → fails closed</span>
+cua replay &lt;artifact&gt; --fault session_timeout           <span class="comment"># re-auth or escalate</span></code></pre>
+
+  <h2>Debugging a failure</h2>
+  <table>
+    <thead><tr><th>Failure</th><th>Usual cause</th></tr></thead>
+    <tbody>
+      <tr><td><code>TARGET_NOT_FOUND</code></td><td>The screen isn't what the artifact expects</td></tr>
+      <tr><td><code>TARGET_AMBIGUOUS</code></td><td>Descriptor too loose, or genuinely two matches</td></tr>
+      <tr><td><code>CHECKPOINT_FAILED</code></td><td>Steps ran but goal state wasn't reached</td></tr>
+      <tr><td><code>UNEXPECTED_STATE</code></td><td>Capability doesn't declare this screen</td></tr>
+      <tr><td><code>RECOVERY_EXHAUSTED</code></td><td>The "transient" condition wasn't transient</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Determinism</h2>
+  <p>Same artifact + same inputs + same app state ⇒ identical decision trace. If two replays diverge, that is a <strong>bug in this system</strong>, not flakiness.</p>
+</div>
+
+<!-- ================================ RUNBOOK: ESCALATION ================================ -->
+<div class="article" id="runbook-escalation">
+  <div class="breadcrumb"><a href="#" onclick="show('overview'); return false">DOCS</a> / RUNBOOKS</div>
+  <h1>Handle an Escalation</h1>
+  <p class="lead">A run stopped because it could not safely proceed. This is a designed outcome, not a crash.</p>
+
+  <h2>Taking control</h2>
+  <pre><code>cua console          <span class="comment"># http://localhost:8812</span></code></pre>
+  <p><strong>Claim</strong> takes the lease. The lease epoch increments, and any in-flight automation dispatch is refused with <code>LEASE_LOST</code>.</p>
+  <p>You are driving <strong>the same live session</strong>, not a copy.</p>
+
+  <h2>What you can and cannot do</h2>
+  <table>
+    <thead><tr><th></th><th>You, during an intervention</th></tr></thead>
+    <tbody>
+      <tr><td>Domain allowlist</td><td><strong>Still enforced</strong></td></tr>
+      <tr><td>Ordinary actions</td><td>Allowed, recorded</td></tr>
+      <tr><td>Irreversible actions</td><td>Allowed <strong>with explicit confirmation</strong>, recorded</td></tr>
+      <tr><td>Evidence</td><td>Everything captured, tagged <code>actor=HUMAN</code></td></tr>
+    </tbody>
+  </table>
+
+  <h2>Handing back</h2>
+  <p><strong>Release</strong> returns the lease. The executor then:</p>
+  <ol>
+    <li>Diffs session state → records <code>human_delta</code></li>
+    <li>Re-evaluates preconditions from the current step forward</li>
+    <li>Skips forward to the first step whose precondition isn't satisfied</li>
+    <li>If the state matches no step's precondition → stops with <code>UNEXPECTED_STATE</code></li>
+  </ol>
+
+  <h2>Afterwards</h2>
+  <p>A recurring escalation is a capability defect, not an operations problem. Usual fixes:</p>
+  <ul>
+    <li>Screen seen repeatedly but undeclared → add an <code>outcomes</code> or <code>recovery</code> entry</li>
+    <li><code>TARGET_AMBIGUOUS</code> on the same step → tighten the descriptor</li>
+    <li>Rising <code>drift_score</code> for one tenant → add a <code>TenantBinding</code> overlay, or re-record</li>
+  </ul>
+</div>
+
+</main>
+</div>
+
+<script>
+function show(id) {
+  // Hide all articles
+  document.querySelectorAll('.article').forEach(a => a.classList.remove('active'));
+  // Show target
+  const target = document.getElementById(id);
+  if (target) target.classList.add('active');
+
+  // Update sidebar active state
+  document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
+  document.querySelectorAll('.sidebar-link').forEach(link => {
+    if (link.getAttribute('onclick') && link.getAttribute('onclick').includes("'" + id + "'")) {
+      link.classList.add('active');
+    }
+  });
+
+  // Close mobile sidebar
+  document.querySelector('.sidebar').classList.remove('open');
+
+  // Scroll to top
+  window.scrollTo(0, 0);
+
+  // Update URL hash
+  history.pushState(null, '', '#' + id);
+}
+
+function filterSidebar(query) {
+  const q = query.toLowerCase();
+  document.querySelectorAll('.sidebar-link').forEach(link => {
+    const text = link.textContent.toLowerCase();
+    link.style.display = text.includes(q) ? '' : 'none';
+  });
+  document.querySelectorAll('.sidebar-group').forEach(group => {
+    const visibleLinks = group.querySelectorAll('.sidebar-link:not([style*="display: none"])');
+    group.style.display = visibleLinks.length > 0 ? '' : 'none';
+  });
+}
+
+function applyHash() {
+  const hash = window.location.hash.slice(1);
+  if (hash && document.getElementById(hash)) {
+    show(hash);
+  } else if (!hash) {
+    show('overview');
+  }
+}
+
+window.addEventListener('DOMContentLoaded', applyHash);
+window.addEventListener('load', applyHash);
+window.addEventListener('hashchange', applyHash);
+window.addEventListener('popstate', applyHash);
+applyHash();
+
+// Theme Toggle with persistence
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('cua-theme', theme);
+  if (theme === 'dark') {
+    themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+  } else {
+    themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+  }
+}
+
+const savedTheme = localStorage.getItem('cua-theme') || 
+  (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+applyTheme(savedTheme);
+
+themeToggle.addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  applyTheme(current === 'dark' ? 'light' : 'dark');
+});
+
+</script>
+
+</body>
+</html>
