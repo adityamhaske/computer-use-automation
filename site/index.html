@@ -1,43 +1,108 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CUA — Computer-Use Automation for Financial Back-Offices</title>
-  <meta name="description" content="An LLM discovers a flow once, compiles it into a typed capability artifact, then replays it deterministically without the model in the loop. Built for back-office banking applications.">
+  <meta name="description"
+    content="An LLM discovers a flow once, compiles it into a typed capability artifact, then replays it deterministically without the model in the loop. Built for back-office banking applications.">
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,wght@0,400;0,600;1,400&display=swap"
+    rel="stylesheet">
+
+  <!-- Crawlers, SEO & AI Agent Discovery -->
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <link rel="canonical" href="https://adityamhaske.github.io/interface.ai/">
+  <link rel="sitemap" type="application/xml" title="Sitemap" href="sitemap.xml">
+  <link rel="alternate" type="text/plain" href="llms.txt" title="LLM Context for AI Agents">
+  <link rel="alternate" type="text/plain" href="llms-full.txt" title="Full Documentation for AI Agents">
+
+  <!-- Open Graph / Social -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://adityamhaske.github.io/interface.ai/">
+  <meta property="og:title" content="CUA — Computer-Use Automation for Financial Back-Offices">
+  <meta property="og:description"
+    content="Discovery is probabilistic. Execution is deterministic. Enterprise computer-use automation for regulated banking applications.">
+  <meta property="og:image" content="https://adityamhaske.github.io/interface.ai/assets/logo.svg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CUA — Computer-Use Automation for Financial Back-Offices">
+  <meta name="twitter:description"
+    content="Discovery is probabilistic. Execution is deterministic. Enterprise computer-use automation for regulated banking applications.">
+
+  <!-- Structured Data (JSON-LD) for Bots & Search Engines -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "CUA — Computer-Use Automation",
+    "operatingSystem": "Linux, macOS, Windows",
+    "applicationCategory": "BusinessApplication",
+    "description": "Deterministic computer-use automation engine for regulated financial back-offices. Discovery is probabilistic, execution is deterministic.",
+    "url": "https://adityamhaske.github.io/interface.ai/",
+    "author": {
+      "@type": "Organization",
+      "name": "interface.ai"
+    }
+  }
+  </script>
+
   <style>
     :root {
-      /* Financial Bullion Gold & Ledger Palette (Strictly No Green, No Blue, No Purple) */
-      --bg: #fcfbf9;
-      --bg-warm: #f7f5ef;
+      /* Sleek High-Contrast Monochrome Black & White Palette */
+      --bg: #ffffff;
+      --bg-warm: #fafafa;
       --bg-card: #ffffff;
-      --bg-code: #f6f3eb;
-      --bg-highlight: #f0ece1;
+      --bg-code: #f4f4f5;
+      --bg-highlight: #f4f4f5;
 
-      --text: #191816;
-      --text-secondary: #4d4942;
-      --text-muted: #7d786e;
-      --text-faint: #aba69b;
+      --text: #09090b;
+      --text-secondary: #3f3f46;
+      --text-muted: #71717a;
+      --text-faint: #a1a1aa;
 
-      /* Bullion Gold & Warm Amber Accents */
-      --accent: #b45309;          /* Deep rich financial gold / amber */
-      --accent-light: #d97706;    /* Warm gold */
-      --accent-glow: #f59e0b;     /* Radiant gold */
-      --accent-bg: #fef3c7;       /* Soft gold tint */
-      --accent-border: #fcd34d;   /* Subtle gold border */
-      --accent-subtle: #fffbeb;   /* Warm parchment glow */
+      /* Sleek High-Contrast Black & White Monochrome */
+      --accent: #09090b;
+      /* Crisp solid black */
+      --accent-light: #27272a;
+      /* Charcoal */
+      --accent-glow: rgba(0, 0, 0, 0.08);
+      --accent-bg: #f4f4f5;
+      /* Subtle neutral gray tint */
+      --accent-border: #e4e4e7;
+      /* Clean zinc border */
+      --accent-subtle: #fafafa;
 
-      --border: #e6e1d5;
-      --border-strong: #d2cbbe;
+      --btn-primary-bg: #09090b;
+      --btn-primary-text: #ffffff;
 
-      --success: #b45309;
-      --warning: #d97706;
-      --danger: #b91c1c;
-      --info: #78716c;
+      --border: #e4e4e7;
+      --border-strong: #d4d4d8;
+
+      /* 4 Subtle Accent Color Tokens (Zero Yellow/Gold) */
+      --color-mint: #059669;
+      --color-mint-bg: #ecfdf5;
+      --color-mint-border: #a7f3d0;
+
+      --color-blue: #2563eb;
+      --color-blue-bg: #eff6ff;
+      --color-blue-border: #bfdbfe;
+
+      --color-purple: #7c3aed;
+      --color-purple-bg: #f5f3ff;
+      --color-purple-border: #ddd6fe;
+
+      --color-red: #dc2626;
+      --color-red-bg: #fef2f2;
+      --color-red-border: #fecaca;
+
+      --success: #059669;
+      --warning: #71717a;
+      --danger: #dc2626;
+      --info: #2563eb;
 
       --radius: 8px;
       --radius-sm: 6px;
@@ -47,41 +112,72 @@
       --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
 
       --nav-height: 60px;
-      --content-max-width: 1060px;
+      --content-max-width: 1120px;
     }
 
-    /* Dark Mode - Obsidian Vault & Burnished Bullion Gold */
+    /* Dark Mode - Obsidian & Crisp White with Subtle Accents */
     [data-theme="dark"] {
-      --bg: #111113;
-      --bg-warm: #17171a;
-      --bg-card: #1c1c21;
-      --bg-code: #161619;
-      --bg-highlight: #26252d;
+      --bg: #09090b;
+      --bg-warm: #111114;
+      --bg-card: #141418;
+      --bg-code: #111114;
+      --bg-highlight: #18181b;
 
-      --text: #f4f3f0;
-      --text-secondary: #b6b3ab;
-      --text-muted: #7e7a72;
-      --text-faint: #4f4c45;
+      --text: #fafafa;
+      --text-secondary: #d4d4d8;
+      --text-muted: #8e8e93;
+      --text-faint: #52525b;
 
-      --accent: #f59e0b;          /* Radiant bullion gold */
-      --accent-light: #fbbf24;
-      --accent-glow: #fcd34d;
-      --accent-bg: rgba(245, 158, 11, 0.12);
-      --accent-border: rgba(245, 158, 11, 0.3);
-      --accent-subtle: rgba(245, 158, 11, 0.05);
+      /* Crisp White & Charcoal Monochrome */
+      --accent: #ffffff;
+      /* Pure crisp white */
+      --accent-light: #f4f4f5;
+      --accent-glow: rgba(255, 255, 255, 0.15);
+      --accent-bg: rgba(255, 255, 255, 0.08);
+      --accent-border: rgba(255, 255, 255, 0.2);
+      --accent-subtle: rgba(255, 255, 255, 0.03);
 
-      --border: #2c2b33;
+      --btn-primary-bg: #ffffff;
+      --btn-primary-text: #09090b;
+
+      --border: #27272a;
       --border-strong: #3f3d48;
 
-      --success: #f59e0b;
-      --warning: #fbbf24;
+      /* 4 Subtle Accent Color Tokens - Dark Mode */
+      --color-mint: #34d399;
+      --color-mint-bg: rgba(16, 185, 129, 0.12);
+      --color-mint-border: rgba(16, 185, 129, 0.28);
+
+      --color-blue: #60a5fa;
+      --color-blue-bg: rgba(59, 130, 246, 0.12);
+      --color-blue-border: rgba(59, 130, 246, 0.28);
+
+      --color-purple: #a78bfa;
+      --color-purple-bg: rgba(139, 92, 246, 0.12);
+      --color-purple-border: rgba(139, 92, 246, 0.28);
+
+      --color-red: #f87171;
+      --color-red-bg: rgba(239, 68, 68, 0.12);
+      --color-red-border: rgba(239, 68, 68, 0.28);
+
+      --success: #34d399;
+      --warning: #a1a1aa;
       --danger: #ef4444;
-      --info: #a8a29e;
+      --info: #60a5fa;
     }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+    }
 
     body {
       font-family: var(--font-sans);
@@ -92,158 +188,268 @@
       transition: background 0.2s ease, color 0.2s ease;
     }
 
-    /* NAV BAR - Centered with balanced side breathing room */
+    /* NAV BAR - Centered with balanced generous side breathing room */
     nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
       height: var(--nav-height);
-      background: rgba(252, 251, 249, 0.90);
+      background: rgba(255, 255, 255, 0.88);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: center;
-      padding: 0 clamp(24px, 5vw, 64px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 clamp(36px, 6vw, 100px);
       transition: background 0.2s ease;
     }
+
     [data-theme="dark"] nav {
-      background: rgba(17, 17, 19, 0.90);
+      background: rgba(9, 9, 11, 0.88);
     }
+
     .nav-inner {
-      max-width: var(--content-max-width); width: 100%;
-      display: flex; align-items: center; justify-content: space-between;
+      max-width: var(--content-max-width);
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     .nav-brand-group {
-      display: flex; align-items: center; gap: 10px; text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
     }
+
     .brand-logo-wrap {
-      display: flex; align-items: center; justify-content: center;
-      width: 32px; height: 32px; border-radius: 7px;
-      background: var(--accent-bg); border: 1px solid var(--accent-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 7px;
+      background: var(--bg-highlight);
+      border: 1px solid var(--border);
       flex-shrink: 0;
     }
+
     .nav-brand-text {
-      display: flex; align-items: baseline; gap: 8px;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
     }
+
     .nav-brand-title {
-      font-weight: 700; font-size: 15px; color: var(--text);
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text);
       letter-spacing: -0.02em;
     }
+
     .nav-brand-subtitle {
-      color: var(--text-muted); font-weight: 400; font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 400;
+      font-size: 13px;
     }
 
     .nav-right {
-      display: flex; gap: 16px; align-items: center;
+      display: flex;
+      gap: 14px;
+      align-items: center;
     }
+
     .nav-link {
-      font-size: 13px; color: var(--text-secondary); text-decoration: none;
-      font-weight: 500; transition: color 0.15s;
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.15s;
     }
-    .nav-link:hover { color: var(--text); }
+
+    .nav-link:hover {
+      color: var(--text);
+    }
 
     /* GitHub Button in Nav */
     .nav-github-btn {
-      display: inline-flex; align-items: center; gap: 7px;
-      border: 1px solid var(--border-strong); padding: 5px 12px;
-      border-radius: 6px; font-size: 12px; font-weight: 600;
-      color: var(--text); background: var(--bg-card);
-      text-decoration: none; transition: all 0.15s;
-    }
-    .nav-github-btn:hover {
-      border-color: var(--accent); color: var(--accent);
-      background: var(--accent-subtle);
-    }
-    .nav-github-btn svg { flex-shrink: 0; }
-
-    /* Theme Toggle */
-    .theme-toggle {
-      background: transparent; border: 1px solid var(--border);
-      border-radius: 6px; width: 32px; height: 32px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid var(--border-strong);
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      background: var(--bg-card);
+      text-decoration: none;
       transition: all 0.15s;
     }
-    .theme-toggle:hover {
-      border-color: var(--border-strong); color: var(--text);
+
+    .nav-github-btn:hover {
+      border-color: var(--border-strong);
+      color: var(--text);
+      background: var(--bg-highlight);
     }
 
-    /* CONTAINER DISCIPLINE: Balanced space left & right, left-aligned content */
+    .nav-github-btn svg {
+      flex-shrink: 0;
+    }
+
+    .theme-toggle {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all 0.15s;
+    }
+
+    .theme-toggle:hover {
+      color: var(--text);
+      border-color: var(--border-strong);
+      background: var(--bg-highlight);
+    }
+
+    /* MAIN CONTAINER - Generous horizontal padding from left and right */
+    .container,
     .page-container {
       max-width: var(--content-max-width);
       margin: 0 auto;
-      padding: 0 clamp(24px, 5vw, 64px);
-      text-align: left;
+      padding: 0 clamp(32px, 6vw, 100px);
     }
 
     /* HERO */
     .hero {
-      padding-top: calc(var(--nav-height) + 64px);
-      padding-bottom: 56px;
+      padding-top: calc(var(--nav-height) + 104px);
+      padding-bottom: 72px;
       text-align: left;
     }
-    .hero-label {
-      display: inline-flex; align-items: center; gap: 8px;
-      font-size: 11px; font-weight: 600;
-      text-transform: uppercase; letter-spacing: 0.12em;
-      color: var(--accent); background: var(--accent-bg);
-      border: 1px solid var(--accent-border);
-      padding: 5px 13px; border-radius: 20px; margin-bottom: 24px;
+
+    .hero-label,
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 15px;
+      border-radius: 20px;
+      background: var(--bg-highlight);
+      border: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 28px;
     }
-    .hero-label-dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 8px var(--accent-glow);
+
+    .hero-label-dot,
+    .hero-badge .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--color-mint);
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.45);
+      flex-shrink: 0;
     }
+
     .hero h1 {
-      font-family: var(--font-serif); font-size: clamp(34px, 5.2vw, 56px);
-      font-weight: 600; line-height: 1.15; letter-spacing: -0.025em;
-      margin-bottom: 20px; color: var(--text);
-      max-width: 920px; text-align: left;
+      font-family: var(--font-serif);
+      font-size: clamp(36px, 4.8vw, 56px);
+      font-weight: 600;
+      line-height: 1.32;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+      color: var(--text);
     }
+
     .hero h1 em {
-      font-style: italic; color: var(--accent);
+      font-style: italic;
+      color: var(--text);
+      display: inline-block;
+      margin-top: 6px;
     }
-    .hero p {
-      font-size: 17px; line-height: 1.7; color: var(--text-secondary);
-      max-width: 760px; margin-bottom: 32px; text-align: left;
+
+    .hero p,
+    .hero-subtitle {
+      font-size: clamp(16.5px, 2vw, 18.5px);
+      color: var(--text-secondary);
+      line-height: 1.78;
+      max-width: 760px;
+      margin-bottom: 36px;
+      text-align: left;
     }
+
     .hero-actions {
-      display: flex; gap: 12px; justify-content: flex-start;
-      flex-wrap: wrap; align-items: center;
+      display: flex;
+      gap: 14px;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 8px;
     }
 
     .btn {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 10px 20px; border-radius: 6px; font-size: 13px;
-      font-weight: 600; text-decoration: none; transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.15s;
     }
+
     .btn-primary {
-      background: var(--accent); color: #ffffff;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      background: var(--btn-primary-bg);
+      color: var(--btn-primary-text);
+      border: 1px solid var(--btn-primary-bg);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
-    [data-theme="dark"] .btn-primary {
-      color: #121214;
-    }
+
     .btn-primary:hover {
       background: var(--accent-light);
+      border-color: var(--accent-light);
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(180, 83, 9, 0.25);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
+
+    [data-theme="dark"] .btn-primary:hover {
+      background: #e4e4e7;
+      border-color: #e4e4e7;
+    }
+
     .btn-github {
       border: 1px solid var(--border-strong);
-      color: var(--text); background: var(--bg-card);
+      color: var(--text);
+      background: var(--bg-card);
     }
+
     .btn-github:hover {
-      border-color: var(--accent); color: var(--accent);
-      background: var(--accent-subtle);
+      border-color: var(--border-strong);
+      color: var(--text);
+      background: var(--bg-highlight);
       transform: translateY(-1px);
     }
+
     .btn-secondary {
-      border: 1px solid var(--border); color: var(--text-secondary);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
       background: transparent;
     }
+
     .btn-secondary:hover {
-      background: var(--bg-warm); color: var(--text);
+      background: var(--bg-warm);
+      color: var(--text);
       border-color: var(--border-strong);
     }
 
@@ -251,34 +457,53 @@
     .pipeline-section {
       padding-bottom: 64px;
     }
+
     .pipeline-board {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 28px 30px;
+      padding: 32px clamp(24px, 4vw, 40px);
       position: relative;
     }
 
     /* Tier Headers */
     .tier-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 14px; flex-wrap: wrap; gap: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 8px;
     }
+
     .tier-pill {
-      display: inline-flex; align-items: center; gap: 7px;
-      font-size: 11px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.08em; padding: 3px 10px; border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 3px 10px;
+      border-radius: 4px;
     }
+
     .tier-pill-discovery {
-      background: var(--bg-highlight); color: var(--text-secondary);
-      border: 1px solid var(--border);
+      background: var(--color-blue-bg);
+      color: var(--color-blue);
+      border: 1px solid var(--color-blue-border);
     }
+
     .tier-pill-replay {
-      background: var(--accent-bg); color: var(--accent);
-      border: 1px solid var(--accent-border);
+      background: var(--color-mint-bg);
+      color: var(--color-mint);
+      border: 1px solid var(--color-mint-border);
     }
+
     .tier-caption {
-      font-size: 12px; color: var(--text-muted); font-style: italic;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-style: italic;
     }
 
     /* Tier Cards Layout */
@@ -288,6 +513,7 @@
       gap: 16px;
       align-items: stretch;
     }
+
     .tier-cards-replay {
       grid-template-columns: repeat(2, 1fr);
     }
@@ -299,76 +525,148 @@
       border-radius: var(--radius-sm);
       padding: 18px 20px;
       transition: all 0.2s ease;
-      display: flex; flex-direction: column; justify-content: space-between;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
       position: relative;
-      text-decoration: none; color: inherit;
+      text-decoration: none;
+      color: inherit;
     }
+
     .pipe-card:hover {
-      border-color: var(--accent-border);
+      border-color: var(--border-strong);
       background: var(--bg-card);
       transform: translateY(-2px);
-      box-shadow: 0 4px 14px rgba(180, 83, 9, 0.08);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
     }
+
     .pipe-card-highlight {
-      background: var(--accent-subtle);
-      border-color: var(--accent-border);
+      background: var(--bg-highlight);
+      border-color: var(--border-strong);
     }
+
     [data-theme="dark"] .pipe-card-highlight {
-      background: rgba(245, 158, 11, 0.06);
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.18);
     }
 
     .pipe-card-top {
-      display: flex; align-items: center; justify-content: space-between;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       margin-bottom: 10px;
     }
+
     .pipe-step-num {
-      font-family: var(--font-mono); font-size: 11px; font-weight: 700;
-      color: var(--accent); letter-spacing: 0.05em;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
     }
+
     .pipe-badge {
-      font-family: var(--font-mono); font-size: 10px; font-weight: 600;
-      padding: 2px 7px; border-radius: 3px;
-      background: var(--bg-highlight); color: var(--text-muted);
-      border: 1px solid var(--border); text-transform: uppercase;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 3px;
+      background: var(--bg-highlight);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      text-transform: uppercase;
     }
-    .pipe-badge-gold {
-      background: var(--accent-bg); color: var(--accent);
-      border-color: var(--accent-border);
+
+    .pipe-badge-highlight {
+      background: var(--bg-highlight);
+      color: var(--text);
+      border: 1px solid var(--border-strong);
+    }
+
+    .pipe-badge-mint {
+      background: var(--color-mint-bg);
+      color: var(--color-mint);
+      border: 1px solid var(--color-mint-border);
+    }
+
+    .pipe-badge-blue {
+      background: var(--color-blue-bg);
+      color: var(--color-blue);
+      border: 1px solid var(--color-blue-border);
+    }
+
+    .pipe-badge-purple {
+      background: var(--color-purple-bg);
+      color: var(--color-purple);
+      border: 1px solid var(--color-purple-border);
+    }
+
+    .pipe-badge-red {
+      background: var(--color-red-bg);
+      color: var(--color-red);
+      border: 1px solid var(--color-red-border);
     }
 
     .pipe-card-title {
-      font-weight: 700; font-size: 15px; color: var(--text);
-      margin-bottom: 6px; letter-spacing: -0.01em;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text);
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
     }
+
     .pipe-card-note {
-      font-size: 12px; color: var(--accent); font-weight: 600;
-      margin-bottom: 6px; font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-family: var(--font-mono);
     }
+
     .pipe-card-desc {
-      font-size: 12.5px; color: var(--text-secondary); line-height: 1.5;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.5;
     }
+
     .pipe-card-footer {
-      margin-top: 14px; padding-top: 10px;
+      margin-top: 14px;
+      padding-top: 10px;
       border-top: 1px dashed var(--border);
-      font-size: 11px; color: var(--text-muted);
-      display: flex; justify-content: space-between; align-items: center;
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     /* Compilation Bridge between lines */
     .pipeline-bridge {
-      display: flex; align-items: center; justify-content: center;
-      margin: 22px 0; position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 22px 0;
+      position: relative;
     }
+
     .bridge-line {
-      flex: 1; height: 1px; background: var(--border);
+      flex: 1;
+      height: 1px;
+      background: var(--border);
     }
+
     .bridge-pill {
-      background: var(--bg-card);
-      border: 1px solid var(--accent-border);
-      padding: 6px 16px; border-radius: 20px;
-      font-size: 11.5px; font-weight: 600; color: var(--accent);
-      display: inline-flex; align-items: center; gap: 8px;
-      box-shadow: 0 2px 8px rgba(180, 83, 9, 0.06);
+      background: var(--color-purple-bg);
+      border: 1px solid var(--color-purple-border);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--color-purple);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     }
 
     /* THESIS */
@@ -376,55 +674,95 @@
       padding: 48px 0 64px;
       border-top: 1px solid var(--border);
     }
+
     .thesis-section blockquote {
-      font-family: var(--font-serif); font-size: 21px;
-      line-height: 1.55; color: var(--text-secondary);
-      border-left: 3px solid var(--accent); padding-left: 24px;
-      max-width: 820px; text-align: left;
+      font-family: var(--font-serif);
+      font-size: 21px;
+      line-height: 1.55;
+      color: var(--text-secondary);
+      border-left: 3px solid var(--text);
+      padding-left: 24px;
+      max-width: 820px;
+      text-align: left;
     }
-    .thesis-section blockquote strong { color: var(--text); font-weight: 600; }
+
+    .thesis-section blockquote strong {
+      color: var(--text);
+      font-weight: 600;
+    }
 
     /* FEATURES GRID */
     .features-section {
       padding: 64px 0;
       border-top: 1px solid var(--border);
     }
+
     .section-title {
-      font-family: var(--font-serif); font-size: 30px; font-weight: 600;
-      margin-bottom: 8px; letter-spacing: -0.02em; text-align: left;
+      font-family: var(--font-serif);
+      font-size: 30px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+      text-align: left;
     }
+
     .section-subtitle {
-      font-size: 14px; color: var(--text-muted); margin-bottom: 36px;
-      max-width: 740px; text-align: left;
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 36px;
+      max-width: 740px;
+      text-align: left;
     }
+
     .features-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 20px;
     }
+
     .feature-card {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 26px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 26px;
       transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
       text-align: left;
-      text-decoration: none; color: inherit; display: block;
+      text-decoration: none;
+      color: inherit;
+      display: block;
     }
+
     .feature-card:hover {
-      border-color: var(--accent-border);
-      box-shadow: 0 6px 20px rgba(180, 83, 9, 0.07);
+      border-color: var(--border-strong);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
       transform: translateY(-2px);
     }
+
     .feature-icon-wrap {
-      width: 40px; height: 40px; border-radius: 8px;
-      background: var(--accent-bg); border: 1px solid var(--accent-border);
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 18px; color: var(--accent);
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: var(--bg-highlight);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+      color: var(--text);
     }
+
     .feature-card h3 {
-      font-size: 16px; font-weight: 600; margin-bottom: 8px;
-      letter-spacing: -0.01em; color: var(--text);
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+      color: var(--text);
     }
+
     .feature-card p {
-      font-size: 13.5px; color: var(--text-secondary); line-height: 1.6;
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      line-height: 1.6;
     }
 
     /* DEMO SECTION */
@@ -432,78 +770,178 @@
       padding: 64px 0;
       border-top: 1px solid var(--border);
     }
-    .demo-code {
-      background: var(--bg-code); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 20px 24px;
-      font-family: var(--font-mono); font-size: 13px; line-height: 1.8;
-      margin-bottom: 32px; overflow-x: auto; text-align: left;
-    }
-    .demo-code .prompt { color: var(--accent); font-weight: 600; }
-    .demo-code .cmd { color: var(--text); font-weight: 500; }
-    .demo-code .comment { color: var(--text-muted); }
 
-    .stages-table {
-      width: 100%; border-collapse: collapse;
-      font-size: 13px; margin-top: 20px;
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: var(--radius); overflow: hidden;
+    .demo-code {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.8;
+      margin-bottom: 32px;
+      overflow-x: auto;
       text-align: left;
     }
+
+    .demo-code .prompt {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .demo-code .cmd {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .demo-code .comment {
+      color: var(--text-muted);
+    }
+
+    .stages-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      font-size: 13px;
+      text-align: left;
+    }
+
     .stages-table th {
-      text-align: left; padding: 10px 16px; font-weight: 600;
-      font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
-      color: var(--text-muted); background: var(--bg-warm);
+      background: var(--bg-warm);
+      padding: 13px clamp(16px, 2.5vw, 24px);
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
       border-bottom: 1px solid var(--border);
     }
+
     .stages-table td {
-      padding: 10px 16px; border-bottom: 1px solid var(--border);
+      padding: 12px clamp(16px, 2.5vw, 24px);
+      border-bottom: 1px solid var(--border);
       color: var(--text-secondary);
     }
-    .stages-table tr:last-child td { border-bottom: none; }
+
+    .stages-table tr:last-child td {
+      border-bottom: none;
+    }
+
     .stages-table .num {
-      font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); width: 36px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-muted);
+      width: 36px;
     }
 
     .status {
-      display: inline-block; padding: 2px 8px; border-radius: 4px;
-      font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+      display: inline-block;
+      padding: 2.5px 9px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
     }
-    .status-success { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent-border); }
-    .status-info { background: var(--bg-highlight); color: var(--text-secondary); border: 1px solid var(--border); }
-    .status-outcome { background: var(--bg-warm); color: var(--text); border: 1px solid var(--border-strong); }
-    .status-human { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent-border); }
-    .status-failed { background: #fee2e2; color: var(--danger); border: 1px solid #fca5a5; }
-    [data-theme="dark"] .status-failed { background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.3); }
+
+    .status-success {
+      background: var(--color-mint-bg);
+      color: var(--color-mint);
+      border: 1px solid var(--color-mint-border);
+    }
+
+    .status-info {
+      background: var(--color-blue-bg);
+      color: var(--color-blue);
+      border: 1px solid var(--color-blue-border);
+    }
+
+    .status-outcome {
+      background: var(--bg-warm);
+      color: var(--text);
+      border: 1px solid var(--border-strong);
+    }
+
+    .status-human {
+      background: var(--color-purple-bg);
+      color: var(--color-purple);
+      border: 1px solid var(--color-purple-border);
+    }
+
+    .status-failed {
+      background: var(--color-red-bg);
+      color: var(--color-red);
+      border: 1px solid var(--color-red-border);
+    }
 
     /* ARCHITECTURE PREVIEW */
     .arch-section {
       padding: 64px 0;
       border-top: 1px solid var(--border);
     }
+
     .arch-pipeline {
-      display: flex; align-items: center; gap: 8px;
-      margin-bottom: 40px; overflow-x: auto; padding: 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 40px;
+      overflow-x: auto;
+      padding: 8px 0;
     }
+
     .arch-node {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 16px 20px;
-      flex: 1; min-width: 160px; text-align: left;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      flex: 1;
+      min-width: 160px;
+      text-align: left;
     }
-    .arch-node .label { font-weight: 600; font-size: 14px; margin-bottom: 4px; color: var(--text); }
-    .arch-node .desc { font-size: 12px; color: var(--text-muted); }
-    .arch-arrow { color: var(--accent); font-size: 18px; flex-shrink: 0; font-weight: 700; }
+
+    .arch-node .label {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+
+    .arch-node .desc {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .arch-arrow {
+      color: var(--text-muted);
+      font-size: 18px;
+      flex-shrink: 0;
+      font-weight: 700;
+    }
 
     .invariants-list {
-      list-style: none; display: grid; grid-template-columns: 1fr 1fr;
-      gap: 12px 24px; text-align: left;
+      list-style: none;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 24px;
+      text-align: left;
     }
+
     .invariants-list li {
-      font-size: 13.5px; color: var(--text-secondary);
-      display: flex; align-items: baseline; gap: 10px;
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
     }
+
     .invariants-list .check-icon {
-      flex-shrink: 0; width: 16px; height: 16px;
-      color: var(--accent); stroke: var(--accent);
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+      color: var(--color-mint);
+      stroke: var(--color-mint);
       transform: translateY(2px);
     }
 
@@ -512,496 +950,716 @@
       padding: 64px 0;
       border-top: 1px solid var(--border);
     }
+
     .docs-cta-card {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 40px clamp(24px, 4vw, 48px);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 40px clamp(24px, 4vw, 48px);
       text-align: left;
-      position: relative; overflow: hidden;
+      position: relative;
+      overflow: hidden;
     }
+
     .docs-cta-card::before {
-      content: ""; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
-      background: var(--accent);
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--text);
     }
+
     .docs-cta-card h2 {
-      font-family: var(--font-serif); font-size: 26px; font-weight: 600;
-      margin-bottom: 12px; color: var(--text);
+      font-family: var(--font-serif);
+      font-size: 26px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--text);
     }
+
     .docs-cta-card p {
-      font-size: 15px; color: var(--text-secondary); max-width: 680px;
+      font-size: 15px;
+      color: var(--text-secondary);
+      max-width: 680px;
       margin-bottom: 24px;
     }
 
     /* FOOTER - Centered with balanced side breathing room */
     footer {
       border-top: 1px solid var(--border);
-      padding: 32px clamp(24px, 5vw, 64px);
-      display: flex; justify-content: center; align-items: center;
-      font-size: 13px; color: var(--text-muted);
+      padding: 36px clamp(40px, 7vw, 110px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 13px;
+      color: var(--text-muted);
     }
+
     .footer-inner {
-      max-width: var(--content-max-width); width: 100%;
-      display: flex; justify-content: space-between; align-items: center;
+      max-width: var(--content-max-width);
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
     }
+
     .footer-left {
-      display: flex; align-items: center; gap: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
+
     footer a {
-      color: var(--text-secondary); text-decoration: none;
-      transition: color 0.15s; font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.15s;
+      font-weight: 500;
     }
-    footer a:hover { color: var(--accent); }
+
+    footer a:hover {
+      color: var(--text);
+    }
 
     /* RESPONSIVE */
     @media (max-width: 860px) {
-      .tier-cards { grid-template-columns: 1fr; }
-      .tier-cards-replay { grid-template-columns: 1fr; }
-      .arch-pipeline { flex-direction: column; align-items: stretch; }
-      .arch-arrow { text-align: center; transform: rotate(90deg); margin: 4px 0; }
-      .invariants-list { grid-template-columns: 1fr; }
-      .footer-inner { flex-direction: column; gap: 12px; text-align: left; align-items: flex-start; }
+      .tier-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .tier-cards-replay {
+        grid-template-columns: 1fr;
+      }
+
+      .arch-pipeline {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .arch-arrow {
+        text-align: center;
+        transform: rotate(90deg);
+        margin: 4px 0;
+      }
+
+      .invariants-list {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        gap: 12px;
+        text-align: left;
+        align-items: flex-start;
+      }
     }
+
     @media (max-width: 640px) {
-      .nav-brand-subtitle { display: none; }
+      .nav-brand-subtitle {
+        display: none;
+      }
     }
   </style>
 </head>
+
 <body>
 
-<!-- NAV -->
-<nav>
-  <div class="nav-inner">
-    <a href="index.html" class="nav-brand-group" aria-label="CUA Home">
-      <div class="brand-logo-wrap">
-        <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="16,2.5 28.5,9.5 28.5,22.5 16,29.5 3.5,22.5 3.5,9.5" fill="var(--accent)" fill-opacity="0.18" stroke="var(--accent)" stroke-width="2.2" stroke-linejoin="round"/>
-          <polygon points="16,7.5 23.5,16 16,24.5 8.5,16" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>
-          <circle cx="16" cy="16" r="3.2" fill="var(--accent)"/>
-        </svg>
+  <!-- NAV -->
+  <nav>
+    <div class="nav-inner">
+      <a href="index.html" class="nav-brand-group" aria-label="CUA Home">
+        <div class="brand-logo-wrap">
+          <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="16,2.5 28.5,9.5 28.5,22.5 16,29.5 3.5,22.5 3.5,9.5" fill="var(--accent)"
+              fill-opacity="0.18" stroke="var(--accent)" stroke-width="2.2" stroke-linejoin="round" />
+            <polygon points="16,7.5 23.5,16 16,24.5 8.5,16" fill="none" stroke="var(--accent)" stroke-width="2"
+              stroke-linejoin="round" />
+            <circle cx="16" cy="16" r="3.2" fill="var(--accent)" />
+          </svg>
+        </div>
+        <div class="nav-brand-text">
+          <span class="nav-brand-title">CUA</span>
+          <span class="nav-brand-subtitle">Computer-Use Automation</span>
+        </div>
+      </a>
+
+      <div class="nav-right">
+        <a href="docs/index.html" class="nav-link">Documentation</a>
+        <a href="https://github.com/adityamhaske/interface.ai" class="nav-github-btn" target="_blank" rel="noopener"
+          aria-label="GitHub Repository">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+          </svg>
+          <span>GitHub</span>
+        </a>
+        <button class="theme-toggle" id="themeToggle" title="Toggle color theme" aria-label="Toggle theme">
+          <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
       </div>
-      <div class="nav-brand-text">
-        <span class="nav-brand-title">CUA</span>
-        <span class="nav-brand-subtitle">Computer-Use Automation</span>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-label">
+        <span class="hero-label-dot"></span>
+        <span>Financial Back-Office Automation · Deterministic CUA</span>
       </div>
-    </a>
-
-    <div class="nav-right">
-      <a href="docs/index.html" class="nav-link">Documentation</a>
-      <a href="https://github.com/adityamhaske/interface.ai" class="nav-github-btn" target="_blank" rel="noopener" aria-label="GitHub Repository">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-        </svg>
-        <span>GitHub</span>
-      </a>
-      <button class="theme-toggle" id="themeToggle" title="Toggle color theme" aria-label="Toggle theme">
-        <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="5"></circle>
-          <line x1="12" y1="1" x2="12" y2="3"></line>
-          <line x1="12" y1="21" x2="12" y2="23"></line>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-          <line x1="1" y1="12" x2="3" y2="12"></line>
-          <line x1="21" y1="12" x2="23" y2="12"></line>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-        </svg>
-      </button>
-    </div>
-  </div>
-</nav>
-
-<div class="page-container">
-
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-label">
-      <span class="hero-label-dot"></span>
-      <span>Financial Back-Office Automation · Deterministic CUA</span>
-    </div>
-    <h1>Discovery is probabilistic.<br><em>Execution is deterministic.</em></h1>
-    <p>An LLM works out how to accomplish a goal in an enterprise legacy application — once. That discovery is compiled into a typed, versioned capability artifact. From then on, it replays deterministically with no model in the loop.</p>
-    <div class="hero-actions">
-      <a href="docs/index.html" class="btn btn-primary">
-        <span>Read the Docs</span>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-      </a>
-      <a href="https://github.com/adityamhaske/interface.ai" class="btn btn-github" target="_blank" rel="noopener">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-        </svg>
-        <span>View on GitHub</span>
-      </a>
-      <a href="#demo" class="btn btn-secondary">
-        <span>See the 12-Stage Demo</span>
-      </a>
-    </div>
-  </section>
-
-  <!-- DYNAMIC MULTI-LINE PIPELINE (No horizontal scrolling) -->
-  <section class="pipeline-section">
-    <div class="pipeline-board">
-
-      <!-- PHASE 1: DISCOVERY & COMPILATION -->
-      <div class="pipeline-tier">
-        <div class="tier-header">
-          <span class="tier-pill tier-pill-discovery">Phase 1: Exploration · Run Once</span>
-          <span class="tier-caption">Probabilistic LLM navigation discovers screens and compiles into a typed capability</span>
-        </div>
-
-        <div class="tier-cards">
-          <!-- Step 01 -->
-          <a href="docs/index.html#quickstart" class="pipe-card" title="View Quickstart in Docs">
-            <div>
-              <div class="pipe-card-top">
-                <span class="pipe-step-num">STAGE 01</span>
-                <span class="pipe-badge">INTENT</span>
-              </div>
-              <div class="pipe-card-title">Goal + Surface Target</div>
-              <div class="pipe-card-desc">Natural language intent paired with an enterprise application surface.</div>
-            </div>
-            <div class="pipe-card-footer">
-              <span>Surface Driver: Web / Frameset UI</span>
-            </div>
-          </a>
-
-          <!-- Step 02 -->
-          <a href="docs/index.html#runbook-discovery" class="pipe-card" title="View Discovery Runbook in Docs">
-            <div>
-              <div class="pipe-card-top">
-                <span class="pipe-step-num">STAGE 02</span>
-                <span class="pipe-badge">MODEL IN LOOP</span>
-              </div>
-              <div class="pipe-card-title">LLM Discovery</div>
-              <div class="pipe-card-note">(once, probabilistic exploration)</div>
-              <div class="pipe-card-desc">Vision/DOM agent drives live screens, discovers actions, and resolves controls.</div>
-            </div>
-            <div class="pipe-card-footer">
-              <span>Execution: Probabilistic Trace</span>
-            </div>
-          </a>
-
-          <!-- Step 03 -->
-          <a href="docs/index.html#artifact-schema" class="pipe-card" title="View Capability Artifact Schema in Docs">
-            <div>
-              <div class="pipe-card-top">
-                <span class="pipe-step-num">STAGE 03</span>
-                <span class="pipe-badge pipe-badge-gold">SEALED</span>
-              </div>
-              <div class="pipe-card-title">Capability Artifact</div>
-              <div class="pipe-card-note">(immutable, content-hashed)</div>
-              <div class="pipe-card-desc">Semantic target descriptors, preconditions, checkpoints, and typed I/O schema.</div>
-            </div>
-            <div class="pipe-card-footer">
-              <span>Integrity: SHA-256 Content-Hashed</span>
-            </div>
-          </a>
-        </div>
-      </div>
-
-      <!-- COMPILATION BRIDGE (Visual transition between lines) -->
-      <div class="pipeline-bridge">
-        <div class="bridge-line"></div>
-        <div class="bridge-pill">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-          </svg>
-          <span>Compiled & Sealed · Model Completely Removed</span>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <polyline points="19 12 12 19 5 12"></polyline>
-          </svg>
-        </div>
-        <div class="bridge-line"></div>
-      </div>
-
-      <!-- PHASE 2: DETERMINISTIC REPLAY -->
-      <div class="pipeline-tier">
-        <div class="tier-header">
-          <span class="tier-pill tier-pill-replay">Phase 2: Production Execution · Every Run After</span>
-          <span class="tier-caption">Zero model calls, zero temperature, subsecond execution</span>
-        </div>
-
-        <div class="tier-cards tier-cards-replay">
-          <!-- Step 04 -->
-          <a href="docs/index.html#runbook-replay" class="pipe-card pipe-card-highlight" title="View Deterministic Replay in Docs">
-            <div>
-              <div class="pipe-card-top">
-                <span class="pipe-step-num">STAGE 04</span>
-                <span class="pipe-badge pipe-badge-gold">0 MODELS</span>
-              </div>
-              <div class="pipe-card-title">Deterministic Replay</div>
-              <div class="pipe-card-note">(every subsequent run, 0 models)</div>
-              <div class="pipe-card-desc">Deterministic engine replays the compiled artifact. Semantic target resolution ladder, policy chokepoint, and session lease lock.</div>
-            </div>
-            <div class="pipe-card-footer">
-              <span>Runtime Cost: $0.00 / Subsecond</span>
-            </div>
-          </a>
-
-          <!-- Step 05 -->
-          <a href="docs/index.html#error-taxonomy" class="pipe-card" title="View Error Taxonomy in Docs">
-            <div>
-              <div class="pipe-card-top">
-                <span class="pipe-step-num">STAGE 05</span>
-                <span class="pipe-badge">VERIFIED</span>
-              </div>
-              <div class="pipe-card-title">Typed Audit Output</div>
-              <div class="pipe-card-desc">Business outcome clearly classified (not conflated with failure), policy-redacted evidence trace, and complete compliance audit record.</div>
-            </div>
-            <div class="pipe-card-footer">
-              <span>Evidence: Redacted RunRecord</span>
-            </div>
-          </a>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- THESIS -->
-  <section class="thesis-section">
-    <blockquote>
-      Banks run a long tail of back-office applications with <strong>no API</strong>. When an AI agent needs to get real work done, the only way in is to drive the UI the way a human operator would. Doing that with an LLM on every invocation is <strong>slow, expensive, non-deterministic, and unauditable</strong> — three of which are disqualifying in a regulated environment.
-    </blockquote>
-  </section>
-
-  <!-- FEATURES -->
-  <section class="features-section">
-    <h2 class="section-title">What makes this architecture different</h2>
-    <p class="section-subtitle">Every claim below is mechanically enforced by automated invariant tests that fail if broken.</p>
-    <div class="features-grid">
-
-      <!-- Feature 1: Deterministic Replay -->
-      <a href="docs/index.html#invariants" class="feature-card">
-        <div class="feature-icon-wrap">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="1 4 1 10 7 10"></polyline>
-            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-            <polyline points="12 8 12 12 14 14"></polyline>
-          </svg>
-        </div>
-        <h3>Deterministic Replay</h3>
-        <p>Same artifact + same inputs + same app state = identical decision trace. No model in the loop, zero temperature, no network calls to LLMs.</p>
-      </a>
-
-      <!-- Feature 2: Semantic Targeting -->
-      <a href="docs/index.html#target-resolution" class="feature-card">
-        <div class="feature-icon-wrap">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="22" y1="12" x2="18" y2="12"></line>
-            <line x1="6" y1="12" x2="2" y2="12"></line>
-            <line x1="12" y1="6" x2="12" y2="2"></line>
-            <line x1="12" y1="22" x2="12" y2="18"></line>
-          </svg>
-        </div>
-        <h3>Semantic Targeting</h3>
-        <p>Controls are identified by role, accessible name, and structural anchors — never brittle CSS selectors. A six-rung ladder survives markup churn.</p>
-      </a>
-
-      <!-- Feature 3: Policy Chokepoint -->
-      <a href="docs/index.html#pipeline" class="feature-card">
-        <div class="feature-icon-wrap">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-            <polyline points="9 12 11 14 15 10"></polyline>
-          </svg>
-        </div>
-        <h3>Policy Chokepoint</h3>
-        <p>Every action — from LLM discovery, replay engine, or human operator — passes through one authorization chokepoint. Zero bypasses, zero exceptions.</p>
-      </a>
-
-      <!-- Feature 4: Fail Closed -->
-      <a href="docs/index.html#error-taxonomy" class="feature-card">
-        <div class="feature-icon-wrap">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-          </svg>
-        </div>
-        <h3>Fail Closed</h3>
-        <p>Unknown UI states stop the run immediately. Ambiguous targets are refused, never guessed. In banking, an unverified click is an incident.</p>
-      </a>
-
-      <!-- Feature 5: Human-in-the-Loop -->
-      <a href="docs/index.html#control-transfer" class="feature-card">
-        <div class="feature-icon-wrap">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-            <circle cx="9" cy="7" r="4"></circle>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-          </svg>
-        </div>
-        <h3>Human Escalation Lease</h3>
-        <p>An operator takes the live session, acts under policy, and hands it back. The engine re-anchors and resumes at the right step, not step 1.</p>
-      </a>
-
-      <!-- Feature 6: Multi-Tenant Reuse -->
-      <a href="docs/index.html#adr-0005" class="feature-card">
-        <div class="feature-icon-wrap">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-            <polyline points="2 17 12 22 22 17"></polyline>
-            <polyline points="2 12 12 17 22 12"></polyline>
-          </svg>
-        </div>
-        <h3>Multi-Tenant Overlays</h3>
-        <p>A rebranded tenant label requires a four-line overlay document, not a re-record. Drift is quantified per tenant before replays fail.</p>
-      </a>
-
-    </div>
-  </section>
-
-  <!-- DEMO -->
-  <section class="demo-section" id="demo">
-    <h2 class="section-title">Interactive verification</h2>
-    <p class="section-subtitle">One command executes the complete 12-stage banking scenario locally end to end.</p>
-    <div class="demo-code">
-      <div><span class="comment"># 1. Setup local environment and headless Chromium driver</span></div>
-      <div><span class="prompt">$ </span><span class="cmd">make setup</span>          <span class="comment"># venv, dependencies, Chromium</span></div>
-      <div style="margin-top: 10px;"><span class="comment"># 2. Run the full deterministic test & demo story</span></div>
-      <div><span class="prompt">$ </span><span class="cmd">make demo</span>           <span class="comment"># all 12 stages, 100% offline verifiable</span></div>
-    </div>
-
-    <table class="stages-table">
-      <thead>
-        <tr><th>#</th><th>Stage</th><th>Observable Behavior</th><th>Result</th></tr>
-      </thead>
-      <tbody>
-        <tr><td class="num">1</td><td>Mock back-office running</td><td>Hostile frameset application, zero test IDs</td><td><span class="status status-info">READY</span></td></tr>
-        <tr><td class="num">2</td><td>LLM Discovery</td><td>Agent drives live UI to goal, exploring paths</td><td><span class="status status-info">TRACE</span></td></tr>
-        <tr><td class="num">3</td><td>Capability compiled</td><td>Typed I/O, semantic targets, content hash</td><td><span class="status status-success">SEALED</span></td></tr>
-        <tr><td class="num">4</td><td>Deterministic replay</td><td>New member inputs, 0 model calls in the loop</td><td><span class="status status-success">SUCCESS</span></td></tr>
-        <tr><td class="num">5</td><td>Business outcome</td><td>member_not_found — valid answer, not a crash</td><td><span class="status status-outcome">EXIT 0</span></td></tr>
-        <tr><td class="num">6</td><td>Injected 502 error</td><td>Declared recovery rule remediates and retries</td><td><span class="status status-success">SUCCESS</span></td></tr>
-        <tr><td class="num">7</td><td>Fault past budget</td><td>Recovery exhausted → escalates to human queue</td><td><span class="status status-human">NEEDS_HUMAN</span></td></tr>
-        <tr><td class="num">8</td><td>Malformed input</td><td>Rejected by schema guard before dispatch</td><td><span class="status status-failed">FAILED</span></td></tr>
-        <tr><td class="num">9</td><td>Undeclared screen</td><td>Fails closed immediately and requests audit</td><td><span class="status status-human">NEEDS_HUMAN</span></td></tr>
-        <tr><td class="num">10</td><td>Human takeover</td><td>Operator drives same session with Lease lock</td><td><span class="status status-info">EPOCH 3</span></td></tr>
-        <tr><td class="num">11</td><td>Re-anchor resume</td><td>Resumes at step 4 without re-running past steps</td><td><span class="status status-success">SUCCESS</span></td></tr>
-        <tr><td class="num">12</td><td>Agent invocation</td><td>Exposed to external agent as a typed tool call</td><td><span class="status status-success">SUCCESS</span></td></tr>
-      </tbody>
-    </table>
-    <p style="margin-top: 16px; font-size: 13px; color: var(--text-muted);">
-      Works completely offline without an API key — discovery falls back to a verified recorded transcript. Supply <code style="font-family: var(--font-mono); font-size: 12px; background: var(--bg-code); padding: 2px 6px; border-radius: 3px; border: 1px solid var(--border);">OPENROUTER_API_KEY</code> for a live LLM execution.
-    </p>
-  </section>
-
-  <!-- ARCHITECTURE PREVIEW -->
-  <section class="arch-section">
-    <h2 class="section-title">The execution pipeline</h2>
-    <p class="section-subtitle">One path to a surface, for every actor. No action reaches a driver without authorization.</p>
-
-    <div class="arch-pipeline">
-      <div class="arch-node"><div class="label">Action</div><div class="desc">click, type, navigate</div></div>
-      <div class="arch-arrow">→</div>
-      <div class="arch-node"><div class="label">TargetResolver</div><div class="desc">resolve or refuse</div></div>
-      <div class="arch-arrow">→</div>
-      <div class="arch-node"><div class="label">PolicyEngine</div><div class="desc">authorize</div></div>
-      <div class="arch-arrow">→</div>
-      <div class="arch-node"><div class="label">SurfaceDriver</div><div class="desc">dispatch</div></div>
-    </div>
-
-    <ul class="invariants-list">
-      <li>
-        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        <span>Replay never calls or imports the LLM</span>
-      </li>
-      <li>
-        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        <span>No action reaches a driver without policy authorization</span>
-      </li>
-      <li>
-        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        <span>Target identity is semantic, never a CSS selector</span>
-      </li>
-      <li>
-        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        <span>Human input cannot bypass policy or evidence</span>
-      </li>
-      <li>
-        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        <span>Unknown UI states fail closed</span>
-      </li>
-      <li>
-        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        <span>Every sink is redacted — logs, artifacts, LLM prompts</span>
-      </li>
-      <li>
-        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        <span>Business outcomes are not failures</span>
-      </li>
-      <li>
-        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        <span>Automation may only act while it holds the session lease</span>
-      </li>
-      <li>
-        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        <span>Capabilities are immutable and content-hashed</span>
-      </li>
-      <li>
-        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        <span>The domain layer is pure — no I/O, no network, no browser</span>
-      </li>
-    </ul>
-  </section>
-
-  <!-- DOCS CTA -->
-  <section class="docs-cta">
-    <div class="docs-cta-card">
-      <h2>Comprehensive Documentation</h2>
-      <p>Explore high-level architecture, low-level component designs, architectural decision records (ADRs), recovery runbooks, and test verification strategies.</p>
-      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+      <h1>Discovery is probabilistic.<br><em>Execution is deterministic.</em></h1>
+      <p class="hero-subtitle">An LLM works out how to accomplish a goal in an enterprise legacy application — once. That discovery is
+        compiled into a typed, versioned capability artifact. From then on, it replays deterministically with no model
+        in the loop.</p>
+      <div class="hero-actions">
         <a href="docs/index.html" class="btn btn-primary">
-          <span>Explore Documentation →</span>
+          <span>Read the Docs</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
         </a>
         <a href="https://github.com/adityamhaske/interface.ai" class="btn btn-github" target="_blank" rel="noopener">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
           </svg>
-          <span>View Repository</span>
+          <span>View on GitHub</span>
+        </a>
+        <a href="#demo" class="btn btn-secondary">
+          <span>See the 12-Stage Demo</span>
         </a>
       </div>
-    </div>
-  </section>
+    </section>
 
-</div>
+    <!-- DYNAMIC MULTI-LINE PIPELINE (No horizontal scrolling) -->
+    <section class="pipeline-section">
+      <div class="pipeline-board">
 
-<!-- FOOTER -->
-<footer>
-  <div class="footer-inner">
-    <div class="footer-left">
-      <span>CUA — Computer-Use Automation for Regulated Financial Back-Offices · Proprietary &amp; Confidential · All Rights Reserved</span>
-    </div>
-    <a href="https://github.com/adityamhaske/interface.ai" target="_blank" rel="noopener">GitHub Repository →</a>
+        <!-- PHASE 1: DISCOVERY & COMPILATION -->
+        <div class="pipeline-tier">
+          <div class="tier-header">
+            <span class="tier-pill tier-pill-discovery">Phase 1: Exploration · Run Once</span>
+            <span class="tier-caption">Probabilistic LLM navigation discovers screens and compiles into a typed
+              capability</span>
+          </div>
+
+          <div class="tier-cards">
+            <!-- Step 01 -->
+            <a href="docs/index.html#quickstart" class="pipe-card" title="View Quickstart in Docs">
+              <div>
+                <div class="pipe-card-top">
+                  <span class="pipe-step-num">STAGE 01</span>
+                  <span class="pipe-badge pipe-badge-blue">INTENT</span>
+                </div>
+                <div class="pipe-card-title">Goal + Surface Target</div>
+                <div class="pipe-card-desc">Natural language intent paired with an enterprise application surface.</div>
+              </div>
+              <div class="pipe-card-footer">
+                <span>Surface Driver: Web / Frameset UI</span>
+              </div>
+            </a>
+
+            <!-- Step 02 -->
+            <a href="docs/index.html#runbook-discovery" class="pipe-card" title="View Discovery Runbook in Docs">
+              <div>
+                <div class="pipe-card-top">
+                  <span class="pipe-step-num">STAGE 02</span>
+                  <span class="pipe-badge pipe-badge-blue">MODEL IN LOOP</span>
+                </div>
+                <div class="pipe-card-title">LLM Discovery</div>
+                <div class="pipe-card-note">(once, probabilistic exploration)</div>
+                <div class="pipe-card-desc">Vision/DOM agent drives live screens, discovers actions, and resolves
+                  controls.</div>
+              </div>
+              <div class="pipe-card-footer">
+                <span>Execution: Probabilistic Trace</span>
+              </div>
+            </a>
+
+            <!-- Step 03 -->
+            <a href="docs/index.html#artifact-schema" class="pipe-card" title="View Capability Artifact Schema in Docs">
+              <div>
+                <div class="pipe-card-top">
+                  <span class="pipe-step-num">STAGE 03</span>
+                  <span class="pipe-badge pipe-badge-purple">SEALED</span>
+                </div>
+                <div class="pipe-card-title">Capability Artifact</div>
+                <div class="pipe-card-note">(immutable, content-hashed)</div>
+                <div class="pipe-card-desc">Semantic target descriptors, preconditions, checkpoints, and typed I/O
+                  schema.</div>
+              </div>
+              <div class="pipe-card-footer">
+                <span>Integrity: SHA-256 Content-Hashed</span>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <!-- COMPILATION BRIDGE (Visual transition between lines) -->
+        <div class="pipeline-bridge">
+          <div class="bridge-line"></div>
+          <div class="bridge-pill">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <span>Compiled & Sealed · Model Completely Removed</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <polyline points="19 12 12 19 5 12"></polyline>
+            </svg>
+          </div>
+          <div class="bridge-line"></div>
+        </div>
+
+        <!-- PHASE 2: DETERMINISTIC REPLAY -->
+        <div class="pipeline-tier">
+          <div class="tier-header">
+            <span class="tier-pill tier-pill-replay">Phase 2: Production Execution · Every Run After</span>
+            <span class="tier-caption">Zero model calls, zero temperature, subsecond execution</span>
+          </div>
+
+          <div class="tier-cards tier-cards-replay">
+            <!-- Step 04 -->
+            <a href="docs/index.html#runbook-replay" class="pipe-card pipe-card-highlight"
+              title="View Deterministic Replay in Docs">
+              <div>
+                <div class="pipe-card-top">
+                  <span class="pipe-step-num">STAGE 04</span>
+                  <span class="pipe-badge pipe-badge-mint">0 MODELS</span>
+                </div>
+                <div class="pipe-card-title">Deterministic Replay</div>
+                <div class="pipe-card-note">(every subsequent run, 0 models)</div>
+                <div class="pipe-card-desc">Deterministic engine replays the compiled artifact. Semantic target
+                  resolution ladder, policy chokepoint, and session lease lock.</div>
+              </div>
+              <div class="pipe-card-footer">
+                <span>Runtime Cost: $0.00 / Subsecond</span>
+              </div>
+            </a>
+
+            <!-- Step 05 -->
+            <a href="docs/index.html#error-taxonomy" class="pipe-card" title="View Error Taxonomy in Docs">
+              <div>
+                <div class="pipe-card-top">
+                  <span class="pipe-step-num">STAGE 05</span>
+                  <span class="pipe-badge pipe-badge-mint">AUDITED</span>
+                </div>
+                <div class="pipe-card-title">Typed Audit Output</div>
+                <div class="pipe-card-desc">Business outcome clearly classified (not conflated with failure),
+                  policy-redacted evidence trace, and complete compliance audit record.</div>
+              </div>
+              <div class="pipe-card-footer">
+                <span>Evidence: Redacted RunRecord</span>
+              </div>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- THESIS -->
+    <section class="thesis-section">
+      <blockquote>
+        Banks run a long tail of back-office applications with <strong>no API</strong>. When an AI agent needs to get
+        real work done, the only way in is to drive the UI the way a human operator would. Doing that with an LLM on
+        every invocation is <strong>slow, expensive, non-deterministic, and unauditable</strong> — three of which are
+        disqualifying in a regulated environment.
+      </blockquote>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features-section">
+      <h2 class="section-title">What makes this architecture different</h2>
+      <p class="section-subtitle">Every claim below is mechanically enforced by automated invariant tests that fail if
+        broken.</p>
+      <div class="features-grid">
+
+        <!-- Feature 1: Deterministic Replay -->
+        <a href="docs/index.html#invariants" class="feature-card">
+          <div class="feature-icon-wrap">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="1 4 1 10 7 10"></polyline>
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+              <polyline points="12 8 12 12 14 14"></polyline>
+            </svg>
+          </div>
+          <h3>Deterministic Replay</h3>
+          <p>Same artifact + same inputs + same app state = identical decision trace. No model in the loop, zero
+            temperature, no network calls to LLMs.</p>
+        </a>
+
+        <!-- Feature 2: Semantic Targeting -->
+        <a href="docs/index.html#target-resolution" class="feature-card">
+          <div class="feature-icon-wrap">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="22" y1="12" x2="18" y2="12"></line>
+              <line x1="6" y1="12" x2="2" y2="12"></line>
+              <line x1="12" y1="6" x2="12" y2="2"></line>
+              <line x1="12" y1="22" x2="12" y2="18"></line>
+            </svg>
+          </div>
+          <h3>Semantic Targeting</h3>
+          <p>Controls are identified by role, accessible name, and structural anchors — never brittle CSS selectors. A
+            six-rung ladder survives markup churn.</p>
+        </a>
+
+        <!-- Feature 3: Policy Chokepoint -->
+        <a href="docs/index.html#pipeline" class="feature-card">
+          <div class="feature-icon-wrap">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              <polyline points="9 12 11 14 15 10"></polyline>
+            </svg>
+          </div>
+          <h3>Policy Chokepoint</h3>
+          <p>Every action — from LLM discovery, replay engine, or human operator — passes through one authorization
+            chokepoint. Zero bypasses, zero exceptions.</p>
+        </a>
+
+        <!-- Feature 4: Fail Closed -->
+        <a href="docs/index.html#error-taxonomy" class="feature-card">
+          <div class="feature-icon-wrap">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </div>
+          <h3>Fail Closed</h3>
+          <p>Unknown UI states stop the run immediately. Ambiguous targets are refused, never guessed. In banking, an
+            unverified click is an incident.</p>
+        </a>
+
+        <!-- Feature 5: Human-in-the-Loop -->
+        <a href="docs/index.html#control-transfer" class="feature-card">
+          <div class="feature-icon-wrap">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+          <h3>Human Escalation Lease</h3>
+          <p>An operator takes the live session, acts under policy, and hands it back. The engine re-anchors and resumes
+            at the right step, not step 1.</p>
+        </a>
+
+        <!-- Feature 6: Multi-Tenant Reuse -->
+        <a href="docs/index.html#adr-0005" class="feature-card">
+          <div class="feature-icon-wrap">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+              <polyline points="2 17 12 22 22 17"></polyline>
+              <polyline points="2 12 12 17 22 12"></polyline>
+            </svg>
+          </div>
+          <h3>Multi-Tenant Overlays</h3>
+          <p>A rebranded tenant label requires a four-line overlay document, not a re-record. Drift is quantified per
+            tenant before replays fail.</p>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- DEMO -->
+    <section class="demo-section" id="demo">
+      <h2 class="section-title">Interactive verification</h2>
+      <p class="section-subtitle">One command executes the complete 12-stage banking scenario locally end to end.</p>
+      <div class="demo-code">
+        <div><span class="comment"># 1. Setup local environment and headless Chromium driver</span></div>
+        <div><span class="prompt">$ </span><span class="cmd">make setup</span> <span class="comment"># venv,
+            dependencies, Chromium</span></div>
+        <div style="margin-top: 10px;"><span class="comment"># 2. Run the full deterministic test & demo story</span>
+        </div>
+        <div><span class="prompt">$ </span><span class="cmd">make demo</span> <span class="comment"># all 12 stages,
+            100% offline verifiable</span></div>
+      </div>
+
+      <table class="stages-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Stage</th>
+            <th>Observable Behavior</th>
+            <th>Result</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="num">1</td>
+            <td>Mock back-office running</td>
+            <td>Hostile frameset application, zero test IDs</td>
+            <td><span class="status status-info">READY</span></td>
+          </tr>
+          <tr>
+            <td class="num">2</td>
+            <td>LLM Discovery</td>
+            <td>Agent drives live UI to goal, exploring paths</td>
+            <td><span class="status status-info">TRACE</span></td>
+          </tr>
+          <tr>
+            <td class="num">3</td>
+            <td>Capability compiled</td>
+            <td>Typed I/O, semantic targets, content hash</td>
+            <td><span class="status status-success">SEALED</span></td>
+          </tr>
+          <tr>
+            <td class="num">4</td>
+            <td>Deterministic replay</td>
+            <td>New member inputs, 0 model calls in the loop</td>
+            <td><span class="status status-success">SUCCESS</span></td>
+          </tr>
+          <tr>
+            <td class="num">5</td>
+            <td>Business outcome</td>
+            <td>member_not_found — valid answer, not a crash</td>
+            <td><span class="status status-outcome">EXIT 0</span></td>
+          </tr>
+          <tr>
+            <td class="num">6</td>
+            <td>Injected 502 error</td>
+            <td>Declared recovery rule remediates and retries</td>
+            <td><span class="status status-success">SUCCESS</span></td>
+          </tr>
+          <tr>
+            <td class="num">7</td>
+            <td>Fault past budget</td>
+            <td>Recovery exhausted → escalates to human queue</td>
+            <td><span class="status status-human">NEEDS_HUMAN</span></td>
+          </tr>
+          <tr>
+            <td class="num">8</td>
+            <td>Malformed input</td>
+            <td>Rejected by schema guard before dispatch</td>
+            <td><span class="status status-failed">FAILED</span></td>
+          </tr>
+          <tr>
+            <td class="num">9</td>
+            <td>Undeclared screen</td>
+            <td>Fails closed immediately and requests audit</td>
+            <td><span class="status status-human">NEEDS_HUMAN</span></td>
+          </tr>
+          <tr>
+            <td class="num">10</td>
+            <td>Human takeover</td>
+            <td>Operator drives same session with Lease lock</td>
+            <td><span class="status status-info">EPOCH 3</span></td>
+          </tr>
+          <tr>
+            <td class="num">11</td>
+            <td>Re-anchor resume</td>
+            <td>Resumes at step 4 without re-running past steps</td>
+            <td><span class="status status-success">SUCCESS</span></td>
+          </tr>
+          <tr>
+            <td class="num">12</td>
+            <td>Agent invocation</td>
+            <td>Exposed to external agent as a typed tool call</td>
+            <td><span class="status status-success">SUCCESS</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="margin-top: 16px; font-size: 13px; color: var(--text-muted);">
+        Works completely offline without an API key — discovery falls back to a verified recorded transcript. Supply
+        <code
+          style="font-family: var(--font-mono); font-size: 12px; background: var(--bg-code); padding: 2px 6px; border-radius: 3px; border: 1px solid var(--border);">OPENROUTER_API_KEY</code>
+        for a live LLM execution.
+      </p>
+    </section>
+
+    <!-- ARCHITECTURE PREVIEW -->
+    <section class="arch-section">
+      <h2 class="section-title">The execution pipeline</h2>
+      <p class="section-subtitle">One path to a surface, for every actor. No action reaches a driver without
+        authorization.</p>
+
+      <div class="arch-pipeline">
+        <div class="arch-node">
+          <div class="label">Action</div>
+          <div class="desc">click, type, navigate</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node">
+          <div class="label">TargetResolver</div>
+          <div class="desc">resolve or refuse</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node">
+          <div class="label">PolicyEngine</div>
+          <div class="desc">authorize</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node">
+          <div class="label">SurfaceDriver</div>
+          <div class="desc">dispatch</div>
+        </div>
+      </div>
+
+      <ul class="invariants-list">
+        <li>
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>Replay never calls or imports the LLM</span>
+        </li>
+        <li>
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>No action reaches a driver without policy authorization</span>
+        </li>
+        <li>
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>Target identity is semantic, never a CSS selector</span>
+        </li>
+        <li>
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>Human input cannot bypass policy or evidence</span>
+        </li>
+        <li>
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>Unknown UI states fail closed</span>
+        </li>
+        <li>
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>Every sink is redacted — logs, artifacts, LLM prompts</span>
+        </li>
+        <li>
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>Business outcomes are not failures</span>
+        </li>
+        <li>
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>Automation may only act while it holds the session lease</span>
+        </li>
+        <li>
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>Capabilities are immutable and content-hashed</span>
+        </li>
+        <li>
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>The domain layer is pure — no I/O, no network, no browser</span>
+        </li>
+      </ul>
+    </section>
+
+    <!-- DOCS CTA -->
+    <section class="docs-cta">
+      <div class="docs-cta-card">
+        <h2>Comprehensive Documentation</h2>
+        <p>Explore high-level architecture, low-level component designs, architectural decision records (ADRs), recovery
+          runbooks, and test verification strategies.</p>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <a href="docs/index.html" class="btn btn-primary">
+            <span>Explore Documentation →</span>
+          </a>
+          <a href="https://github.com/adityamhaske/interface.ai" class="btn btn-github" target="_blank" rel="noopener">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+            </svg>
+            <span>View Repository</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
   </div>
-</footer>
 
-<script>
-  // Theme Toggle with persistence
-  const themeToggle = document.getElementById('themeToggle');
-  const themeIcon = document.getElementById('themeIcon');
-  
-  function applyTheme(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('cua-theme', theme);
-    if (theme === 'dark') {
-      themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
-    } else {
-      themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-left">
+        <span>CUA — Computer-Use Automation for Regulated Financial Back-Offices</span>
+      </div>
+      <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+        <a href="sitemap.xml">Sitemap</a>
+        <a href="llms.txt" style="font-family: var(--font-mono); font-size: 12px;">llms.txt</a>
+        <a href="llms-full.txt" style="font-family: var(--font-mono); font-size: 12px;">Full Specs</a>
+        <a href="https://github.com/adityamhaske/interface.ai" target="_blank" rel="noopener">GitHub Repository →</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Theme Toggle with persistence
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('cua-theme', theme);
+      if (theme === 'dark') {
+        themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+      } else {
+        themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+      }
     }
-  }
 
-  const savedTheme = localStorage.getItem('cua-theme') || 
-    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-  applyTheme(savedTheme);
+    const savedTheme = localStorage.getItem('cua-theme') ||
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    applyTheme(savedTheme);
 
-  themeToggle.addEventListener('click', () => {
-    const current = document.documentElement.getAttribute('data-theme');
-    applyTheme(current === 'dark' ? 'light' : 'dark');
-  });
-</script>
+    themeToggle.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme');
+      applyTheme(current === 'dark' ? 'light' : 'dark');
+    });
+  </script>
 
 </body>
+
 </html>

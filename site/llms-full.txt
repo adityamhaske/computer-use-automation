@@ -1,0 +1,233 @@
+# Computer-Use Automation System (CUA) — Full Technical Specification & Documentation
+
+> Core Thesis: Discovery is probabilistic. Execution is deterministic.
+> Canonical URL: https://adityamhaske.github.io/interface.ai/
+> GitHub: https://github.com/adityamhaske/interface.ai
+
+---
+
+## 1. Overview
+CUA is an enterprise computer-use automation system engineered for regulated financial back-offices (banks and credit unions). An LLM is permitted to explore an arbitrary legacy application with no API exactly once. That exploration trace is compiled into an immutable, typed, content-hashed Capability Artifact. All subsequent runs execute deterministically with zero model calls in the loop.
+
+Built for mission-critical back-office applications at banks and credit unions, where the only path to automation is driving the live UI with strict regulatory compliance, complete auditability, and zero data leakage.
+
+```
+Goal + Target ──► LLM Discovery Run ──► Capability Artifact ──► Deterministic Replay ──► Typed Outputs
+                       (once)             (reviewed, sealed)        (every time after)
+                                                                            │
+                                                              stuck? ───────┴──► Human takes the
+                                                                                 live session, acts,
+                                                                                 hands it back
+```
+
+---
+
+## 2. Quick Start & Prerequisites
+
+### Prerequisites
+- Python 3.11 or later
+- Playwright Chromium (`make setup` installs this)
+- macOS or Linux
+- An optional OpenRouter API key for live LLM discovery runs (offline recordings are provided for zero-API-key testing)
+
+### Installation
+```bash
+git clone https://github.com/adityamhaske/interface.ai.git
+cd interface.ai
+make setup          # Creates venv, installs dependencies, installs Chromium
+```
+
+### Running the Demo
+```bash
+./start.sh          # Runs the 12-stage verified execution story end to end
+```
+
+### Testing
+```bash
+make check          # lint + strict typecheck + invariants + tests
+make test           # 100% offline test suite (0 external calls)
+```
+
+---
+
+## 3. The 12-Stage Verified Execution Story
+
+The demo executes 12 deterministic stages against a live back-office application:
+1. Mock Back-Office Running: Hostile multi-frame banking application starts on port 8811.
+2. LLM Discovery: Model discovers navigation path to goal once.
+3. Capability Compiled: Trace compiled into typed, frozen, content-hashed artifact.
+4. Deterministic Replay: New member inputs executed with 0 models in the loop.
+5. Business Outcome: Member not found handled as a legitimate answer, not a crash.
+6. Injected 502 Fault: Declared recovery rule catches HTTP 502, remediates, and retries.
+7. Fault Past Budget: Exceeded retry budget triggers clean handoff to human operator.
+8. Malformed Input: Input schema guard rejects invalid inputs before touching the browser.
+9. Undeclared Screen: Unrecognized screen state fails closed (`UNEXPECTED_STATE`).
+10. Human Takeover: Operator claims session with exclusive Lease and drives screen.
+11. Re-Anchor Resume: Engine reconciles screen state and resumes without duplicate mutation.
+12. Agent Tool Call: Capability exposed to caller agents as a standard typed function.
+
+---
+
+## 4. System Architecture & Package Map
+
+```
+Action ──► TargetResolver ──► PolicyEngine ──► SurfaceDriver
+       (resolve or refuse)    (authorize)      (dispatch)
+```
+
+| Package | Purpose & Ownership | Permitted Imports |
+|---|---|---|
+| `cua/domain` | Types only: `Capability`, `TargetDescriptor`, `Action`, `UiSnapshot`, `RunRecord`, taxonomy | Nothing from `cua` (pure) |
+| `cua/perception` | Normalizing raw surface observation into `UiSnapshot`; fingerprinting | `domain` |
+| `cua/targeting` | The resolution ladder, scoring, ambiguity, drift | `domain`, `perception` |
+| `cua/policy` | Allowlist, risk tiers, redaction, secrets, `AuthorizedAction` | `domain`, `targeting` |
+| `cua/hitl` | `Lease`, `SessionBroker`, intervention queue, operator console | `domain`, `policy` |
+| `cua/runtime` | `dispatcher.py` — the sole importer of `surfaces` | everything below |
+| `cua/surfaces` | `SurfaceDriver` port; Playwright/CDP driver; desktop stub | `domain`, `perception` |
+| `cua/agent` | `LlmPort`, prompts, the discovery loop | `runtime` and below |
+| `cua/replay` | The deterministic executor — **never imports agent** | `runtime` and below |
+| `cua/recorder` | Compiling a discovery trace into a `Capability` | `domain`, `targeting` |
+| `cua/evidence` | Structured, redacted, actor-tagged run records | `domain`, `policy` |
+| `cua/catalog` | Capability store, tenant overlays, tool-spec export | `domain` |
+| `cua/cli` | Unified CLI entry points | everything |
+
+---
+
+## 5. The Ten Architectural Invariants
+
+### 1. Replay never calls or imports the LLM
+`cua.replay` may not import `cua.agent`, `httpx`, or any model client — directly or transitively.
+- Why: It is the core thesis. Replay must be deterministic, auditable, and cost-free.
+- Enforced by: `.importlinter` contract `no-llm-in-replay`, `tests/invariants/test_import_contracts.py`.
+
+### 2. No action reaches a driver without policy authorization
+The only path to a surface is: `Action -> TargetResolver -> PolicyEngine -> SurfaceDriver`.
+`cua.runtime.dispatcher` is the only module permitted to call `dispatch()`.
+- Why: Guardrails cannot be bypassed.
+- Enforced by: `policy-chokepoint` contract and `tests/invariants/test_policy_chokepoint.py`.
+
+### 3. Target identity is a semantic TargetDescriptor, never a raw CSS selector
+Artifacts describe controls by role, accessible name, scope, structural anchor, and ordinal.
+- Why: Survives restyling, re-branding, and cross-platform execution (Playwright, Windows UIA).
+- Enforced by: `surface-neutral-targeting` contract and `tests/integration/test_variant_b.py`.
+
+### 4. Human input cannot bypass policy or evidence
+The operator console never injects directly into the page. It submits `raw_input` actions to `SessionBroker`, which routes them through the policy chokepoint under the `HUMAN` policy profile.
+- Enforced by: `tests/invariants/test_human_control_safety.py`.
+
+### 5. Unknown states fail closed
+If the observed UI matches no declared precondition, checkpoint, outcome, or recovery rule, it is `UNEXPECTED_STATE` and execution immediately halts. If a target is ambiguous, the resolver refuses with `TARGET_AMBIGUOUS`.
+- Enforced by: `tests/integration/test_fault_matrix.py`.
+
+### 6. Every sink is redacted
+Logs, artifacts, evidence files, screenshots, and outbound LLM prompts are redacted. Secrets are `{$secret: ref}` references resolved only at dispatch time.
+- Enforced by: `tests/invariants/test_redaction.py`.
+
+### 7. Business outcomes are not failures
+Observable conditions are strictly partitioned into:
+- `BUSINESS_OUTCOME`: Real answer (`member_not_found`, `account_closed`) -> terminal success (Exit 0).
+- `RECOVERABLE`: Bounded transient condition (`transient_load`, `session_expired`) -> retry.
+- `HARD_FAILURE`: Defect (`target_not_found`, `checkpoint_failed`) -> terminal failure.
+- `UNEXPECTED_STATE`: Unrecognized state -> fail closed to human.
+- Enforced by: `tests/integration/test_fault_matrix.py`.
+
+### 8. Automation may only act while it holds the session
+Every automation dispatch checks: who holds this session, and has it changed hands since this run was authorized (`expected_epoch`). Either can refuse with `LEASE_LOST`.
+- Enforced by: `tests/integration/test_handoff.py`.
+
+### 9. Capabilities are immutable
+A capability artifact at `id@version` is frozen and SHA-256 content-hashed.
+- Enforced by: `tests/contract/test_capability_schema.py`.
+
+### 10. domain/ is pure
+Zero I/O, zero network, zero browser, zero clock.
+- Enforced by: `.importlinter` contract `pure-domain`.
+
+---
+
+## 6. Capability Schema Reference
+
+A capability document contains:
+- `id`: Unique identifier (e.g. `memberdesk.savings_balance`)
+- `version`: SemVer string (e.g. `1.0.0`)
+- `content_hash`: SHA-256 hash of all fields excluding the hash itself
+- `inputs`: JSON Schema defining required caller arguments
+- `outputs`: JSON Schema defining returned values
+- `steps`: Ordered list of deterministic steps:
+  - `action`: `click`, `fill`, `select_option`, `press_key`
+  - `target`: `TargetDescriptor` (role, name, anchor, hints)
+  - `checkpoint`: Expected post-action state assertion
+- `outcomes`: Declared business outcomes and their extractors
+- `recovery`: Declared retry rules for recoverable transients
+- `sensitive_names`: Fields to redact from all audit sinks
+
+---
+
+## 7. Target Resolution Ladder
+
+```
+Step 1: Hint match (cached CSS/node-id) -> verify semantic assertion
+Step 2: Role + accessible name match in active frame
+Step 3: Structural anchor match (relative to stable landmark)
+Step 4: Refusal if ambiguous (>1 match) with TARGET_AMBIGUOUS
+Step 5: Refusal if 0 matches with TARGET_NOT_FOUND
+```
+
+Drift Scoring:
+- Score 0.0: Exact semantic and cached hint match
+- Score 0.1 - 0.4: Semantic match holds, cached hint updated
+- Score 0.5 - 0.7: Anchor match holds, flags warning for maintainer
+- Score > 0.8: Resolution fails closed
+
+---
+
+## 8. Error Taxonomy & Fault Matrix
+
+| Observable State | Classification | Action Taken | Exit Code |
+|---|---|---|---|
+| `member_found` | `BUSINESS_OUTCOME` | Extract balance, write run record | 0 |
+| `member_not_found` | `BUSINESS_OUTCOME` | Return typed outcome, write record | 0 |
+| `http_502_bad_gateway` | `RECOVERABLE` | Remediate via refresh, retry step | N/A (resumes) |
+| `retry_budget_exceeded`| `HARD_FAILURE` | Escalate to human queue | 1 |
+| `target_not_found` | `HARD_FAILURE` | Record failure with screenshot | 1 |
+| `unknown_screen` | `UNEXPECTED_STATE` | Immediate stop, lock session | 2 |
+| `operator_claimed` | `LEASE_LOST` | Yield session to human | 3 |
+
+---
+
+## 9. CLI Reference
+
+### `cua discover`
+```bash
+cua discover --goal "Look up member balance" --target http://localhost:8811 --out evidence/capabilities/
+```
+Options:
+- `--goal`: Natural language description of workflow
+- `--target`: Base URL of target application surface
+- `--out`: Directory where compiled capability artifact is written
+
+### `cua replay`
+```bash
+cua replay evidence/capabilities/memberdesk.savings_balance@1.0.0.yaml --input member_id=12345
+```
+Options:
+- `--input`: Key-value pairs matching capability inputs schema
+- `--base-url`: Override base URL for target environment
+- `--headed`: Run with visible browser window for debugging
+- `--fault`: Inject fault (`session_timeout`, `bad_gateway`, `slow_render`)
+
+### `cua console`
+```bash
+cua console --target http://localhost:8811 --port 8812
+```
+Options:
+- `--target`: Application surface to supervise
+- `--port`: Port for web operator console (default 8812)
+
+---
+
+## 10. Summary for AI Agents & Tools
+When integrating CUA into an agent loop:
+- Invariants 1 and 2 guarantee that invoking a capability artifact will never spawn an uncontrolled LLM call or bypass policy chokepoints.
+- Outputs are fully typed and validated against the capability's declared schema.
+- All secrets are injected as `{$secret: ref}` references resolved at dispatch, ensuring zero credentials are leakable to calling agents or output logs.

@@ -9,36 +9,87 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+  <!-- Crawlers, SEO & AI Agent Discovery -->
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <link rel="canonical" href="https://adityamhaske.github.io/interface.ai/docs/index.html">
+  <link rel="sitemap" type="application/xml" title="Sitemap" href="../sitemap.xml">
+  <link rel="alternate" type="text/plain" href="../llms.txt" title="LLM Context for AI Agents">
+  <link rel="alternate" type="text/plain" href="../llms-full.txt" title="Full Documentation for AI Agents">
+
+  <!-- Open Graph / Social -->
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://adityamhaske.github.io/interface.ai/docs/index.html">
+  <meta property="og:title" content="Documentation — CUA Computer-Use Automation">
+  <meta property="og:description" content="Technical specifications, architecture, 10 invariants, capability schema, target resolution, and error taxonomy.">
+  <meta property="og:image" content="https://adityamhaske.github.io/interface.ai/assets/logo.svg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- JSON-LD Structured Data for Docs -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "CUA — Computer-Use Automation Technical Documentation",
+    "description": "Deterministic computer-use automation engine for regulated financial back-offices.",
+    "url": "https://adityamhaske.github.io/interface.ai/docs/index.html",
+    "author": {
+      "@type": "Organization",
+      "name": "interface.ai"
+    }
+  }
+  </script>
+
   <style>
     :root {
-      /* Financial Ledger / Bullion Gold Palette (Zero Green, Zero Blue, Zero Purple) */
-      --bg: #fcfbf9;
-      --bg-warm: #f7f5ef;
+      /* Sleek High-Contrast Monochrome Black & White Palette */
+      --bg: #ffffff;
+      --bg-warm: #fafafa;
       --bg-card: #ffffff;
-      --bg-code: #f6f3eb;
-      --bg-highlight: #f0ece1;
-      --bg-sidebar: #f8f6f0;
+      --bg-code: #f4f4f5;
+      --bg-highlight: #f4f4f5;
+      --bg-sidebar: #fafafa;
 
-      --text: #191816;
-      --text-secondary: #4d4942;
-      --text-muted: #7d786e;
-      --text-faint: #aba69b;
+      --text: #09090b;
+      --text-secondary: #3f3f46;
+      --text-muted: #71717a;
+      --text-faint: #a1a1aa;
 
-      /* Bullion Gold & Warm Amber Accents */
-      --accent: #b45309;          /* Deep rich financial gold / amber */
-      --accent-light: #d97706;    /* Warm gold */
-      --accent-glow: #f59e0b;     /* Bright gold */
-      --accent-bg: #fef3c7;       /* Soft gold tint */
-      --accent-border: #fcd34d;   /* Subtle gold border */
-      --accent-subtle: #fffbeb;   /* Warm parchment glow */
+      /* Sleek High-Contrast Black & White Monochrome */
+      --accent: #09090b;          /* Pure stark black */
+      --accent-light: #27272a;    /* Charcoal */
+      --accent-glow: rgba(0, 0, 0, 0.08);
+      --accent-bg: #f4f4f5;       /* Subtle neutral gray tint */
+      --accent-border: #e4e4e7;   /* Clean zinc border */
+      --accent-subtle: #fafafa;
 
-      --border: #e6e1d5;
-      --border-strong: #d2cbbe;
+      --btn-primary-bg: #09090b;
+      --btn-primary-text: #ffffff;
 
-      --success: #b45309;
-      --warning: #d97706;
-      --danger: #b91c1c;
-      --info: #78716c;
+      --border: #e4e4e7;
+      --border-strong: #d4d4d8;
+
+      /* 4 Subtle Accent Color Tokens (Zero Yellow/Gold) */
+      --color-mint: #059669;
+      --color-mint-bg: #ecfdf5;
+      --color-mint-border: #a7f3d0;
+
+      --color-blue: #2563eb;
+      --color-blue-bg: #eff6ff;
+      --color-blue-border: #bfdbfe;
+
+      --color-purple: #7c3aed;
+      --color-purple-bg: #f5f3ff;
+      --color-purple-border: #ddd6fe;
+
+      --color-red: #dc2626;
+      --color-red-bg: #fef2f2;
+      --color-red-border: #fecaca;
+
+      --success: #059669;
+      --warning: #71717a;
+      --danger: #dc2626;
+      --info: #2563eb;
 
       --radius: 8px;
       --radius-sm: 6px;
@@ -48,37 +99,58 @@
       --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
 
       --nav-height: 58px;
-      --sidebar-width: 260px;
+      --sidebar-width: 270px;
     }
 
-    /* Dark Mode - Obsidian Vault & Burnished Bullion Gold */
+    /* Dark Mode - Obsidian & Crisp White with Subtle Accents */
     [data-theme="dark"] {
-      --bg: #111113;
-      --bg-warm: #17171a;
-      --bg-card: #1c1c21;
-      --bg-code: #161619;
-      --bg-highlight: #26252d;
-      --bg-sidebar: #151518;
+      --bg: #09090b;
+      --bg-warm: #111114;
+      --bg-card: #141418;
+      --bg-code: #111114;
+      --bg-highlight: #18181b;
+      --bg-sidebar: #0e0e11;
 
-      --text: #f4f3f0;
-      --text-secondary: #b6b3ab;
-      --text-muted: #7e7a72;
-      --text-faint: #4f4c45;
+      --text: #fafafa;
+      --text-secondary: #d4d4d8;
+      --text-muted: #8e8e93;
+      --text-faint: #52525b;
 
-      --accent: #f59e0b;          /* Radiant bullion gold */
-      --accent-light: #fbbf24;
-      --accent-glow: #fcd34d;
-      --accent-bg: rgba(245, 158, 11, 0.12);
-      --accent-border: rgba(245, 158, 11, 0.3);
-      --accent-subtle: rgba(245, 158, 11, 0.05);
+      /* Crisp White & Charcoal Monochrome */
+      --accent: #ffffff;          /* Pure crisp white */
+      --accent-light: #f4f4f5;
+      --accent-glow: rgba(255, 255, 255, 0.15);
+      --accent-bg: rgba(255, 255, 255, 0.08);
+      --accent-border: rgba(255, 255, 255, 0.2);
+      --accent-subtle: rgba(255, 255, 255, 0.03);
 
-      --border: #2c2b33;
+      --btn-primary-bg: #ffffff;
+      --btn-primary-text: #09090b;
+
+      --border: #27272a;
       --border-strong: #3f3d48;
 
-      --success: #f59e0b;
-      --warning: #fbbf24;
+      /* 4 Subtle Accent Color Tokens - Dark Mode */
+      --color-mint: #34d399;
+      --color-mint-bg: rgba(16, 185, 129, 0.12);
+      --color-mint-border: rgba(16, 185, 129, 0.28);
+
+      --color-blue: #60a5fa;
+      --color-blue-bg: rgba(59, 130, 246, 0.12);
+      --color-blue-border: rgba(59, 130, 246, 0.28);
+
+      --color-purple: #a78bfa;
+      --color-purple-bg: rgba(139, 92, 246, 0.12);
+      --color-purple-border: rgba(139, 92, 246, 0.28);
+
+      --color-red: #f87171;
+      --color-red-bg: rgba(239, 68, 68, 0.12);
+      --color-red-border: rgba(239, 68, 68, 0.28);
+
+      --success: #34d399;
+      --warning: #a1a1aa;
       --danger: #ef4444;
-      --info: #a8a29e;
+      --info: #60a5fa;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -96,19 +168,19 @@
     nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
       height: var(--nav-height);
-      background: rgba(252, 251, 249, 0.90);
+      background: rgba(255, 255, 255, 0.88);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
       display: flex; align-items: center; justify-content: center;
-      padding: 0 clamp(24px, 4vw, 56px);
+      padding: 0 clamp(40px, 6vw, 100px);
       transition: background 0.2s ease;
     }
     [data-theme="dark"] nav {
-      background: rgba(17, 17, 19, 0.90);
+      background: rgba(9, 9, 11, 0.88);
     }
     .nav-inner {
-      max-width: 1240px; width: 100%;
+      max-width: 1280px; width: 100%;
       display: flex; align-items: center; justify-content: space-between;
     }
     .nav-brand-group {
@@ -117,7 +189,7 @@
     .brand-logo-wrap {
       display: flex; align-items: center; justify-content: center;
       width: 32px; height: 32px; border-radius: 7px;
-      background: var(--accent-bg); border: 1px solid var(--accent-border);
+      background: var(--bg-highlight); border: 1px solid var(--border);
       flex-shrink: 0;
     }
     .nav-brand-text {
@@ -131,7 +203,7 @@
       color: var(--text-muted); font-weight: 400; font-size: 13px;
     }
     .nav-right {
-      display: flex; gap: 16px; align-items: center;
+      display: flex; gap: 14px; align-items: center;
     }
     .nav-link {
       font-size: 13px; color: var(--text-secondary); text-decoration: none;
@@ -139,9 +211,10 @@
     }
     .nav-link:hover { color: var(--text); }
     .nav-link.active {
-      color: var(--accent); font-weight: 600;
-      border-bottom: 2px solid var(--accent); padding-bottom: 2px;
+      color: var(--text); font-weight: 600;
+      border-bottom: 2px solid var(--text); padding-bottom: 2px;
     }
+
     .nav-github-btn {
       display: inline-flex; align-items: center; gap: 7px;
       border: 1px solid var(--border-strong); padding: 5px 12px;
@@ -150,8 +223,8 @@
       text-decoration: none; transition: all 0.15s;
     }
     .nav-github-btn:hover {
-      border-color: var(--accent); color: var(--accent);
-      background: var(--accent-subtle);
+      border-color: var(--border-strong); color: var(--text);
+      background: var(--bg-highlight);
     }
     .theme-toggle {
       background: transparent; border: 1px solid var(--border);
@@ -164,15 +237,15 @@
       border-color: var(--border-strong); color: var(--text);
     }
 
-    /* LAYOUT: Centered with balanced side space */
+    /* LAYOUT: Centered with generous side margins from left and right */
     .layout {
       display: flex;
       padding-top: var(--nav-height);
       min-height: 100vh;
-      max-width: 1240px;
+      max-width: 1280px;
       margin: 0 auto;
-      padding-left: clamp(20px, 3.5vw, 48px);
-      padding-right: clamp(20px, 3.5vw, 48px);
+      padding-left: clamp(40px, 6vw, 100px);
+      padding-right: clamp(40px, 6vw, 100px);
     }
 
     /* SIDEBAR */
@@ -195,7 +268,7 @@
       outline: none; margin-bottom: 24px;
       transition: border-color 0.15s;
     }
-    .sidebar-filter:focus { border-color: var(--accent); }
+    .sidebar-filter:focus { border-color: var(--border-strong); }
     .sidebar-filter::placeholder { color: var(--text-faint); }
     .sidebar-group { margin-bottom: 24px; }
     .sidebar-group-label {
@@ -210,13 +283,16 @@
       transition: all 0.1s; cursor: pointer;
     }
     .sidebar-link:hover { background: var(--bg-highlight); color: var(--text); }
-    .sidebar-link.active { background: var(--accent-bg); color: var(--accent); font-weight: 500; }
+    .sidebar-link.active {
+      background: var(--accent-bg); color: var(--text);
+      font-weight: 600; border-left: 2px solid var(--text);
+    }
 
     /* MOBILE TOGGLE */
     .sidebar-toggle {
       display: none; position: fixed; bottom: 20px; left: 20px; z-index: 200;
       width: 44px; height: 44px; border-radius: 50%;
-      background: var(--accent); color: #fff; border: none;
+      background: var(--btn-primary-bg); color: var(--btn-primary-text); border: none;
       font-size: 20px; cursor: pointer;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
@@ -224,8 +300,8 @@
     /* MAIN CONTENT */
     .content {
       flex: 1; min-width: 0;
-      padding: 40px clamp(24px, 4vw, 56px) 80px;
-      max-width: 800px;
+      padding: 40px clamp(36px, 4vw, 64px) 96px;
+      max-width: 840px;
     }
 
     /* BREADCRUMB */
@@ -235,7 +311,7 @@
       margin-bottom: 8px;
     }
     .breadcrumb a { color: var(--text-muted); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
+    .breadcrumb a:hover { color: var(--text); }
 
     /* ARTICLE CONTENT */
     .article { display: none; }
@@ -265,7 +341,7 @@
     .article code {
       font-family: var(--font-mono); font-size: 0.88em;
       background: var(--bg-code); padding: 2px 6px; border-radius: 3px;
-      color: var(--accent);
+      color: var(--text); border: 1px solid var(--border);
     }
 
     .article pre {
@@ -274,7 +350,7 @@
       line-height: 1.7; overflow-x: auto; margin: 16px 0 24px;
     }
     .article pre code {
-      background: none; padding: 0; color: inherit; font-size: inherit;
+      background: none; padding: 0; color: inherit; font-size: inherit; border: none;
     }
     .article pre .comment { color: #6a9955; }
     .article pre .keyword { color: #c586c0; }
@@ -299,19 +375,19 @@
     .article tr:last-child td { border-bottom: none; }
 
     .article blockquote {
-      border-left: 3px solid var(--accent); padding: 12px 20px;
-      margin: 16px 0 24px; background: var(--accent-bg);
+      border-left: 3px solid var(--border-strong); padding: 12px 20px;
+      margin: 16px 0 24px; background: var(--bg-warm);
       border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
       font-size: 14px; color: var(--text-secondary);
     }
-    .article blockquote strong { color: var(--accent); }
+    .article blockquote strong { color: var(--text); }
 
     .callout {
       padding: 16px 20px; border-radius: var(--radius-sm);
       margin: 16px 0 24px; font-size: 13px;
     }
-    .callout-info { background: var(--bg-highlight); border-left: 3px solid var(--info); }
-    .callout-warn { background: var(--accent-bg); border-left: 3px solid var(--accent); }
+    .callout-info { background: var(--color-blue-bg); border-left: 3px solid var(--color-blue); }
+    .callout-warn { background: var(--color-purple-bg); border-left: 3px solid var(--color-purple); }
 
     /* DOC INDEX TABLE */
     .doc-index {
@@ -324,7 +400,7 @@
       cursor: pointer; transition: all 0.15s;
       background: var(--bg-card);
     }
-    .doc-index li:hover { border-color: var(--accent-border); background: var(--accent-bg); }
+    .doc-index li:hover { border-color: var(--border-strong); background: var(--bg-highlight); }
     .doc-index .doc-title { font-weight: 500; font-size: 14px; color: var(--text); }
     .doc-index .doc-path { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
 
@@ -332,12 +408,11 @@
       font-family: var(--font-mono); font-size: 11px; font-weight: 600;
       padding: 2px 8px; border-radius: 4px; white-space: nowrap;
     }
-    .badge-success { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent-border); }
-    .badge-outcome { background: var(--bg-warm); color: var(--text); border: 1px solid var(--border-strong); }
-    .badge-human { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent-border); }
-    .badge-failed { background: #fee2e2; color: var(--danger); border: 1px solid #fca5a5; }
-    [data-theme="dark"] .badge-failed { background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.3); }
-    .badge-info { background: var(--bg-highlight); color: var(--text-secondary); border: 1px solid var(--border); }
+    .badge-success { background: var(--color-mint-bg); color: var(--color-mint); border: 1px solid var(--color-mint-border); }
+    .badge-outcome { background: var(--bg-warm); color: var(--text-secondary); border: 1px solid var(--border); }
+    .badge-human { background: var(--color-purple-bg); color: var(--color-purple); border: 1px solid var(--color-purple-border); }
+    .badge-failed { background: var(--color-red-bg); color: var(--color-red); border: 1px solid var(--color-red-border); }
+    .badge-info { background: var(--color-blue-bg); color: var(--color-blue); border: 1px solid var(--color-blue-border); }
 
     @media (max-width: 860px) {
       .sidebar {
@@ -468,7 +543,7 @@
 <div class="article active" id="overview">
   <div class="breadcrumb">DOCS</div>
   <h1>Documentation</h1>
-  <p class="lead">Documentation for the Computer-Use Automation system. Every statement describes what is built, or is marked explicitly as planned. New here? Start with <a href="#" onclick="show('quickstart'); return false" style="color: var(--accent)">Quick Start</a>, then <a href="#" onclick="show('demo'); return false" style="color: var(--accent)">Demo Walkthrough</a>.</p>
+  <p class="lead">Documentation for the Computer-Use Automation system. Every statement describes what is built, or is marked explicitly as planned. New here? Start with <a href="#" onclick="show('quickstart'); return false" style="color: var(--text); font-weight: 600; text-decoration: underline;">Quick Start</a>, then <a href="#" onclick="show('demo'); return false" style="color: var(--text); font-weight: 600; text-decoration: underline;">Demo Walkthrough</a>.</p>
 
   <h2>Getting Started</h2>
   <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">What this is, how to run it, and how to configure a model — including a local one.</p>
@@ -1395,7 +1470,12 @@ cua replay &lt;artifact&gt; --fault session_timeout           <span class="comme
 
   <footer style="margin-top: 64px; padding-top: 24px; padding-bottom: 24px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
     <span>CUA &middot; Computer-Use Automation &middot; Proprietary and Confidential &middot; All Rights Reserved</span>
-    <a href="https://github.com/adityamhaske/interface.ai" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: none; font-weight: 500;">GitHub Repository &rarr;</a>
+    <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+      <a href="../sitemap.xml" style="color: var(--text-muted); text-decoration: none;">Sitemap</a>
+      <a href="../llms.txt" style="color: var(--color-blue); font-family: var(--font-mono); text-decoration: none;">llms.txt</a>
+      <a href="../llms-full.txt" style="color: var(--text-muted); font-family: var(--font-mono); text-decoration: none;">Full Markdown</a>
+      <a href="https://github.com/adityamhaske/interface.ai" target="_blank" rel="noopener" style="color: var(--text); text-decoration: none; font-weight: 500;">GitHub Repository &rarr;</a>
+    </div>
   </footer>
 </main>
 </div>

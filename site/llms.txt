@@ -1,0 +1,53 @@
+# Computer-Use Automation System (CUA)
+> Deterministic Execution Engine for Regulated Banking Applications.
+> Core Thesis: Discovery is probabilistic. Execution is deterministic.
+
+## Summary
+CUA is an enterprise computer-use automation system engineered for regulated financial back-offices (banks and credit unions). An LLM is permitted to explore an arbitrary legacy application with no API exactly once. That exploration trace is compiled into an immutable, typed, content-hashed Capability Artifact. All subsequent runs execute deterministically with zero model calls in the loop.
+
+- Full Documentation: https://adityamhaske.github.io/interface.ai/docs/index.html
+- Complete Single-File Context: https://adityamhaske.github.io/interface.ai/llms-full.txt
+- GitHub Repository: https://github.com/adityamhaske/interface.ai
+- License: Proprietary & Confidential
+
+## The 10 Invariants
+1. Replay never calls or imports the LLM: Replay is purely deterministic with 0 model calls.
+2. No action reaches a driver without policy authorization: Action -> TargetResolver -> PolicyEngine -> SurfaceDriver.
+3. Target identity is a semantic TargetDescriptor: Uses accessible names and structural anchors, never brittle CSS/XPath.
+4. Human input cannot bypass policy or evidence: Operator input goes through the same chokepoint and evidence logger.
+5. Unknown states fail closed: Undeclared screens trigger UNEXPECTED_STATE and immediate human handoff.
+6. Every sink is redacted: Secrets and PII are redacted from logs, records, screenshots, and prompts.
+7. Business outcomes are not failures: 'member_not_found' is a valid business return, not a defect.
+8. Automation may only act while it holds the session: Leases and epochs prevent collisions with human operators.
+9. Capabilities are immutable: Versioned, frozen, and SHA-256 content-hashed.
+10. domain/ is pure: Zero I/O, zero network, zero browser dependencies.
+
+## Architecture Pipeline
+1. Goal + Surface Target: What to accomplish in an application with no API.
+2. LLM Discovery: Agent explores live UI once; captures trace.
+3. Capability Artifact: Trace compiled into typed, sealed, immutable artifact.
+4. Deterministic Replay: 100% deterministic re-execution; 0 models.
+5. Typed Audit Output: Complete audit trail, structured outputs, evidence files.
+
+## Documentation Index
+- [Overview](https://adityamhaske.github.io/interface.ai/docs/index.html#overview): System introduction and key principles.
+- [Quick Start](https://adityamhaske.github.io/interface.ai/docs/index.html#quickstart): Setup, environment variables, and offline verification.
+- [Demo Walkthrough](https://adityamhaske.github.io/interface.ai/docs/index.html#demo): 12-stage verified execution story.
+- [System Architecture](https://adityamhaske.github.io/interface.ai/docs/index.html#architecture): Monorepo structure, package map, and data flow.
+- [The Ten Invariants](https://adityamhaske.github.io/interface.ai/docs/index.html#invariants): Mechanical rules and enforcing test contracts.
+- [Capability Schema](https://adityamhaske.github.io/interface.ai/docs/index.html#capability_schema): JSON Schema, inputs, outputs, recovery rules, and checkpoints.
+- [Target Resolution](https://adityamhaske.github.io/interface.ai/docs/index.html#target_resolution): Semantic ladder, scoring, drift calculation, and ambiguity refusal.
+- [Policy & Redaction](https://adityamhaske.github.io/interface.ai/docs/index.html#policy_engine): Chokepoint enforcement, risk tiers, and secret redaction.
+- [Human-in-the-Loop Console](https://adityamhaske.github.io/interface.ai/docs/index.html#hitl_console): Lease tokens, live takeover, and re-anchor resume.
+- [Error Taxonomy](https://adityamhaske.github.io/interface.ai/docs/index.html#error_taxonomy): Classification into business outcome, recoverable, hard failure, unexpected state.
+- [CLI Reference](https://adityamhaske.github.io/interface.ai/docs/index.html#cli_reference): `cua discover`, `cua replay`, `cua console`, `cua evaluate`.
+- [Fault & Test Matrix](https://adityamhaske.github.io/interface.ai/docs/index.html#test_matrix): Offline test suite and fault injection verification.
+
+## Unified CLI Commands
+```bash
+./start.sh                 # Default: setup venv + run the full 12-stage demo
+./start.sh ui              # Launch HITL Web Console (:8812) + Mock Bank (:8811)
+./start.sh check           # Run CI checks: lint + strict typecheck + invariants + tests
+./start.sh test            # Run offline test suite (0 API keys, 0 network)
+cua replay <artifact>      # Replay a compiled capability deterministically
+```

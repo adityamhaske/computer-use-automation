@@ -221,6 +221,11 @@ make demo         # the full end-to-end story
   isn't visible locally.
 - **Document what you mock.** Deliberate stubs are fine and expected; undocumented ones read as
   unfinished work.
+- **Keep documentation synchronized with code.** Whenever you make major changes to architecture,
+  invariants, CLI commands, capability schemas, or runtime behavior, you MUST update the documentation
+  website under `site/` (`site/index.html`, `site/docs/index.html`, `site/llms.txt`, and `site/llms-full.txt`).
+  The documentation website deployed via GitHub Pages is the live single source of truth for operators,
+  developers, and AI agents.
 
 ## Scope discipline
 
