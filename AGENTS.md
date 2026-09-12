@@ -27,6 +27,7 @@ you are probably about to make the system's core claim untrue. Stop and raise it
 Each is mechanically enforced. The enforcing test is named so you can see it fail on purpose.
 
 ### 1. Replay never calls or imports the LLM
+
 `cua.replay` may not import `cua.agent`, `httpx`, or any model client — directly or transitively.
 
 *Why:* it is the whole thesis. A replay that can quietly ask a model for help is not deterministic,
@@ -39,9 +40,10 @@ to make the suite green takes a deliberate edit; and
 model wired at all, proving the rule isn't being routed around at runtime.
 
 ### 2. No action reaches a driver without policy authorization
+
 The only path to a surface, for every actor, is:
 
-```
+```text
 Action ──► TargetResolver ──► PolicyEngine ──► SurfaceDriver
        (resolve or refuse)    (authorize)      (dispatch)
 ```
@@ -65,6 +67,7 @@ take the same path, which is how we know production behaves like the tests.
 dispatch event in a run record must have a matching authorization event).
 
 ### 3. Target identity is a semantic `TargetDescriptor`, never a raw CSS selector
+
 Artifacts describe controls by role, accessible name, scope, structural anchor, and ordinal.
 Surface-specific data (CSS paths, node ids) may appear **only** inside `TargetDescriptor.hints`, and
 a hint is an *unverified cache*: it is accepted only if the node it resolves to also satisfies the
@@ -78,6 +81,7 @@ rebranded tenant doesn't require a re-record.
 succeeds via `structural_anchor`).
 
 ### 4. Human input cannot bypass policy or evidence
+
 The operator console never injects into the page. It submits `raw_input` actions to the
 `SessionBroker`, which runs them through the same chokepoint under the **`HUMAN` policy profile**.
 
@@ -91,6 +95,7 @@ still apply.
 `tests/integration/test_handoff.py::test_human_input_goes_through_policy`.
 
 ### 5. Unknown states fail closed
+
 If the observed UI matches no declared precondition, checkpoint, outcome, or recovery rule, it is
 `UNEXPECTED_STATE` and the run **stops**. If a target resolves ambiguously, the resolver **refuses**
 with `TARGET_AMBIGUOUS`. Never proceed on the assumption that the click probably worked.
@@ -102,6 +107,7 @@ that acts on a screen it doesn't understand is an incident.
 `tests/unit/test_resolver.py::test_ambiguity_is_refused_not_tiebroken`.
 
 ### 6. Every sink is redacted
+
 Logs, artifacts, evidence files, screenshots, **and outbound LLM prompts**. Secrets are
 `{$secret: ref}` references resolved at dispatch time and never written anywhere. A capability's
 `sensitive: true` declarations reach every sink through `Capability.sensitive_names`.
@@ -117,11 +123,12 @@ sink that can be. Prefer signatures that make the unredacted path unrepresentabl
 sinks).
 
 ### 7. Business outcomes are not failures
+
 "No such member" is a legitimate answer the caller needs, not a crash. Every observable condition
 must be classified into exactly one of:
 
 | Class | Meaning | Terminal? |
-|---|---|---|
+| --- | --- | --- |
 | `BUSINESS_OUTCOME` | A real answer from the application (`member_not_found`, `account_closed`) | yes |
 | `RECOVERABLE` | A bounded, declared transient condition (`transient_load`, `session_expired`) | no — remediate and retry, then `RECOVERY_EXHAUSTED` |
 | `HARD_FAILURE` | A debuggable defect (`target_not_found`, `checkpoint_failed`) | yes |
@@ -134,6 +141,7 @@ shrug.
 *Enforced by:* `tests/integration/test_fault_matrix.py`.
 
 ### 8. Automation may only act while it holds the session
+
 Every automation dispatch asks the lease two questions: **who holds this session**, and **has it
 changed hands since this run was authorized**. Either answer can refuse the dispatch with
 `LEASE_LOST`.
@@ -155,6 +163,7 @@ that a caller can silently decline is not a guarantee.
 `::test_a_run_authorized_before_the_handoff_cannot_resume_on_its_old_epoch`.
 
 ### 9. Capabilities are immutable
+
 A `Capability` at `id@version` is frozen and content-hashed. Anything that changes because you *ran*
 it lives in a separate document: `RunRecord`, `CapabilityEvaluation`, `CapabilityApproval`.
 
@@ -165,6 +174,7 @@ ran?" stops being answerable.
 `::test_tampering_is_detected`, and `tests/integration/test_catalog.py``::test_an_artifact_edited_in_place_is_refused` -- the catalog refuses to serve one.
 
 ### 10. `domain/` is pure
+
 No I/O, no network, no browser, no clock. `cua.domain` imports nothing else from `cua`.
 
 *Why:* the artifact schema is the centerpiece of this system. It has to be reasonable about, and
@@ -177,7 +187,7 @@ testable, in isolation.
 ## Architecture map
 
 | Package | Owns | May import |
-|---|---|---|
+| --- | --- | --- |
 | `cua/domain` | Types only: `Capability`, `TargetDescriptor`, `Action`, `UiSnapshot`, `RunRecord`, taxonomy | nothing from `cua` |
 | `cua/perception` | Normalizing a raw surface observation into `UiSnapshot`; fingerprinting | `domain` |
 | `cua/targeting` | The resolution ladder, scoring, ambiguity, drift | `domain`, `perception` |

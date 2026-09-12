@@ -1,5 +1,6 @@
 # Computer-Use Automation System (CUA)
-### Deterministic Execution Engine for Regulated Banking Applications
+
+## Deterministic Execution Engine for Regulated Banking Applications
 
 > **Discovery is probabilistic. Execution is deterministic.**
 
@@ -11,13 +12,13 @@ An LLM works out how to accomplish a goal in a legacy application that has no AP
 
 Built for mission-critical back-office applications at banks and credit unions, where the only path to automation is driving the live UI with strict regulatory compliance, complete auditability, and zero data leakage.
 
-```
+```text
 Goal + Target ──► LLM Discovery Run ──► Capability Artifact ──► Deterministic Replay ──► Typed Outputs
                        (once)             (reviewed, sealed)        (every time after)
                                                                             │
-                                                              stuck? ───────┴──► Human takes the
-                                                                                 live session, acts,
-                                                                                 hands it back
+                                                               stuck? ───────┴──► Human takes the
+                                                                                  live session, acts,
+                                                                                  hands it back
 ```
 
 ---
@@ -51,7 +52,7 @@ make demo           # the complete 12-stage story in ~60 seconds
 `make demo` boots the mock back-office and executes all 12 stages sequentially, writing evidence to [`evidence/`](evidence/):
 
 | # | Stage | Observable Behavior | Contract / Result |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **1** | Mock Back-Office Running | Hostile frameset application, zero test IDs | `READY` |
 | **2** | LLM Discovery | Agent drives live UI to goal, discovering path | `TRACE` |
 | **3** | Capability Compiled | Typed I/O, semantic descriptors, content hash | `SEALED` |
@@ -106,6 +107,7 @@ cua catalog invoke lookup_member --input member_id=12345 --base-url http://local
 ```
 
 ### Exit Code Contract
+
 * `0`: Success **and** valid business outcome (`member_not_found`, `account_closed`).
 * `1`: Hard failure / defect (`target_not_found`, `checkpoint_failed`).
 * `2`: Escalation required (`unexpected_state`, `recovery_exhausted`).
@@ -140,7 +142,7 @@ In enterprise banking, different tenant institutions often run the same core bac
 
 ## Repository Structure
 
-```
+```text
 site/                  Interactive documentation and architecture portal (GitHub Pages)
 src/cua/
   domain/              Pure domain types: Capability, Action, TargetDescriptor, RunRecord
@@ -167,7 +169,7 @@ tests/                 Unit, integration, contract, invariant, and fault matrix 
 ## Documentation Index
 
 | Resource | Purpose |
-|---|---|
+| --- | --- |
 | [**Interactive Documentation Portal**](https://adityamhaske.github.io/interface.ai/) | **Complete web documentation, interactive execution pipeline, and guides** |
 | [`REPORT.md`](REPORT.md) | Architectural trade-offs, design rationale, and technical retrospective |
 | [`AGENTS.md`](AGENTS.md) | Working agreement, invariant specifications, and test contracts |
@@ -181,7 +183,7 @@ tests/                 Unit, integration, contract, invariant, and fault matrix 
 
 ## Proprietary Notice & License
 
-**PROPRIETARY AND CONFIDENTIAL**
+### Proprietary and Confidential
 
 Copyright © 2026 Aditya Mhaske / interface.ai. All rights reserved.
 
