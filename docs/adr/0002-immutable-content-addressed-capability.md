@@ -50,3 +50,7 @@ files on disk that is a trivially acceptable cost; at scale it is the normal sha
 
 **Also good, unexpectedly.** Immutability makes the multi-tenant story cleaner: a tenant cannot
 "drift" a shared capability by using it, only by declaring an explicit overlay.
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

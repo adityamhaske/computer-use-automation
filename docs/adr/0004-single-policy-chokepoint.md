@@ -77,3 +77,7 @@ rather than pretending otherwise, and say so as a stated limit in REPORT.md §6.
 **Cost.** One extra indirection on every action, and the console is harder to build than direct
 injection. Both are worth it; the second is the reason Phase 09 builds the control model headless
 first and adds pixel streaming last.
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

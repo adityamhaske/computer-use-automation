@@ -70,3 +70,7 @@ review, so the cost falls mostly on review rather than authoring.
 *actually* wrong. A capability with sloppy detectors will over-report it. That is the correct
 failure direction — noisy and safe beats silent and wrong — but it does mean the metric to watch is
 `unexpected_state_rate` per capability, which `CapabilityEvaluation` records.
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

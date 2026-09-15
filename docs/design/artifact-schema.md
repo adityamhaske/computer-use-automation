@@ -178,3 +178,7 @@ fooled (ADR 0004). They are combined conservatively: the highest tier wins.
 
 **What is deliberately not here:** run counts, stability scores, approval state, last-run timestamps,
 tenant specifics. All of it lives in the sibling documents above.
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

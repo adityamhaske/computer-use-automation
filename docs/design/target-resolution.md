@@ -132,3 +132,7 @@ stable to anchor to. Cheaper to find in a spike than in Phase 08.
 
 `tests/integration/test_variant_b.py` asserts case A succeeds without an overlay and case B fails
 closed without one and succeeds with one. The `cross_tenant` eval measures both.
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

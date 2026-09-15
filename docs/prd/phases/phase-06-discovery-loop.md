@@ -80,3 +80,7 @@ defensible alone; together they turn a rule you can check into a rule you have t
 | Model loops or wanders | Hard budgets: max steps, wall clock, tokens; dead-end detection on no-progress. |
 | Recorded fixtures drift from the live loop and silently stop testing production | Regenerate fixtures from a live run via script; a contract test asserts fixture shape matches the live `LlmPort` schema. |
 | No API key available at build time | Everything else is buildable and testable offline; the live run is a discrete, cheap final step. It must happen before submission. |
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

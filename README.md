@@ -42,17 +42,17 @@ Or the two commands the system is actually built around:
 make app &         # the hostile mock back-office on :8811
 
 # 1. Discover — drive a live surface with a model until the goal is met, and record what worked.
-cua discover --goal "Look up member 12345 and read their current savings balance" \
-             --target http://127.0.0.1:8811/
+#    Needs a model in .env; everything below this line does not.
+make discover
 
 # 2. Replay the compiled artifact deterministically, with an input discovery never saw.
 cua replay evidence/capabilities/memberdesk.savings_balance@1.0.0.yaml \
-           --input member_number=67890 --base-url http://127.0.0.1:8811 --sign-in
+           --input member_number=67890 --base-url http://localhost:8811 --sign-in
 #   -> SUCCESS - 2 output(s)   {"savings_balance": "18730.00", ...}
 
 # A member who does not exist is an answer, not a crash.
 cua replay evidence/capabilities/corebank.member.savings_balance@1.0.0.yaml \
-           --input member_id=99999 --base-url http://127.0.0.1:8811 --sign-in
+           --input member_id=99999 --base-url http://localhost:8811 --sign-in
 #   -> BUSINESS OUTCOME - member_not_found   (exit 0)
 ```
 
@@ -64,7 +64,7 @@ fault armed, so a real intervention is waiting when the page opens:
 ```bash
 cua console --capability corebank.member.savings_balance@1.0.0 \
             --arm-fault undeclared_dialog --input member_id=12345 --sign-in
-# open http://127.0.0.1:8812 → claim it → click the page → hand it back
+# then open the console it prints → claim it → click the page → hand it back
 ```
 
 The operator's clicks travel the same policy chokepoint as the machine's. From

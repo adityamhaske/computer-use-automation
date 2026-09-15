@@ -107,3 +107,7 @@ screen and continues the run on the operator's session — skipping the entrypoi
 the epoch the handoff produced, and carrying forward outputs and spent recovery attempts. For a while
 `reconcile()` returned a plan that no caller consumed, which meant the system could pause and cede
 control but never finish.
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

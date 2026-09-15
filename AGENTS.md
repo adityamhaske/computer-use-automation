@@ -263,3 +263,7 @@ multi-tenant infrastructure**. Single process, files on disk. Multi-tenancy is m
 If a change adds infrastructure, it needs to justify itself against the alternative of not existing.
 The core abstractions are designed so that scaling out later is possible; building that now is not
 the goal.
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

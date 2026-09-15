@@ -40,3 +40,7 @@ checked before anything ships.
   intervention rows were caught exactly this way: keyboard-reachable and clickable, but reporting no
   accessible name to the tree, meaning "keyboard support" was real but "screen-reader support" for
   that specific control was not.
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

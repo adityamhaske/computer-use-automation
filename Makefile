@@ -84,6 +84,12 @@ console: ## Run the human operator console
 demo: ## THE GRADING STORY: discover -> artifact -> replay -> outcome -> fault -> escalate -> takeover -> resume
 	$(PY) -m cua.cli.main demo
 
+.PHONY: discover
+discover: ## Live LLM-driven discovery against a running `make app` -- needs a model in .env
+	$(PY) -m cua.cli.main discover --sign-in \
+	  --goal "Look up member 12345 and report their savings account balance, the account status, and the as-of date." \
+	  --target http://127.0.0.1:$(MOCK_APP_PORT)
+
 .PHONY: report
 report: ## Render REPORT.md to site/report/ as three pages, a PDF and a Markdown download
 	$(PY) scripts/build_report_page.py

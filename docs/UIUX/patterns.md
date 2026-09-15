@@ -66,3 +66,7 @@ render it with real indentation and light syntax coloring (see `util.js`'s `json
 monospace panel with its own scroll — never a raw, unformatted dump, and never truncated without
 saying so. A list-then-detail layout (narrow list on the left, detail on the right, stacking on
 narrow screens) is the default shape for "browse many records, inspect one closely."
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

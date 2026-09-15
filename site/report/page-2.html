@@ -142,7 +142,7 @@ tomorrow. <strong><code>cua.targeting</code> and <code>cua.perception</code> may
 <code>surfaces/desktop_uia/</code> is an interface-only stub documenting the UIA→<code>UiSnapshot</code> mapping.</p>
 <p>Tenants are an <strong>overlay, never a fork</strong>: <code>TenantBinding</code> supplies vars and per-step overrides,
 resolved at load into an effective capability whose content hash covers the overlay.</p>
-<p>The no-CSS claim is <strong>measured</strong>, in <a href="evidence/evals/cross_tenant.md"><code>evidence/evals/cross_tenant.md</code></a>.
+<p>The no-CSS claim is <strong>measured</strong>, in <a href="https://github.com/adityamhaske/interface.ai/blob/main/evidence/evals/cross_tenant.md"><code>evidence/evals/cross_tenant.md</code></a>.
 Variant B relabels controls <em>and</em> restyles markup, so every <code>hints.css</code> in the artifact names a
 selector that does not exist there — and the runs succeed anyway: 100%, zero wrong actions. Markup
 churn is carried by <code>semantic_exact</code>; rebranding by <code>structural_anchor</code> plus the overlay. Both rungs

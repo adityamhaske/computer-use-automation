@@ -22,3 +22,7 @@ Phases 10 and 11 are the stretch goals and are droppable, in that order.
 | [12](phase-12-docs-evidence.md) | Docs, evidence, submission | |
 
 ⭐ = disproportionate depth. ⭐⭐ = the pieces the graders said are most often faked.
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

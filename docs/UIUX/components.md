@@ -101,3 +101,7 @@ Inline SVG, stroke-based, one consistent stroke weight across the whole icon set
 author or vendor the dozen or so you actually need (`src/cua/hitl/console/static/icons.js` is the
 reference: plain exported SVG strings, no build step, no CDN dependency, renders identically
 offline).
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

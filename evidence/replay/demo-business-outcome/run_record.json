@@ -2,7 +2,7 @@
   "run_id": "demo-business-outcome",
   "kind": "replay",
   "capability_ref": "corebank.member.savings_balance@1.0.0",
-  "capability_content_hash": "sha256:e1707a18428653e3fd9ba2b2f2624f7c8bb1c8b34dba3efb2fb427e925f2ff8a",
+  "capability_content_hash": "sha256:74bb8641b3bfc34c4513983d5868af52ad40e02c561d8535252c164f63e3a15e",
   "tenant": null,
   "goal": null,
   "inputs": {
@@ -19,7 +19,7 @@
       "policy_decision": "safe (default)",
       "observation": null,
       "resolution": null,
-      "started_at": "2026-09-15T12:39:29.513209Z",
+      "started_at": "2026-09-15T12:51:09.097062Z",
       "duration_ms": 10,
       "recovery_rule_applied": null,
       "error_code": null,
@@ -44,8 +44,8 @@
         "ambiguity_score": null,
         "fingerprint_matched": null
       },
-      "started_at": "2026-09-15T12:39:29.528651Z",
-      "duration_ms": 2,
+      "started_at": "2026-09-15T12:51:09.114275Z",
+      "duration_ms": 3,
       "recovery_rule_applied": null,
       "error_code": null,
       "snapshot_ref": null,
@@ -69,7 +69,7 @@
         "ambiguity_score": null,
         "fingerprint_matched": null
       },
-      "started_at": "2026-09-15T12:39:29.610296Z",
+      "started_at": "2026-09-15T12:51:09.200543Z",
       "duration_ms": 0,
       "recovery_rule_applied": null,
       "error_code": null,
@@ -81,7 +81,7 @@
     "status": "business_outcome",
     "capability_id": "corebank.member.savings_balance",
     "capability_version": "1.0.0",
-    "run_id": "rep-9cc71728a8",
+    "run_id": "rep-6b5f34f392",
     "outputs": {},
     "outcome": {
       "code": "member_not_found",
@@ -93,7 +93,7 @@
     "intervention": null,
     "steps_executed": 2,
     "steps_total": 5,
-    "duration_ms": 140,
+    "duration_ms": 147,
     "drift_score": 0.0,
     "strategy_mix": {
       "semantic_exact": 2
@@ -101,8 +101,8 @@
     "recovery_attempts": 0,
     "evidence_ref": "evidence/replay/demo-business-outcome"
   },
-  "started_at": "2026-09-15T12:39:29.490635Z",
-  "duration_ms": 140,
+  "started_at": "2026-09-15T12:51:09.073667Z",
+  "duration_ms": 147,
   "evidence_ref": "evidence/replay/demo-business-outcome",
   "model_name": null,
   "tokens_used": null,

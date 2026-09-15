@@ -83,7 +83,11 @@ class LlmError(RuntimeError):
 
 @dataclass
 class OpenRouterLlm:
-    """An OpenAI-compatible chat-completions client (OpenRouter, Omniroute, or similar)."""
+    """An OpenAI-compatible chat-completions client.
+
+    Works against OpenRouter, a self-hosted gateway, or anything else that speaks the same
+    /chat/completions shape.
+    """
 
     api_key: str = field(default_factory=lambda: os.environ.get("OPENROUTER_API_KEY", ""))
     base_url: str = field(

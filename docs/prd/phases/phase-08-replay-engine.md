@@ -82,3 +82,7 @@ reporting a confident, wrong diagnosis. It now reports that the remedy could not
 | Hidden nondeterminism (dict ordering, timing, retries) | Determinism test compares full traces across N runs; scoring is pure; ties break on document order. |
 | Waits that mask real failures | Timeouts are declared per step and a timeout is a *result*, not a retry. |
 | Recovery loops | `max_attempts` is mandatory in the schema — a recovery rule without one fails validation. |
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

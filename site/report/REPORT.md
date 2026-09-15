@@ -231,7 +231,7 @@ LLM fallback on replay failure — would breach the no-model-in-replay invariant
 policed path.
 
 **The discovery evidence is a real model run.** [`evidence/discovery/disc-0a7e7b7ccd/`](evidence/discovery/disc-0a7e7b7ccd/)
-is a genuine LLM-driven run against the live frameset app, routed through a local OmniRoute gateway:
+is a genuine LLM-driven run against the live frameset app, routed through a self-hosted OpenAI-compatible gateway:
 six model calls, 10,215 tokens, each carrying the gateway's own provider and request id so the run
 can be checked against the gateway's logs rather than taken on trust. The model signed in, searched,
 read the balance, status and as-of date off the member record and stopped -- three effective steps.
@@ -269,3 +269,7 @@ and `replay_gates` are parsed and displayed but not yet read by the executor.
 | The invariants, enforced | [`.importlinter`](.importlinter), [`tests/invariants/`](tests/invariants/) |
 | The whole story, one command | `make demo` |
 | The numbers behind §3 and §4 | [`evidence/evals/`](evidence/evals/) |
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

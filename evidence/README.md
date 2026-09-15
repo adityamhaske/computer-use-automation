@@ -62,7 +62,7 @@ evals-runs/          the traces behind those reports (gitignored: 16MB of workin
 ```
 
 `discovery/` holds two runs, and the difference matters. `disc-0a7e7b7ccd/` is the one the published
-artifact was compiled from: a real model, via a local OmniRoute gateway, driving the app to the goal.
+artifact was compiled from: a real model, via a self-hosted OpenAI-compatible gateway, driving the app to the goal.
 Its `run_record.json` carries a non-null `tokens_used`, and every `llm_call` in its trace carries the
 gateway's `provider` and `request_id` -- issued by something other than this process, so the run can
 be verified rather than believed.
@@ -141,3 +141,7 @@ with fabricated data; no real credentials or personal information exist anywhere
 Over-redaction is a failure too. Capability references (`id@version`) once matched the email
 pattern and were being masked, which made run records unable to say which capability had run.
 `tests/invariants/test_redaction.py` now asserts both directions.
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

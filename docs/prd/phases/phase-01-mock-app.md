@@ -78,3 +78,7 @@ VARIANT B  2. Per-frame getFullAXTree ...... 45 nodes in 'content'
 |---|---|
 | Over-building the mock instead of the system | Time-box. It is a fixture, not a deliverable. Five screens, four faults. |
 | So hostile the semantic tree is useless | Phase 03 spike measures this immediately; the driver may enrich nodes from table headers. |
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

@@ -143,3 +143,7 @@ Stated here rather than left to be discovered:
   observed regression, which is the honest limit of a self-contained target.
 - **Wrong-action rate rests on seeded ground truth.** Against a real system it would need a
   reconciliation source; the metric is the same, the source of truth is harder.
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

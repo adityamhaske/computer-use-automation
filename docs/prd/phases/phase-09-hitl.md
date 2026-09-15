@@ -85,3 +85,7 @@ along. The caller knows where it escalated and has to say so.
 ---
 
 **Superseded where it differs from what shipped.** This is the phase *plan*; [`docs/design/control-transfer.md`](../../design/control-transfer.md) describes the built system. The notable difference: continuous CDP screencast streaming was cut, and resume is executed by `ReplayExecutor.resume()` rather than left as a computed plan.
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

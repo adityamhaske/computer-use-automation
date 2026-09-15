@@ -76,3 +76,7 @@ itself" argument applies to the frontend).
 - [ ] No fabricated data — every number/label traces to a real value or is honestly omitted
 - [ ] `make check` (or the surface's equivalent) still passes — a UI change that breaks a backend
       test usually means a contract was touched, not just pixels
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

@@ -62,3 +62,7 @@ A recurring escalation is a capability defect, not an operations problem. The us
 - Screen seen repeatedly but undeclared → add an `outcomes` or `recovery` entry
 - `TARGET_AMBIGUOUS` on the same step → tighten the descriptor (add a scope or an anchor)
 - Rising `drift_score` for one tenant → add a `TenantBinding` overlay, or re-record
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

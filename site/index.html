@@ -82,21 +82,20 @@
       --border: #e4e4e7;
       --border-strong: #d4d4d8;
 
-      /* Accent tokens. The names are historical; the values are not blue or purple.
-         Hue is reserved for meaning here exactly as in the console: emerald for healthy,
-         amber for attention, brick for failure, and a warm graphite for everything that
-         is merely in progress. Neutrals are warm (hue ~35), not cool blue-grey. */
+      /* Hue carries meaning here, exactly as it does in the operator console: emerald for
+         healthy, amber for attention, brick for failure, warm graphite for anything merely
+         in progress. Every neutral is warm (hue ~35). */
       --color-mint: #157a4a;
       --color-mint-bg: #e7f2ea;
       --color-mint-border: #c4e2d1;
 
-      --color-blue: #6b665d;   /* warm graphite — see the note above */
-      --color-blue-bg: #f2f0ec;
-      --color-blue-border: #ddd8d0;
+      --color-neutral: #6b665d;   /* warm graphite */
+      --color-neutral-bg: #f2f0ec;
+      --color-neutral-border: #ddd8d0;
 
-      --color-purple: #146b52;
-      --color-purple-bg: #e8f2ed;
-      --color-purple-border: #cfe4d9;
+      --color-seal: #146b52;
+      --color-seal-bg: #e8f2ed;
+      --color-seal-border: #cfe4d9;
 
       --color-red: #9c3428;
       --color-red-bg: #f9eae7;
@@ -151,13 +150,13 @@
       --color-mint-bg: rgba(87, 189, 139, 0.14);
       --color-mint-border: rgba(87, 189, 139, 0.28);
 
-      --color-blue: #9d968c;
-      --color-blue-bg: rgba(157, 150, 140, 0.14);
-      --color-blue-border: rgba(157, 150, 140, 0.28);
+      --color-neutral: #9d968c;
+      --color-neutral-bg: rgba(157, 150, 140, 0.14);
+      --color-neutral-border: rgba(157, 150, 140, 0.28);
 
-      --color-purple: #5cbf99;
-      --color-purple-bg: rgba(92, 191, 153, 0.14);
-      --color-purple-border: rgba(92, 191, 153, 0.28);
+      --color-seal: #5cbf99;
+      --color-seal-bg: rgba(92, 191, 153, 0.14);
+      --color-seal-border: rgba(92, 191, 153, 0.28);
 
       --color-red: #e08b80;
       --color-red-bg: rgba(224, 139, 128, 0.13);
@@ -227,6 +226,10 @@
       align-items: center;
       gap: 10px;
       text-decoration: none;
+      /* Without this the anchor itself resolves to the UA default link blue. The child spans
+         happen to cover it today, so it renders correctly and is still wrong -- any text added
+         directly to the link would come out blue, in a palette that has no blue in it. */
+      color: inherit;
     }
 
     .brand-logo-wrap {
@@ -492,9 +495,9 @@
     }
 
     .tier-pill-discovery {
-      background: var(--color-blue-bg);
-      color: var(--color-blue);
-      border: 1px solid var(--color-blue-border);
+      background: var(--color-neutral-bg);
+      color: var(--color-neutral);
+      border: 1px solid var(--color-neutral-border);
     }
 
     .tier-pill-replay {
@@ -592,16 +595,16 @@
       border: 1px solid var(--color-mint-border);
     }
 
-    .pipe-badge-blue {
-      background: var(--color-blue-bg);
-      color: var(--color-blue);
-      border: 1px solid var(--color-blue-border);
+    .pipe-badge-neutral {
+      background: var(--color-neutral-bg);
+      color: var(--color-neutral);
+      border: 1px solid var(--color-neutral-border);
     }
 
-    .pipe-badge-purple {
-      background: var(--color-purple-bg);
-      color: var(--color-purple);
-      border: 1px solid var(--color-purple-border);
+    .pipe-badge-seal {
+      background: var(--color-seal-bg);
+      color: var(--color-seal);
+      border: 1px solid var(--color-seal-border);
     }
 
     .pipe-badge-red {
@@ -659,13 +662,13 @@
     }
 
     .bridge-pill {
-      background: var(--color-purple-bg);
-      border: 1px solid var(--color-purple-border);
+      background: var(--color-seal-bg);
+      border: 1px solid var(--color-seal-border);
       padding: 6px 16px;
       border-radius: 20px;
       font-size: 11.5px;
       font-weight: 600;
-      color: var(--color-purple);
+      color: var(--color-seal);
       display: inline-flex;
       align-items: center;
       gap: 8px;
@@ -856,9 +859,9 @@
     }
 
     .status-info {
-      background: var(--color-blue-bg);
-      color: var(--color-blue);
-      border: 1px solid var(--color-blue-border);
+      background: var(--color-neutral-bg);
+      color: var(--color-neutral);
+      border: 1px solid var(--color-neutral-border);
     }
 
     .status-outcome {
@@ -868,9 +871,9 @@
     }
 
     .status-human {
-      background: var(--color-purple-bg);
-      color: var(--color-purple);
-      border: 1px solid var(--color-purple-border);
+      background: var(--color-seal-bg);
+      color: var(--color-seal);
+      border: 1px solid var(--color-seal-border);
     }
 
     .status-failed {
@@ -1065,6 +1068,65 @@
         display: none;
       }
     }
+    /* Evidence: measured figures, not claims. Reuses the card surface so it reads as part of
+       the same system rather than a bolted-on stats banner. */
+    .evidence-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      margin-top: 28px;
+    }
+
+    .evidence-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+    }
+
+    .evidence-figure {
+      font-family: var(--font-mono);
+      font-size: 26px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+      color: var(--text);
+    }
+
+    .evidence-label {
+      margin-top: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .evidence-note {
+      margin-top: 6px;
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--text-secondary);
+    }
+
+    .evidence-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-top: 24px;
+      font-size: 14px;
+    }
+
+    .evidence-links a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 550;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.15s;
+    }
+
+    .evidence-links a:hover {
+      border-bottom-color: var(--accent);
+    }
+
   </style>
 </head>
 
@@ -1124,15 +1186,15 @@
     <section class="hero">
       <div class="hero-label">
         <span class="hero-label-dot"></span>
-        <span>Financial Back-Office Automation · Deterministic CUA</span>
+        <span>Computer-use automation for regulated back-offices</span>
       </div>
       <h1>Discovery is probabilistic.<br><em>Execution is deterministic.</em></h1>
       <p class="hero-subtitle">An LLM works out how to accomplish a goal in an enterprise legacy application — once. That discovery is
         compiled into a typed, versioned capability artifact. From then on, it replays deterministically with no model
         in the loop.</p>
       <div class="hero-actions">
-        <a href="docs/index.html" class="btn btn-primary">
-          <span>Read the Docs</span>
+        <a href="report/index.html" class="btn btn-primary">
+          <span>Read the design write-up</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
             stroke-linecap="round" stroke-linejoin="round">
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -1146,13 +1208,23 @@
           </svg>
           <span>View on GitHub</span>
         </a>
-        <a href="#demo" class="btn btn-secondary">
-          <span>See the 12-Stage Demo</span>
+        <a href="docs/index.html" class="btn btn-secondary">
+          <span>Documentation</span>
         </a>
       </div>
     </section>
 
-    <!-- DYNAMIC MULTI-LINE PIPELINE (No horizontal scrolling) -->
+    <!-- THESIS -->
+    <section class="thesis-section">
+      <blockquote>
+        Banks run a long tail of back-office applications with <strong>no API</strong>. When an AI agent needs to get
+        real work done, the only way in is to drive the UI the way a human operator would. Doing that with an LLM on
+        every invocation is <strong>slow, expensive, non-deterministic, and unauditable</strong> — and the last three are
+        disqualifying in a regulated environment.
+      </blockquote>
+    </section>
+
+    <!-- HOW IT WORKS -->
     <section class="pipeline-section">
       <div class="pipeline-board">
 
@@ -1170,13 +1242,13 @@
               <div>
                 <div class="pipe-card-top">
                   <span class="pipe-step-num">STAGE 01</span>
-                  <span class="pipe-badge pipe-badge-blue">INTENT</span>
+                  <span class="pipe-badge pipe-badge-neutral">INTENT</span>
                 </div>
                 <div class="pipe-card-title">Goal + Surface Target</div>
                 <div class="pipe-card-desc">Natural language intent paired with an enterprise application surface.</div>
               </div>
               <div class="pipe-card-footer">
-                <span>Surface Driver: Web / Frameset UI</span>
+                <span>Surface: legacy web frameset</span>
               </div>
             </a>
 
@@ -1185,7 +1257,7 @@
               <div>
                 <div class="pipe-card-top">
                   <span class="pipe-step-num">STAGE 02</span>
-                  <span class="pipe-badge pipe-badge-blue">MODEL IN LOOP</span>
+                  <span class="pipe-badge pipe-badge-neutral">MODEL IN LOOP</span>
                 </div>
                 <div class="pipe-card-title">LLM Discovery</div>
                 <div class="pipe-card-note">(once, probabilistic exploration)</div>
@@ -1193,7 +1265,7 @@
                   controls.</div>
               </div>
               <div class="pipe-card-footer">
-                <span>Execution: Probabilistic Trace</span>
+                <span>Output: a recorded trace</span>
               </div>
             </a>
 
@@ -1202,7 +1274,7 @@
               <div>
                 <div class="pipe-card-top">
                   <span class="pipe-step-num">STAGE 03</span>
-                  <span class="pipe-badge pipe-badge-purple">SEALED</span>
+                  <span class="pipe-badge pipe-badge-seal">SEALED</span>
                 </div>
                 <div class="pipe-card-title">Capability Artifact</div>
                 <div class="pipe-card-note">(immutable, content-hashed)</div>
@@ -1210,7 +1282,7 @@
                   schema.</div>
               </div>
               <div class="pipe-card-footer">
-                <span>Integrity: SHA-256 Content-Hashed</span>
+                <span>Sealed with a SHA-256 content hash</span>
               </div>
             </a>
           </div>
@@ -1225,7 +1297,7 @@
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
               <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
             </svg>
-            <span>Compiled & Sealed · Model Completely Removed</span>
+            <span>Compiled and sealed · the model leaves the loop here</span>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
               stroke-linecap="round" stroke-linejoin="round">
               <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -1239,7 +1311,7 @@
         <div class="pipeline-tier">
           <div class="tier-header">
             <span class="tier-pill tier-pill-replay">Phase 2: Production Execution · Every Run After</span>
-            <span class="tier-caption">Zero model calls, zero temperature, subsecond execution</span>
+            <span class="tier-caption">No model calls, no temperature, sub-second</span>
           </div>
 
           <div class="tier-cards tier-cards-replay">
@@ -1257,7 +1329,7 @@
                   resolution ladder, policy chokepoint, and session lease lock.</div>
               </div>
               <div class="pipe-card-footer">
-                <span>Runtime Cost: $0.00 / Subsecond</span>
+                <span>No model calls · sub-second</span>
               </div>
             </a>
 
@@ -1273,7 +1345,7 @@
                   policy-redacted evidence trace, and complete compliance audit record.</div>
               </div>
               <div class="pipe-card-footer">
-                <span>Evidence: Redacted RunRecord</span>
+                <span>Redacted run record</span>
               </div>
             </a>
           </div>
@@ -1282,21 +1354,10 @@
       </div>
     </section>
 
-    <!-- THESIS -->
-    <section class="thesis-section">
-      <blockquote>
-        Banks run a long tail of back-office applications with <strong>no API</strong>. When an AI agent needs to get
-        real work done, the only way in is to drive the UI the way a human operator would. Doing that with an LLM on
-        every invocation is <strong>slow, expensive, non-deterministic, and unauditable</strong> — three of which are
-        disqualifying in a regulated environment.
-      </blockquote>
-    </section>
-
     <!-- FEATURES -->
     <section class="features-section">
-      <h2 class="section-title">What makes this architecture different</h2>
-      <p class="section-subtitle">Every claim below is mechanically enforced by automated invariant tests that fail if
-        broken.</p>
+      <h2 class="section-title">Design commitments</h2>
+      <p class="section-subtitle">Each is enforced by an invariant test that fails the build if it stops holding.</p>
       <div class="features-grid">
 
         <!-- Feature 1: Deterministic Replay -->
@@ -1393,17 +1454,57 @@
       </div>
     </section>
 
+    <!-- EVIDENCE -->
+    <section class="evidence-section">
+      <h2 class="section-title">Evidence</h2>
+      <p class="section-subtitle">Figures from committed runs in the repository, not estimates. Every
+        one is reproducible from the commands below.</p>
+
+      <div class="evidence-grid">
+        <div class="evidence-card">
+          <div class="evidence-figure">6</div>
+          <div class="evidence-label">Live model calls</div>
+          <div class="evidence-note">One real LLM-driven discovery through an OpenAI-compatible
+            gateway — 10,215 tokens. Each call records the gateway's own provider and request id,
+            so the run can be checked against gateway logs rather than taken on trust.</div>
+        </div>
+        <div class="evidence-card">
+          <div class="evidence-figure">0.00</div>
+          <div class="evidence-label">Drift on replay</div>
+          <div class="evidence-note">The artifact compiled from that run replays for three members
+            it never saw, including a closed account — no model, identical resolution strategies.</div>
+        </div>
+        <div class="evidence-card">
+          <div class="evidence-figure">273</div>
+          <div class="evidence-label">Tests passing</div>
+          <div class="evidence-note">Including invariant tests that fail the build if the policy
+            chokepoint, redaction, layering or fail-closed guarantees stop holding.</div>
+        </div>
+        <div class="evidence-card">
+          <div class="evidence-figure">12</div>
+          <div class="evidence-label">Demo stages</div>
+          <div class="evidence-note">Discovery, compile, replay, business outcome, bounded recovery,
+            escalation, operator handoff and resume — each writing its own evidence directory.</div>
+        </div>
+      </div>
+
+      <div class="evidence-links">
+        <a href="https://github.com/adityamhaske/interface.ai/tree/main/evidence">Browse the evidence directory →</a>
+        <a href="https://github.com/adityamhaske/interface.ai/tree/main/evidence/capabilities">The capability artifact →</a>
+      </div>
+    </section>
+
     <!-- DEMO -->
     <section class="demo-section" id="demo">
-      <h2 class="section-title">Interactive verification</h2>
-      <p class="section-subtitle">One command executes the complete 12-stage banking scenario locally end to end.</p>
+      <h2 class="section-title">Run it yourself</h2>
+      <p class="section-subtitle">One command walks the whole scenario end to end, on your machine.</p>
       <div class="demo-code">
-        <div><span class="comment"># 1. Setup local environment and headless Chromium driver</span></div>
-        <div><span class="prompt">$ </span><span class="cmd">make setup</span> <span class="comment"># venv,
-            dependencies, Chromium</span></div>
-        <div style="margin-top: 10px;"><span class="comment"># 2. Run the full deterministic test & demo story</span>
-        </div>
-        <div><span class="prompt">$ </span><span class="cmd">make demo</span> <span class="comment"># all 12 stages, no API key needed</span></div>
+        <div><span class="comment"># venv, dependencies, headless Chromium</span></div>
+        <div><span class="prompt">$ </span><span class="cmd">make setup</span></div>
+        <div style="margin-top: 12px;"><span class="comment"># all 12 stages — falls back to a recorded transcript when no model is configured, and says so</span></div>
+        <div><span class="prompt">$ </span><span class="cmd">make demo</span></div>
+        <div style="margin-top: 12px;"><span class="comment"># optional: a genuine LLM-driven discovery (needs an OpenAI-compatible endpoint in .env)</span></div>
+        <div><span class="prompt">$ </span><span class="cmd">make discover</span></div>
       </div>
 
       <table class="stages-table">
@@ -1500,9 +1601,9 @@
 
     <!-- ARCHITECTURE PREVIEW -->
     <section class="arch-section">
-      <h2 class="section-title">The execution pipeline</h2>
-      <p class="section-subtitle">One path to a surface, for every actor. No action reaches a driver without
-        authorization.</p>
+      <h2 class="section-title">One path to the surface</h2>
+      <p class="section-subtitle">Discovery, replay and a human operator all reach the browser the same way.
+        Nothing dispatches without passing policy.</p>
 
       <div class="arch-pipeline">
         <div class="arch-node">
@@ -1600,22 +1701,26 @@
       </ul>
     </section>
 
-    <!-- DOCS CTA -->
+    <!-- READ NEXT -->
     <section class="docs-cta">
       <div class="docs-cta-card">
-        <h2>Comprehensive Documentation</h2>
-        <p>Explore high-level architecture, low-level component designs, architectural decision records (ADRs), recovery
-          runbooks, and test verification strategies.</p>
+        <h2>Read next</h2>
+        <p>The design write-up answers the brief directly — architecture, determinism, the error
+          taxonomy, escalation, and what was deliberately left out. The documentation goes a level
+          down: component designs, ADRs, runbooks and the test strategy.</p>
         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-          <a href="docs/index.html" class="btn btn-primary">
-            <span>Explore Documentation →</span>
+          <a href="report/index.html" class="btn btn-primary">
+            <span>Design write-up</span>
+          </a>
+          <a href="docs/index.html" class="btn btn-secondary">
+            <span>Documentation</span>
           </a>
           <a href="https://github.com/adityamhaske/interface.ai" class="btn btn-github" target="_blank" rel="noopener">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
               <path
                 d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
             </svg>
-            <span>View Repository</span>
+            <span>Source on GitHub</span>
           </a>
         </div>
       </div>
@@ -1627,12 +1732,13 @@
   <footer>
     <div class="footer-inner">
       <div class="footer-left">
-        <span>CUA — Computer-Use Automation for Regulated Financial Back-Offices</span>
+        <span>Computer-use automation for regulated back-offices · <a href="https://github.com/adityamhaske/interface.ai">adityamhaske/interface.ai</a></span>
       </div>
       <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
-        <a href="sitemap.xml">Sitemap</a>
+        <a href="report/index.html">Design write-up</a>
+        <a href="docs/index.html">Documentation</a>
         <a href="llms.txt" style="font-family: var(--font-mono); font-size: 12px;">llms.txt</a>
-        <a href="llms-full.txt" style="font-family: var(--font-mono); font-size: 12px;">Full Specs</a>
+        <a href="llms-full.txt" style="font-family: var(--font-mono); font-size: 12px;">llms-full.txt</a>
         <a href="https://github.com/adityamhaske/interface.ai" target="_blank" rel="noopener">GitHub Repository →</a>
       </div>
     </div>

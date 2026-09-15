@@ -70,3 +70,7 @@ the loaded version and fail closed on an override targeting an unknown step id.
 **Explicitly not built.** Overlay *storage*, tenant registries, and rollout tooling. The brief says
 designing the abstraction so it could scale is valuable and prematurely building the infrastructure
 is not. This is the abstraction; the plumbing is a documented cut.
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

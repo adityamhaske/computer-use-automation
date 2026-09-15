@@ -46,3 +46,7 @@ second implementation. Must tolerate a missing API key by falling back to a reco
 | `make demo` becomes a fragile 10-stage script that breaks on grading day | Build it last, from working commands; each stage independently runnable; tolerate a missing key. |
 | Evidence accidentally contains real-looking PII | Seeded fake data only, plus the redaction invariant test run against `evidence/`. |
 | Writing the report last, badly, under time pressure | ADRs are written as decisions are made; REPORT.md assembles them rather than inventing reasoning after the fact. |
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

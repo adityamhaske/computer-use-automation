@@ -56,3 +56,7 @@ root README is deliberately short.
 
 [`/AGENTS.md`](../AGENTS.md) is the working agreement: the nine enforced invariants, the
 architecture map, and the scope discipline. Read it before editing code.
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

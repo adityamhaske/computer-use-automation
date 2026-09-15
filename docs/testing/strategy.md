@@ -56,3 +56,7 @@ script, plus a contract test asserting fixture shape matches the live `LlmPort` 
 - The mock app's own correctness beyond what fixtures need — it is a fixture, not a deliverable.
 - Playwright and CDP themselves.
 - Load, concurrency, and scale. There is no concurrency in this system by design.
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

@@ -75,3 +75,7 @@ in a core banking screen that is the expensive outcome. A run that stops and esc
 the design working; a run that confidently returns another member's balance is not.
 
 Regenerate with `make eval`.
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

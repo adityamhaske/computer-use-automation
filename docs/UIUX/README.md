@@ -38,3 +38,7 @@ The console (`src/cua/hitl/console/static/styles/tokens.css`) now uses the emera
 (`#146b52` light / `#5cbf99` dark) defined in [design-tokens.md](design-tokens.md), matching this
 guideline. The site (`site/index.html`) is closer already: its base is neutral ink/graphite with
 mint/emerald used for one semantic status.
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

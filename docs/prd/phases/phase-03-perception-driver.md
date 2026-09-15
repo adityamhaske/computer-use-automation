@@ -128,3 +128,7 @@ vacuous — proving nothing, because there would have been no hints to invalidat
 |---|---|
 | **Thin accessibility tree on the hostile app** — the project's biggest technical bet | The spike runs first, before Phase 04 depends on it. Fallback is driver-side enrichment, which leaves the architecture intact. |
 | Unstable `node_id`s break determinism | Derive them from structural position + role + name, never from a counter or memory address. Asserted by the identical-snapshot test. |
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

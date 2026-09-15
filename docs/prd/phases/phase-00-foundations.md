@@ -61,3 +61,7 @@ re-checked at the end of the phase that first gives its package something to imp
 |---|---|
 | Import contracts written against packages that don't exist yet pass vacuously | Phase 02+ adds real modules; a contract is only trustworthy once its source package has code. Re-verify each contract when its package first gains an import. |
 | `mypy --strict` on Pydantic needs the plugin | Configured in `pyproject.toml`. |
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

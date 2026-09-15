@@ -73,3 +73,7 @@ Three real defects, which is the argument for building measurement rather than a
 - [x] Ladder descent measured and reported, not asserted
 - [x] `CapabilityEvaluation` emitted as a document separate from the capability
 - [x] Wrong-action rate reported as 0, separately from refusal rate
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

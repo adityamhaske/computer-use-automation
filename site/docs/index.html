@@ -69,21 +69,20 @@
       --border: #e4e4e7;
       --border-strong: #d4d4d8;
 
-      /* Accent tokens. The names are historical; the values are not blue or purple.
-         Hue is reserved for meaning here exactly as in the console: emerald for healthy,
-         amber for attention, brick for failure, and a warm graphite for everything that
-         is merely in progress. Neutrals are warm (hue ~35), not cool blue-grey. */
+      /* Hue carries meaning here, exactly as it does in the operator console: emerald for
+         healthy, amber for attention, brick for failure, warm graphite for anything merely
+         in progress. Every neutral is warm (hue ~35). */
       --color-mint: #157a4a;
       --color-mint-bg: #e7f2ea;
       --color-mint-border: #c4e2d1;
 
-      --color-blue: #6b665d;   /* warm graphite — see the note above */
-      --color-blue-bg: #f2f0ec;
-      --color-blue-border: #ddd8d0;
+      --color-neutral: #6b665d;   /* warm graphite */
+      --color-neutral-bg: #f2f0ec;
+      --color-neutral-border: #ddd8d0;
 
-      --color-purple: #146b52;
-      --color-purple-bg: #e8f2ed;
-      --color-purple-border: #cfe4d9;
+      --color-seal: #146b52;
+      --color-seal-bg: #e8f2ed;
+      --color-seal-border: #cfe4d9;
 
       --color-red: #9c3428;
       --color-red-bg: #f9eae7;
@@ -138,13 +137,13 @@
       --color-mint-bg: rgba(87, 189, 139, 0.14);
       --color-mint-border: rgba(87, 189, 139, 0.28);
 
-      --color-blue: #9d968c;
-      --color-blue-bg: rgba(157, 150, 140, 0.14);
-      --color-blue-border: rgba(157, 150, 140, 0.28);
+      --color-neutral: #9d968c;
+      --color-neutral-bg: rgba(157, 150, 140, 0.14);
+      --color-neutral-border: rgba(157, 150, 140, 0.28);
 
-      --color-purple: #5cbf99;
-      --color-purple-bg: rgba(92, 191, 153, 0.14);
-      --color-purple-border: rgba(92, 191, 153, 0.28);
+      --color-seal: #5cbf99;
+      --color-seal-bg: rgba(92, 191, 153, 0.14);
+      --color-seal-border: rgba(92, 191, 153, 0.28);
 
       --color-red: #e08b80;
       --color-red-bg: rgba(224, 139, 128, 0.13);
@@ -188,6 +187,7 @@
     }
     .nav-brand-group {
       display: flex; align-items: center; gap: 10px; text-decoration: none;
+      color: inherit;   /* otherwise the anchor resolves to the UA default link blue */
     }
     .brand-logo-wrap {
       display: flex; align-items: center; justify-content: center;
@@ -389,8 +389,8 @@
       padding: 16px 20px; border-radius: var(--radius-sm);
       margin: 16px 0 24px; font-size: 13px;
     }
-    .callout-info { background: var(--color-blue-bg); border-left: 3px solid var(--color-blue); }
-    .callout-warn { background: var(--color-purple-bg); border-left: 3px solid var(--color-purple); }
+    .callout-info { background: var(--color-neutral-bg); border-left: 3px solid var(--color-neutral); }
+    .callout-warn { background: var(--color-seal-bg); border-left: 3px solid var(--color-seal); }
 
     /* DOC INDEX TABLE */
     .doc-index {
@@ -413,9 +413,9 @@
     }
     .badge-success { background: var(--color-mint-bg); color: var(--color-mint); border: 1px solid var(--color-mint-border); }
     .badge-outcome { background: var(--bg-warm); color: var(--text-secondary); border: 1px solid var(--border); }
-    .badge-human { background: var(--color-purple-bg); color: var(--color-purple); border: 1px solid var(--color-purple-border); }
+    .badge-human { background: var(--color-seal-bg); color: var(--color-seal); border: 1px solid var(--color-seal-border); }
     .badge-failed { background: var(--color-red-bg); color: var(--color-red); border: 1px solid var(--color-red-border); }
-    .badge-info { background: var(--color-blue-bg); color: var(--color-blue); border: 1px solid var(--color-blue-border); }
+    .badge-info { background: var(--color-neutral-bg); color: var(--color-neutral); border: 1px solid var(--color-neutral-border); }
 
     @media (max-width: 860px) {
       .sidebar {
@@ -658,7 +658,7 @@ make demo</code></pre>
 make test           <span class="comment"># offline suite; no API key, no network</span>
 make invariants     <span class="comment"># just the architectural contracts</span>
 make eval           <span class="comment"># stability + cross-tenant measurement</span></code></pre>
-  <p>244 tests, <code>mypy --strict</code> clean, five enforced import contracts. The whole suite runs offline with no API key.</p>
+  <p>273 tests, <code>mypy --strict</code> clean, five enforced import contracts. The whole suite runs offline with no API key.</p>
 </div>
 
 <!-- ================================ DEMO ================================ -->
@@ -1344,7 +1344,7 @@ overrides:
   </table>
 
   <h2>Offline by default</h2>
-  <p>Everything except <code>e2e/</code> runs with <strong>no API key and no network</strong>. 244 tests, <code>mypy --strict</code> clean. CI configures no API key on purpose — if a test needs the model, CI must fail rather than silently skip.</p>
+  <p>Everything except <code>e2e/</code> runs with <strong>no API key and no network</strong>. 273 tests, <code>mypy --strict</code> clean. CI configures no API key on purpose — if a test needs the model, CI must fail rather than silently skip.</p>
 
   <h2>The fake LLM</h2>
   <p><code>agent/fake.py</code> implements <code>LlmPort</code> by replaying a recorded transcript. This exercises the real discovery loop — same policy, same resolver, same evidence bus — for free.</p>
@@ -1475,7 +1475,7 @@ cua replay &lt;artifact&gt; --fault session_timeout           <span class="comme
     <span>CUA &middot; Computer-Use Automation &middot; MIT Licensed</span>
     <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
       <a href="../sitemap.xml" style="color: var(--text-muted); text-decoration: none;">Sitemap</a>
-      <a href="../llms.txt" style="color: var(--color-blue); font-family: var(--font-mono); text-decoration: none;">llms.txt</a>
+      <a href="../llms.txt" style="color: var(--color-neutral); font-family: var(--font-mono); text-decoration: none;">llms.txt</a>
       <a href="../llms-full.txt" style="color: var(--text-muted); font-family: var(--font-mono); text-decoration: none;">Full Markdown</a>
       <a href="https://github.com/adityamhaske/interface.ai" target="_blank" rel="noopener" style="color: var(--text); text-decoration: none; font-weight: 500;">GitHub Repository &rarr;</a>
     </div>

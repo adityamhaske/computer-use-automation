@@ -89,7 +89,7 @@ The model is allowed to be uncertain exactly once. That uncertainty is compiled 
 that never needs it again.</p>
 </blockquote>
 <p>Every claim below is backed by something runnable: an enforced import contract, a test, or a file in
-<a href="evidence/"><code>evidence/</code></a>. What is not built says so in §7.</p>
+<a href="https://github.com/adityamhaske/interface.ai/tree/main/evidence/"><code>evidence/</code></a>. What is not built says so in §7.</p>
 <hr />
 <h2>1. Architecture</h2>
 <p>An LLM drives a live legacy UI to a goal <strong>once</strong>. That run is compiled into a typed, versioned
@@ -128,7 +128,7 @@ provider is one class rather than a dependency; <code>temperature=0</code>. YAML
 reviewer has to read one without running anything.</p>
 <h2>2. Artifact schema</h2>
 <p>The focal point. <code>cua.capability/v1</code> — Pydantic, YAML, immutable, content-addressed. Examples in
-<a href="evidence/capabilities/"><code>evidence/capabilities/</code></a>.</p>
+<a href="https://github.com/adityamhaske/interface.ai/tree/main/evidence/capabilities/"><code>evidence/capabilities/</code></a>.</p>
 <p><strong>Targets are semantic, never selectors.</strong> A <code>TargetDescriptor</code> is role, accessible name, structural
 anchor, scope, ordinal. A CSS selector may appear only under <code>hints</code> — a cache accepted only if the
 node it finds <em>also</em> satisfies the semantic assertion. <code>role: button, name: &quot;Search&quot;</code> means the same

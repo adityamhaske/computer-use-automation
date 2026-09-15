@@ -103,8 +103,36 @@ hr{border:0;border-top:1px solid var(--border);margin:2rem 0}
 """
 
 
+REPO_BLOB = "https://github.com/adityamhaske/interface.ai/blob/main/"
+REPO_TREE = "https://github.com/adityamhaske/interface.ai/tree/main/"
+
+
+def _absolutise(html: str) -> str:
+    """Point repository-relative links at GitHub.
+
+    REPORT.md lives in the repository, so its links are written relative to it -- `evidence/`,
+    `src/cua/...`, `AGENTS.md`. Those are correct on GitHub and dead on the site, which publishes
+    only `site/`: the rendered pages were shipping 404s to the two directories the write-up most
+    wants a reader to open. Rewriting here rather than in the source keeps REPORT.md readable in
+    the repository, which is where most people will actually read it.
+
+    A trailing slash means a directory, which GitHub serves under /tree/; everything else is a
+    file, under /blob/.
+    """
+
+    def repoint(match: re.Match[str]) -> str:
+        href = match.group(1)
+        if href.startswith(("http://", "https://", "#", "mailto:")):
+            return match.group(0)
+        base = REPO_TREE if href.endswith("/") else REPO_BLOB
+        return f'href="{base}{href}"'
+
+    return re.sub(r'href="([^"]+)"', repoint, html)
+
+
 def _render(md_text: str) -> str:
-    return MarkdownIt("commonmark", {"html": True}).enable("table").render(md_text)
+    html = MarkdownIt("commonmark", {"html": True}).enable("table").render(md_text)
+    return _absolutise(html)
 
 
 def _split_sections(md_text: str) -> tuple[str, dict[int, str]]:

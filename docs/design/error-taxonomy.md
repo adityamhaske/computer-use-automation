@@ -105,3 +105,7 @@ than a guarantee.
 
 This table is the taxonomy's test. If a row can't be written for a new condition, the condition
 hasn't been classified yet.
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

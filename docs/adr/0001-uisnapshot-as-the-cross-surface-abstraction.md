@@ -65,3 +65,7 @@ driver's internals. Phase 03 spikes this before Phase 04 depends on it.
   strategy 7 of the ladder, and hard-disabled during replay.
 - **DOM/CSS first** — rejected as primary. Retained as a cached *hint* (strategy 5), and only ever
   accepted when the node it finds also satisfies the semantic assertion.
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

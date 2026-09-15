@@ -64,3 +64,7 @@ supplied on purpose.
 |---|---|
 | `structural_anchor` over-fits our table layout | Expressed as general relations (`row_of`, `adjacent_to`, `within_section`), never as a path — so they mean the same thing on a desktop surface. |
 | Refusal rate too high to be usable | Measured separately from wrong-action rate by the `replay_stability` eval. They are never traded off: a refusal costs minutes, a wrong click on a financial screen may not be recoverable. |
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

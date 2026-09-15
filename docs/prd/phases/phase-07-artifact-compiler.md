@@ -82,3 +82,7 @@ invariant is about transitive reach.
 |---|---|
 | Over-generalization: wrong literal becomes a parameter | Conservative lifting rules + draft status + human review gate. Documented as a known limit. |
 | Under-specified checkpoints ("page loaded") that pass trivially | Require the checkpoint to assert something *goal-specific* — the extracted output's shape, not just a heading. |
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

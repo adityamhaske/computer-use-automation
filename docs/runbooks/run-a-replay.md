@@ -52,3 +52,7 @@ that is a **bug in this system**, not flakiness — `invariants/test_determinism
 
 Rising `drift_score` across runs means the UI is moving under the artifact. That is the window in
 which a re-record or a tenant overlay is cheap.
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

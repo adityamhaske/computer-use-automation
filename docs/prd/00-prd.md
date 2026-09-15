@@ -95,3 +95,7 @@ explicit fault flags, so failures are debuggable rather than flaky.
 
 Feature breadth. Framework name-dropping. Scaling infrastructure. The brief states plainly that none
 of these are rewarded, and that "a small, correct, well-argued system is the goal."
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

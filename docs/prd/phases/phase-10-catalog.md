@@ -56,3 +56,7 @@ runs.
 - [x] `cua catalog invoke <id> --input member_id=12345` runs a deterministic replay
 - [x] A calling-agent demo invokes a capability by name and handles all four run statuses
 - [x] A tampered artifact is refused rather than served
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

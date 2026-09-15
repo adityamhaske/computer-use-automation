@@ -76,3 +76,7 @@ the import rule and the authorize↔dispatch reconciliation are what hold agains
 |---|---|
 | Redaction that is thorough enough to be useless for debugging | Redact *values*, keep *shapes*: `member_id=<redacted:string[5]>`. A debugger needs to know a field was present and well-formed. |
 | The token guard is trivially bypassable in Python | True — it stops accidents, not adversaries. The import rule and the reconciliation test are the real enforcement. Stated as a limit in REPORT.md §6. |
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

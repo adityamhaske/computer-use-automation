@@ -107,7 +107,7 @@ the queue a reviewer opens has something in it.</p>
 <h2>6. Safety</h2>
 <p>One chokepoint, three enforcements (§1), applied identically to all three actors.</p>
 <p><strong>Allowlist</strong> — domains, URL patterns, action types, step and duration caps, in
-<a href="config/policy.yaml"><code>config/policy.yaml</code></a>. Navigation outside it is <code>NAVIGATION_BLOCKED</code>, for humans
+<a href="https://github.com/adityamhaske/interface.ai/blob/main/config/policy.yaml"><code>config/policy.yaml</code></a>. Navigation outside it is <code>NAVIGATION_BLOCKED</code>, for humans
 too. A capability's own <code>allowed_domains</code> <strong>narrows</strong> the global list. Two gaps closed here, both the
 same shape — a check that covered the stated intent and missed the actual outcome. Entrypoint
 navigation now goes through the ordinary path rather than the raw page handle, because <code>--target</code> is
@@ -157,12 +157,12 @@ desktop surface — interface-only stub on purpose; declaring the seam and enfor
 what it is worth here. Multi-operator routing, SSO, audit sign-off — designed, not built. Assisted
 LLM fallback on replay failure — would breach the no-model-in-replay invariant without a separate
 policed path.</p>
-<p><strong>The discovery evidence is a real model run.</strong> <a href="evidence/discovery/disc-0a7e7b7ccd/"><code>evidence/discovery/disc-0a7e7b7ccd/</code></a>
-is a genuine LLM-driven run against the live frameset app, routed through a local OmniRoute gateway:
+<p><strong>The discovery evidence is a real model run.</strong> <a href="https://github.com/adityamhaske/interface.ai/tree/main/evidence/discovery/disc-0a7e7b7ccd/"><code>evidence/discovery/disc-0a7e7b7ccd/</code></a>
+is a genuine LLM-driven run against the live frameset app, routed through a self-hosted OpenAI-compatible gateway:
 six model calls, 10,215 tokens, each carrying the gateway's own provider and request id so the run
 can be checked against the gateway's logs rather than taken on trust. The model signed in, searched,
 read the balance, status and as-of date off the member record and stopped -- three effective steps.
-The artifact the compiler produced from it, <a href="evidence/capabilities/"><code>memberdesk.savings_balance@1.0.0</code></a>,
+The artifact the compiler produced from it, <a href="https://github.com/adityamhaske/interface.ai/tree/main/evidence/capabilities/"><code>memberdesk.savings_balance@1.0.0</code></a>,
 replays for members that run never saw: 12345, 67890 and the closed account 24680, model-free, at
 zero drift.</p>
 <p>Publication is the part worth stating precisely, because getting it wrong would quietly turn that
@@ -193,19 +193,19 @@ and <code>replay_gates</code> are parsed and displayed but not yet read by the e
 <tbody>
 <tr>
 <td>The artifact</td>
-<td><a href="evidence/capabilities/"><code>evidence/capabilities/</code></a></td>
+<td><a href="https://github.com/adityamhaske/interface.ai/tree/main/evidence/capabilities/"><code>evidence/capabilities/</code></a></td>
 </tr>
 <tr>
 <td>The handoff, with actors and epochs</td>
-<td><a href="evidence/escalation/demo-escalation/trace.jsonl"><code>evidence/escalation/demo-escalation/trace.jsonl</code></a></td>
+<td><a href="https://github.com/adityamhaske/interface.ai/blob/main/evidence/escalation/demo-escalation/trace.jsonl"><code>evidence/escalation/demo-escalation/trace.jsonl</code></a></td>
 </tr>
 <tr>
 <td>All four terminal statuses</td>
-<td><a href="evidence/replay/"><code>evidence/replay/</code></a>, <a href="evidence/escalation/"><code>evidence/escalation/</code></a></td>
+<td><a href="https://github.com/adityamhaske/interface.ai/tree/main/evidence/replay/"><code>evidence/replay/</code></a>, <a href="https://github.com/adityamhaske/interface.ai/tree/main/evidence/escalation/"><code>evidence/escalation/</code></a></td>
 </tr>
 <tr>
 <td>The invariants, enforced</td>
-<td><a href=".importlinter"><code>.importlinter</code></a>, <a href="tests/invariants/"><code>tests/invariants/</code></a></td>
+<td><a href="https://github.com/adityamhaske/interface.ai/blob/main/.importlinter"><code>.importlinter</code></a>, <a href="https://github.com/adityamhaske/interface.ai/tree/main/tests/invariants/"><code>tests/invariants/</code></a></td>
 </tr>
 <tr>
 <td>The whole story, one command</td>
@@ -213,8 +213,10 @@ and <code>replay_gates</code> are parsed and displayed but not yet read by the e
 </tr>
 <tr>
 <td>The numbers behind §3 and §4</td>
-<td><a href="evidence/evals/"><code>evidence/evals/</code></a></td>
+<td><a href="https://github.com/adityamhaske/interface.ai/tree/main/evidence/evals/"><code>evidence/evals/</code></a></td>
 </tr>
 </tbody>
 </table>
+<hr />
+<p><a href="https://github.com/adityamhaske/interface.ai">Repository</a> · <a href="https://adityamhaske.github.io/interface.ai/">Documentation</a> · <a href="https://adityamhaske.github.io/interface.ai/report/">Design write-up</a></p>
 <div class="pager"><a href="page-2.html">← Determinism, errors & scale</a><span class="disabled">End of the write-up</span></div></div></body></html>

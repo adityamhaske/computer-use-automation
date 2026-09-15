@@ -73,3 +73,7 @@ Anything that executes. This phase is types and their laws.
 |---|---|
 | Schema churn once replay meets reality | Expected and healthy. Version the schema from day one (`schema_version`) and treat Phase 08 feedback as the real design review. |
 | Over-modelling — types nobody uses | Every type must be exercised by the demo path. If it isn't, delete it. |
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

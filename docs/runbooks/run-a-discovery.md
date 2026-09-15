@@ -57,3 +57,7 @@ The artifact is a **draft** (`CapabilityApproval.state = draft`). Review before 
 | `POLICY_DENIED` | Expected if the goal needs an irreversible action. Check `config/policy.yaml`. |
 | `TARGET_AMBIGUOUS` | The screen genuinely has two matching controls. Good — it refused. |
 | Model can't find a control | Check the `UiSnapshot` in `snapshots/`. If the control isn't there, it's a perception gap, not a model gap. |
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

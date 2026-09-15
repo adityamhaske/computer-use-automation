@@ -60,3 +60,7 @@ specific noun over a vague one ("the mock back-office" not "the application"). E
 what was expected and what was observed, the same discipline the run-result taxonomy already uses
 for automation failures (`docs/design/error-taxonomy.md`) — a human reading the UI deserves the same
 debuggability an agent reading `RunResult` gets.
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)

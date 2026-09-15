@@ -175,3 +175,7 @@ contrast instead; keep the shadow tokens for elevation logic but expect them to 
 Motion explains a state change (a drawer sliding in shows *where* it came from); it never exists
 just to feel alive. Always respect `prefers-reduced-motion` — collapse everything to `0.001ms` under
 that query rather than degrading gracefully, so it is genuinely off, not just shorter.
+
+---
+
+[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)
