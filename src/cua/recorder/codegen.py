@@ -29,7 +29,7 @@ from datetime import UTC, datetime
 
 from cua.domain.action import Click, Extract, PressKey, Select, Type
 from cua.domain.capability import Capability
-from cua.domain.values import InputRef
+from cua.domain.values import InputRef, OutputRef, SecretRef
 
 # What a declared output type looks like once read off the screen. The generated test asserts
 # shape, not value: the balance is fixture data and may change, but "money still looks like money"
@@ -51,6 +51,19 @@ class UnsupportedStepError(ValueError):
     """
 
 
+def _lit(value: str) -> str:
+    """A string as an escaped Python literal.
+
+    Everything interpolated into generated source goes through this. Accessible names, anchor text
+    and frame names all come from the page the discovery run drove -- page-controlled content --
+    and `TargetDescriptor.name` is an unconstrained `str`, so nothing upstream rejects a quote.
+    Dropping those between double quotes by hand was not merely a syntax-error risk: a closing
+    quote lets a recorded label inject arbitrary expressions into a file this project then executes
+    under pytest, both in its own suite and in whatever CI a reader points `--out` at.
+    """
+    return repr(value)
+
+
 def _frame(step_frame: str | None) -> str:
     """The Playwright handle for the frame a target is scoped to.
 
@@ -61,7 +74,7 @@ def _frame(step_frame: str | None) -> str:
     """
     if not step_frame:
         return "page"
-    return f'frame(page, "{step_frame}")'
+    return f"frame(page, {_lit(step_frame)})"
 
 
 def _locator(target: object) -> str:
@@ -73,7 +86,7 @@ def _locator(target: object) -> str:
     frame = _frame(getattr(scope, "frame", None) if scope else None)
 
     if name is not None and getattr(name, "value", None):
-        return f'{frame}.get_by_role("{role}", name="{name.value}", exact=True)'
+        return f"{frame}.get_by_role({_lit(str(role))}, name={_lit(name.value)}, exact=True)"
 
     if anchor is not None and getattr(anchor, "text", None):
         # `adjacent_to` means "the cell immediately after the one holding this label", and it is
@@ -87,7 +100,7 @@ def _locator(target: object) -> str:
         # An XPath axis rather than a CSS selector: this is a structural relation, the same one
         # the resolver's anchor expresses, not a hook into how the page is styled.
         return (
-            f'{frame}.get_by_role("cell", name="{anchor.text}", exact=True)'
+            f"{frame}.get_by_role('cell', name={_lit(anchor.text)}, exact=True)"
             f'.locator("xpath=following-sibling::*[1]")'
         )
 
@@ -97,7 +110,15 @@ def _locator(target: object) -> str:
 
 
 def _value(action: object, inputs: dict[str, str]) -> str:
-    """The literal to type, resolved from the supplied inputs."""
+    """The literal to type, resolved from the supplied inputs.
+
+    Only an `InputRef` can be resolved here. A `SecretRef` has no value outside a live run by
+    design, and an `OutputRef` names something an earlier step read. Both used to fall through to
+    `repr(str(raw))`, which stringifies the pydantic model -- so a password step emitted
+    `.fill("secret_name='core.pw'")` and the generated test typed that literal into the field,
+    failing later and looking like a broken application rather than a mistranslated artifact.
+    Refused instead, for the reason `UnsupportedStepError` exists.
+    """
     raw = getattr(action, "value", "")
     if isinstance(raw, InputRef):
         if raw.input_name not in inputs:
@@ -105,8 +126,18 @@ def _value(action: object, inputs: dict[str, str]) -> str:
                 f"step needs input {raw.input_name!r}; "
                 f"pass it with --input {raw.input_name}=<value>"
             )
-        return repr(inputs[raw.input_name])
-    return repr(str(raw))
+        return _lit(inputs[raw.input_name])
+    if isinstance(raw, SecretRef):
+        raise UnsupportedStepError(
+            f"step types the secret {raw.secret_name!r}, which has no value outside a live run; "
+            "a generated test cannot carry it"
+        )
+    if isinstance(raw, OutputRef):
+        raise UnsupportedStepError(
+            f"step types the earlier output {raw.output_name!r}; chaining an extracted value into "
+            "a later step is not translated yet"
+        )
+    return _lit(str(raw))
 
 
 def render_test(capability: Capability, inputs: dict[str, str], *, base_url: str) -> str:

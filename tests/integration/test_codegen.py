@@ -28,6 +28,8 @@ from apps.mock_bank.server import create_app
 
 from cua.domain.capability import Capability
 from cua.domain.serde import dump_capability, load_capability
+from cua.domain.target import NameMatch
+from cua.domain.values import OutputRef, SecretRef
 from cua.recorder.codegen import UnsupportedStepError, render_test
 
 pytestmark = [pytest.mark.browser, pytest.mark.slow]
@@ -127,3 +129,113 @@ def test_the_generated_test_actually_passes(
     assert completed.returncode == 0, (
         f"the generated test failed:\n{completed.stdout[-3000:]}\n{completed.stderr[-2000:]}"
     )
+
+
+def test_a_hostile_accessible_name_cannot_inject_code(capability: Capability) -> None:
+    """Names come from the page, and the page is not trusted.
+
+    Every accessible name, anchor text and frame name in an artifact was read off the application
+    the discovery run drove. Interpolating those between double quotes by hand was not merely a
+    syntax-error risk: a closing quote lets a recorded label inject arbitrary expressions into a
+    file this project then executes under pytest -- in its own suite, and in whatever CI a reader
+    points `--out` at.
+
+    Asserted on the parse tree rather than by string matching, because the payload is *supposed* to
+    appear in the output; what must never appear is an executable node built from it.
+    """
+    payload = (
+        'Member Number", exact=True) or __import__("os").system("touch /tmp/pwned") '
+        'or page.get_by_role("textbox", name="Member Number'
+    )
+    first = capability.steps[0]
+    hostile = capability.model_copy(
+        update={
+            "steps": (
+                first.model_copy(
+                    update={
+                        "action": first.action.model_copy(
+                            update={
+                                "target": first.action.target.model_copy(
+                                    update={"name": NameMatch(value=payload)}
+                                )
+                            }
+                        )
+                    }
+                ),
+                *capability.steps[1:],
+            )
+        }
+    )
+
+    source = render_test(hostile, {"member_id": "12345"}, base_url="http://127.0.0.1:8811")
+    tree = ast.parse(source)
+
+    executable = [n for n in ast.walk(tree) if isinstance(n, ast.Name) and n.id == "__import__"]
+    assert not executable, "a recorded accessible name reached the output as executable code"
+
+    inert = [
+        n
+        for n in ast.walk(tree)
+        if isinstance(n, ast.Constant) and isinstance(n.value, str) and "__import__" in n.value
+    ]
+    assert len(inert) == 1, "the payload should survive exactly once, as inert data"
+
+
+def test_a_backslash_in_a_name_is_not_silently_reinterpreted(capability: Capability) -> None:
+    """`C:\\x41 path` must stay that string, not decode to `C:A path` and match a different cell."""
+    first = capability.steps[0]
+    odd = capability.model_copy(
+        update={
+            "steps": (
+                first.model_copy(
+                    update={
+                        "action": first.action.model_copy(
+                            update={
+                                "target": first.action.target.model_copy(
+                                    update={"name": NameMatch(value="C:\\x41 path")}
+                                )
+                            }
+                        )
+                    }
+                ),
+                *capability.steps[1:],
+            )
+        }
+    )
+    source = render_test(odd, {"member_id": "12345"}, base_url="http://127.0.0.1:8811")
+    names = [
+        kw.value.value
+        for node in ast.walk(ast.parse(source))
+        if isinstance(node, ast.Call)
+        for kw in node.keywords
+        if kw.arg == "name" and isinstance(kw.value, ast.Constant)
+    ]
+    assert "C:\\x41 path" in names, f"the name was re-interpreted: {names}"
+
+
+def test_a_secret_or_chained_output_is_refused_not_stringified(capability: Capability) -> None:
+    """Both used to emit the pydantic model's repr as the literal to type.
+
+    A password step became `.fill("secret_name='core.pw'")`: the generated test typed that string
+    into the field and failed later, looking like a broken application rather than a mistranslated
+    artifact.
+    """
+    first = capability.steps[0]
+
+    def _with_value(value: object) -> Capability:
+        return capability.model_copy(
+            update={
+                "steps": (
+                    first.model_copy(
+                        update={"action": first.action.model_copy(update={"value": value})}
+                    ),
+                    *capability.steps[1:],
+                )
+            }
+        )
+
+    with pytest.raises(UnsupportedStepError, match=r"core\.pw"):
+        render_test(_with_value(SecretRef(secret_name="core.pw")), {}, base_url="http://x")
+
+    with pytest.raises(UnsupportedStepError, match="savings_balance"):
+        render_test(_with_value(OutputRef(output_name="savings_balance")), {}, base_url="http://x")

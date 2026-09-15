@@ -808,14 +808,20 @@ class ReplayExecutor:
                 "this capability performs an irreversible action and the caller did not opt in "
                 "(allow_irreversible)"
             )
-        if self.replay_gates.irreversible_requires_approval and (
-            self.approval is None
-            or not self.approval.permits_unattended_replay(content_hash=capability.content_hash)
-        ):
-            return (
-                f"this capability performs an irreversible action and {capability.ref} is not "
-                "approved at this exact content hash"
-            )
+        if self.replay_gates.irreversible_requires_approval:
+            # Against the *verified* hash, not the declared one. `capability.content_hash` is a
+            # line in a file the editor also controls: an edited artifact keeps its old declared
+            # hash, so comparing against it meant the stale approval still matched and a tampered
+            # capability ran unattended. `hash_is_valid()` recomputes from the content, which is
+            # the only version of this check that means anything.
+            verified = capability.content_hash if capability.hash_is_valid() else ""
+            if self.approval is None or not self.approval.permits_unattended_replay(
+                content_hash=verified
+            ):
+                return (
+                    f"this capability performs an irreversible action and {capability.ref} is not "
+                    "approved at this exact content hash"
+                )
         return None
 
 

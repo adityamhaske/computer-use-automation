@@ -48,7 +48,15 @@ class CapabilityApproval(BaseModel):
 
         Requires approval of *this exact content*. Combined with an explicit caller opt-in, this is
         the gate on money-moving automation.
+
+        Both hashes must be non-empty. Equality alone was not enough: an unsealed artifact has
+        `content_hash == ""`, and a hand-written approval record carrying `""` compared equal to
+        it -- so a file anyone could author approved a capability nobody had sealed, let alone
+        reviewed. "Approved at this exact content" has no meaning when there is no content hash to
+        pin, and the honest answer there is no, not yes.
         """
+        if not self.content_hash or not content_hash:
+            return False
         return self.state is ApprovalState.APPROVED and self.content_hash == content_hash
 
     @staticmethod
