@@ -21,15 +21,40 @@ Goal + Target ──► LLM Discovery ──► Capability Artifact ──► De
 
 ## Setup
 
-Python 3.11 or 3.12, `git`, and ~400 MB for Chromium.
+Python 3.11 or 3.12, `git`, and ~400 MB for Chromium. Nothing else — no database, no Docker, no
+account, no API key.
 
 ```bash
-make setup
+make setup && make demo
 ```
 
-Everything below runs offline with no API key. The one thing that needs a model is a live discovery
-run: copy `.env.example` to `.env` and set `OPENROUTER_API_KEY`. Without it, discovery replays a
-recorded transcript and says so — in the output and in the evidence it writes.
+That is the whole assessment path: `make setup` builds the venv and installs Chromium, `make demo`
+runs all twelve stages end to end in about a minute. Everything in this repository works offline
+with no key. The single exception is a live discovery run — copy `.env.example` to `.env` and set
+`OPENROUTER_API_KEY` for that; without one, discovery replays a recorded transcript and says so, in
+the output and in the evidence it writes.
+
+`make` on its own lists every target.
+
+## Poking at it by hand
+
+```bash
+make app        # the mock back-office on :8811
+```
+
+The sign-on screen prints the fixture credentials, and the search screen lists the seeded members
+and what each one demonstrates, so nothing below needs to be looked up:
+
+| Sign on | `teller01` / `not-a-real-password` |
+|---|---|
+| `12345`, `67890` | a member with a savings account — the straightforward case |
+| `24680` | savings closed, $0.00 — an empty account is still an answer |
+| `13579` | checking only → business outcome `no_savings_account` |
+| `55555` | restricted record → business outcome `permission_denied` |
+| `99999` | no such member → business outcome `member_not_found` |
+
+Every member, balance and credential here is invented; this is a mock application built for the
+exercise.
 
 ## Demo path
 

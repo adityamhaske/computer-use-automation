@@ -57,6 +57,11 @@ def create_app(variant_key: str = "base") -> FastAPI:
     def render(name: str, request: Request, **ctx: Any) -> HTMLResponse:
         ctx.setdefault("v", variant)
         ctx.setdefault("session", request.cookies.get(SESSION_COOKIE))
+        # The sign-on screen prints these so a first-time reader is not stopped by a login wall
+        # they have no way past. Read from the constants rather than repeated in the template, so
+        # the screen cannot start lying if the fixture credentials ever change.
+        ctx.setdefault("demo_user", VALID_USER)
+        ctx.setdefault("demo_password", VALID_PW)
         return templates.TemplateResponse(request=request, name=name, context=ctx)
 
     def signed_in(request: Request) -> bool:

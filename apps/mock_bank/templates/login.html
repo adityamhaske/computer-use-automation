@@ -18,4 +18,25 @@
   </form>
 </table>
 
+{# Anyone opening this app for the first time lands here and has no way to get past it. The
+   credentials were in .env.example and in the source, which is two places they should not have
+   to go to see a demo. They are fixture values for a mock application with fictional data --
+   printing them here is the honest thing, not a leak. #}
+<table class="{{ v.css_form_table }}" cellpadding="4" cellspacing="0" border="0"
+       style="margin-top:16px">
+  <tr><td colspan="2"><b>Demo fixture &mdash; sign in with</b></td></tr>
+  <tr>
+    <td class="{{ v.css_label_cell }}">Operator ID</td>
+    <td><code>{{ demo_user }}</code></td>
+  </tr>
+  <tr>
+    <td class="{{ v.css_label_cell }}">Password</td>
+    <td><code>{{ demo_password }}</code></td>
+  </tr>
+  <tr>
+    <td colspan="2">This is a mock core-banking application. Every member, balance and
+      credential in it is invented.</td>
+  </tr>
+</table>
+
 {% endblock %}

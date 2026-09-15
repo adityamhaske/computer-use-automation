@@ -18,4 +18,26 @@
   </form>
 </table>
 
+{# The seeded members cover every declared outcome, and nothing said so. A reviewer would find
+   12345 from the placeholder and never reach 13579 or 55555 -- which are precisely the two that
+   show a negative answer is not a failure. #}
+<table class="{{ v.css_form_table }}" cellpadding="4" cellspacing="0" border="0"
+       style="margin-top:20px">
+  <tr><td colspan="2"><b>Seeded members &mdash; what each one shows</b></td></tr>
+  <tr><td class="{{ v.css_label_cell }}"><code>12345</code></td>
+      <td>Ada Lovelace &mdash; savings $4,210.55, Active. The straightforward case.</td></tr>
+  <tr><td class="{{ v.css_label_cell }}"><code>67890</code></td>
+      <td>Grace Hopper &mdash; savings $18,730.00. Different values, same screen.</td></tr>
+  <tr><td class="{{ v.css_label_cell }}"><code>24680</code></td>
+      <td>Alan Turing &mdash; savings $0.00, Closed. An empty account is still an answer.</td></tr>
+  <tr><td class="{{ v.css_label_cell }}"><code>13579</code></td>
+      <td>Katherine Johnson &mdash; checking only. Returns <code>no_savings_account</code>.</td></tr>
+  <tr><td class="{{ v.css_label_cell }}"><code>55555</code></td>
+      <td>Restricted record. Returns <code>permission_denied</code>.</td></tr>
+  <tr><td class="{{ v.css_label_cell }}"><code>99999</code></td>
+      <td>No such member. Returns <code>member_not_found</code>.</td></tr>
+  <tr><td colspan="2">The last three are business outcomes, not failures: the capability exits 0
+      and reports the code.</td></tr>
+</table>
+
 {% endblock %}
