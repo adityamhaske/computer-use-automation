@@ -1109,7 +1109,7 @@
       <div class="demo-code">
         <div><span class="comment"># venv, dependencies, headless Chromium</span></div>
         <div><span class="prompt">$ </span><span class="cmd">make setup</span></div>
-        <div style="margin-top: 12px;"><span class="comment"># all 12 stages — falls back to a recorded transcript when no model is configured, and says so</span></div>
+        <div style="margin-top: 12px;"><span class="comment"># all 14 stages — falls back to a recorded transcript when no model is configured, and says so</span></div>
         <div><span class="prompt">$ </span><span class="cmd">make demo</span></div>
         <div style="margin-top: 12px;"><span class="comment"># optional: a genuine LLM-driven discovery (needs an OpenAI-compatible endpoint in .env)</span></div>
         <div><span class="prompt">$ </span><span class="cmd">make discover</span></div>
@@ -1195,6 +1195,18 @@
             <td class="num">12</td>
             <td>Agent invocation</td>
             <td>Exposed to external agent as a typed tool call</td>
+            <td><span class="status status-success">SUCCESS</span></td>
+          </tr>
+          <tr>
+            <td class="num">13</td>
+            <td>Approval gate</td>
+            <td>Integrity and review shown as separate axes; unattended replay gated on the second</td>
+            <td><span class="status status-success">SUCCESS</span></td>
+          </tr>
+          <tr>
+            <td class="num">14</td>
+            <td>Generated test</td>
+            <td>A runnable Playwright test emitted from the artifact, carrying no CSS hint</td>
             <td><span class="status status-success">SUCCESS</span></td>
           </tr>
         </tbody>

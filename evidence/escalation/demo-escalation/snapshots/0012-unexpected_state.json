@@ -1,6 +1,6 @@
 {
-  "snapshot_id": "snap-353af98649",
-  "url": "http://127.0.0.1:50241/",
+  "snapshot_id": "snap-0e2d682570",
+  "url": "http://127.0.0.1:54459/",
   "title": "MemberDesk",
   "nodes": [
     {
@@ -19,7 +19,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "188"
+        "native": "209"
       },
       "fingerprint": "34942f57acae2b27"
     },
@@ -37,7 +37,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "199"
+        "native": "219"
       },
       "fingerprint": "dac0da6641c0fbca"
     },
@@ -55,7 +55,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "200"
+        "native": "220"
       },
       "fingerprint": "dac0da6641c0fbca"
     },
@@ -73,7 +73,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "191"
+        "native": "212"
       },
       "fingerprint": "d3a596dc8cf2c44a"
     },
@@ -93,7 +93,7 @@
         "nav:/generic[4]/text[0]"
       ],
       "hints": {
-        "native": "208"
+        "native": "228"
       },
       "fingerprint": "a8ff80b0f161e267"
     },
@@ -111,7 +111,7 @@
       "parent_id": "nav:/generic[4]",
       "child_ids": [],
       "hints": {
-        "native": "227"
+        "native": "248"
       },
       "fingerprint": "06d59be9b77f218f"
     },
@@ -131,7 +131,7 @@
         "nav:/generic[5]/text[0]"
       ],
       "hints": {
-        "native": "209"
+        "native": "229"
       },
       "fingerprint": "a8ff80b0f161e267"
     },
@@ -149,7 +149,7 @@
       "parent_id": "nav:/generic[5]",
       "child_ids": [],
       "hints": {
-        "native": "228"
+        "native": "249"
       },
       "fingerprint": "0a382f79a9b7333e"
     },
@@ -169,7 +169,7 @@
         "nav:/generic[6]/text[0]"
       ],
       "hints": {
-        "native": "210"
+        "native": "230"
       },
       "fingerprint": "a8ff80b0f161e267"
     },
@@ -187,7 +187,7 @@
       "parent_id": "nav:/generic[6]",
       "child_ids": [],
       "hints": {
-        "native": "229"
+        "native": "250"
       },
       "fingerprint": "c402e295accdbf69"
     },
@@ -205,7 +205,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "211"
+        "native": "231"
       },
       "fingerprint": "71449859354b6cef"
     },
@@ -226,7 +226,7 @@
         "nav:/generic[8]/text[1]"
       ],
       "hints": {
-        "native": "225"
+        "native": "246"
       },
       "fingerprint": "a8ff80b0f161e267"
     },
@@ -244,7 +244,7 @@
       "parent_id": "nav:/generic[8]",
       "child_ids": [],
       "hints": {
-        "native": "235"
+        "native": "256"
       },
       "fingerprint": "c79329f8d8d2d557"
     },
@@ -262,7 +262,7 @@
       "parent_id": "nav:/generic[8]",
       "child_ids": [],
       "hints": {
-        "native": "236"
+        "native": "257"
       },
       "fingerprint": "bdad67387a00acff"
     },
@@ -282,7 +282,7 @@
         "nav:/row[9]/cell[0]"
       ],
       "hints": {
-        "native": "213"
+        "native": "233"
       },
       "fingerprint": "fa1f5bbbdad001d1"
     },
@@ -302,7 +302,7 @@
         "nav:/row[9]/cell[0]/link[0]"
       ],
       "hints": {
-        "native": "214"
+        "native": "234"
       },
       "fingerprint": "d50d2553ca8865ec"
     },
@@ -323,7 +323,7 @@
       ],
       "hints": {
         "css": "a.nav-link-btn",
-        "native": "193"
+        "native": "235"
       },
       "fingerprint": "c5ec08a2c78d2403"
     },
@@ -341,7 +341,7 @@
       "parent_id": "nav:/row[9]/cell[0]/link[0]",
       "child_ids": [],
       "hints": {
-        "native": "230"
+        "native": "251"
       },
       "fingerprint": "46ba5b490b98688e"
     },
@@ -361,7 +361,7 @@
         "nav:/row[10]/cell[0]"
       ],
       "hints": {
-        "native": "215"
+        "native": "236"
       },
       "fingerprint": "fa1f5bbbdad001d1"
     },
@@ -381,7 +381,7 @@
         "nav:/row[10]/cell[0]/link[0]"
       ],
       "hints": {
-        "native": "216"
+        "native": "237"
       },
       "fingerprint": "66987dac872f321c"
     },
@@ -400,7 +400,7 @@
       "child_ids": [],
       "hints": {
         "css": "a.nav-link-disabled",
-        "native": "217"
+        "native": "238"
       },
       "fingerprint": "57694f773dac3ffa"
     },
@@ -420,7 +420,7 @@
         "nav:/row[11]/cell[0]"
       ],
       "hints": {
-        "native": "220"
+        "native": "241"
       },
       "fingerprint": "fa1f5bbbdad001d1"
     },
@@ -440,7 +440,7 @@
         "nav:/row[11]/cell[0]/link[0]"
       ],
       "hints": {
-        "native": "221"
+        "native": "242"
       },
       "fingerprint": "f56beefd1c51c710"
     },
@@ -459,7 +459,7 @@
       "child_ids": [],
       "hints": {
         "css": "a.nav-link-disabled",
-        "native": "222"
+        "native": "243"
       },
       "fingerprint": "9121073edbb9c685"
     },
@@ -477,7 +477,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "231"
+        "native": "252"
       },
       "fingerprint": "ca4c1a686b35aada"
     },
@@ -495,7 +495,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "232"
+        "native": "253"
       },
       "fingerprint": "03cff1e7f00ab099"
     },
@@ -513,7 +513,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "233"
+        "native": "254"
       },
       "fingerprint": "3a9c4d5892cb41ff"
     },
@@ -531,7 +531,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "234"
+        "native": "255"
       },
       "fingerprint": "03cff1e7f00ab099"
     },
@@ -549,7 +549,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "192"
+        "native": "213"
       },
       "fingerprint": "eba30ff83962866f"
     },
@@ -567,7 +567,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "242"
+        "native": "263"
       },
       "fingerprint": "f6d07955fec5f341"
     },
@@ -587,7 +587,7 @@
         "content:/row[18]/cell[0]"
       ],
       "hints": {
-        "native": "244"
+        "native": "265"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -607,7 +607,7 @@
         "content:/row[18]/cell[0]/text[0]"
       ],
       "hints": {
-        "native": "245"
+        "native": "266"
       },
       "fingerprint": "d7271651741997e8"
     },
@@ -625,7 +625,7 @@
       "parent_id": "content:/row[18]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "252"
+        "native": "273"
       },
       "fingerprint": "6b36bc12c8726792"
     },
@@ -645,7 +645,7 @@
         "content:/row[19]/cell[0]"
       ],
       "hints": {
-        "native": "247"
+        "native": "268"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -665,7 +665,7 @@
         "content:/row[19]/cell[0]/text[0]"
       ],
       "hints": {
-        "native": "248"
+        "native": "269"
       },
       "fingerprint": "745b975a7a5d072a"
     },
@@ -683,7 +683,7 @@
       "parent_id": "content:/row[19]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "253"
+        "native": "274"
       },
       "fingerprint": "a09fd40aabf82bcf"
     },
@@ -703,7 +703,7 @@
         "content:/row[20]/cell[0]"
       ],
       "hints": {
-        "native": "249"
+        "native": "270"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -723,7 +723,7 @@
         "content:/row[20]/cell[0]/button[0]"
       ],
       "hints": {
-        "native": "250"
+        "native": "271"
       },
       "fingerprint": "d13a573cbe4520e8"
     },
@@ -744,7 +744,7 @@
       ],
       "hints": {
         "css": "input.btn1",
-        "native": "251"
+        "native": "272"
       },
       "fingerprint": "a59d144f368d1b11"
     },
@@ -762,11 +762,11 @@
       "parent_id": "content:/row[20]/cell[0]/button[0]",
       "child_ids": [],
       "hints": {
-        "native": "254"
+        "native": "275"
       },
       "fingerprint": "d711eb93a8bc15a6"
     }
   ],
-  "captured_at": "2026-09-15T16:49:07.429692Z",
+  "captured_at": "2026-09-15T18:56:50.555106Z",
   "http_status": 200
 }

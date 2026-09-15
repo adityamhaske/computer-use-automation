@@ -1,6 +1,6 @@
 {
-  "snapshot_id": "snap-3431f9b317",
-  "url": "http://127.0.0.1:50241/",
+  "snapshot_id": "snap-863280bbbe",
+  "url": "http://127.0.0.1:54459/",
   "title": "MemberDesk",
   "nodes": [
     {
@@ -19,7 +19,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "64"
+        "native": "85"
       },
       "fingerprint": "34942f57acae2b27"
     },
@@ -37,7 +37,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "74"
+        "native": "95"
       },
       "fingerprint": "dac0da6641c0fbca"
     },
@@ -55,7 +55,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "75"
+        "native": "96"
       },
       "fingerprint": "dac0da6641c0fbca"
     },
@@ -73,7 +73,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "67"
+        "native": "88"
       },
       "fingerprint": "d3a596dc8cf2c44a"
     },
@@ -93,7 +93,7 @@
         "nav:/generic[4]/text[0]"
       ],
       "hints": {
-        "native": "83"
+        "native": "104"
       },
       "fingerprint": "a8ff80b0f161e267"
     },
@@ -111,7 +111,7 @@
       "parent_id": "nav:/generic[4]",
       "child_ids": [],
       "hints": {
-        "native": "103"
+        "native": "124"
       },
       "fingerprint": "06d59be9b77f218f"
     },
@@ -131,7 +131,7 @@
         "nav:/generic[5]/text[0]"
       ],
       "hints": {
-        "native": "84"
+        "native": "105"
       },
       "fingerprint": "a8ff80b0f161e267"
     },
@@ -149,7 +149,7 @@
       "parent_id": "nav:/generic[5]",
       "child_ids": [],
       "hints": {
-        "native": "104"
+        "native": "125"
       },
       "fingerprint": "0a382f79a9b7333e"
     },
@@ -169,7 +169,7 @@
         "nav:/generic[6]/text[0]"
       ],
       "hints": {
-        "native": "85"
+        "native": "106"
       },
       "fingerprint": "a8ff80b0f161e267"
     },
@@ -187,7 +187,7 @@
       "parent_id": "nav:/generic[6]",
       "child_ids": [],
       "hints": {
-        "native": "105"
+        "native": "126"
       },
       "fingerprint": "c402e295accdbf69"
     },
@@ -205,7 +205,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "86"
+        "native": "107"
       },
       "fingerprint": "71449859354b6cef"
     },
@@ -226,7 +226,7 @@
         "nav:/generic[8]/text[1]"
       ],
       "hints": {
-        "native": "101"
+        "native": "122"
       },
       "fingerprint": "a8ff80b0f161e267"
     },
@@ -244,7 +244,7 @@
       "parent_id": "nav:/generic[8]",
       "child_ids": [],
       "hints": {
-        "native": "111"
+        "native": "132"
       },
       "fingerprint": "c79329f8d8d2d557"
     },
@@ -262,7 +262,7 @@
       "parent_id": "nav:/generic[8]",
       "child_ids": [],
       "hints": {
-        "native": "112"
+        "native": "133"
       },
       "fingerprint": "bdad67387a00acff"
     },
@@ -282,7 +282,7 @@
         "nav:/row[9]/cell[0]"
       ],
       "hints": {
-        "native": "88"
+        "native": "109"
       },
       "fingerprint": "fa1f5bbbdad001d1"
     },
@@ -302,7 +302,7 @@
         "nav:/row[9]/cell[0]/link[0]"
       ],
       "hints": {
-        "native": "89"
+        "native": "110"
       },
       "fingerprint": "d50d2553ca8865ec"
     },
@@ -323,7 +323,7 @@
       ],
       "hints": {
         "css": "a.nav-link-btn",
-        "native": "90"
+        "native": "111"
       },
       "fingerprint": "c5ec08a2c78d2403"
     },
@@ -341,7 +341,7 @@
       "parent_id": "nav:/row[9]/cell[0]/link[0]",
       "child_ids": [],
       "hints": {
-        "native": "106"
+        "native": "127"
       },
       "fingerprint": "46ba5b490b98688e"
     },
@@ -361,7 +361,7 @@
         "nav:/row[10]/cell[0]"
       ],
       "hints": {
-        "native": "91"
+        "native": "112"
       },
       "fingerprint": "fa1f5bbbdad001d1"
     },
@@ -381,7 +381,7 @@
         "nav:/row[10]/cell[0]/link[0]"
       ],
       "hints": {
-        "native": "92"
+        "native": "113"
       },
       "fingerprint": "66987dac872f321c"
     },
@@ -400,7 +400,7 @@
       "child_ids": [],
       "hints": {
         "css": "a.nav-link-disabled",
-        "native": "93"
+        "native": "114"
       },
       "fingerprint": "57694f773dac3ffa"
     },
@@ -420,7 +420,7 @@
         "nav:/row[11]/cell[0]"
       ],
       "hints": {
-        "native": "96"
+        "native": "117"
       },
       "fingerprint": "fa1f5bbbdad001d1"
     },
@@ -440,7 +440,7 @@
         "nav:/row[11]/cell[0]/link[0]"
       ],
       "hints": {
-        "native": "97"
+        "native": "118"
       },
       "fingerprint": "f56beefd1c51c710"
     },
@@ -459,7 +459,7 @@
       "child_ids": [],
       "hints": {
         "css": "a.nav-link-disabled",
-        "native": "98"
+        "native": "119"
       },
       "fingerprint": "9121073edbb9c685"
     },
@@ -477,7 +477,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "107"
+        "native": "128"
       },
       "fingerprint": "ca4c1a686b35aada"
     },
@@ -495,7 +495,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "108"
+        "native": "129"
       },
       "fingerprint": "03cff1e7f00ab099"
     },
@@ -513,7 +513,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "109"
+        "native": "130"
       },
       "fingerprint": "3a9c4d5892cb41ff"
     },
@@ -531,7 +531,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "110"
+        "native": "131"
       },
       "fingerprint": "03cff1e7f00ab099"
     },
@@ -549,7 +549,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "68"
+        "native": "89"
       },
       "fingerprint": "2036af81e670b643"
     },
@@ -567,7 +567,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "117"
+        "native": "138"
       },
       "fingerprint": "f6d07955fec5f341"
     },
@@ -587,7 +587,7 @@
         "content:/row[18]/cell[0]"
       ],
       "hints": {
-        "native": "119"
+        "native": "140"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -607,7 +607,7 @@
         "content:/row[18]/cell[0]/text[0]"
       ],
       "hints": {
-        "native": "120"
+        "native": "141"
       },
       "fingerprint": "c394caaebdfce97b"
     },
@@ -625,7 +625,7 @@
       "parent_id": "content:/row[18]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "124"
+        "native": "145"
       },
       "fingerprint": "a760c5991922e47e"
     },
@@ -645,7 +645,7 @@
         "content:/row[19]/cell[0]"
       ],
       "hints": {
-        "native": "122"
+        "native": "143"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -665,7 +665,7 @@
         "content:/row[19]/cell[0]/text[0]"
       ],
       "hints": {
-        "native": "123"
+        "native": "144"
       },
       "fingerprint": "1933f3b8613c4c07"
     },
@@ -683,11 +683,11 @@
       "parent_id": "content:/row[19]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "125"
+        "native": "146"
       },
       "fingerprint": "faaa60e7413fd03b"
     }
   ],
-  "captured_at": "2026-09-15T16:49:07.378275Z",
+  "captured_at": "2026-09-15T18:56:50.496559Z",
   "http_status": 502
 }

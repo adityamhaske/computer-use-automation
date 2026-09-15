@@ -361,7 +361,7 @@
   <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">What this is, how to run it, and how to configure a model — including a local one.</p>
   <ul class="doc-index">
     <li onclick="show('quickstart')"><span class="doc-title">Quick Start</span><span class="doc-path">setup + dependencies</span></li>
-    <li onclick="show('demo')"><span class="doc-title">Demo Walkthrough</span><span class="doc-path">12 stages, end to end</span></li>
+    <li onclick="show('demo')"><span class="doc-title">Demo Walkthrough</span><span class="doc-path">14 stages, end to end</span></li>
     <li onclick="show('cli')"><span class="doc-title">CLI Reference</span><span class="doc-path">every command</span></li>
   </ul>
 
@@ -446,14 +446,14 @@ make setup</code></pre>
   </table>
 
   <h2>Run the demo</h2>
-  <pre><code><span class="comment"># The whole story, one command — twelve stages end to end</span>
+  <pre><code><span class="comment"># The whole story, one command — fourteen stages end to end</span>
 make demo</code></pre>
   <p>Takes about a minute. Works without an API key — discovery falls back to a recorded transcript and says so explicitly.</p>
 
   <h2>Unified Orchestrator (<code>./start.sh</code>)</h2>
   <p>Orchestration over the Makefile targets — it adds nothing you could not run by hand, it just
     names the combinations (app and console together, wait-for-ready, teardown on Ctrl+C).</p>
-  <pre><code>./start.sh                 <span class="comment"># Default: setup venv + run the full 12-stage demo</span>
+  <pre><code>./start.sh                 <span class="comment"># Default: setup venv + run the full 14-stage demo</span>
 ./start.sh ui              <span class="comment"># Console + mock bank, with an escalation already waiting</span>
 ./start.sh ui --headed     <span class="comment"># ...and watch the supervised browser while you claim it</span>
 ./start.sh ui --bare       <span class="comment"># Console over an idle session: the queue stays empty</span>
@@ -475,7 +475,7 @@ make eval           <span class="comment"># stability + cross-tenant measurement
 <div class="article" id="demo">
   <div class="breadcrumb"><a href="#" onclick="show('overview'); return false">DOCS</a> / GETTING STARTED</div>
   <h1>Demo Walkthrough</h1>
-  <p class="lead"><code>make demo</code> boots the mock back-office and runs twelve stages end to end, writing everything to <code>evidence/</code>.</p>
+  <p class="lead"><code>make demo</code> boots the mock back-office and runs fourteen stages end to end, writing everything to <code>evidence/</code>.</p>
 
   <table>
     <thead><tr><th>#</th><th>Stage</th><th>What happens</th><th>Result</th></tr></thead>

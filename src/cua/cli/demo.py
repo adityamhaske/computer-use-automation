@@ -31,6 +31,7 @@ from cua.agent.llm import LlmError, LlmPort, OpenRouterLlm
 from cua.agent.loop import DiscoveryAgent
 from cua.agent.stop import Budget, StopReason
 from cua.domain.action import Click, RawInput, RawInputKind, Type
+from cua.domain.approval import CapabilityApproval
 from cua.domain.capability import Capability
 from cua.domain.discovery import DiscoveryRun
 from cua.domain.result import FailureCode, RunResult, RunStatus
@@ -620,7 +621,61 @@ class Demo:
             f'{missing.disposition}: "{missing.message}"',
             ok=found.disposition == "answered" and missing.disposition == "answered_negative",
         )
+
+        self.approval_gate(capability)
+        self.generated_test(capability)
+
         return found.disposition == "answered" and missing.disposition == "answered_negative"
+
+    def approval_gate(self, capability: Capability) -> None:
+        """Integrity and review are different questions, and the catalog answers both.
+
+        Shown here because the gate was built long before anything could exercise it: the executor
+        has always refused an unapproved irreversible step, and until there was a way to record a
+        decision, nobody could see it happen.
+        """
+        from cua.catalog.approvals import ApprovalStore
+        from cua.domain.approval import ApprovalState
+
+        store = ApprovalStore(root=EVIDENCE / "capabilities", evals_root=EVIDENCE / "evals")
+        before = store.state_for(capability.ref, content_hash=capability.content_hash)
+        evaluation = store.evaluation_for(capability.ref, content_hash=capability.content_hash)
+        supported, why = (
+            CapabilityApproval.recommend(evaluation)
+            if evaluation
+            else (False, "no measured evidence")
+        )
+
+        # Deliberately not written to disk: the demo reports what the evidence supports, and leaves
+        # the decision to a person, which is the whole point of the gate.
+        self.say(
+            "Unattended replay is gated on review, not just integrity",
+            f"{capability.ref} is [{'sealed' if capability.hash_is_valid() else 'TAMPERED'} · "
+            f"{before.value}] — evidence {'supports' if supported else 'does not support'} "
+            f"approval: {why}. `cua catalog approve --from-eval` records it; editing the artifact "
+            f"invalidates it.",
+            ok=before in {ApprovalState.DRAFT, ApprovalState.APPROVED},
+        )
+
+    def generated_test(self, capability: Capability) -> None:
+        """The artifact is complete enough to describe automation outside this system."""
+        from cua.recorder.codegen import render_test
+
+        source = render_test(capability, {"member_id": "12345"}, base_url="http://127.0.0.1:8811")
+        hints = [
+            value
+            for step in capability.steps
+            if (target := getattr(step.action, "target", None)) is not None
+            for value in target.hints.values()
+        ]
+        leaked = [h for h in hints if h in source]
+        self.say(
+            "The artifact also generates a test that runs without this system",
+            f"`cua codegen` emitted {len(source.splitlines())} lines of pytest + Playwright from "
+            f"{len(capability.steps)} recorded step(s); {len(hints)} CSS hint(s) in the artifact, "
+            f"{len(leaked)} in the output.",
+            ok=not leaked,
+        )
 
     def summary(self) -> None:
         typer.echo()

@@ -1,6 +1,6 @@
 {
-  "snapshot_id": "snap-b8a08262ea",
-  "url": "http://127.0.0.1:50241/",
+  "snapshot_id": "snap-c2380e2f6a",
+  "url": "http://127.0.0.1:54459/",
   "title": "MemberDesk",
   "nodes": [
     {
@@ -17,7 +17,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "194"
+        "native": "322"
       },
       "fingerprint": "34942f57acae2b27"
     },
@@ -35,7 +35,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "204"
+        "native": "332"
       },
       "fingerprint": "dac0da6641c0fbca"
     },
@@ -53,7 +53,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "205"
+        "native": "333"
       },
       "fingerprint": "dac0da6641c0fbca"
     },
@@ -71,7 +71,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "197"
+        "native": "325"
       },
       "fingerprint": "d3a596dc8cf2c44a"
     },
@@ -91,7 +91,7 @@
         "nav:/generic[4]/text[0]"
       ],
       "hints": {
-        "native": "213"
+        "native": "341"
       },
       "fingerprint": "a8ff80b0f161e267"
     },
@@ -109,7 +109,7 @@
       "parent_id": "nav:/generic[4]",
       "child_ids": [],
       "hints": {
-        "native": "233"
+        "native": "361"
       },
       "fingerprint": "06d59be9b77f218f"
     },
@@ -129,7 +129,7 @@
         "nav:/generic[5]/text[0]"
       ],
       "hints": {
-        "native": "214"
+        "native": "342"
       },
       "fingerprint": "a8ff80b0f161e267"
     },
@@ -147,7 +147,7 @@
       "parent_id": "nav:/generic[5]",
       "child_ids": [],
       "hints": {
-        "native": "234"
+        "native": "362"
       },
       "fingerprint": "0a382f79a9b7333e"
     },
@@ -167,7 +167,7 @@
         "nav:/generic[6]/text[0]"
       ],
       "hints": {
-        "native": "215"
+        "native": "343"
       },
       "fingerprint": "a8ff80b0f161e267"
     },
@@ -185,7 +185,7 @@
       "parent_id": "nav:/generic[6]",
       "child_ids": [],
       "hints": {
-        "native": "235"
+        "native": "363"
       },
       "fingerprint": "c402e295accdbf69"
     },
@@ -203,7 +203,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "216"
+        "native": "344"
       },
       "fingerprint": "71449859354b6cef"
     },
@@ -224,7 +224,7 @@
         "nav:/generic[8]/text[1]"
       ],
       "hints": {
-        "native": "231"
+        "native": "359"
       },
       "fingerprint": "a8ff80b0f161e267"
     },
@@ -242,7 +242,7 @@
       "parent_id": "nav:/generic[8]",
       "child_ids": [],
       "hints": {
-        "native": "241"
+        "native": "369"
       },
       "fingerprint": "c79329f8d8d2d557"
     },
@@ -260,7 +260,7 @@
       "parent_id": "nav:/generic[8]",
       "child_ids": [],
       "hints": {
-        "native": "242"
+        "native": "370"
       },
       "fingerprint": "bdad67387a00acff"
     },
@@ -280,7 +280,7 @@
         "nav:/row[9]/cell[0]"
       ],
       "hints": {
-        "native": "218"
+        "native": "346"
       },
       "fingerprint": "fa1f5bbbdad001d1"
     },
@@ -300,7 +300,7 @@
         "nav:/row[9]/cell[0]/link[0]"
       ],
       "hints": {
-        "native": "219"
+        "native": "347"
       },
       "fingerprint": "d50d2553ca8865ec"
     },
@@ -321,7 +321,7 @@
       ],
       "hints": {
         "css": "a.nav-link-btn",
-        "native": "220"
+        "native": "348"
       },
       "fingerprint": "c5ec08a2c78d2403"
     },
@@ -339,7 +339,7 @@
       "parent_id": "nav:/row[9]/cell[0]/link[0]",
       "child_ids": [],
       "hints": {
-        "native": "236"
+        "native": "364"
       },
       "fingerprint": "46ba5b490b98688e"
     },
@@ -359,7 +359,7 @@
         "nav:/row[10]/cell[0]"
       ],
       "hints": {
-        "native": "221"
+        "native": "349"
       },
       "fingerprint": "fa1f5bbbdad001d1"
     },
@@ -379,7 +379,7 @@
         "nav:/row[10]/cell[0]/link[0]"
       ],
       "hints": {
-        "native": "222"
+        "native": "350"
       },
       "fingerprint": "66987dac872f321c"
     },
@@ -398,7 +398,7 @@
       "child_ids": [],
       "hints": {
         "css": "a.nav-link-disabled",
-        "native": "223"
+        "native": "351"
       },
       "fingerprint": "57694f773dac3ffa"
     },
@@ -418,7 +418,7 @@
         "nav:/row[11]/cell[0]"
       ],
       "hints": {
-        "native": "226"
+        "native": "354"
       },
       "fingerprint": "fa1f5bbbdad001d1"
     },
@@ -438,7 +438,7 @@
         "nav:/row[11]/cell[0]/link[0]"
       ],
       "hints": {
-        "native": "227"
+        "native": "355"
       },
       "fingerprint": "f56beefd1c51c710"
     },
@@ -457,7 +457,7 @@
       "child_ids": [],
       "hints": {
         "css": "a.nav-link-disabled",
-        "native": "228"
+        "native": "356"
       },
       "fingerprint": "9121073edbb9c685"
     },
@@ -475,7 +475,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "237"
+        "native": "365"
       },
       "fingerprint": "ca4c1a686b35aada"
     },
@@ -493,7 +493,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "238"
+        "native": "366"
       },
       "fingerprint": "03cff1e7f00ab099"
     },
@@ -511,7 +511,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "239"
+        "native": "367"
       },
       "fingerprint": "3a9c4d5892cb41ff"
     },
@@ -529,7 +529,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "240"
+        "native": "368"
       },
       "fingerprint": "03cff1e7f00ab099"
     },
@@ -549,7 +549,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "198"
+        "native": "326"
       },
       "fingerprint": "eba30ff83962866f"
     },
@@ -567,7 +567,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "249"
+        "native": "377"
       },
       "fingerprint": "f6d07955fec5f341"
     },
@@ -587,7 +587,7 @@
         "content:/row[18]/cell[0]"
       ],
       "hints": {
-        "native": "251"
+        "native": "379"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -607,7 +607,7 @@
         "content:/row[18]/cell[0]/table[0]"
       ],
       "hints": {
-        "native": "252"
+        "native": "380"
       },
       "fingerprint": "bb5923d22e1419a1"
     },
@@ -625,7 +625,7 @@
       "parent_id": "content:/row[18]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "253"
+        "native": "381"
       },
       "fingerprint": "db0f241a64a7611f"
     },
@@ -645,7 +645,7 @@
         "content:/row[19]/cell[0]"
       ],
       "hints": {
-        "native": "261"
+        "native": "389"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -662,10 +662,11 @@
       },
       "parent_id": "content:/row[19]",
       "child_ids": [
-        "content:/row[19]/cell[0]/table[0]"
+        "content:/row[19]/cell[0]/table[0]",
+        "content:/row[19]/cell[0]/table[1]"
       ],
       "hints": {
-        "native": "262"
+        "native": "390"
       },
       "fingerprint": "1bd1205026807024"
     },
@@ -683,7 +684,25 @@
       "parent_id": "content:/row[19]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "263"
+        "native": "391"
+      },
+      "fingerprint": "db0f241a64a7611f"
+    },
+    {
+      "node_id": "content:/row[19]/cell[0]/table[1]",
+      "role": "table",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[19]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "407"
       },
       "fingerprint": "db0f241a64a7611f"
     },
@@ -704,7 +723,7 @@
         "content:/row[20]/cell[1]"
       ],
       "hints": {
-        "native": "255"
+        "native": "383"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -725,7 +744,7 @@
         "content:/row[20]/cell[0]/text[1]"
       ],
       "hints": {
-        "native": "256"
+        "native": "384"
       },
       "fingerprint": "db3531c999a9d575"
     },
@@ -743,7 +762,7 @@
       "parent_id": "content:/row[20]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "279"
+        "native": "441"
       },
       "fingerprint": "ddb193202da1e4c9"
     },
@@ -761,7 +780,7 @@
       "parent_id": "content:/row[20]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "280"
+        "native": "442"
       },
       "fingerprint": "e0bbb5ae6b8cabc8"
     },
@@ -784,7 +803,7 @@
         "content:/row[20]/cell[1]/link[0]"
       ],
       "hints": {
-        "native": "258"
+        "native": "386"
       },
       "fingerprint": "4284a156d8302fc6"
     },
@@ -802,7 +821,7 @@
       "parent_id": "content:/row[20]/cell[1]",
       "child_ids": [],
       "hints": {
-        "native": "281"
+        "native": "443"
       },
       "fingerprint": "819bb6935224d41b"
     },
@@ -820,7 +839,7 @@
       "parent_id": "content:/row[20]/cell[1]",
       "child_ids": [],
       "hints": {
-        "native": "282"
+        "native": "444"
       },
       "fingerprint": "c4e51303c3643336"
     },
@@ -838,7 +857,7 @@
       "parent_id": "content:/row[20]/cell[1]",
       "child_ids": [],
       "hints": {
-        "native": "283"
+        "native": "445"
       },
       "fingerprint": "501fcbbbd30bd5c6"
     },
@@ -859,7 +878,7 @@
       ],
       "hints": {
         "css": "a[href=\"/logout\"]",
-        "native": "260"
+        "native": "388"
       },
       "fingerprint": "b56cffb08b23a60c"
     },
@@ -877,7 +896,7 @@
       "parent_id": "content:/row[20]/cell[1]/link[0]",
       "child_ids": [],
       "hints": {
-        "native": "284"
+        "native": "446"
       },
       "fingerprint": "c508d2200d4b1e2c"
     },
@@ -897,7 +916,7 @@
         "content:/row[21]/cell[0]"
       ],
       "hints": {
-        "native": "265"
+        "native": "393"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -917,7 +936,7 @@
         "content:/row[21]/cell[0]/text[0]"
       ],
       "hints": {
-        "native": "266"
+        "native": "394"
       },
       "fingerprint": "293ac13b6a7f3ab4"
     },
@@ -935,7 +954,7 @@
       "parent_id": "content:/row[21]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "285"
+        "native": "447"
       },
       "fingerprint": "adff22ea7b3bebde"
     },
@@ -956,7 +975,7 @@
         "content:/row[22]/cell[1]"
       ],
       "hints": {
-        "native": "269"
+        "native": "397"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -976,7 +995,7 @@
         "content:/row[22]/cell[0]/text[0]"
       ],
       "hints": {
-        "native": "270"
+        "native": "398"
       },
       "fingerprint": "604a7eb9b7dddc29"
     },
@@ -994,7 +1013,7 @@
       "parent_id": "content:/row[22]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "286"
+        "native": "448"
       },
       "fingerprint": "66914960d53ab108"
     },
@@ -1014,7 +1033,7 @@
         "content:/row[22]/cell[1]/textbox[0]"
       ],
       "hints": {
-        "native": "271"
+        "native": "399"
       },
       "fingerprint": "1d1f6d3376e804d9"
     },
@@ -1037,7 +1056,7 @@
       ],
       "hints": {
         "css": "input[name=\"memno\"]",
-        "native": "272"
+        "native": "400"
       },
       "fingerprint": "ea2237aa18a5e0e3"
     },
@@ -1057,7 +1076,7 @@
         "content:/row[22]/cell[1]/textbox[0]/generic[0]/text[0]"
       ],
       "hints": {
-        "native": "274"
+        "native": "402"
       },
       "fingerprint": "2df0b7969bca5fce"
     },
@@ -1075,7 +1094,7 @@
       "parent_id": "content:/row[22]/cell[1]/textbox[0]/generic[0]",
       "child_ids": [],
       "hints": {
-        "native": "290"
+        "native": "472"
       },
       "fingerprint": "a5c328d6c85b07c6"
     },
@@ -1096,7 +1115,7 @@
         "content:/row[23]/cell[1]"
       ],
       "hints": {
-        "native": "275"
+        "native": "403"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -1114,7 +1133,7 @@
       "parent_id": "content:/row[23]",
       "child_ids": [],
       "hints": {
-        "native": "276"
+        "native": "404"
       },
       "fingerprint": "1bd1205026807024"
     },
@@ -1134,7 +1153,7 @@
         "content:/row[23]/cell[1]/button[0]"
       ],
       "hints": {
-        "native": "277"
+        "native": "405"
       },
       "fingerprint": "e075ba34a53453aa"
     },
@@ -1155,7 +1174,7 @@
       ],
       "hints": {
         "css": "input.btn1",
-        "native": "278"
+        "native": "406"
       },
       "fingerprint": "7597c82cb4ec8e3c"
     },
@@ -1173,11 +1192,1003 @@
       "parent_id": "content:/row[23]/cell[1]/button[0]",
       "child_ids": [],
       "hints": {
-        "native": "287"
+        "native": "449"
       },
       "fingerprint": "55399652a926d8e4"
+    },
+    {
+      "node_id": "content:/row[24]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[24]/cell[0]"
+      ],
+      "hints": {
+        "native": "409"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[24]/cell[0]",
+      "role": "cell",
+      "name": "Seeded members \u2014 what each one shows",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[24]",
+      "child_ids": [
+        "content:/row[24]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "410"
+      },
+      "fingerprint": "ea414f670bd74f96"
+    },
+    {
+      "node_id": "content:/row[24]/cell[0]/text[0]",
+      "role": "text",
+      "name": "Seeded members \u2014 what each one shows",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[24]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "450"
+      },
+      "fingerprint": "e16efe5a924324f9"
+    },
+    {
+      "node_id": "content:/row[25]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[25]/cell[0]",
+        "content:/row[25]/cell[1]"
+      ],
+      "hints": {
+        "native": "412"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[25]/cell[0]",
+      "role": "cell",
+      "name": "12345",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[25]",
+      "child_ids": [
+        "content:/row[25]/cell[0]/code[0]"
+      ],
+      "hints": {
+        "native": "413"
+      },
+      "fingerprint": "aadbc78a4b5e8a37"
+    },
+    {
+      "node_id": "content:/row[25]/cell[0]/code[0]",
+      "role": "code",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[25]/cell[0]",
+      "child_ids": [
+        "content:/row[25]/cell[0]/code[0]/text[0]"
+      ],
+      "hints": {
+        "native": "414"
+      },
+      "fingerprint": "2fba1f5135f6386f"
+    },
+    {
+      "node_id": "content:/row[25]/cell[0]/code[0]/text[0]",
+      "role": "text",
+      "name": "12345",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[25]/cell[0]/code[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "451"
+      },
+      "fingerprint": "371a596769c7e4b3"
+    },
+    {
+      "node_id": "content:/row[25]/cell[1]",
+      "role": "cell",
+      "name": "Ada Lovelace \u2014 savings $4,210.55, Active. The straightforward case.",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[25]",
+      "child_ids": [
+        "content:/row[25]/cell[1]/text[0]"
+      ],
+      "hints": {
+        "native": "415"
+      },
+      "fingerprint": "3332b87f84008cd3"
+    },
+    {
+      "node_id": "content:/row[25]/cell[1]/text[0]",
+      "role": "text",
+      "name": "Ada Lovelace \u2014 savings $4,210.55, Active. The straightforward case.",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[25]/cell[1]",
+      "child_ids": [],
+      "hints": {
+        "native": "452"
+      },
+      "fingerprint": "611cf50aae466980"
+    },
+    {
+      "node_id": "content:/row[26]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[26]/cell[0]",
+        "content:/row[26]/cell[1]"
+      ],
+      "hints": {
+        "native": "416"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[26]/cell[0]",
+      "role": "cell",
+      "name": "67890",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[26]",
+      "child_ids": [
+        "content:/row[26]/cell[0]/code[0]"
+      ],
+      "hints": {
+        "native": "417"
+      },
+      "fingerprint": "1d1f6d3376e804d9"
+    },
+    {
+      "node_id": "content:/row[26]/cell[0]/code[0]",
+      "role": "code",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[26]/cell[0]",
+      "child_ids": [
+        "content:/row[26]/cell[0]/code[0]/text[0]"
+      ],
+      "hints": {
+        "native": "418"
+      },
+      "fingerprint": "2fba1f5135f6386f"
+    },
+    {
+      "node_id": "content:/row[26]/cell[0]/code[0]/text[0]",
+      "role": "text",
+      "name": "67890",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[26]/cell[0]/code[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "453"
+      },
+      "fingerprint": "a0b39046301b2ba4"
+    },
+    {
+      "node_id": "content:/row[26]/cell[1]",
+      "role": "cell",
+      "name": "Grace Hopper \u2014 savings $18,730.00. Different values, same screen.",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[26]",
+      "child_ids": [
+        "content:/row[26]/cell[1]/text[0]"
+      ],
+      "hints": {
+        "native": "419"
+      },
+      "fingerprint": "4b03b411813e2c9a"
+    },
+    {
+      "node_id": "content:/row[26]/cell[1]/text[0]",
+      "role": "text",
+      "name": "Grace Hopper \u2014 savings $18,730.00. Different values, same screen.",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[26]/cell[1]",
+      "child_ids": [],
+      "hints": {
+        "native": "454"
+      },
+      "fingerprint": "a7d348458ea6389d"
+    },
+    {
+      "node_id": "content:/row[27]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[27]/cell[0]",
+        "content:/row[27]/cell[1]"
+      ],
+      "hints": {
+        "native": "420"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[27]/cell[0]",
+      "role": "cell",
+      "name": "24680",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[27]",
+      "child_ids": [
+        "content:/row[27]/cell[0]/code[0]"
+      ],
+      "hints": {
+        "native": "421"
+      },
+      "fingerprint": "9bbc36e793c33cf1"
+    },
+    {
+      "node_id": "content:/row[27]/cell[0]/code[0]",
+      "role": "code",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[27]/cell[0]",
+      "child_ids": [
+        "content:/row[27]/cell[0]/code[0]/text[0]"
+      ],
+      "hints": {
+        "native": "422"
+      },
+      "fingerprint": "2fba1f5135f6386f"
+    },
+    {
+      "node_id": "content:/row[27]/cell[0]/code[0]/text[0]",
+      "role": "text",
+      "name": "24680",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[27]/cell[0]/code[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "455"
+      },
+      "fingerprint": "5845a9a5c43c83b2"
+    },
+    {
+      "node_id": "content:/row[27]/cell[1]",
+      "role": "cell",
+      "name": "Alan Turing \u2014 savings $0.00, Closed. An empty account is still an answer.",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[27]",
+      "child_ids": [
+        "content:/row[27]/cell[1]/text[0]"
+      ],
+      "hints": {
+        "native": "423"
+      },
+      "fingerprint": "fb69b59306afb4d3"
+    },
+    {
+      "node_id": "content:/row[27]/cell[1]/text[0]",
+      "role": "text",
+      "name": "Alan Turing \u2014 savings $0.00, Closed. An empty account is still an answer.",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[27]/cell[1]",
+      "child_ids": [],
+      "hints": {
+        "native": "456"
+      },
+      "fingerprint": "7ef923748757bc2e"
+    },
+    {
+      "node_id": "content:/row[28]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[28]/cell[0]",
+        "content:/row[28]/cell[1]"
+      ],
+      "hints": {
+        "native": "424"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[28]/cell[0]",
+      "role": "cell",
+      "name": "13579",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[28]",
+      "child_ids": [
+        "content:/row[28]/cell[0]/code[0]"
+      ],
+      "hints": {
+        "native": "425"
+      },
+      "fingerprint": "ce9d606a9528de6f"
+    },
+    {
+      "node_id": "content:/row[28]/cell[0]/code[0]",
+      "role": "code",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[28]/cell[0]",
+      "child_ids": [
+        "content:/row[28]/cell[0]/code[0]/text[0]"
+      ],
+      "hints": {
+        "native": "426"
+      },
+      "fingerprint": "2fba1f5135f6386f"
+    },
+    {
+      "node_id": "content:/row[28]/cell[0]/code[0]/text[0]",
+      "role": "text",
+      "name": "13579",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[28]/cell[0]/code[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "457"
+      },
+      "fingerprint": "e0e1bd630ab6c27e"
+    },
+    {
+      "node_id": "content:/row[28]/cell[1]",
+      "role": "cell",
+      "name": "Katherine Johnson \u2014 checking only. Returns no_savings_account.",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[28]",
+      "child_ids": [
+        "content:/row[28]/cell[1]/text[0]",
+        "content:/row[28]/cell[1]/code[0]",
+        "content:/row[28]/cell[1]/text[1]"
+      ],
+      "hints": {
+        "native": "427"
+      },
+      "fingerprint": "83fad458a4b319de"
+    },
+    {
+      "node_id": "content:/row[28]/cell[1]/text[0]",
+      "role": "text",
+      "name": "Katherine Johnson \u2014 checking only. Returns",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[28]/cell[1]",
+      "child_ids": [],
+      "hints": {
+        "native": "458"
+      },
+      "fingerprint": "27de5bb20b520d7a"
+    },
+    {
+      "node_id": "content:/row[28]/cell[1]/code[0]",
+      "role": "code",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[28]/cell[1]",
+      "child_ids": [
+        "content:/row[28]/cell[1]/code[0]/text[0]"
+      ],
+      "hints": {
+        "native": "428"
+      },
+      "fingerprint": "2fba1f5135f6386f"
+    },
+    {
+      "node_id": "content:/row[28]/cell[1]/code[0]/text[0]",
+      "role": "text",
+      "name": "no_savings_account",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[28]/cell[1]/code[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "459"
+      },
+      "fingerprint": "570c590a93e3d8d3"
+    },
+    {
+      "node_id": "content:/row[28]/cell[1]/text[1]",
+      "role": "text",
+      "name": ".",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[28]/cell[1]",
+      "child_ids": [],
+      "hints": {
+        "native": "460"
+      },
+      "fingerprint": "501fcbbbd30bd5c6"
+    },
+    {
+      "node_id": "content:/row[29]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[29]/cell[0]",
+        "content:/row[29]/cell[1]"
+      ],
+      "hints": {
+        "native": "429"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[29]/cell[0]",
+      "role": "cell",
+      "name": "55555",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[29]",
+      "child_ids": [
+        "content:/row[29]/cell[0]/code[0]"
+      ],
+      "hints": {
+        "native": "430"
+      },
+      "fingerprint": "2e41c95a777c8bda"
+    },
+    {
+      "node_id": "content:/row[29]/cell[0]/code[0]",
+      "role": "code",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[29]/cell[0]",
+      "child_ids": [
+        "content:/row[29]/cell[0]/code[0]/text[0]"
+      ],
+      "hints": {
+        "native": "431"
+      },
+      "fingerprint": "2fba1f5135f6386f"
+    },
+    {
+      "node_id": "content:/row[29]/cell[0]/code[0]/text[0]",
+      "role": "text",
+      "name": "55555",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[29]/cell[0]/code[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "461"
+      },
+      "fingerprint": "93375588160d59bd"
+    },
+    {
+      "node_id": "content:/row[29]/cell[1]",
+      "role": "cell",
+      "name": "Restricted record. Returns permission_denied.",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[29]",
+      "child_ids": [
+        "content:/row[29]/cell[1]/text[0]",
+        "content:/row[29]/cell[1]/code[0]",
+        "content:/row[29]/cell[1]/text[1]"
+      ],
+      "hints": {
+        "native": "432"
+      },
+      "fingerprint": "a307d0f5c44a735a"
+    },
+    {
+      "node_id": "content:/row[29]/cell[1]/text[0]",
+      "role": "text",
+      "name": "Restricted record. Returns",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[29]/cell[1]",
+      "child_ids": [],
+      "hints": {
+        "native": "462"
+      },
+      "fingerprint": "67405cdf16c5c438"
+    },
+    {
+      "node_id": "content:/row[29]/cell[1]/code[0]",
+      "role": "code",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[29]/cell[1]",
+      "child_ids": [
+        "content:/row[29]/cell[1]/code[0]/text[0]"
+      ],
+      "hints": {
+        "native": "433"
+      },
+      "fingerprint": "2fba1f5135f6386f"
+    },
+    {
+      "node_id": "content:/row[29]/cell[1]/code[0]/text[0]",
+      "role": "text",
+      "name": "permission_denied",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[29]/cell[1]/code[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "463"
+      },
+      "fingerprint": "9782e881d9e72b50"
+    },
+    {
+      "node_id": "content:/row[29]/cell[1]/text[1]",
+      "role": "text",
+      "name": ".",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[29]/cell[1]",
+      "child_ids": [],
+      "hints": {
+        "native": "464"
+      },
+      "fingerprint": "501fcbbbd30bd5c6"
+    },
+    {
+      "node_id": "content:/row[30]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[30]/cell[0]",
+        "content:/row[30]/cell[1]"
+      ],
+      "hints": {
+        "native": "434"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[30]/cell[0]",
+      "role": "cell",
+      "name": "99999",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[30]",
+      "child_ids": [
+        "content:/row[30]/cell[0]/code[0]"
+      ],
+      "hints": {
+        "native": "435"
+      },
+      "fingerprint": "136c790db84301d4"
+    },
+    {
+      "node_id": "content:/row[30]/cell[0]/code[0]",
+      "role": "code",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[30]/cell[0]",
+      "child_ids": [
+        "content:/row[30]/cell[0]/code[0]/text[0]"
+      ],
+      "hints": {
+        "native": "436"
+      },
+      "fingerprint": "2fba1f5135f6386f"
+    },
+    {
+      "node_id": "content:/row[30]/cell[0]/code[0]/text[0]",
+      "role": "text",
+      "name": "99999",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[30]/cell[0]/code[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "465"
+      },
+      "fingerprint": "acb683931cffda11"
+    },
+    {
+      "node_id": "content:/row[30]/cell[1]",
+      "role": "cell",
+      "name": "No such member. Returns member_not_found.",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[30]",
+      "child_ids": [
+        "content:/row[30]/cell[1]/text[0]",
+        "content:/row[30]/cell[1]/code[0]",
+        "content:/row[30]/cell[1]/text[1]"
+      ],
+      "hints": {
+        "native": "437"
+      },
+      "fingerprint": "3508a374eb8c3dcb"
+    },
+    {
+      "node_id": "content:/row[30]/cell[1]/text[0]",
+      "role": "text",
+      "name": "No such member. Returns",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[30]/cell[1]",
+      "child_ids": [],
+      "hints": {
+        "native": "466"
+      },
+      "fingerprint": "2f5291b66c0dd8b4"
+    },
+    {
+      "node_id": "content:/row[30]/cell[1]/code[0]",
+      "role": "code",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[30]/cell[1]",
+      "child_ids": [
+        "content:/row[30]/cell[1]/code[0]/text[0]"
+      ],
+      "hints": {
+        "native": "438"
+      },
+      "fingerprint": "2fba1f5135f6386f"
+    },
+    {
+      "node_id": "content:/row[30]/cell[1]/code[0]/text[0]",
+      "role": "text",
+      "name": "member_not_found",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[30]/cell[1]/code[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "467"
+      },
+      "fingerprint": "f6d12190bee88d8f"
+    },
+    {
+      "node_id": "content:/row[30]/cell[1]/text[1]",
+      "role": "text",
+      "name": ".",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[30]/cell[1]",
+      "child_ids": [],
+      "hints": {
+        "native": "468"
+      },
+      "fingerprint": "501fcbbbd30bd5c6"
+    },
+    {
+      "node_id": "content:/row[31]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[31]/cell[0]"
+      ],
+      "hints": {
+        "native": "439"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[31]/cell[0]",
+      "role": "cell",
+      "name": "The last three are business outcomes, not failures: the capability exits 0 and reports the code.",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[31]",
+      "child_ids": [
+        "content:/row[31]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "440"
+      },
+      "fingerprint": "ad0c823b7f328827"
+    },
+    {
+      "node_id": "content:/row[31]/cell[0]/text[0]",
+      "role": "text",
+      "name": "The last three are business outcomes, not failures: the capability exits 0 and reports the code.",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[31]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "469"
+      },
+      "fingerprint": "176eaa0c009b8daf"
     }
   ],
-  "captured_at": "2026-09-15T16:49:04.015150Z",
+  "captured_at": "2026-09-15T18:56:47.272040Z",
   "http_status": 200
 }

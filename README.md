@@ -29,7 +29,7 @@ make setup && make demo
 ```
 
 That is the whole assessment path: `make setup` builds the venv and installs Chromium, `make demo`
-runs all twelve stages end to end in about a minute. Everything in this repository works offline
+runs all fourteen stages end to end in about a minute. Everything in this repository works offline
 with no key. The single exception is a live discovery run — copy `.env.example` to `.env` and set
 `OPENROUTER_API_KEY` for that; without one, discovery replays a recorded transcript and says so, in
 the output and in the evidence it writes.
