@@ -1,6 +1,6 @@
 {
-  "snapshot_id": "snap-3ceb4c7947",
-  "url": "http://127.0.0.1:62957/",
+  "snapshot_id": "snap-db9038b6bd",
+  "url": "http://127.0.0.1:50241/",
   "title": "MemberDesk",
   "nodes": [
     {
@@ -35,7 +35,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "198"
+        "native": "199"
       },
       "fingerprint": "dac0da6641c0fbca"
     },
@@ -53,7 +53,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "199"
+        "native": "200"
       },
       "fingerprint": "dac0da6641c0fbca"
     },
@@ -93,7 +93,7 @@
         "nav:/generic[4]/text[0]"
       ],
       "hints": {
-        "native": "207"
+        "native": "208"
       },
       "fingerprint": "a8ff80b0f161e267"
     },
@@ -131,7 +131,7 @@
         "nav:/generic[5]/text[0]"
       ],
       "hints": {
-        "native": "208"
+        "native": "209"
       },
       "fingerprint": "a8ff80b0f161e267"
     },
@@ -169,7 +169,7 @@
         "nav:/generic[6]/text[0]"
       ],
       "hints": {
-        "native": "209"
+        "native": "210"
       },
       "fingerprint": "a8ff80b0f161e267"
     },
@@ -205,7 +205,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "210"
+        "native": "211"
       },
       "fingerprint": "71449859354b6cef"
     },
@@ -282,7 +282,7 @@
         "nav:/row[9]/cell[0]"
       ],
       "hints": {
-        "native": "212"
+        "native": "213"
       },
       "fingerprint": "fa1f5bbbdad001d1"
     },
@@ -302,7 +302,7 @@
         "nav:/row[9]/cell[0]/link[0]"
       ],
       "hints": {
-        "native": "213"
+        "native": "214"
       },
       "fingerprint": "d50d2553ca8865ec"
     },
@@ -323,7 +323,7 @@
       ],
       "hints": {
         "css": "a.nav-link-btn",
-        "native": "214"
+        "native": "193"
       },
       "fingerprint": "c5ec08a2c78d2403"
     },
@@ -767,6 +767,6 @@
       "fingerprint": "d711eb93a8bc15a6"
     }
   ],
-  "captured_at": "2026-09-15T12:51:11.548222Z",
+  "captured_at": "2026-09-15T16:49:07.489834Z",
   "http_status": 200
 }

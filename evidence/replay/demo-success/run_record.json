@@ -2,7 +2,7 @@
   "run_id": "demo-success",
   "kind": "replay",
   "capability_ref": "corebank.member.savings_balance@1.0.0",
-  "capability_content_hash": "sha256:74bb8641b3bfc34c4513983d5868af52ad40e02c561d8535252c164f63e3a15e",
+  "capability_content_hash": "sha256:cf15c4da20accd71f204df1d5529fa90340a9f76bbab66d9ac640b6b906a7237",
   "tenant": null,
   "goal": null,
   "inputs": {
@@ -19,8 +19,8 @@
       "policy_decision": "safe (default)",
       "observation": null,
       "resolution": null,
-      "started_at": "2026-09-15T12:51:08.227749Z",
-      "duration_ms": 12,
+      "started_at": "2026-09-15T16:49:03.991058Z",
+      "duration_ms": 11,
       "recovery_rule_applied": null,
       "error_code": null,
       "snapshot_ref": null,
@@ -44,8 +44,8 @@
         "ambiguity_score": null,
         "fingerprint_matched": null
       },
-      "started_at": "2026-09-15T12:51:08.245455Z",
-      "duration_ms": 3,
+      "started_at": "2026-09-15T16:49:04.006741Z",
+      "duration_ms": 2,
       "recovery_rule_applied": null,
       "error_code": null,
       "snapshot_ref": null,
@@ -69,7 +69,7 @@
         "ambiguity_score": null,
         "fingerprint_matched": null
       },
-      "started_at": "2026-09-15T12:51:08.333628Z",
+      "started_at": "2026-09-15T16:49:04.094549Z",
       "duration_ms": 1,
       "recovery_rule_applied": null,
       "error_code": null,
@@ -94,7 +94,7 @@
         "ambiguity_score": null,
         "fingerprint_matched": null
       },
-      "started_at": "2026-09-15T12:51:08.369045Z",
+      "started_at": "2026-09-15T16:49:04.136267Z",
       "duration_ms": 0,
       "recovery_rule_applied": null,
       "error_code": "extract is not a driver-level action",
@@ -119,7 +119,7 @@
         "ambiguity_score": null,
         "fingerprint_matched": null
       },
-      "started_at": "2026-09-15T12:51:08.466419Z",
+      "started_at": "2026-09-15T16:49:04.238377Z",
       "duration_ms": 0,
       "recovery_rule_applied": null,
       "error_code": "extract is not a driver-level action",
@@ -144,7 +144,7 @@
         "ambiguity_score": null,
         "fingerprint_matched": null
       },
-      "started_at": "2026-09-15T12:51:08.575700Z",
+      "started_at": "2026-09-15T16:49:04.369867Z",
       "duration_ms": 0,
       "recovery_rule_applied": null,
       "error_code": "extract is not a driver-level action",
@@ -156,7 +156,7 @@
     "status": "success",
     "capability_id": "corebank.member.savings_balance",
     "capability_version": "1.0.0",
-    "run_id": "rep-4942379cc5",
+    "run_id": "rep-4fb10d9eed",
     "outputs": {
       "savings_balance": "18730.00",
       "account_status": "Active",
@@ -167,7 +167,7 @@
     "intervention": null,
     "steps_executed": 5,
     "steps_total": 5,
-    "duration_ms": 470,
+    "duration_ms": 503,
     "drift_score": 0.0,
     "strategy_mix": {
       "semantic_exact": 2,
@@ -176,8 +176,8 @@
     "recovery_attempts": 0,
     "evidence_ref": "evidence/replay/demo-success"
   },
-  "started_at": "2026-09-15T12:51:08.200376Z",
-  "duration_ms": 470,
+  "started_at": "2026-09-15T16:49:03.966397Z",
+  "duration_ms": 503,
   "evidence_ref": "evidence/replay/demo-success",
   "model_name": null,
   "tokens_used": null,

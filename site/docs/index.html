@@ -463,9 +463,12 @@ make demo</code></pre>
   <p>Takes about a minute. Works without an API key — discovery falls back to a recorded transcript and says so explicitly.</p>
 
   <h2>Unified Orchestrator (<code>./start.sh</code>)</h2>
+  <p>Orchestration over the Makefile targets — it adds nothing you could not run by hand, it just
+    names the combinations (app and console together, wait-for-ready, teardown on Ctrl+C).</p>
   <pre><code>./start.sh                 <span class="comment"># Default: setup venv + run the full 12-stage demo</span>
-./start.sh ui              <span class="comment"># Launch Human-in-the-Loop Web Console + Mock Bank</span>
-./start.sh ui --headed     <span class="comment"># Run the console with visible (headed) Chromium</span>
+./start.sh ui              <span class="comment"># Console + mock bank, with an escalation already waiting</span>
+./start.sh ui --headed     <span class="comment"># ...and watch the supervised browser while you claim it</span>
+./start.sh ui --bare       <span class="comment"># Console over an idle session: the queue stays empty</span>
 ./start.sh app             <span class="comment"># Run hostile mock back-office app (port 8811)</span>
 ./start.sh app-b           <span class="comment"># Run rebranded second-tenant variant (port 8811)</span>
 ./start.sh check           <span class="comment"># Run CI checks: lint + typecheck + invariants + tests</span>

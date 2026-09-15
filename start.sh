@@ -21,6 +21,13 @@ CUA=".venv/bin/cua"
 MODE="demo"
 SKIP_SETUP=0
 HEADLESS="${CUA_HEADLESS:-true}"
+BARE_CONSOLE=0
+
+# What `console`/`ui` supervises so the queue is not empty. A capability that fails closed on
+# an armed fault is the shortest honest route to a real intervention -- nothing is faked.
+DEMO_CAPABILITY="corebank.member.savings_balance@1.0.0"
+DEMO_MEMBER="12345"
+DEMO_FAULT="undeclared_dialog"
 MOCK_APP_PORT="${MOCK_APP_PORT:-8811}"
 CONSOLE_PORT="${CONSOLE_PORT:-8812}"
 
@@ -35,9 +42,11 @@ MODES
                 Works with no API key — discovery falls back to a recorded transcript and says so.
   app         Just the hostile mock back-office, in the foreground, on --app-port (default 8811).
   app-b       The same app as the "second tenant" variant (rebranded, restyled), same port.
-  console     The operator console, supervising a freshly booted mock back-office. Starts the app
-                in the background, waits for it to answer, then runs the console in the foreground
-                on --console-port (default 8812). Ctrl+C stops both.
+  console     The operator console with a real escalation already waiting. Starts the mock
+                back-office in the background, waits for it to answer, then runs a capability
+                against the console's own session with a fault armed — so the intervention queue
+                has something in it and the human handoff is reachable from the served UI. Ctrl+C
+                stops both. Pass --bare for a console supervising an idle session instead.
   ui          Alias for `console` — the phrase people reach for when they mean "show me the app".
   check       `make check` — lint + strict typecheck + architectural invariants + full test suite.
   test        `make test` — the offline suite only (no API key, no network).
@@ -49,12 +58,14 @@ OPTIONS
   --app-port PORT       Port for the mock back-office (default 8811, or $MOCK_APP_PORT).
   --console-port PORT   Port for the operator console (default 8812, or $CONSOLE_PORT).
   --headed              Run the console's supervised browser headed (visible), not headless.
+  --bare                 console/ui: supervise an idle session with no capability and no fault.
+                           The queue stays empty and the handoff cannot be demonstrated.
   --skip-setup           Assume .venv already exists; fail instead of auto-running `make setup`.
   -h, --help             Show this message.
 
 EXAMPLES
   ./start.sh                          # the whole graded demo
-  ./start.sh ui                       # click around the redesigned operator console yourself
+  ./start.sh ui                       # console with an escalation waiting — claim it, act, hand back
   ./start.sh ui --headed              # ...and watch the real browser window while you do it
   ./start.sh app-b --app-port 9001    # the rebranded tenant, on a different port
   ./start.sh check                    # what CI runs
@@ -74,6 +85,7 @@ while [[ $# -gt 0 ]]; do
     --console-port) CONSOLE_PORT="$2"; shift 2 ;;
     --headed) HEADLESS="false"; shift ;;
     --skip-setup) SKIP_SETUP=1; shift ;;
+    --bare) BARE_CONSOLE=1; shift ;;
     -h|--help) usage; exit 0 ;;
     *) echo "start.sh: unrecognized option '$1'" >&2; usage >&2; exit 2 ;;
   esac
@@ -160,13 +172,33 @@ run_console() {
     exit 1
   fi
 
-  echo "==> Operator console on http://127.0.0.1:${CONSOLE_PORT}"
+  # Built as an array rather than an unquoted command substitution: the old
+  # `$( [[ ... ]] && echo --no-headless )` relied on word-splitting an empty string to mean "no
+  # flag", which shellcheck flags (SC2046) and which breaks the moment an argument contains a
+  # space. An array says "these are the arguments" without relying on splitting at all.
+  local args=(console --port "$CONSOLE_PORT" --target "http://127.0.0.1:${MOCK_APP_PORT}/")
+  [[ "$HEADLESS" == "false" ]] && args+=(--no-headless)
+
+  if [[ "$BARE_CONSOLE" == "1" ]]; then
+    echo "==> Operator console on http://127.0.0.1:${CONSOLE_PORT}  (--bare: idle session)"
+    echo "    the intervention queue will be empty — nothing can escalate on an idle session"
+  else
+    # Without a capability the console supervises a session that can never escalate, so the
+    # queue stays empty and the one flow this console exists for is unreachable from the served
+    # UI -- which is exactly what someone typing `./start.sh ui` is trying to look at. So run a
+    # real capability against the console's own session with a fault armed, and hand them a
+    # console with an escalation already in it. `--bare` restores the idle behaviour.
+    args+=(--sign-in
+           --capability "$DEMO_CAPABILITY"
+           --input "member_id=${DEMO_MEMBER}"
+           --arm-fault "$DEMO_FAULT")
+    echo "==> Operator console on http://127.0.0.1:${CONSOLE_PORT}"
+    echo "    an escalation will be waiting — claim it, act on the page, hand it back"
+  fi
   echo "    supervising  : http://127.0.0.1:${MOCK_APP_PORT}/"
   echo "    supervised browser headless: ${HEADLESS}"
-  "$CUA" console \
-    --port "$CONSOLE_PORT" \
-    --target "http://127.0.0.1:${MOCK_APP_PORT}/" \
-    $( [[ "$HEADLESS" == "false" ]] && echo "--no-headless" ) &
+
+  "$CUA" "${args[@]}" &
   console_pid=$!
   wait "$console_pid"
 }
