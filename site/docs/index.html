@@ -332,7 +332,6 @@
 
   <div class="sidebar-group">
     <div class="sidebar-group-label">Product</div>
-    <a class="sidebar-link" onclick="show('prd')">Product Requirements</a>
     <a class="sidebar-link" onclick="show('requirements')">Requirements Traceability</a>
   </div>
 
@@ -395,8 +394,7 @@
 
   <h2>Product</h2>
   <ul class="doc-index">
-    <li onclick="show('prd')"><span class="doc-title">Product Requirements</span><span class="doc-path">prd/00-prd</span></li>
-    <li onclick="show('requirements')"><span class="doc-title">Requirements Traceability</span><span class="doc-path">prd/01-requirements-traceability</span></li>
+    <li onclick="show('requirements')"><span class="doc-title">Requirements Traceability</span><span class="doc-path">requirements-traceability</span></li>
   </ul>
 
   <h2>Testing</h2>
@@ -1002,54 +1000,6 @@ overrides:
 </div>
 
 <!-- ================================ PRD ================================ -->
-<div class="article" id="prd">
-  <div class="breadcrumb"><a href="#" onclick="show('overview'); return false">DOCS</a> / PRODUCT</div>
-  <h1>Product Requirements</h1>
-  <p class="lead">Problem, users, requirements, success criteria, and scope.</p>
-
-  <blockquote><strong>Thesis: discovery is probabilistic; execution is deterministic.</strong></blockquote>
-
-  <h2>Problem</h2>
-  <p>Banks and credit unions run a long tail of back-office applications with <strong>no API</strong>: core banking screens, servicing tools, admin consoles. When an AI agent needs to get real work done, the only way in is to drive the UI the way a human operator would.</p>
-  <p>Doing that with an LLM on every invocation is slow, expensive, non-deterministic, and unauditable — three of which are disqualifying in a regulated environment.</p>
-
-  <h2>Users</h2>
-  <table>
-    <thead><tr><th>User</th><th>Needs</th></tr></thead>
-    <tbody>
-      <tr><td><strong>A calling AI agent</strong></td><td>Invoke a capability by name with typed arguments and get a typed result back</td></tr>
-      <tr><td><strong>A human reviewer</strong></td><td>Read a capability and understand what it does, without running it</td></tr>
-      <tr><td><strong>A human operator</strong></td><td>Take a stuck session, control it, and hand it back</td></tr>
-      <tr><td><strong>An engineer on call</strong></td><td>Read a failure and know: what step, what was expected, what was observed</td></tr>
-    </tbody>
-  </table>
-
-  <h2>Requirements</h2>
-  <table>
-    <thead><tr><th>#</th><th>Requirement</th></tr></thead>
-    <tbody>
-      <tr><td>R1</td><td>Accept a natural-language goal + target; run an LLM observe→decide→act loop against a live UI</td></tr>
-      <tr><td>R2</td><td>Emit a typed, versioned, serializable artifact: ordered steps, typed I/O, success checkpoint</td></tr>
-      <tr><td>R3</td><td>Replay that artifact deterministically with no LLM in the decision loop</td></tr>
-      <tr><td>R4</td><td>Distinguish business outcomes from recoverable conditions from hard failures</td></tr>
-      <tr><td>R5</td><td>Enforce a configurable allowlist; classify risky actions; never persist secrets or raw PII</td></tr>
-      <tr><td>R6</td><td>Produce evidence: a structured log of what happened and why</td></tr>
-      <tr><td>R7</td><td>Detect "stuck", route an intervention, let a human take the live session and hand it back</td></tr>
-      <tr><td>R8</td><td>Design a credible answer for heterogeneous surfaces and multi-tenant reuse</td></tr>
-    </tbody>
-  </table>
-
-  <h2>Success criteria</h2>
-  <ol>
-    <li>A real LLM discovery run exists in <code>/evidence/</code></li>
-    <li>The artifact schema is genuinely good — typed I/O, semantic targeting, asserted checkpoint</li>
-    <li>Replay demonstrably never touches the LLM, and a fault matrix shows the taxonomy working</li>
-    <li>A human really takes over the live session and the run resumes</li>
-    <li><code>REPORT.md</code> defends the trade-offs under the seven mandated headings</li>
-  </ol>
-</div>
-
-<!-- ================================ REQUIREMENTS ================================ -->
 <div class="article" id="requirements">
   <div class="breadcrumb"><a href="#" onclick="show('overview'); return false">DOCS</a> / PRODUCT</div>
   <h1>Requirements Traceability</h1>

@@ -29,7 +29,7 @@ drift score, a four-line overlay names the new label, and it succeeds. The demo 
 
 Discovered by spiking the accessibility tree against this app before building the resolver -- an
 earlier draft of this file claimed structural anchoring survived rebranding, which the spike
-disproved. See docs/prd/phases/phase-03-perception-driver.md.
+disproved. See docs/adr/0001-uisnapshot-as-the-cross-surface-abstraction.md.
 """
 
 from __future__ import annotations

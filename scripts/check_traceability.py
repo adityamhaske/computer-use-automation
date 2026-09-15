@@ -18,7 +18,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-MATRIX = ROOT / "docs/prd/01-requirements-traceability.md"
+MATRIX = ROOT / "docs/requirements-traceability.md"
 
 # AGENTS.md is checked for the same reason and is arguably the more important of the two: it is the
 # document that *defines* the invariants and claims each one is enforced. Four of its nine "Enforced

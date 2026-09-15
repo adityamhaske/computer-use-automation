@@ -123,9 +123,9 @@ exists is as misleading as one that names what does not.
 
 | Deliverable | Where |
 |---|---|
-| `/README.md` — setup + demo path | [`README.md`](../../README.md) |
-| `/REPORT.md` — the seven mandated headings | [`REPORT.md`](../../REPORT.md) |
-| `/evidence/` — artifact + discovery log + replay logs | [`evidence/`](../../evidence/) |
+| `/README.md` — setup + demo path | [`README.md`](../README.md) |
+| `/REPORT.md` — the seven mandated headings | [`REPORT.md`](../REPORT.md) |
+| `/evidence/` — artifact + discovery log + replay logs | [`evidence/`](../evidence/) |
 | An error-path replay | `evidence/replay/demo-recovery-exhausted/`, `evidence/replay/demo-input-rejected/`, `evidence/escalation/demo-escalation/` |
 
 ## Known gaps

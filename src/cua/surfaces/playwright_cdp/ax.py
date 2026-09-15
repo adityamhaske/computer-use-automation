@@ -14,7 +14,7 @@ stitch the results. Two approaches that do *not* work, recorded so nobody re-der
 - A depth argument on the page-level call -- frames are a boundary, not a depth limit.
 
 Measured in `scripts/spike_semantic_tree.py`; findings in
-docs/prd/phases/phase-03-perception-driver.md.
+docs/adr/0001-uisnapshot-as-the-cross-surface-abstraction.md.
 """
 
 from __future__ import annotations

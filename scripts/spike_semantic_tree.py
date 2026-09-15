@@ -8,7 +8,8 @@ a reviewer should be able to check the claim rather than take it on faith.
     make app-variant-b MOCK_APP_PORT=8821       # terminal 2 (optional, for the variant comparison)
     .venv/bin/python scripts/spike_semantic_tree.py
 
-Findings are recorded in docs/prd/phases/phase-03-perception-driver.md.
+The decision this measurement supports is recorded in
+docs/adr/0001-uisnapshot-as-the-cross-surface-abstraction.md.
 """
 
 from __future__ import annotations
@@ -121,7 +122,7 @@ def main() -> int:
         return 1
 
     print("=" * 76)
-    print("Conclusions (see docs/prd/phases/phase-03-perception-driver.md)")
+    print("Conclusions (see docs/adr/0001-uisnapshot-as-the-cross-surface-abstraction.md)")
     print("=" * 76)
     print("  - The AX tree does NOT cross frames; the driver must stitch per-frame trees.")
     print("  - Controls carry real accessible names, so semantic_exact is viable.")
