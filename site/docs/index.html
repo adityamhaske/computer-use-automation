@@ -69,27 +69,30 @@
       --border: #e4e4e7;
       --border-strong: #d4d4d8;
 
-      /* 4 Subtle Accent Color Tokens (Zero Yellow/Gold) */
-      --color-mint: #059669;
-      --color-mint-bg: #ecfdf5;
-      --color-mint-border: #a7f3d0;
+      /* Accent tokens. The names are historical; the values are not blue or purple.
+         Hue is reserved for meaning here exactly as in the console: emerald for healthy,
+         amber for attention, brick for failure, and a warm graphite for everything that
+         is merely in progress. Neutrals are warm (hue ~35), not cool blue-grey. */
+      --color-mint: #157a4a;
+      --color-mint-bg: #e7f2ea;
+      --color-mint-border: #c4e2d1;
 
-      --color-blue: #2563eb;
-      --color-blue-bg: #eff6ff;
-      --color-blue-border: #bfdbfe;
+      --color-blue: #6b665d;   /* warm graphite — see the note above */
+      --color-blue-bg: #f2f0ec;
+      --color-blue-border: #ddd8d0;
 
-      --color-purple: #7c3aed;
-      --color-purple-bg: #f5f3ff;
-      --color-purple-border: #ddd6fe;
+      --color-purple: #146b52;
+      --color-purple-bg: #e8f2ed;
+      --color-purple-border: #cfe4d9;
 
-      --color-red: #dc2626;
-      --color-red-bg: #fef2f2;
-      --color-red-border: #fecaca;
+      --color-red: #9c3428;
+      --color-red-bg: #f9eae7;
+      --color-red-border: #edcdc7;
 
-      --success: #059669;
-      --warning: #71717a;
-      --danger: #dc2626;
-      --info: #2563eb;
+      --success: #157a4a;
+      --warning: #8a6410;
+      --danger: #9c3428;
+      --info: #6b665d;
 
       --radius: 8px;
       --radius-sm: 6px;
@@ -130,27 +133,27 @@
       --border: #27272a;
       --border-strong: #3f3d48;
 
-      /* 4 Subtle Accent Color Tokens - Dark Mode */
-      --color-mint: #34d399;
-      --color-mint-bg: rgba(16, 185, 129, 0.12);
-      --color-mint-border: rgba(16, 185, 129, 0.28);
+      /* Dark values for the same tokens. */
+      --color-mint: #57bd8b;
+      --color-mint-bg: rgba(87, 189, 139, 0.14);
+      --color-mint-border: rgba(87, 189, 139, 0.28);
 
-      --color-blue: #60a5fa;
-      --color-blue-bg: rgba(59, 130, 246, 0.12);
-      --color-blue-border: rgba(59, 130, 246, 0.28);
+      --color-blue: #9d968c;
+      --color-blue-bg: rgba(157, 150, 140, 0.14);
+      --color-blue-border: rgba(157, 150, 140, 0.28);
 
-      --color-purple: #a78bfa;
-      --color-purple-bg: rgba(139, 92, 246, 0.12);
-      --color-purple-border: rgba(139, 92, 246, 0.28);
+      --color-purple: #5cbf99;
+      --color-purple-bg: rgba(92, 191, 153, 0.14);
+      --color-purple-border: rgba(92, 191, 153, 0.28);
 
-      --color-red: #f87171;
-      --color-red-bg: rgba(239, 68, 68, 0.12);
-      --color-red-border: rgba(239, 68, 68, 0.28);
+      --color-red: #e08b80;
+      --color-red-bg: rgba(224, 139, 128, 0.13);
+      --color-red-border: rgba(224, 139, 128, 0.28);
 
-      --success: #34d399;
-      --warning: #a1a1aa;
-      --danger: #ef4444;
-      --info: #60a5fa;
+      --success: #57bd8b;
+      --warning: #d9a441;
+      --danger: #e08b80;
+      --info: #9d968c;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -353,7 +356,7 @@
       background: none; padding: 0; color: inherit; font-size: inherit; border: none;
     }
     .article pre .comment { color: #6a9955; }
-    .article pre .keyword { color: #c586c0; }
+    .article pre .keyword { color: #a3d9bd; }
     .article pre .string { color: #ce9178; }
     .article pre .type { color: #4ec9b0; }
 
@@ -1377,7 +1380,6 @@ make app                 <span class="comment"># the mock back-office on :8811</
   <h2>Output</h2>
   <pre><code>evidence/discovery/&lt;run_id&gt;/
   trace.jsonl        authorize / resolve / dispatch / observe, actor-tagged
-  llm_calls.jsonl    full model exchange, redacted
   snapshots/         UiSnapshot per step
   screenshots/       redacted
   run_record.json    status, timings, budget
@@ -1387,7 +1389,7 @@ evidence/capabilities/&lt;id&gt;@&lt;version&gt;.yaml</code></pre>
   <table>
     <thead><tr><th>Symptom</th><th>Look at</th></tr></thead>
     <tbody>
-      <tr><td>Stops at <code>max_steps</code></td><td><code>llm_calls.jsonl</code> — is it looping on one screen?</td></tr>
+      <tr><td>Stops at <code>max_steps</code></td><td>the <code>llm_call</code> events in <code>trace.jsonl</code> — is it looping on one screen?</td></tr>
       <tr><td><code>POLICY_DENIED</code></td><td>Expected if the goal needs an irreversible action</td></tr>
       <tr><td><code>TARGET_AMBIGUOUS</code></td><td>The screen genuinely has two matching controls. Good — it refused.</td></tr>
       <tr><td>Model can't find a control</td><td>Check the <code>UiSnapshot</code> in <code>snapshots/</code></td></tr>
@@ -1469,7 +1471,7 @@ cua replay &lt;artifact&gt; --fault session_timeout           <span class="comme
 </div>
 
   <footer style="margin-top: 64px; padding-top: 24px; padding-bottom: 24px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-    <span>CUA &middot; Computer-Use Automation &middot; Proprietary and Confidential &middot; All Rights Reserved</span>
+    <span>CUA &middot; Computer-Use Automation &middot; MIT Licensed</span>
     <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
       <a href="../sitemap.xml" style="color: var(--text-muted); text-decoration: none;">Sitemap</a>
       <a href="../llms.txt" style="color: var(--color-blue); font-family: var(--font-mono); text-decoration: none;">llms.txt</a>
@@ -1547,8 +1549,9 @@ function applyTheme(theme) {
   }
 }
 
-const savedTheme = localStorage.getItem('cua-theme') || 
-  (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+// Light by default, unconditionally — the OS preference is not consulted. Dark is a
+// deliberate choice via the toggle, and it persists once made.
+const savedTheme = localStorage.getItem('cua-theme') || 'light';
 applyTheme(savedTheme);
 
 themeToggle.addEventListener('click', () => {

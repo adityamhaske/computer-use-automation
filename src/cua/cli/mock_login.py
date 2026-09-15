@@ -20,20 +20,51 @@ this is not a general "log in to any target" mechanism, and it is never pointed 
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from cua.runtime.wiring import Rig
 
 
+def _demo_credentials() -> tuple[str, str]:
+    """The mock app's own fixed credentials, read from the app rather than duplicated.
+
+    `apps/` is deliberately not part of the installed package -- it is a test fixture, not product
+    code -- so it is importable only because the repository root is the working directory. That
+    holds for `python -m cua.cli.main`, whose sys.path[0] is the cwd, and *not* for the `cua`
+    console script, whose sys.path[0] is the venv's bin directory. The README documents the console
+    script, so `cua replay --sign-in` raised ModuleNotFoundError while the identical `python -m`
+    invocation worked.
+
+    Adding the repository root explicitly is the narrow fix. It is guarded: if `apps` is genuinely
+    absent this is an installed copy with no mock app, and `--sign-in` has nothing to sign in to --
+    so say that, rather than failing with an import error four frames deep.
+    """
+    try:
+        from apps.mock_bank.server import VALID_PW, VALID_USER
+    except ModuleNotFoundError:
+        root = Path(__file__).resolve().parents[3]
+        if not (root / "apps").is_dir():
+            raise RuntimeError(
+                "--sign-in drives the bundled mock back-office, which is not present in this "
+                "install. Run from a checkout of the repository."
+            ) from None
+        sys.path.insert(0, str(root))
+        from apps.mock_bank.server import VALID_PW, VALID_USER
+
+    return VALID_USER, VALID_PW
+
+
 def sign_in(rig: Rig, base_url: str) -> None:
     """Put the mock app's session where an already-authenticated operator's would already be."""
-    from apps.mock_bank.server import VALID_PW, VALID_USER
+    user, password = _demo_credentials()
 
     page = rig.driver.page
     page.goto(f"{base_url}/login")
-    page.fill('input[name="user"]', VALID_USER)
-    page.fill('input[name="pw"]', VALID_PW)
+    page.fill('input[name="user"]', user)
+    page.fill('input[name="pw"]', password)
     page.click('input[type="submit"]')
     page.wait_for_load_state()
     page.goto(base_url)

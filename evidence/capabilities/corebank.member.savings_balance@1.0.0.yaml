@@ -92,6 +92,18 @@ steps:
         scope: {frame: content}
         recorded_strategy: semantic_exact
     wait: {for: navigation, timeout_ms: 8000}
+    # Without this, a resume after a handoff cannot tell that the operator already ran the search --
+    # `reconcile` may only skip a step whose postcondition holds -- so it would return this step as
+    # the resume point and submit the search a second time.
+    #
+    # The assertion is deliberately only "the form is gone". A postcondition answers "did this
+    # step's effect happen", not "are we on the right screen"; the read steps' own preconditions
+    # answer the second question. Adding "and a member record is showing" looked stronger and was
+    # wrong: not-found and permission-denied are legitimate outcomes of a submitted search, and the
+    # extra clause turned both into a postcondition failure before `classify` could recognise them.
+    postcondition:
+      assert: node_absent
+      query: {role: textbox, name: Member Number, scope: {frame: content}}
     risk: elevated
 
   - id: read_balance
@@ -211,3 +223,8 @@ provenance:
   notes: >-
     Hand-authored as the reference artifact for schema design. The Phase 07 compiler must be able to
     produce this shape from a discovery trace.
+
+# Sealed. The evidence copy is published from this file by `cua demo`, so the hash has to
+# live at the source -- adding it to the published copy alone meant the next demo run wiped it
+# and the reviewed artifact showed up in the catalog as an unsealed draft.
+content_hash: sha256:c02fd44b01c3c1a62e83ed2a18d249d6aa7be28e57ff18bcb45ee11d79739547

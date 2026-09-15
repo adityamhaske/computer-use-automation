@@ -163,3 +163,15 @@ hr {
     scroll-behavior: auto !important;
   }
 }
+
+/* The Settings toggle sets `.no-motion` on <html>. Without these rules it set a class nothing
+   styled — a control that described itself as a working override and did nothing. Mirrors the
+   prefers-reduced-motion block above, as an explicit opt-in for people whose OS setting is off. */
+:root.no-motion *,
+:root.no-motion *::before,
+:root.no-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}

@@ -29,13 +29,14 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import StrEnum
 
-from cua.domain.action import Action, ActionRisk
+from cua.domain.action import Action, ActionRisk, Navigate
 from cua.domain.actor import Actor
 from cua.domain.capability import Capability
-from cua.domain.result import FailureCode
+from cua.domain.result import FailureCode, ResolutionDebug
 from cua.domain.snapshot import UiSnapshot
 from cua.domain.target import TargetDescriptor
 from cua.evidence.bus import EventType, EvidenceBus
+from cua.policy.allowlist import AllowlistCheck
 from cua.policy.engine import Outcome, PolicyDecision, PolicyEngine
 from cua.policy.secrets import SecretResolver
 from cua.surfaces.base import ActionResult, SurfaceDriver
@@ -65,9 +66,21 @@ class DispatchOutcome:
     failure_code: FailureCode | None = None
     message: str = ""
 
+    resolution_debug: ResolutionDebug | None = None
+    """Why targeting produced the answer it did, on the two failures it exists for.
+
+    It was emitted into the evidence trace and dropped from the value the caller branches on, so a
+    caller holding a TARGET_NOT_FOUND had "could not find the button" and had to go read a JSONL
+    file to learn which rungs were tried and what else was on screen.
+    """
+
     @property
     def ok(self) -> bool:
         return self.status is DispatchStatus.OK
+
+
+class NavigationBlockedError(RuntimeError):
+    """A navigation the allowlist refuses. Raised rather than returned: there is no run to fail."""
 
 
 @dataclass
@@ -79,6 +92,31 @@ class Dispatcher:
     resolver: TargetResolver
     evidence: EvidenceBus
     secrets: SecretResolver | None = None
+
+    def open_entrypoint(self, url: str, *, session_id: str) -> None:
+        """Put the session on an entry URL, through the same chokepoint as everything else.
+
+        This used to be `driver.page.goto(...)` called straight from the CLI and from
+        `build_supervised_session`, on the reasoning that opening the entry point is *setup* rather
+        than a step a capability declares. The reasoning was fine; going to the raw handle was not.
+        `--target` is caller-supplied, and the allowlist exists precisely to constrain where the
+        browser may go -- so the one check that unambiguously applied was the one being skipped.
+
+        A `Navigate` needs no resolved target, so nothing here is special-cased: the ordinary path
+        already classifies it and refuses a host outside the allowlist.
+        """
+        outcome = self.execute(
+            Navigate(url=url),
+            snapshot=self.observe(),
+            actor=Actor.AUTOMATION,
+            session_id=session_id,
+            lease_epoch=0,
+        )
+        if not outcome.ok:
+            raise NavigationBlockedError(
+                f"could not open {url}: {outcome.message}. If this is a target this deployment "
+                "may drive, add its host to the allowlist in config/policy.yaml."
+            )
 
     def observe(self) -> UiSnapshot:
         """Capture the surface and record that we looked.
@@ -160,6 +198,13 @@ class Dispatcher:
                         else FailureCode.TARGET_NOT_FOUND
                     ),
                     message=str(failure),
+                    resolution_debug=ResolutionDebug(
+                        target_description=target.describe(),
+                        strategies_tried=tuple(failure.strategies_tried),
+                        candidates_considered=len(failure.candidate_summaries()),
+                        candidate_summaries=tuple(failure.candidate_summaries()),
+                        ambiguity_score=failure.ambiguity,
+                    ),
                 )
 
             self.evidence.emit(
@@ -241,6 +286,42 @@ class Dispatcher:
             duration_ms=result.duration_ms,
             message=result.message,
         )
+
+        # --- 4. Where did we actually end up? --------------------------------
+        # The allowlist was checked on a `navigate`'s *stated* URL. That covers the case where the
+        # system decides to go somewhere, and misses the one that matters more: a *click* that
+        # navigates. A link on an untrusted page is untrusted input, so "the action was a click, so
+        # no destination to check" is exactly the gap a redirect walks through. Checked after the
+        # fact because there is no destination to check before it.
+        if result.ok and result.navigated:
+            landed = self.driver.session_info().url
+            extra = capability.policy.allowed_domains if capability else ()
+            verdict = AllowlistCheck(
+                self.policy.config.allowlist, extra_domains=tuple(extra)
+            ).check(landed)
+            if not verdict.allowed:
+                self.evidence.emit(
+                    EventType.NOTE,
+                    actor=actor,
+                    lease_epoch=lease_epoch,
+                    note="navigation left the allowlist",
+                    url=landed,
+                    reason=verdict.reason,
+                    action_type=action.type,
+                )
+                return DispatchOutcome(
+                    status=DispatchStatus.DENIED,
+                    decision=decision,
+                    resolution=resolution,
+                    result=result,
+                    drifted=drifted,
+                    failure_code=FailureCode.NAVIGATION_BLOCKED,
+                    message=(
+                        f"the session landed on {landed}, which is outside the allowlist "
+                        f"({verdict.reason}). The action itself was permitted; its destination "
+                        "was not."
+                    ),
+                )
 
         return DispatchOutcome(
             status=DispatchStatus.OK if result.ok else DispatchStatus.FAILED,

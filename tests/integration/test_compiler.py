@@ -87,6 +87,18 @@ SCRIPT = [
         name="09/11/2026",
         arguments={"output_name": "as_of"},
     ),
+    # The third cell reading "Active" -- the label/value summary table. The first two are rows of
+    # the Accounts Overview grid, where the preceding cell is a *balance*; recording from there is
+    # what produced `adjacent_to "$812.30"` in a committed artifact. Included here so the compiler
+    # is exercised against a screen that can mislead it.
+    ScriptedCall(
+        "extract",
+        "read the account status",
+        role="cell",
+        name="Active",
+        occurrence=2,
+        arguments={"output_name": "account_status"},
+    ),
     ScriptedCall(
         "finish",
         "done",
@@ -309,3 +321,84 @@ def test_the_capability_is_namespaced_by_product_not_tenant(compiled) -> None:
     could never be shared with the next one running the same software."""
     assert compiled.capability.id.startswith("memberdesk.")
     assert compiled.capability.surface.app.product == "MemberDesk"
+
+
+def test_the_compiled_capability_replays_for_a_different_member(
+    compiled, app: tuple[str, int], tmp_path: Path
+) -> None:
+    """The through-line, end to end: discover once, replay for someone else.
+
+    Every other test here inspects the artifact's *shape*. This one executes it, against a member
+    the discovery run never saw, and is the only test that can catch the failure that matters --
+    a capability that compiles, validates, serializes, and then works for exactly one record.
+
+    It has caught one already. The compiler described the account-status cell by the text beside
+    it, which on the Accounts Overview grid is a balance rather than a label, so the artifact
+    carried `adjacent_to "$812.30"` -- member 12345's checking balance -- and resolved for nobody
+    else. Shape assertions all passed; only replaying it for 67890 revealed it.
+    """
+    from cua.domain.result import RunStatus
+    from cua.domain.tenant_binding import TenantBinding
+    from cua.replay.executor import ReplayExecutor
+
+    base_url, port = app
+    config = parse_policy(POLICY.read_text())
+    config = config.model_copy(
+        update={
+            "allowlist": config.allowlist.model_copy(
+                update={"domains": (*config.allowlist.domains, f"127.0.0.1:{port}")}
+            )
+        }
+    )
+    redactor = Redactor(config.redaction)
+    bus = EvidenceBus(tmp_path, redactor, run_id="compiled-replay")
+
+    bound = TenantBinding.model_validate(
+        {
+            "capability_ref": compiled.capability.ref,
+            "tenant": "test",
+            "vars": {"base_url": base_url},
+        }
+    ).apply(compiled.capability)
+
+    driver = PlaywrightCdpDriver(headless=True)
+    try:
+        page = driver.page
+        page.goto(f"{base_url}/login")
+        page.fill('input[name="user"]', VALID_USER)
+        page.fill('input[name="pw"]', VALID_PW)
+        page.click('input[type="submit"]')
+        page.wait_for_load_state()
+
+        result = ReplayExecutor(
+            dispatcher=Dispatcher(
+                driver=driver,
+                policy=PolicyEngine(config),
+                resolver=TargetResolver(allow_vision=False),
+                evidence=bus,
+            ),
+            evidence=bus,
+        ).run(bound, {"member_number": "67890"})
+    finally:
+        driver.close()
+
+    assert result.status is RunStatus.SUCCESS, result.summary
+    assert result.outputs["savings_balance"] == "$18,730.00", result.outputs
+    assert result.outputs["account_status"] == "Active", result.outputs
+
+
+def test_no_target_is_described_by_a_value_it_observed(compiled) -> None:
+    """A recorded anchor must be a label, never a datum.
+
+    The cheap, fast guard for the same defect: an anchor carrying a currency amount, a date or a
+    long number has captured one record's data as though it were page structure.
+    """
+    from cua.recorder.naming import looks_like_value
+
+    for step in compiled.capability.steps:
+        target = getattr(step.action, "target", None)
+        if target is None or target.anchor is None:
+            continue
+        assert not looks_like_value(target.anchor.text), (
+            f"step {step.id!r} is anchored to {target.anchor.text!r}, which is a value, not a label"
+        )

@@ -1,6 +1,6 @@
 {
-  "snapshot_id": "snap-2acf4bf77a",
-  "url": "http://127.0.0.1:50165/",
+  "snapshot_id": "snap-<redacted:account_number>",
+  "url": "http://127.0.0.1:60308/",
   "title": "MemberDesk",
   "nodes": [
     {
@@ -19,7 +19,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "158"
+        "native": "188"
       },
       "fingerprint": "34942f57acae2b27"
     },
@@ -37,7 +37,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "167"
+        "native": "198"
       },
       "fingerprint": "dac0da6641c0fbca"
     },
@@ -55,7 +55,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "168"
+        "native": "199"
       },
       "fingerprint": "dac0da6641c0fbca"
     },
@@ -73,12 +73,126 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "161"
+        "native": "191"
       },
       "fingerprint": "d3a596dc8cf2c44a"
     },
     {
-      "node_id": "nav:/table[4]",
+      "node_id": "nav:/generic[4]",
+      "role": "generic",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/generic[4]/text[0]"
+      ],
+      "hints": {
+        "native": "207"
+      },
+      "fingerprint": "a8ff80b0f161e267"
+    },
+    {
+      "node_id": "nav:/generic[4]/text[0]",
+      "role": "text",
+      "name": "MemberDesk",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/generic[4]",
+      "child_ids": [],
+      "hints": {
+        "native": "227"
+      },
+      "fingerprint": "06d59be9b77f218f"
+    },
+    {
+      "node_id": "nav:/generic[5]",
+      "role": "generic",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/generic[5]/text[0]"
+      ],
+      "hints": {
+        "native": "208"
+      },
+      "fingerprint": "a8ff80b0f161e267"
+    },
+    {
+      "node_id": "nav:/generic[5]/text[0]",
+      "role": "text",
+      "name": "Core Banking System v2.4",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/generic[5]",
+      "child_ids": [],
+      "hints": {
+        "native": "228"
+      },
+      "fingerprint": "0a382f79a9b7333e"
+    },
+    {
+      "node_id": "nav:/generic[6]",
+      "role": "generic",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/generic[6]/text[0]"
+      ],
+      "hints": {
+        "native": "209"
+      },
+      "fingerprint": "a8ff80b0f161e267"
+    },
+    {
+      "node_id": "nav:/generic[6]/text[0]",
+      "role": "text",
+      "name": "WORKFLOWS",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/generic[6]",
+      "child_ids": [],
+      "hints": {
+        "native": "229"
+      },
+      "fingerprint": "c402e295accdbf69"
+    },
+    {
+      "node_id": "nav:/table[7]",
       "role": "table",
       "name": null,
       "value": null,
@@ -91,13 +205,13 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "174"
+        "native": "210"
       },
       "fingerprint": "71449859354b6cef"
     },
     {
-      "node_id": "nav:/row[5]",
-      "role": "row",
+      "node_id": "nav:/generic[8]",
+      "role": "generic",
       "name": null,
       "value": null,
       "states": [],
@@ -108,37 +222,18 @@
       },
       "parent_id": null,
       "child_ids": [
-        "nav:/row[5]/cell[0]"
+        "nav:/generic[8]/text[0]",
+        "nav:/generic[8]/text[1]"
       ],
       "hints": {
-        "native": "176"
+        "native": "225"
       },
-      "fingerprint": "fa1f5bbbdad001d1"
+      "fingerprint": "a8ff80b0f161e267"
     },
     {
-      "node_id": "nav:/row[5]/cell[0]",
-      "role": "cell",
-      "name": "Functions",
-      "value": null,
-      "states": [],
-      "bounds": null,
-      "scope": {
-        "frame": "nav",
-        "region": null
-      },
-      "parent_id": "nav:/row[5]",
-      "child_ids": [
-        "nav:/row[5]/cell[0]/text[0]"
-      ],
-      "hints": {
-        "native": "177"
-      },
-      "fingerprint": "a6860dcb7608e989"
-    },
-    {
-      "node_id": "nav:/row[5]/cell[0]/text[0]",
+      "node_id": "nav:/generic[8]/text[0]",
       "role": "text",
-      "name": "Functions",
+      "name": "\u2022",
       "value": null,
       "states": [],
       "bounds": null,
@@ -146,15 +241,33 @@
         "frame": "nav",
         "region": null
       },
-      "parent_id": "nav:/row[5]/cell[0]",
+      "parent_id": "nav:/generic[8]",
       "child_ids": [],
       "hints": {
-        "native": "188"
+        "native": "235"
       },
-      "fingerprint": "e4dad854fe14f36d"
+      "fingerprint": "c79329f8d8d2d557"
     },
     {
-      "node_id": "nav:/row[6]",
+      "node_id": "nav:/generic[8]/text[1]",
+      "role": "text",
+      "name": "Online \u00b7 Fixture Ready",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/generic[8]",
+      "child_ids": [],
+      "hints": {
+        "native": "236"
+      },
+      "fingerprint": "bdad67387a00acff"
+    },
+    {
+      "node_id": "nav:/row[9]",
       "role": "row",
       "name": null,
       "value": null,
@@ -166,15 +279,15 @@
       },
       "parent_id": null,
       "child_ids": [
-        "nav:/row[6]/cell[0]"
+        "nav:/row[9]/cell[0]"
       ],
       "hints": {
-        "native": "179"
+        "native": "212"
       },
       "fingerprint": "fa1f5bbbdad001d1"
     },
     {
-      "node_id": "nav:/row[6]/cell[0]",
+      "node_id": "nav:/row[9]/cell[0]",
       "role": "cell",
       "name": "Member Search",
       "value": null,
@@ -184,17 +297,17 @@
         "frame": "nav",
         "region": null
       },
-      "parent_id": "nav:/row[6]",
+      "parent_id": "nav:/row[9]",
       "child_ids": [
-        "nav:/row[6]/cell[0]/link[0]"
+        "nav:/row[9]/cell[0]/link[0]"
       ],
       "hints": {
-        "native": "180"
+        "native": "213"
       },
       "fingerprint": "d50d2553ca8865ec"
     },
     {
-      "node_id": "nav:/row[6]/cell[0]/link[0]",
+      "node_id": "nav:/row[9]/cell[0]/link[0]",
       "role": "link",
       "name": "Member Search",
       "value": null,
@@ -204,18 +317,18 @@
         "frame": "nav",
         "region": null
       },
-      "parent_id": "nav:/row[6]/cell[0]",
+      "parent_id": "nav:/row[9]/cell[0]",
       "child_ids": [
-        "nav:/row[6]/cell[0]/link[0]/text[0]"
+        "nav:/row[9]/cell[0]/link[0]/text[0]"
       ],
       "hints": {
-        "css": "a[href=\"#\"]",
-        "native": "181"
+        "css": "a.nav-link-btn",
+        "native": "214"
       },
       "fingerprint": "c5ec08a2c78d2403"
     },
     {
-      "node_id": "nav:/row[6]/cell[0]/link[0]/text[0]",
+      "node_id": "nav:/row[9]/cell[0]/link[0]/text[0]",
       "role": "text",
       "name": "Member Search",
       "value": null,
@@ -225,15 +338,15 @@
         "frame": "nav",
         "region": null
       },
-      "parent_id": "nav:/row[6]/cell[0]/link[0]",
+      "parent_id": "nav:/row[9]/cell[0]/link[0]",
       "child_ids": [],
       "hints": {
-        "native": "189"
+        "native": "230"
       },
       "fingerprint": "46ba5b490b98688e"
     },
     {
-      "node_id": "nav:/row[7]",
+      "node_id": "nav:/row[10]",
       "role": "row",
       "name": null,
       "value": null,
@@ -245,17 +358,17 @@
       },
       "parent_id": null,
       "child_ids": [
-        "nav:/row[7]/cell[0]"
+        "nav:/row[10]/cell[0]"
       ],
       "hints": {
-        "native": "182"
+        "native": "215"
       },
       "fingerprint": "fa1f5bbbdad001d1"
     },
     {
-      "node_id": "nav:/row[7]/cell[0]",
+      "node_id": "nav:/row[10]/cell[0]",
       "role": "cell",
-      "name": "Reports",
+      "name": "Reports Core",
       "value": null,
       "states": [],
       "bounds": null,
@@ -263,19 +376,19 @@
         "frame": "nav",
         "region": null
       },
-      "parent_id": "nav:/row[7]",
+      "parent_id": "nav:/row[10]",
       "child_ids": [
-        "nav:/row[7]/cell[0]/link[0]"
+        "nav:/row[10]/cell[0]/link[0]"
       ],
       "hints": {
-        "native": "183"
+        "native": "216"
       },
-      "fingerprint": "c7133279a03177da"
+      "fingerprint": "66987dac872f321c"
     },
     {
-      "node_id": "nav:/row[7]/cell[0]/link[0]",
+      "node_id": "nav:/row[10]/cell[0]/link[0]",
       "role": "link",
-      "name": "Reports",
+      "name": "Reports Core",
       "value": null,
       "states": [],
       "bounds": null,
@@ -283,36 +396,16 @@
         "frame": "nav",
         "region": null
       },
-      "parent_id": "nav:/row[7]/cell[0]",
-      "child_ids": [
-        "nav:/row[7]/cell[0]/link[0]/text[0]"
-      ],
-      "hints": {
-        "css": "a[href=\"#\"]",
-        "native": "184"
-      },
-      "fingerprint": "eea752b2f3040250"
-    },
-    {
-      "node_id": "nav:/row[7]/cell[0]/link[0]/text[0]",
-      "role": "text",
-      "name": "Reports",
-      "value": null,
-      "states": [],
-      "bounds": null,
-      "scope": {
-        "frame": "nav",
-        "region": null
-      },
-      "parent_id": "nav:/row[7]/cell[0]/link[0]",
+      "parent_id": "nav:/row[10]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "190"
+        "css": "a.nav-link-disabled",
+        "native": "217"
       },
-      "fingerprint": "e9b643b64b9fb7bf"
+      "fingerprint": "57694f773dac3ffa"
     },
     {
-      "node_id": "nav:/row[8]",
+      "node_id": "nav:/row[11]",
       "role": "row",
       "name": null,
       "value": null,
@@ -324,17 +417,17 @@
       },
       "parent_id": null,
       "child_ids": [
-        "nav:/row[8]/cell[0]"
+        "nav:/row[11]/cell[0]"
       ],
       "hints": {
-        "native": "185"
+        "native": "220"
       },
       "fingerprint": "fa1f5bbbdad001d1"
     },
     {
-      "node_id": "nav:/row[8]/cell[0]",
+      "node_id": "nav:/row[11]/cell[0]",
       "role": "cell",
-      "name": "Administration",
+      "name": "Administration Core",
       "value": null,
       "states": [],
       "bounds": null,
@@ -342,19 +435,19 @@
         "frame": "nav",
         "region": null
       },
-      "parent_id": "nav:/row[8]",
+      "parent_id": "nav:/row[11]",
       "child_ids": [
-        "nav:/row[8]/cell[0]/link[0]"
+        "nav:/row[11]/cell[0]/link[0]"
       ],
       "hints": {
-        "native": "186"
+        "native": "221"
       },
-      "fingerprint": "72fe99457961cc31"
+      "fingerprint": "f56beefd1c51c710"
     },
     {
-      "node_id": "nav:/row[8]/cell[0]/link[0]",
+      "node_id": "nav:/row[11]/cell[0]/link[0]",
       "role": "link",
-      "name": "Administration",
+      "name": "Administration Core",
       "value": null,
       "states": [],
       "bounds": null,
@@ -362,18 +455,52 @@
         "frame": "nav",
         "region": null
       },
-      "parent_id": "nav:/row[8]/cell[0]",
-      "child_ids": [
-        "nav:/row[8]/cell[0]/link[0]/text[0]"
-      ],
+      "parent_id": "nav:/row[11]/cell[0]",
+      "child_ids": [],
       "hints": {
-        "css": "a[href=\"#\"]",
-        "native": "187"
+        "css": "a.nav-link-disabled",
+        "native": "222"
       },
-      "fingerprint": "3e0ca16cb2e51805"
+      "fingerprint": "9121073edbb9c685"
     },
     {
-      "node_id": "nav:/row[8]/cell[0]/link[0]/text[0]",
+      "node_id": "nav:/text[12]",
+      "role": "text",
+      "name": "Reports",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "231"
+      },
+      "fingerprint": "ca4c1a686b35aada"
+    },
+    {
+      "node_id": "nav:/text[13]",
+      "role": "text",
+      "name": "Core",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "232"
+      },
+      "fingerprint": "03cff1e7f00ab099"
+    },
+    {
+      "node_id": "nav:/text[14]",
       "role": "text",
       "name": "Administration",
       "value": null,
@@ -383,15 +510,33 @@
         "frame": "nav",
         "region": null
       },
-      "parent_id": "nav:/row[8]/cell[0]/link[0]",
+      "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "191"
+        "native": "233"
       },
-      "fingerprint": "c28b3d03a05cec35"
+      "fingerprint": "3a9c4d5892cb41ff"
     },
     {
-      "node_id": "content:/document[9]",
+      "node_id": "nav:/text[15]",
+      "role": "text",
+      "name": "Core",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "234"
+      },
+      "fingerprint": "03cff1e7f00ab099"
+    },
+    {
+      "node_id": "content:/document[16]",
       "role": "document",
       "name": "MemberDesk",
       "value": null,
@@ -404,12 +549,12 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "162"
+        "native": "192"
       },
       "fingerprint": "eba30ff83962866f"
     },
     {
-      "node_id": "content:/table[10]",
+      "node_id": "content:/table[17]",
       "role": "table",
       "name": null,
       "value": null,
@@ -422,12 +567,12 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "197"
+        "native": "242"
       },
       "fingerprint": "f6d07955fec5f341"
     },
     {
-      "node_id": "content:/row[11]",
+      "node_id": "content:/row[18]",
       "role": "row",
       "name": null,
       "value": null,
@@ -439,15 +584,15 @@
       },
       "parent_id": null,
       "child_ids": [
-        "content:/row[11]/cell[0]"
+        "content:/row[18]/cell[0]"
       ],
       "hints": {
-        "native": "199"
+        "native": "244"
       },
       "fingerprint": "13ca239244183fe8"
     },
     {
-      "node_id": "content:/row[11]/cell[0]",
+      "node_id": "content:/row[18]/cell[0]",
       "role": "cell",
       "name": "System Notice",
       "value": null,
@@ -457,17 +602,17 @@
         "frame": "content",
         "region": null
       },
-      "parent_id": "content:/row[11]",
+      "parent_id": "content:/row[18]",
       "child_ids": [
-        "content:/row[11]/cell[0]/text[0]"
+        "content:/row[18]/cell[0]/text[0]"
       ],
       "hints": {
-        "native": "200"
+        "native": "245"
       },
       "fingerprint": "d7271651741997e8"
     },
     {
-      "node_id": "content:/row[11]/cell[0]/text[0]",
+      "node_id": "content:/row[18]/cell[0]/text[0]",
       "role": "text",
       "name": "System Notice",
       "value": null,
@@ -477,15 +622,15 @@
         "frame": "content",
         "region": null
       },
-      "parent_id": "content:/row[11]/cell[0]",
+      "parent_id": "content:/row[18]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "207"
+        "native": "252"
       },
       "fingerprint": "6b36bc12c8726792"
     },
     {
-      "node_id": "content:/row[12]",
+      "node_id": "content:/row[19]",
       "role": "row",
       "name": null,
       "value": null,
@@ -497,15 +642,15 @@
       },
       "parent_id": null,
       "child_ids": [
-        "content:/row[12]/cell[0]"
+        "content:/row[19]/cell[0]"
       ],
       "hints": {
-        "native": "202"
+        "native": "247"
       },
       "fingerprint": "13ca239244183fe8"
     },
     {
-      "node_id": "content:/row[12]/cell[0]",
+      "node_id": "content:/row[19]/cell[0]",
       "role": "cell",
       "name": "A scheduled core maintenance window has been announced for this weekend. Some account functions may be unavailable. Contact your administrator for details.",
       "value": null,
@@ -515,17 +660,17 @@
         "frame": "content",
         "region": null
       },
-      "parent_id": "content:/row[12]",
+      "parent_id": "content:/row[19]",
       "child_ids": [
-        "content:/row[12]/cell[0]/text[0]"
+        "content:/row[19]/cell[0]/text[0]"
       ],
       "hints": {
-        "native": "203"
+        "native": "248"
       },
       "fingerprint": "745b975a7a5d072a"
     },
     {
-      "node_id": "content:/row[12]/cell[0]/text[0]",
+      "node_id": "content:/row[19]/cell[0]/text[0]",
       "role": "text",
       "name": "A scheduled core maintenance window has been announced for this weekend. Some account functions may be unavailable. Contact your administrator for details.",
       "value": null,
@@ -535,15 +680,15 @@
         "frame": "content",
         "region": null
       },
-      "parent_id": "content:/row[12]/cell[0]",
+      "parent_id": "content:/row[19]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "208"
+        "native": "253"
       },
       "fingerprint": "a09fd40aabf82bcf"
     },
     {
-      "node_id": "content:/row[13]",
+      "node_id": "content:/row[20]",
       "role": "row",
       "name": null,
       "value": null,
@@ -555,15 +700,15 @@
       },
       "parent_id": null,
       "child_ids": [
-        "content:/row[13]/cell[0]"
+        "content:/row[20]/cell[0]"
       ],
       "hints": {
-        "native": "204"
+        "native": "249"
       },
       "fingerprint": "13ca239244183fe8"
     },
     {
-      "node_id": "content:/row[13]/cell[0]",
+      "node_id": "content:/row[20]/cell[0]",
       "role": "cell",
       "name": "Continue",
       "value": null,
@@ -573,17 +718,17 @@
         "frame": "content",
         "region": null
       },
-      "parent_id": "content:/row[13]",
+      "parent_id": "content:/row[20]",
       "child_ids": [
-        "content:/row[13]/cell[0]/button[0]"
+        "content:/row[20]/cell[0]/button[0]"
       ],
       "hints": {
-        "native": "205"
+        "native": "250"
       },
       "fingerprint": "d13a573cbe4520e8"
     },
     {
-      "node_id": "content:/row[13]/cell[0]/button[0]",
+      "node_id": "content:/row[20]/cell[0]/button[0]",
       "role": "button",
       "name": "Continue",
       "value": null,
@@ -593,18 +738,18 @@
         "frame": "content",
         "region": null
       },
-      "parent_id": "content:/row[13]/cell[0]",
+      "parent_id": "content:/row[20]/cell[0]",
       "child_ids": [
-        "content:/row[13]/cell[0]/button[0]/text[0]"
+        "content:/row[20]/cell[0]/button[0]/text[0]"
       ],
       "hints": {
         "css": "input.btn1",
-        "native": "206"
+        "native": "251"
       },
       "fingerprint": "a59d144f368d1b11"
     },
     {
-      "node_id": "content:/row[13]/cell[0]/button[0]/text[0]",
+      "node_id": "content:/row[20]/cell[0]/button[0]/text[0]",
       "role": "text",
       "name": "Continue",
       "value": null,
@@ -614,14 +759,14 @@
         "frame": "content",
         "region": null
       },
-      "parent_id": "content:/row[13]/cell[0]/button[0]",
+      "parent_id": "content:/row[20]/cell[0]/button[0]",
       "child_ids": [],
       "hints": {
-        "native": "209"
+        "native": "254"
       },
       "fingerprint": "d711eb93a8bc15a6"
     }
   ],
-  "captured_at": "2026-09-12T16:14:22.036215Z",
+  "captured_at": "2026-09-15T12:19:15.245061Z",
   "http_status": 200
 }

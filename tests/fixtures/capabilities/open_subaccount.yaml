@@ -1,0 +1,211 @@
+# The brief's second example goal: "open a new sub-account for this member and reach the
+# confirmation screen". A multi-field form with a confirmation step, which is a different shape from
+# the read-only lookup -- and the one that can be *rejected*.
+#
+# It exists mainly to exercise `validation_rejected`. "Validation errors" is one of the seven runtime
+# conditions the brief enumerates, and it was the only one with no capability behind it: the lookup
+# flow submits nothing, so nothing could ever be rejected. A taxonomy row with no capability driving
+# it is a claim, not a guarantee.
+#
+# Note what the controls here deliberately lack: no `title`, no `<label for>`, no placeholder, no id.
+# They have no accessible name at all, so `semantic_exact` cannot see them and every target below
+# resolves structurally -- "the control in the row whose label cell reads 'Account Type'".
+
+schema_version: "1.0.0"
+id: corebank.member.open_subaccount
+version: 1.0.0
+title: Open a sub-account for a member
+description: >-
+  Open a new sub-account of a given type for a member, with an initial deposit, and read back the
+  reference from the confirmation screen. Returns a business outcome when the core system rejects
+  the request.
+
+surface:
+  kind: legacy_web
+  driver_capabilities: [semantic_tree, screenshot]
+  app:
+    vendor: acme-core
+    product: MemberDesk
+    version_range: ">=4.2 <5"
+
+entrypoint:
+  url_pattern: "{base_url}/"
+
+inputs:
+  - name: member_id
+    type: string
+    required: true
+    description: The member number as printed on the member's statement.
+    pattern: "^[0-9]{4,10}$"
+    example: "12345"
+  - name: account_type
+    type: string
+    required: true
+    description: The kind of sub-account to open, as the core system names it.
+    pattern: "^(savings|checking|certificate)$"
+    example: "savings"
+  - name: initial_deposit
+    type: string
+    required: true
+    description: Opening deposit, as the screen expects it to be typed.
+    pattern: "^[0-9]+(\\.[0-9]{2})?$"
+    example: "500.00"
+
+outputs:
+  - name: reference
+    type: string
+    description: The core system's reference for the recorded request.
+    source: {step: read_reference}
+
+steps:
+  - id: enter_member_id
+    description: Type the member number into the search field.
+    action:
+      type: type
+      value: {$input: member_id}
+      target:
+        role: textbox
+        name: {value: Member Number, match: exact}
+        scope: {frame: content}
+        recorded_strategy: semantic_exact
+    precondition:
+      assert: node_exists
+      query: {role: textbox, name: Member Number, scope: {frame: content}}
+    wait: {for: snapshot_stable, timeout_ms: 3000}
+    risk: safe
+
+  - id: submit_search
+    description: Submit the search.
+    action:
+      type: click
+      target:
+        role: button
+        name: {value: Search, match: exact}
+        scope: {frame: content}
+        recorded_strategy: semantic_exact
+    wait: {for: navigation, timeout_ms: 8000}
+    postcondition:
+      assert: node_absent
+      query: {role: textbox, name: Member Number, scope: {frame: content}}
+    risk: safe
+
+  - id: open_the_form
+    description: Open the sub-account form from the member record.
+    action:
+      type: click
+      target:
+        role: link
+        name: {value: Open Sub-Account, match: contains}
+        scope: {frame: content}
+        recorded_strategy: semantic_exact
+    precondition:
+      assert: node_exists
+      query: {role: cell, name_contains: Savings Balance, scope: {frame: content}}
+    wait: {for: navigation, timeout_ms: 8000}
+    risk: safe
+
+  - id: choose_account_type
+    description: Choose the account type. The control has no accessible name; only its label does.
+    action:
+      type: select
+      value: {$input: account_type}
+      target:
+        role: combobox
+        anchor: {relation: row_of, text: Account Type}
+        scope: {frame: content}
+        recorded_strategy: structural_anchor
+    precondition:
+      assert: node_exists
+      query: {role: cell, name_contains: Account Type, scope: {frame: content}}
+    wait: {for: snapshot_stable, timeout_ms: 3000}
+    risk: safe
+
+  - id: enter_deposit
+    description: Type the opening deposit.
+    action:
+      type: type
+      value: {$input: initial_deposit}
+      target:
+        role: textbox
+        anchor: {relation: row_of, text: Initial Deposit}
+        scope: {frame: content}
+        recorded_strategy: structural_anchor
+    wait: {for: snapshot_stable, timeout_ms: 3000}
+    risk: safe
+
+  # The only step that changes anything in the core system. Elevated rather than irreversible: the
+  # confirmation screen says a *request* has been recorded, not that money moved. Annotated so the
+  # policy engine's third signal is the artifact's own declaration rather than an inference.
+  - id: submit_the_form
+    description: Submit the sub-account request.
+    action:
+      type: click
+      target:
+        role: button
+        name: {value: Open Account, match: exact}
+        scope: {frame: content}
+        recorded_strategy: semantic_exact
+    wait: {for: navigation, timeout_ms: 8000}
+    risk: elevated
+
+  - id: read_reference
+    description: Read the reference off the confirmation screen.
+    precondition:
+      assert: node_exists
+      query: {role: cell, name_contains: Reference, scope: {frame: content}}
+    action:
+      type: extract
+      into: reference
+      target:
+        role: cell
+        anchor: {relation: adjacent_to, text: Reference}
+        scope: {frame: content}
+        recorded_strategy: structural_anchor
+    risk: safe
+
+checkpoint:
+  assert: all_of
+  of:
+    - assert: node_exists
+      query: {role: cell, name_contains: Reference, scope: {frame: content}}
+    - assert: node_exists
+      query: {role: cell, name_matches: '^SA-[0-9]+-[A-Z]{3}$', scope: {frame: content}}
+
+# The point of this capability. A form the core system refuses is a legitimate answer the caller
+# needs -- not a crash, and not something a human should be paged about.
+outcomes:
+  - code: validation_rejected
+    description: The core system rejected the request; the form came back with a field error.
+    detect: {assert: text_present, value: below the minimum required}
+    returns: {member_id: {$input: member_id}}
+
+  - code: member_not_found
+    description: No member exists with that number.
+    detect: {assert: text_present, value: No records found}
+    returns: {member_id: {$input: member_id}}
+
+recovery:
+  - id: transient_load
+    description: The app server returned a gateway error. Re-fetch and continue.
+    detect: {assert: http_status_in, codes: [502, 503, 504]}
+    remedy:
+      - {type: reload}
+    max_attempts: 3
+    backoff: exponential
+    scope: any_step
+
+escalation:
+  triggers: [target_ambiguous, target_not_found, checkpoint_failed, recovery_exhausted, unexpected_state]
+  policy: pause_and_request_human
+
+policy:
+  allowed_domains: ["{base_url}"]
+  allowed_actions: [click, type, select, navigate, extract, wait_for, assert]
+  max_steps: 20
+  max_duration_ms: 60000
+
+provenance:
+  notes: >-
+    Hand-authored to cover the brief's second example goal and, specifically, the
+    `validation_rejected` outcome -- the one runtime condition in docs/design/error-taxonomy.md that
+    no capability drove.

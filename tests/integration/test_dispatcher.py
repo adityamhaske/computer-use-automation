@@ -13,6 +13,7 @@ import pytest
 
 from cua.domain.action import Click, Navigate, Type
 from cua.domain.actor import Actor
+from cua.domain.result import FailureCode
 from cua.domain.snapshot import NodeScope, UiNode, UiSnapshot
 from cua.domain.target import NameMatch, TargetDescriptor
 from cua.evidence.bus import EventType, EvidenceBus
@@ -34,9 +35,15 @@ class FakeDriver:
     double that accepted anything would let the chokepoint rot while the suite stayed green.
     """
 
-    def __init__(self, snapshot: UiSnapshot) -> None:
+    def __init__(self, snapshot: UiSnapshot, *, lands_on: str | None = None) -> None:
         self._snapshot = snapshot
         self.dispatched: list[AuthorizedAction] = []
+        self._lands_on = lands_on
+        """Where the session ends up after a dispatch, when the action navigates.
+
+        Set it to model the case the allowlist used to miss entirely: a *click* on a link that
+        leaves the permitted host. The action carries no URL, so nothing could be checked up front.
+        """
 
     def observe(self) -> UiSnapshot:
         return self._snapshot
@@ -44,7 +51,7 @@ class FakeDriver:
     def dispatch(self, action: AuthorizedAction) -> ActionResult:
         assert isinstance(action, AuthorizedAction), "the driver must only ever see authorized work"
         self.dispatched.append(action)
-        return ActionResult(ok=True, duration_ms=3)
+        return ActionResult(ok=True, duration_ms=3, navigated=self._lands_on is not None)
 
     def screenshot(self, *, redact: tuple = ()) -> bytes:
         return b"\x89PNG"
@@ -53,7 +60,12 @@ class FakeDriver:
         return {}
 
     def session_info(self) -> SessionInfo:
-        return SessionInfo(session_id="sess-1", driver="fake", capabilities=("semantic_tree",))
+        return SessionInfo(
+            session_id="sess-1",
+            driver="fake",
+            capabilities=("semantic_tree",),
+            url=self._lands_on or "http://127.0.0.1:8811/search",
+        )
 
     def close(self) -> None:
         return None
@@ -181,6 +193,21 @@ def test_a_denied_action_is_authorized_against_but_never_dispatched(rig) -> None
     assert not any(event["event"] == EventType.DISPATCH.value for event in events)
 
 
+def test_an_entrypoint_outside_the_allowlist_is_refused(rig) -> None:
+    """Opening a target is setup, not a declared step -- and still may not leave the allowlist.
+
+    `cua discover --target ...` and the operator console both take the URL from the caller, and both
+    used to reach `driver.page.goto` directly. That skipped the one check that unambiguously applies
+    to a navigation, so a typo -- or a malicious argument -- pointed the browser anywhere.
+    """
+    from cua.runtime.dispatcher import NavigationBlockedError
+
+    dispatcher, driver, _ = rig
+    with pytest.raises(NavigationBlockedError):
+        dispatcher.open_entrypoint("http://evil.example.com/", session_id="s")
+    assert driver.dispatched == []
+
+
 def test_off_allowlist_navigation_is_blocked(rig) -> None:
     dispatcher, driver, _ = rig
     outcome = dispatcher.execute(
@@ -285,3 +312,36 @@ def test_observation_needs_no_authorization_but_is_recorded(rig) -> None:
     observe = next(e for e in bus.read_events() if e["event"] == EventType.OBSERVE.value)
     assert observe["node_count"] == 5
     assert observe["snapshot_ref"].startswith("snapshots/")
+
+
+def test_a_click_that_navigates_off_the_allowlist_is_refused(tmp_path: Path) -> None:
+    """The allowlist has to constrain where the session *lands*, not only where it says it is going.
+
+    Checking a `navigate` action's stated URL covers the case where the system decides to leave. It
+    misses the case that matters more: a click on a link, on a page whose content is untrusted, that
+    redirects off the permitted host. The action carries no URL, so there was nothing to check up
+    front and nothing checked afterwards — `result.navigated` was recorded in the evidence and read
+    by nobody.
+    """
+    config = parse_policy(POLICY.read_text())
+    bus = EvidenceBus(tmp_path, Redactor(config.redaction), run_id="run-redirect")
+    driver = FakeDriver(_page(), lands_on="https://evil.example.com/phish")
+    dispatcher = Dispatcher(
+        driver=driver,
+        policy=PolicyEngine(config),
+        resolver=TargetResolver(),
+        evidence=bus,
+    )
+
+    outcome = dispatcher.execute(
+        Click(target=TargetDescriptor(role="button", name=NameMatch(value="Search"))),
+        snapshot=_page(),
+        **SESSION,
+    )
+
+    assert outcome.status is DispatchStatus.DENIED, outcome.message
+    assert outcome.failure_code is FailureCode.NAVIGATION_BLOCKED
+    assert "evil.example.com" in outcome.message
+    # The click itself was legitimately authorized and did happen — it is the destination that is
+    # refused, and saying so is what makes the result debuggable.
+    assert driver.dispatched, "the action was permitted; only where it landed was not"

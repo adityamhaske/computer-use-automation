@@ -222,6 +222,44 @@ class SessionBroker:
         )
         return delta
 
+    def sweep(self) -> bool:
+        """Reclaim a session whose operator hold has lapsed. Returns True if anything was reclaimed.
+
+        `Lease.reclaim_expired` and `InterventionQueue.abandon` both existed and neither had a
+        caller, so the expiry the lease docstring describes -- "a session held open by an operator
+        who walked away is not [recoverable], so the hold has an expiry rather than trusting that
+        release always happens" -- could never actually fire. A guarantee nothing invokes is a
+        comment.
+
+        Deliberately pull, not push: no timer, no background thread. The console polls state every
+        couple of seconds anyway, so sweeping there reclaims the session within one poll of the
+        deadline without adding a scheduler to a single-process system. Nothing is lost by the delay
+        -- the session is already idle, by definition.
+
+        The intervention goes back to the queue as ABANDONED rather than silently reopening: the
+        next operator needs to know a person had this and stopped, which is different from a run
+        that has been waiting untouched.
+        """
+        if not self.lease.expired:
+            return False
+
+        operator = self.lease.operator
+        epoch = self.lease.reclaim_expired()
+        if self.handoff is not None:
+            self.queue.abandon(
+                self.handoff.intervention_id,
+                f"the hold by {operator or 'an operator'} expired before it was released",
+            )
+            self.handoff = None
+        self.evidence.emit(
+            EventType.LEASE,
+            actor=Actor.SYSTEM,
+            lease_epoch=epoch,
+            transition="hold expired",
+            operator=operator,
+        )
+        return True
+
     def resume(self) -> int:
         """Automation takes the session back. Returns the epoch it must now act under."""
         epoch = self.lease.resume()

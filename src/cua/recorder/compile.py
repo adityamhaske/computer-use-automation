@@ -48,11 +48,13 @@ from cua.domain.capability import (
 )
 from cua.domain.discovery import DiscoveryRun, DiscoveryStep
 from cua.domain.predicates import AllOf, NodeExists, NodeQuery, Predicate
+from cua.domain.target import ResolutionStrategy
 from cua.domain.values import InputRef
 from cua.recorder.naming import (
     capability_id,
     infer_type,
     input_pattern,
+    looks_like_value,
     shape_pattern,
     snake,
 )
@@ -110,6 +112,20 @@ def compile_capability(
     steps = _compile_steps(effective, lifted, warnings)
     checkpoint = _infer_checkpoint(effective, outputs)
 
+    positional = [
+        step.tool
+        for step in effective
+        if step.descriptor
+        and step.descriptor.recorded_strategy is ResolutionStrategy.ORDINAL_IN_REGION
+    ]
+    if positional:
+        warnings.append(
+            f"{len(positional)} step(s) could only be described by position "
+            f"({', '.join(sorted(set(positional)))}): nothing on the screen identified the control "
+            "semantically. Position survives rebranding but not reordering -- confirm these "
+            "targets before approving."
+        )
+
     unverified = [
         step.tool for step in effective if step.descriptor and not step.descriptor_verified
     ]
@@ -144,7 +160,7 @@ def compile_capability(
                 at=datetime.now(UTC).isoformat(),
             ),
             transcript_ref=transcript_ref,
-            notes=REVIEW_NOTES,
+            notes=_notes(warnings),
         ),
     ).with_hash()
 
@@ -313,6 +329,19 @@ def _compile_steps(
 # ----------------------------------------------------------------- checkpoint
 
 
+def _notes(warnings: list[str]) -> str:
+    """The reviewer's checklist, plus anything this particular run made the compiler uneasy about.
+
+    `CompileResult.warnings` is returned to the caller, which is fine for a CLI and useless to the
+    person who opens the YAML six months later. A warning that does not travel with the artifact is
+    not a warning.
+    """
+    if not warnings:
+        return REVIEW_NOTES
+    listed = "\n".join(f"  - {warning}" for warning in warnings)
+    return f"{REVIEW_NOTES}\n\nCOMPILER WARNINGS FROM THIS RUN:\n{listed}"
+
+
 def _infer_checkpoint(steps: list[DiscoveryStep], outputs: list[OutputSpec]) -> Predicate:
     """Assert that the declared outputs are present, in the shape they were observed.
 
@@ -332,15 +361,19 @@ def _infer_checkpoint(steps: list[DiscoveryStep], outputs: list[OutputSpec]) -> 
         _, value = step.extracted
         pattern = shape_pattern(value)
         query = NodeQuery(role=step.descriptor.role, scope=step.descriptor.scope)
-        assertions.append(
-            NodeExists(query=query.model_copy(update={"name_matches": pattern}))
-            if pattern
-            else NodeExists(query=query.model_copy(update={"name": value}))
-        )
+        if pattern:
+            # A shape is a claim about the *kind* of value this screen shows, which is what makes
+            # the checkpoint goal-specific without binding it to one record.
+            assertions.append(NodeExists(query=query.model_copy(update={"name_matches": pattern})))
+        # No `else` branch. Asserting the literal observed value -- `name: Active` -- would pin the
+        # checkpoint to the member discovery happened to see, so every other member fails the
+        # success condition and escalates. A value with no distinctive shape supports no honest
+        # claim, and the anchor assertion below carries the specificity instead.
 
         # The label beside the value is part of the claim: it is what makes this the *savings*
-        # balance rather than any currency amount on the page.
-        if step.descriptor.anchor:
+        # balance rather than any currency amount on the page. Only when it really is a label --
+        # an anchor that captured a datum would re-introduce exactly the coupling avoided above.
+        if step.descriptor.anchor and not looks_like_value(step.descriptor.anchor.text):
             assertions.append(
                 NodeExists(query=NodeQuery(role="cell", name=step.descriptor.anchor.text))
             )

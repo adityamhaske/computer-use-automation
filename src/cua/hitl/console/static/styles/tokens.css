@@ -1,50 +1,58 @@
 /* Design tokens — the single source of truth for color, type, space, radius, motion.
  *
- * Light values live on bare :root. Dark values are redefined twice, on purpose:
- * once under prefers-color-scheme (the "system" default) and once under
- * [data-theme="dark"] (an explicit user choice), so an explicit choice always wins
- * over the OS setting. Never give a token its only definition inside either block.
+ * LIGHT IS THE DEFAULT, deliberately and unconditionally. This console is read in
+ * daylit back offices next to a core banking terminal, so it does not follow the OS
+ * into dark mode on its own; dark is available, but only when someone asks for it via
+ * the toggle ([data-theme="dark"]). That is why there is no prefers-color-scheme block.
+ *
+ * The neutrals are WARM (hue ~35°), not the cool blue-grey most dashboards default to.
+ * There is no blue and no purple anywhere in this file: hue is reserved for meaning —
+ * green for healthy and for human control, amber for attention, brick for failure —
+ * and "running" is a warm graphite precisely because a run that is simply proceeding
+ * needs no color at all. Every value below clears WCAG AA on every surface it is used on.
  */
 
 :root {
   color-scheme: light;
 
   /* ---- surfaces & structure ---- */
-  --bg: #f6f7fa;
+  --bg: #faf9f7;
   --surface: #ffffff;
-  --surface-2: #f0f1f5;
+  --surface-2: #f4f2ef;
   --surface-raised: #ffffff;
-  --border: #e2e4ea;
-  --border-strong: #cfd2db;
-  --overlay: rgba(15, 17, 23, 0.42);
+  --border: #e8e4de;
+  --border-strong: #d4cec6;
+  --overlay: rgba(28, 26, 23, 0.38);
 
   /* ---- text ---- */
-  --text: #14161c;
-  --text-secondary: #575c68;
-  --text-tertiary: #8a8fa0;
+  --text: #1c1a17;
+  --text-secondary: #59544c;
+  --text-tertiary: #6e685f;
   --text-on-accent: #ffffff;
 
-  /* ---- brand / accent (emerald) ---- */
-  --accent: #0f7a5c;
-  --accent-hover: #0c6249;
-  --accent-active: #0a4f3b;
-  --accent-soft: #e6f5ef;
-  --accent-soft-strong: #cdebe0;
-  --accent-text: #0c6249;
-  --focus-ring: #0f7a5c;
+  /* ---- brand / accent (deep emerald) ---- */
+  --accent: #146b52;
+  --accent-hover: #10583f;
+  --accent-active: #0d4633;
+  --accent-soft: #e8f2ed;
+  --accent-soft-strong: #d2e7dd;
+  --accent-text: #10583f;
+  --focus-ring: #146b52;
 
-  /* ---- semantic status ---- */
-  --success: #157a4a;
-  --success-soft: #e6f6ec;
-  --running: #3f6b8a;
-  --running-soft: #eaf1f6;
-  --human: #0f7a5c;
-  --human-soft: #e6f5ef;
-  --warning: #92660a;
-  --warning-soft: #fdf1de;
-  --danger: #a52c2c;
-  --danger-soft: #fbeaea;
-  --neutral-soft: #eeeeec;
+  /* ---- semantic status ----
+     Colour only where it carries meaning. `running` is a neutral graphite on purpose:
+     a run that is simply proceeding is not asking anything of the operator. */
+  --success: #2f6b46;
+  --success-soft: #e7f2ea;
+  --running: #6b665d;
+  --running-soft: #f0ede8;
+  --human: #146b52;
+  --human-soft: #e8f2ed;
+  --warning: #8a6410;
+  --warning-soft: #fbf1dd;
+  --danger: #9c3428;
+  --danger-soft: #f9eae7;
+  --neutral-soft: #f0ede8;
 
   /* ---- typography ---- */
   --font-sans:
@@ -104,86 +112,42 @@
   --content-max: 1240px;
 }
 
-/* System preference (no explicit choice made) */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-
-    --bg: #0c0d11;
-    --surface: #14161c;
-    --surface-2: #1a1d25;
-    --surface-raised: #1c1f28;
-    --border: #262a35;
-    --border-strong: #343948;
-    --overlay: rgba(4, 5, 8, 0.6);
-
-    --text: #eceef3;
-    --text-secondary: #a2a7b5;
-    --text-tertiary: #6d7284;
-    --text-on-accent: #ffffff;
-
-    --accent: #3fd6a0;
-    --accent-hover: #5ce0af;
-    --accent-active: #6ee6ba;
-    --accent-soft: rgba(63, 214, 160, 0.14);
-    --accent-soft-strong: rgba(63, 214, 160, 0.22);
-    --accent-text: #6ee6ba;
-    --focus-ring: #3fd6a0;
-
-    --success: #3fd693;
-    --success-soft: rgba(63, 214, 147, 0.13);
-    --running: #8fb4cc;
-    --running-soft: rgba(143, 180, 204, 0.13);
-    --human: #3fd6a0;
-    --human-soft: rgba(63, 214, 160, 0.14);
-    --warning: #f0b23f;
-    --warning-soft: rgba(240, 178, 63, 0.13);
-    --danger: #ff7a7a;
-    --danger-soft: rgba(255, 122, 122, 0.13);
-    --neutral-soft: #262620;
-
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3);
-    --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.3);
-  }
-}
-
-/* Explicit user choice always wins, in both directions */
+/* Dark is opt-in, never automatic — see the note at the top of this file. */
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --bg: #0c0d11;
-  --surface: #14161c;
-  --surface-2: #1a1d25;
-  --surface-raised: #1c1f28;
-  --border: #262a35;
-  --border-strong: #343948;
-  --overlay: rgba(4, 5, 8, 0.6);
+  --bg: #12110f;
+  --surface: #1a1816;
+  --surface-2: #211f1c;
+  --surface-raised: #24211e;
+  --border: #302c28;
+  --border-strong: #423d37;
+  --overlay: rgba(8, 7, 6, 0.62);
 
-  --text: #eceef3;
-  --text-secondary: #a2a7b5;
-  --text-tertiary: #6d7284;
-  --text-on-accent: #ffffff;
+  --text: #f0ede8;
+  --text-secondary: #b5aea4;
+  --text-tertiary: #928b81;
+  --text-on-accent: #10231c;
 
-  --accent: #3fd6a0;
-  --accent-hover: #5ce0af;
-  --accent-active: #6ee6ba;
-  --accent-soft: rgba(63, 214, 160, 0.14);
-  --accent-soft-strong: rgba(63, 214, 160, 0.22);
-  --accent-text: #6ee6ba;
-  --focus-ring: #3fd6a0;
+  --accent: #5cbf99;
+  --accent-hover: #74cfab;
+  --accent-active: #8bd9bb;
+  --accent-soft: rgba(92, 191, 153, 0.14);
+  --accent-soft-strong: rgba(92, 191, 153, 0.22);
+  --accent-text: #74cfab;
+  --focus-ring: #5cbf99;
 
-  --success: #3fd693;
-  --success-soft: rgba(63, 214, 147, 0.13);
-  --running: #8fb4cc;
-  --running-soft: rgba(143, 180, 204, 0.13);
-  --human: #3fd6a0;
-  --human-soft: rgba(63, 214, 160, 0.14);
-  --warning: #f0b23f;
-  --warning-soft: rgba(240, 178, 63, 0.13);
-  --danger: #ff7a7a;
-  --danger-soft: rgba(255, 122, 122, 0.13);
-  --neutral-soft: #262620;
+  --success: #57bd8b;
+  --success-soft: rgba(87, 189, 139, 0.13);
+  --running: #9d968c;
+  --running-soft: rgba(157, 150, 140, 0.14);
+  --human: #5cbf99;
+  --human-soft: rgba(92, 191, 153, 0.14);
+  --warning: #d9a441;
+  --warning-soft: rgba(217, 164, 65, 0.13);
+  --danger: #e08b80;
+  --danger-soft: rgba(224, 139, 128, 0.13);
+  --neutral-soft: #262320;
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3);

@@ -82,27 +82,30 @@
       --border: #e4e4e7;
       --border-strong: #d4d4d8;
 
-      /* 4 Subtle Accent Color Tokens (Zero Yellow/Gold) */
-      --color-mint: #059669;
-      --color-mint-bg: #ecfdf5;
-      --color-mint-border: #a7f3d0;
+      /* Accent tokens. The names are historical; the values are not blue or purple.
+         Hue is reserved for meaning here exactly as in the console: emerald for healthy,
+         amber for attention, brick for failure, and a warm graphite for everything that
+         is merely in progress. Neutrals are warm (hue ~35), not cool blue-grey. */
+      --color-mint: #157a4a;
+      --color-mint-bg: #e7f2ea;
+      --color-mint-border: #c4e2d1;
 
-      --color-blue: #2563eb;
-      --color-blue-bg: #eff6ff;
-      --color-blue-border: #bfdbfe;
+      --color-blue: #6b665d;   /* warm graphite — see the note above */
+      --color-blue-bg: #f2f0ec;
+      --color-blue-border: #ddd8d0;
 
-      --color-purple: #7c3aed;
-      --color-purple-bg: #f5f3ff;
-      --color-purple-border: #ddd6fe;
+      --color-purple: #146b52;
+      --color-purple-bg: #e8f2ed;
+      --color-purple-border: #cfe4d9;
 
-      --color-red: #dc2626;
-      --color-red-bg: #fef2f2;
-      --color-red-border: #fecaca;
+      --color-red: #9c3428;
+      --color-red-bg: #f9eae7;
+      --color-red-border: #edcdc7;
 
-      --success: #059669;
-      --warning: #71717a;
-      --danger: #dc2626;
-      --info: #2563eb;
+      --success: #157a4a;
+      --warning: #8a6410;
+      --danger: #9c3428;
+      --info: #6b665d;
 
       --radius: 8px;
       --radius-sm: 6px;
@@ -143,27 +146,27 @@
       --border: #27272a;
       --border-strong: #3f3d48;
 
-      /* 4 Subtle Accent Color Tokens - Dark Mode */
-      --color-mint: #34d399;
-      --color-mint-bg: rgba(16, 185, 129, 0.12);
-      --color-mint-border: rgba(16, 185, 129, 0.28);
+      /* Dark values for the same tokens. */
+      --color-mint: #57bd8b;
+      --color-mint-bg: rgba(87, 189, 139, 0.14);
+      --color-mint-border: rgba(87, 189, 139, 0.28);
 
-      --color-blue: #60a5fa;
-      --color-blue-bg: rgba(59, 130, 246, 0.12);
-      --color-blue-border: rgba(59, 130, 246, 0.28);
+      --color-blue: #9d968c;
+      --color-blue-bg: rgba(157, 150, 140, 0.14);
+      --color-blue-border: rgba(157, 150, 140, 0.28);
 
-      --color-purple: #a78bfa;
-      --color-purple-bg: rgba(139, 92, 246, 0.12);
-      --color-purple-border: rgba(139, 92, 246, 0.28);
+      --color-purple: #5cbf99;
+      --color-purple-bg: rgba(92, 191, 153, 0.14);
+      --color-purple-border: rgba(92, 191, 153, 0.28);
 
-      --color-red: #f87171;
-      --color-red-bg: rgba(239, 68, 68, 0.12);
-      --color-red-border: rgba(239, 68, 68, 0.28);
+      --color-red: #e08b80;
+      --color-red-bg: rgba(224, 139, 128, 0.13);
+      --color-red-border: rgba(224, 139, 128, 0.28);
 
-      --success: #34d399;
-      --warning: #a1a1aa;
-      --danger: #ef4444;
-      --info: #60a5fa;
+      --success: #57bd8b;
+      --warning: #d9a441;
+      --danger: #e08b80;
+      --info: #9d968c;
     }
 
     *,
@@ -1399,8 +1402,7 @@
             dependencies, Chromium</span></div>
         <div style="margin-top: 10px;"><span class="comment"># 2. Run the full deterministic test & demo story</span>
         </div>
-        <div><span class="prompt">$ </span><span class="cmd">make demo</span> <span class="comment"># all 12 stages,
-            100% offline verifiable</span></div>
+        <div><span class="prompt">$ </span><span class="cmd">make demo</span> <span class="comment"># all 12 stages, no API key needed</span></div>
       </div>
 
       <table class="stages-table">
@@ -1650,8 +1652,9 @@
       }
     }
 
-    const savedTheme = localStorage.getItem('cua-theme') ||
-      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    // Light by default, unconditionally — the OS preference is not consulted. Dark is a
+// deliberate choice via the toggle, and it persists once made.
+const savedTheme = localStorage.getItem('cua-theme') || 'light';
     applyTheme(savedTheme);
 
     themeToggle.addEventListener('click', () => {

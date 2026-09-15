@@ -41,10 +41,16 @@ class Budget:
     def elapsed_s(self) -> float:
         return time.monotonic() - self.started_at
 
-    def record_step(self, *, tokens: int, page_changed: bool, denied: bool) -> None:
+    def record_step(self, *, tokens: int, progressed: bool, denied: bool) -> None:
+        """Record one model turn.
+
+        `progressed` is deliberately broader than "the page changed": reading a value off a screen
+        moves the run forward without moving the screen, and a goal that is purely a read would
+        otherwise be indistinguishable from a loop.
+        """
         self.steps += 1
         self.tokens += tokens
-        self.unchanged_steps = 0 if page_changed else self.unchanged_steps + 1
+        self.unchanged_steps = 0 if progressed else self.unchanged_steps + 1
         self.consecutive_denials = self.consecutive_denials + 1 if denied else 0
 
     def exceeded(self) -> StopReason | None:

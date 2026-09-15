@@ -34,7 +34,6 @@ cua discover \
 ```
 evidence/discovery/<run_id>/
   trace.jsonl        authorize / resolve / dispatch / observe, actor-tagged
-  llm_calls.jsonl    full model exchange, redacted
   snapshots/         UiSnapshot per step
   screenshots/       redacted
   run_record.json    status, timings, budget
@@ -54,7 +53,7 @@ The artifact is a **draft** (`CapabilityApproval.state = draft`). Review before 
 
 | Symptom | Look at |
 |---|---|
-| Stops at `max_steps` | `llm_calls.jsonl` — is it looping on one screen? Usually a thin snapshot. |
+| Stops at `max_steps` | the `llm_call` events in `trace.jsonl` — is it looping on one screen? Usually a thin snapshot. |
 | `POLICY_DENIED` | Expected if the goal needs an irreversible action. Check `config/policy.yaml`. |
 | `TARGET_AMBIGUOUS` | The screen genuinely has two matching controls. Good — it refused. |
 | Model can't find a control | Check the `UiSnapshot` in `snapshots/`. If the control isn't there, it's a perception gap, not a model gap. |

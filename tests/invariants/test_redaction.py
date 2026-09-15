@@ -160,16 +160,38 @@ def test_outbound_prompts_are_redacted(redactor: Redactor) -> None:
 
 
 def test_resolved_credentials_are_scrubbed_by_literal(redactor: Redactor) -> None:
-    """No pattern can recognise an arbitrary password, so the secret resolver tells the redactor
-    exactly which literals to remove."""
-    resolver = SecretResolver(overrides={"core.password": PASSWORD})
+    """No pattern can recognise an arbitrary password, so the resolver registers the literal.
+
+    Asserted through `resolve()` rather than by calling `register_secret` here, because the thing
+    worth proving is the *wiring*, not the function. An earlier version of this test did the
+    registration itself and passed for months while `register_secret` had no production caller at
+    all -- the redactor's `extra_secrets` was empty in every real run.
+    """
     from cua.domain.values import SecretRef
 
+    resolver = SecretResolver(overrides={"core.password": PASSWORD}, redactor=redactor)
     value = resolver.resolve(SecretRef.model_validate({"$secret": "core.password"}))
-    for issued in resolver.issued_values:
-        redactor.register_secret(issued)
 
     assert PASSWORD not in redactor.text(f"typed {value} into the field")
+    assert not redactor.is_clean(f"typed {PASSWORD} into the field")
+
+
+def test_every_rig_wires_the_resolver_to_the_redactor() -> None:
+    """The guarantee above is only real if production actually connects the two.
+
+    Both rigs are checked: `build_rig` for discovery and replay, and `build_supervised_session` for
+    the operator console -- which for a long time constructed no resolver at all, so a capability
+    referencing a secret could not have run there.
+    """
+    import inspect
+
+    from cua.runtime import wiring
+
+    source = inspect.getsource(wiring)
+    assert source.count("SecretResolver(redactor=redactor)") == 2, (
+        "every SecretResolver in wiring.py must be constructed with the redactor it reports to"
+    )
+    assert "SecretResolver()" not in source, "a resolver with no redactor scrubs nothing"
 
 
 def test_snapshots_written_to_disk_are_redacted(bus: EvidenceBus, tmp_path: Path) -> None:

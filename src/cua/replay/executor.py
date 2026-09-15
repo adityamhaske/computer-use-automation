@@ -25,10 +25,18 @@ from collections import Counter
 from dataclasses import dataclass, field
 from typing import Any
 
-from cua.domain.action import ActionRisk, Extract, Navigate
+from cua.domain.action import ActionRisk, Assert, Extract, Navigate
+from cua.domain.action import WaitFor as WaitForAction
 from cua.domain.actor import Actor
 from cua.domain.approval import CapabilityApproval
-from cua.domain.capability import Capability, RecoveryRule, RunCapability, Step
+from cua.domain.capability import (
+    Capability,
+    RecoveryRule,
+    RunCapability,
+    Step,
+    WaitPolicy,
+)
+from cua.domain.capability import WaitFor as WaitForPolicy
 from cua.domain.result import (
     BusinessOutcome,
     FailureCode,
@@ -43,9 +51,12 @@ from cua.domain.run_record import RunKind
 from cua.domain.snapshot import UiSnapshot
 from cua.evidence.bus import EventType, EvidenceBus
 from cua.evidence.record import build_run_record, write_run_record
+from cua.hitl.reanchor import reconcile
+from cua.policy.config import ReplayGates
 from cua.replay.bind import UnboundReferenceError, bind_action
 from cua.replay.classify import classify
 from cua.replay.inputs import InputValidationError, validate_inputs
+from cua.replay.transforms import UnknownTransformError, apply_transform
 from cua.replay.wait import wait_for
 from cua.runtime.capture import FailureCapture
 from cua.runtime.dispatcher import Dispatcher, DispatchStatus
@@ -74,6 +85,15 @@ class ReplayExecutor:
     it without depending on its type."""
 
     session_id: str = field(default_factory=lambda: f"replay-{uuid.uuid4().hex[:8]}")
+
+    replay_gates: ReplayGates = field(default_factory=ReplayGates)
+    """Which gates an irreversible capability must clear before it runs unattended.
+
+    Mirrors `replay_gates` in `config/policy.yaml`, which was parsed into a typed model, rendered to
+    the operator on the Settings page as live policy, and read by no Python at all -- so turning a
+    gate off there changed a displayed value and nothing else. Defaults are both-on, because a
+    policy file that fails to load must not be the reason a wire transfer runs unattended.
+    """
 
     max_recovery_attempts_total: int = 6
     """Recovery attempts allowed across the whole run, independent of any one rule's budget.
@@ -147,7 +167,81 @@ class ReplayExecutor:
         outcome and an escalation are all as well evidenced as a success. The run you most want a
         record of is the one that did not succeed.
         """
-        result = self._execute(capability, supplied)
+        return self._record(self._execute(capability, supplied))
+
+    def resume(
+        self,
+        capability: Capability,
+        supplied: dict[str, Any],
+        *,
+        from_index: int,
+        prior_outputs: dict[str, str] | None = None,
+        prior_recovery_attempts: int = 0,
+        run_id: str | None = None,
+    ) -> RunResult:
+        """Continue a run an operator interrupted, on the session they just handed back.
+
+        Not a variant of `run()` with an offset. Four things differ, and each one is a way a naive
+        resume goes wrong:
+
+        **It does not navigate to the entrypoint.** `_execute` opens by loading the capability's
+        entry URL, which on a frameset app reloads the shell and discards precisely the state the
+        operator produced. Resuming re-enters mid-flow, so the screen in front of us *is* the
+        starting condition.
+
+        **It re-anchors before acting.** Where the run stopped is not necessarily where it should
+        pick up: the operator may have completed several steps by hand, or left the application
+        somewhere this capability cannot act from. `reconcile` answers both questions against the
+        live screen, and we fail closed when it cannot -- guessing here means acting on a page
+        nobody verified.
+
+        **It adopts the epoch the handoff produced.** A full handoff advances the lease four times,
+        so the epoch this run was authorized under is stale by definition and every dispatch would
+        be refused with LEASE_LOST. Re-adopting is the one legitimate case for it; `run()`
+        deliberately does not, which is what keeps a genuinely stale run failing.
+
+        **It carries the run forward.** Outputs already extracted and recovery attempts already
+        spent are passed back in, so a resumed run returns everything it read and cannot refresh a
+        bounded retry budget by being resumed.
+        """
+        if self.broker is not None:
+            self.lease_epoch = int(self.broker.lease.epoch)
+
+        state = _State(
+            capability=capability,
+            run_id=run_id or f"rep-{uuid.uuid4().hex[:10]}",
+            started=time.monotonic(),
+        )
+        try:
+            bound = validate_inputs(capability, supplied)
+        except InputValidationError as exc:
+            return self._record(self._fail(state, FailureCode.INPUT_VALIDATION_FAILED, str(exc)))
+
+        plan = reconcile(capability, self.dispatcher.observe(), inputs=bound, from_index=from_index)
+        self.evidence.emit(
+            EventType.NOTE,
+            actor=Actor.AUTOMATION,
+            note="re-anchor after handoff",
+            resume_index=plan.resume_index,
+            skipped=list(plan.skipped),
+            reason=plan.reason,
+        )
+        if plan.resume_index is None:
+            return self._record(self._fail(state, FailureCode.UNEXPECTED_STATE, plan.reason))
+
+        return self._record(
+            self._execute(
+                capability,
+                supplied,
+                start_index=plan.resume_index,
+                prior_outputs=prior_outputs,
+                prior_recovery_attempts=prior_recovery_attempts,
+                run_id=state.run_id,
+            )
+        )
+
+    def _record(self, result: RunResult) -> RunResult:
+        """Leave a `run_record.json` behind, whichever way the run ended."""
         try:
             write_run_record(
                 build_run_record(self.evidence.run_dir, kind=RunKind.REPLAY, result=result),
@@ -161,8 +255,17 @@ class ReplayExecutor:
             )
         return result
 
-    def _execute(self, capability: Capability, supplied: dict[str, Any]) -> RunResult:
-        run_id = f"rep-{uuid.uuid4().hex[:10]}"
+    def _execute(
+        self,
+        capability: Capability,
+        supplied: dict[str, Any],
+        *,
+        start_index: int = 0,
+        prior_outputs: dict[str, str] | None = None,
+        prior_recovery_attempts: int = 0,
+        run_id: str | None = None,
+    ) -> RunResult:
+        run_id = run_id or f"rep-{uuid.uuid4().hex[:10]}"
         started = time.monotonic()
 
         if self.lease_epoch is None and self.broker is not None:
@@ -183,6 +286,8 @@ class ReplayExecutor:
         )
 
         state = _State(capability=capability, run_id=run_id, started=started)
+        state.outputs.update(prior_outputs or {})
+        state.recovery_attempts = prior_recovery_attempts
 
         if (unavailable := self._lease_available()) is not None:
             return self._fail(state, FailureCode.LEASE_LOST, unavailable)
@@ -207,7 +312,11 @@ class ReplayExecutor:
         if (gate := self._approval_gate(capability)) is not None:
             return self._fail(state, FailureCode.POLICY_DENIED, gate)
 
-        if capability.entrypoint.url_pattern.startswith(("http://", "https://")):
+        # Skipped on a resume: the operator's screen *is* the starting condition, and reloading
+        # the entrypoint would discard the state they just produced by hand.
+        if start_index == 0 and capability.entrypoint.url_pattern.startswith(
+            ("http://", "https://")
+        ):
             held, current = self._epochs()
             outcome = self.dispatcher.execute(
                 Navigate(url=capability.entrypoint.url_pattern),
@@ -225,7 +334,9 @@ class ReplayExecutor:
                     f"could not reach the entrypoint: {outcome.message}",
                 )
 
-        for index, step in enumerate(capability.steps):
+        # `start_index == len(steps)` is a legitimate answer from `reconcile`: the operator
+        # finished the flow by hand, so there is nothing left to do but verify it.
+        for index, step in enumerate(capability.steps[start_index:], start=start_index):
             result = self._run_step(state, step, index)
             if result is not None:
                 return result
@@ -236,6 +347,7 @@ class ReplayExecutor:
 
     def _run_step(self, state: _State, step: Step, index: int) -> RunResult | None:
         """Execute one step. Returns a terminal result, or None to continue."""
+        state.step_index = index
         attempts = 0
 
         while True:
@@ -299,6 +411,47 @@ class ReplayExecutor:
                 state, FailureCode.INPUT_VALIDATION_FAILED, str(exc), step=step, snapshot=snapshot
             )
 
+        # `assert` and `wait_for` change nothing on the surface, so they are evaluated here against
+        # the snapshot rather than dispatched. The driver already documented that intent -- and then
+        # returned "not a driver-level action" for both, so a step using either hard-failed the run
+        # despite being a member of the closed action space and named in the reference
+        # artifact's own `allowed_actions`. Nothing reaches a surface, so nothing needs authorizing.
+        if isinstance(action, Assert):
+            if not action.that.evaluate(snapshot, state.inputs):
+                return self._fail(
+                    state,
+                    FailureCode.PRECONDITION_FAILED,
+                    f"assertion did not hold: {action.that.describe()}",
+                    step=step,
+                    snapshot=snapshot,
+                    expected=action.that.describe(),
+                )
+            state.steps_executed = index + 1
+            return None
+
+        if isinstance(action, WaitForAction):
+            waited = wait_for(
+                WaitPolicy(
+                    for_=WaitForPolicy.PREDICATE,
+                    until=action.until,
+                    timeout_ms=action.timeout_ms,
+                ),
+                observe=self.dispatcher.observe,
+                inputs=state.inputs,
+            )
+            if not waited.satisfied:
+                return self._fail(
+                    state,
+                    FailureCode.TIMEOUT,
+                    f"condition did not hold within {action.timeout_ms}ms: "
+                    f"{action.until.describe()}",
+                    step=step,
+                    snapshot=waited.snapshot,
+                    expected=action.until.describe(),
+                )
+            state.steps_executed = index + 1
+            return None
+
         held, current = self._epochs()
         outcome = self.dispatcher.execute(
             action,
@@ -340,6 +493,13 @@ class ReplayExecutor:
                     snapshot=snapshot,
                     resolution=outcome.resolution,
                 )
+            if action.transform:
+                try:
+                    value = apply_transform(action.transform, value)
+                except UnknownTransformError as exc:
+                    return self._fail(
+                        state, FailureCode.ACTION_FAILED, str(exc), step=step, snapshot=snapshot
+                    )
             state.outputs[action.into] = value
 
         if not extracted and outcome.status is not DispatchStatus.OK:
@@ -350,6 +510,7 @@ class ReplayExecutor:
                 step=step,
                 snapshot=snapshot,
                 resolution=outcome.resolution,
+                resolution_debug=outcome.resolution_debug,
             )
 
         waited = wait_for(
@@ -536,6 +697,7 @@ class ReplayExecutor:
         snapshot: UiSnapshot | None = None,
         expected: str = "",
         resolution: Any = None,
+        resolution_debug: ResolutionDebug | None = None,
     ) -> RunResult:
         """Terminate. Escalates rather than failing when the capability says a human decides."""
         capture_ref = None
@@ -550,8 +712,14 @@ class ReplayExecutor:
             step_id=step.id if step else None,
             expected=expected or None,
             observed=(snapshot.url if snapshot else None),
+            # Prefer the debug the dispatcher built: on TARGET_NOT_FOUND and TARGET_AMBIGUOUS --
+            # the two failures this field exists for -- there is no `Resolution` to derive one from,
+            # because nothing resolved. Deriving only from a *successful* resolution meant the field
+            # was empty exactly when it was needed.
             resolution=(
-                ResolutionDebug(
+                resolution_debug
+                if resolution_debug is not None
+                else ResolutionDebug(
                     target_description=resolution.node.role,
                     strategies_tried=(resolution.strategy,),
                     candidates_considered=resolution.candidates_considered,
@@ -612,10 +780,18 @@ class ReplayExecutor:
         if escalates:
             return RunResult(
                 status=RunStatus.NEEDS_HUMAN,
+                outputs=dict(state.outputs),
+                # The same `FailureDetail` a FAILED run returns. Escalating used to drop it, so the
+                # path that most needs debugging -- a person is being asked to look at this -- was
+                # the one that came back with free text and no failure code, no step, no
+                # expected/observed. `_shape_matches_status` only forbids an error on SUCCESS.
+                error=detail,
                 intervention=InterventionRef(
                     intervention_id=intervention_id,
                     reason=message,
                     step_id=step.id if step else None,
+                    step_index=state.step_index,
+                    outputs_so_far=dict(state.outputs),
                 ),
                 **common,
             )
@@ -627,13 +803,14 @@ class ReplayExecutor:
         """Two independent gates on an irreversible capability, or it does not run unattended."""
         if capability.max_risk is not ActionRisk.IRREVERSIBLE:
             return None
-        if not self.allow_irreversible:
+        if self.replay_gates.irreversible_requires_caller_optin and not self.allow_irreversible:
             return (
                 "this capability performs an irreversible action and the caller did not opt in "
                 "(allow_irreversible)"
             )
-        if self.approval is None or not self.approval.permits_unattended_replay(
-            content_hash=capability.content_hash
+        if self.replay_gates.irreversible_requires_approval and (
+            self.approval is None
+            or not self.approval.permits_unattended_replay(content_hash=capability.content_hash)
         ):
             return (
                 f"this capability performs an irreversible action and {capability.ref} is not "
@@ -652,6 +829,12 @@ class _State:
     inputs: dict[str, Any] = field(default_factory=dict)
     outputs: dict[str, str] = field(default_factory=dict)
     steps_executed: int = 0
+    step_index: int | None = None
+    """Position of the step currently in flight.
+
+    `steps_executed` counts *completed* dispatches, so it cannot answer "which step stopped" -- the
+    two differ by one exactly when it matters. A resume needs the failing index, not the count.
+    """
     resolutions: int = 0
     drifted: int = 0
     recovery_attempts: int = 0

@@ -157,3 +157,23 @@ def test_driver_dispatch_accepts_only_an_authorized_action() -> None:
     signature = inspect.signature(PlaywrightCdpDriver.dispatch)
     annotation = signature.parameters["action"].annotation
     assert annotation in (AuthorizedAction, "AuthorizedAction")
+
+
+def test_the_entrypoint_navigation_is_allowlist_checked() -> None:
+    """Opening a target is setup, not a declared step -- but it still may not leave the allowlist.
+
+    `cua discover --target ...` and the operator console both take a URL from the caller. Both used
+    to reach `driver.page.goto` directly, which skipped the one check that unambiguously applies to
+    a navigation. Routing them through `Dispatcher.open_entrypoint` puts them back inside it.
+    """
+    import inspect
+
+    from cua.cli import main as cli_main
+    from cua.runtime import wiring
+
+    for module in (cli_main, wiring):
+        source = inspect.getsource(module)
+        assert ".page.goto(" not in source, (
+            f"{module.__name__} navigates off the raw page handle; use "
+            "Dispatcher.open_entrypoint so the allowlist applies"
+        )

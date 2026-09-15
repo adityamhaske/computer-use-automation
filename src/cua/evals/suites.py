@@ -26,17 +26,17 @@ CASES: list[GroundTruth] = [
     GroundTruth(
         inputs={"member_id": "12345"},
         expect_status=RunStatus.SUCCESS,
-        outputs={"savings_balance": "$4,210.55", "account_status": "Active"},
+        outputs={"savings_balance": "4210.55", "account_status": "Active"},
     ),
     GroundTruth(
         inputs={"member_id": "67890"},
         expect_status=RunStatus.SUCCESS,
-        outputs={"savings_balance": "$18,730.00", "account_status": "Active"},
+        outputs={"savings_balance": "18730.00", "account_status": "Active"},
     ),
     GroundTruth(
         inputs={"member_id": "24680"},
         expect_status=RunStatus.SUCCESS,
-        outputs={"savings_balance": "$0.00", "account_status": "Closed"},
+        outputs={"savings_balance": "0.00", "account_status": "Closed"},
     ),
     GroundTruth(
         inputs={"member_id": "99999"},

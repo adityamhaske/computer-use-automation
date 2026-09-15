@@ -7,7 +7,7 @@
 **What we observed** (a classification of a moment):
 
 ```python
-ObservationClass = EXPECTED | BUSINESS_OUTCOME | RECOVERABLE | HARD_FAILURE | UNEXPECTED_STATE
+ObservationClass = EXPECTED | BUSINESS_OUTCOME | RECOVERABLE | UNEXPECTED_STATE
 ```
 
 **How the run ended** (a terminal status):
@@ -27,7 +27,6 @@ At every observation point the executor asks, in this order:
 1. Does the state satisfy the step precondition / checkpoint?   → EXPECTED, proceed
 2. Does it match a declared `outcomes` detector?                → BUSINESS_OUTCOME, return to caller
 3. Does it match a declared `recovery` detector?                → RECOVERABLE, remediate (bounded)
-4. Is it a known hard-failure condition?                        → HARD_FAILURE, stop
 5. Otherwise                                                    → UNEXPECTED_STATE, FAIL CLOSED
 ```
 
@@ -94,6 +93,13 @@ retries against a struggling core banking system.
 | `session_timeout` | `SUCCESS` or `NEEDS_HUMAN` | re-auth recovery, else escalate |
 | undeclared interstitial dialog | `NEEDS_HUMAN` | `UNEXPECTED_STATE` |
 | `validation_error` on submit | `BUSINESS_OUTCOME` | `validation_rejected` |
+
+Every row above is driven by a committed capability and asserted in
+`tests/integration/test_fault_matrix.py`. `validation_rejected` was the last one that was not:
+the savings-balance lookup submits nothing, so nothing could be rejected. It is covered by
+`corebank.member.open_subaccount`, a multi-field form with a confirmation step — the brief's
+second example goal — because a taxonomy row with no capability behind it is a claim rather
+than a guarantee.
 | permission-denied account | `BUSINESS_OUTCOME` | `permission_denied` |
 | off-allowlist redirect | `FAILED` | `NAVIGATION_BLOCKED` |
 

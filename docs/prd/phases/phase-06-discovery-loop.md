@@ -15,7 +15,7 @@ evidence. Everything else may be mocked; this may not.
 | `agent/prompts/` | System prompt, observation rendering, goal framing |
 | `agent/loop.py` | observe → decide → act, with budget accounting |
 | `agent/stop.py` | Stopping conditions: goal met, max steps, timeout, token budget, dead-end (no progress in N steps) |
-| `agent/transcript.py` | Full LLM call capture to `llm_calls.jsonl` — **redacted outbound** |
+| `evidence/bus.py` | Full LLM call capture as `llm_call` events in `trace.jsonl` — **redacted outbound** |
 | `agent/fake.py` | Fake `LlmPort` replaying recorded transcripts, so CI exercises the real loop for free |
 
 ## Design notes

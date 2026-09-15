@@ -1,7 +1,10 @@
 # Documentation map
 
 Start with [`/README.md`](../README.md) to run the system, and [`/REPORT.md`](../REPORT.md) for the
-design write-up. This tree is the supporting detail.
+design write-up. This tree is the supporting detail, and it is also published, rendered and
+cross-linked, at the **[documentation site](https://adityamhaske.github.io/interface.ai/)** — which
+is where the CLI reference, the demo walkthrough and the getting-started material live now that the
+root README is deliberately short.
 
 ## Decisions — *why it is this way*
 

@@ -8,7 +8,6 @@ CUA is an enterprise computer-use automation system engineered for regulated fin
 - Full Documentation: https://adityamhaske.github.io/interface.ai/docs/index.html
 - Complete Single-File Context: https://adityamhaske.github.io/interface.ai/llms-full.txt
 - GitHub Repository: https://github.com/adityamhaske/interface.ai
-- License: Proprietary & Confidential
 
 ## The 10 Invariants
 1. Replay never calls or imports the LLM: Replay is purely deterministic with 0 model calls.

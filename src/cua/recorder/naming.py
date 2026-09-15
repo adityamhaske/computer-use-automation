@@ -12,14 +12,23 @@ import re
 
 from cua.domain.values import ValueType
 
-MONEY = re.compile(r"^-?\$-?[\d,]+\.\d{2}$|^-?[\d]{1,3}(?:,\d{3})+\.\d{2}$")
-"""Requires a currency symbol or thousands grouping.
+# The shape vocabulary lives in `cua.perception` because `cua.targeting` needs it too and cannot
+# import this module -- the layering contract puts recorder above targeting. Re-exported here so
+# this module still reads as the one place naming and typing decisions are made.
+from cua.perception.normalize import DATE, INTEGER, MONEY, NUMBER, looks_like_value
 
-A bare `4210.55` is left as `number`: two decimal places alone is equally consistent with an
-interest rate or a fee multiplier, and a type is a claim to a calling agent rather than a hint."""
-DATE = re.compile(r"^\d{1,2}/\d{1,2}/\d{4}$|^\d{4}-\d{2}-\d{2}$")
-INTEGER = re.compile(r"^-?\d+$")
-NUMBER = re.compile(r"^-?\d+\.\d+$")
+__all__ = [
+    "DATE",
+    "INTEGER",
+    "MONEY",
+    "NUMBER",
+    "capability_id",
+    "infer_type",
+    "input_pattern",
+    "looks_like_value",
+    "shape_pattern",
+    "snake",
+]
 
 
 def snake(text: str) -> str:

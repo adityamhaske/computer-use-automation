@@ -140,6 +140,24 @@ def build_run_record(
         else (result.duration_ms if result else 0)
     )
 
+    # Token accounting, derived from the trace rather than threaded through the caller -- the record
+    # is a projection of what happened, and keeping it one keeps it honest. `tokens_used` is
+    # documented as the field that shows a run actually spent a model, and nothing populated it, so
+    # every record read `null` whether or not a model had run. A run with no `llm_call` events
+    # stays `None`: zero and "no model was involved" are different claims.
+    llm_calls = [e for e in events if e["event"] == EventType.LLM_CALL.value]
+    tokens_used = (
+        sum(
+            int(e.get("prompt_tokens") or 0) + int(e.get("completion_tokens") or 0)
+            for e in llm_calls
+        )
+        if llm_calls
+        else None
+    )
+    # The model the *provider* reported, which a scripted port cannot fabricate as easily as the
+    # requested name it was handed.
+    observed_model = next((str(e["model"]) for e in llm_calls if e.get("model")), None)
+
     return RunRecord(
         run_id=str(start.get("run_id") or run_dir.name),
         kind=kind,
@@ -153,7 +171,8 @@ def build_run_record(
         started_at=started_at,
         duration_ms=duration,
         evidence_ref=str(run_dir),
-        model_name=model_name,
+        model_name=model_name or observed_model or start.get("model"),
+        tokens_used=tokens_used,
         resolver_config_hash=resolver_config_hash,
         human_actions=sum(1 for s in steps if str(s.actor) == "human"),
         lease_transitions=tuple(

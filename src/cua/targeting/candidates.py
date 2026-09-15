@@ -37,6 +37,18 @@ def _base_pool(snapshot: UiSnapshot, target: TargetDescriptor) -> list[UiNode]:
     return [n for n in snapshot.nodes if _role_matches(n, target) and _in_scope(n, target)]
 
 
+def ordinal_pool(snapshot: UiSnapshot, target: TargetDescriptor) -> list[UiNode]:
+    """The candidate list an `ordinal` indexes into, in document order.
+
+    Public because the *recorder* has to count over exactly this list. It did not: it enumerated
+    role + frame while the resolver filters role + frame + region, so a descriptor carrying a region
+    recorded a position counted across the whole frame and replayed it against a narrower list. That
+    resolves -- to the wrong control, silently, which is worse than failing. Sharing the function is
+    what makes the two definitionally the same rather than the same by inspection.
+    """
+    return _base_pool(snapshot, target)
+
+
 def semantic_exact(target: TargetDescriptor, snapshot: UiSnapshot) -> list[UiNode]:
     """Role plus accessible name, matched exactly after whitespace cleanup."""
     if target.name is None:

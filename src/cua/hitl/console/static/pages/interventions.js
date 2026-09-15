@@ -13,6 +13,32 @@ import { statusPill, escapeHtml, truncate } from "../util.js";
 // captured here, client-side, at the moment of claim, or it is gone for the rest of the handoff.
 let claimedCard = null;
 
+const FORWARDED_KEYS = new Set([
+  "Enter", "Tab", "Backspace", "Delete", "Escape",
+  "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Home", "End",
+]);
+
+/**
+ * Where a click on the rendered frame lands in the captured page's own pixels.
+ *
+ * The image is `object-fit: contain`, so when its aspect ratio differs from the box it sits in the
+ * browser letterboxes it — bars of empty element on two sides. Scaling straight from the element's
+ * bounding rect treats those bars as page, which pushes every click toward the centre; near the
+ * edges the error reached tens of pixels and the operator's click landed on the wrong control.
+ * Returns null for a click in the letterbox itself, which is not a click on the page at all.
+ */
+function framePoint(img, event) {
+  const rect = img.getBoundingClientRect();
+  if (!img.naturalWidth || !img.naturalHeight) return null;
+  const scale = Math.min(rect.width / img.naturalWidth, rect.height / img.naturalHeight);
+  const offsetX = (rect.width - img.naturalWidth * scale) / 2;
+  const offsetY = (rect.height - img.naturalHeight * scale) / 2;
+  const x = (event.clientX - rect.left - offsetX) / scale;
+  const y = (event.clientY - rect.top - offsetY) / scale;
+  if (x < 0 || y < 0 || x > img.naturalWidth || y > img.naturalHeight) return null;
+  return { x, y };
+}
+
 export async function render(container, ctx) {
   claimedCard = null;
 
@@ -49,20 +75,26 @@ export async function render(container, ctx) {
   const img = container.querySelector("#iv-screen");
   img.addEventListener("click", (e) => {
     if (!isConnected()) return;
-    const rect = img.getBoundingClientRect();
-    // Scale from displayed pixels to the frame's own resolution — the two differ whenever the
-    // viewport is narrower than the captured page, exactly as the original console computed it.
-    gesture.click(
-      (e.clientX - rect.left) * (img.naturalWidth / rect.width),
-      (e.clientY - rect.top) * (img.naturalHeight / rect.height)
-    );
+    const point = framePoint(img, e);
+    if (point) gesture.click(point.x, point.y);
   });
 
   const onKeydown = (e) => {
-    if (!isConnected() || e.key.length !== 1) return;
+    if (!isConnected()) return;
     const active = document.activeElement;
     if (active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA")) return;
-    gesture.text(e.key);
+    // Printable characters go as text; the keys that actually operate a legacy form — Enter to
+    // submit, Tab between fields, Backspace to correct — have to travel as key presses. Dropping
+    // everything with `key.length !== 1` silently discarded all of them, so an operator could type
+    // into a field and then had no way to submit it.
+    if (e.key.length === 1) {
+      gesture.text(e.key);
+      return;
+    }
+    if (FORWARDED_KEYS.has(e.key)) {
+      e.preventDefault();
+      gesture.key(e.key);
+    }
   };
   document.addEventListener("keydown", onKeydown);
 
@@ -112,8 +144,13 @@ function paint(container, ctx, store) {
     return;
   }
 
+  // The message has to follow the state, not the happy path. While a run is paused there IS an
+  // intervention waiting, and telling the operator "nothing is escalated right now" next to a queue
+  // card that says otherwise reads as a broken page.
   emptyText.textContent =
-    "Automation owns the session. Nothing is escalated right now — this panel goes live the moment an operator claims control.";
+    state.state === "paused"
+      ? "A run stopped and is waiting for a person. Claim it to take the session — the live view opens as soon as you do."
+      : "Automation owns the session. Nothing is escalated right now — this panel goes live the moment an operator claims control.";
 
   if (!store.interventions.length) {
     rail.innerHTML = `<div class="card card-pad"><div><strong style="font-size:var(--text-sm);">No open interventions</strong><p style="margin-top:4px;color:var(--text-secondary);font-size:var(--text-sm);">Automation is running normally — nothing needs a person right now.</p></div></div>`;
@@ -171,10 +208,30 @@ function railHuman(state, card) {
       </div>
     </div>
     ${detail}
-    <button class="btn btn-human" id="iv-release-btn" style="width:100%;">Release to automation</button>
+    <button class="btn btn-human" id="iv-release-btn" style="width:100%;">Hand back to automation</button>
     <p style="font-size:var(--text-2xs);color:var(--text-tertiary);text-align:center;">Click the
     viewport to send a click. Type to send characters. Both travel through the same policy chokepoint
     as automation, tagged <code class="mono">actor=human</code>.</p>`;
+}
+
+/**
+ * The screen as it was when the run stopped.
+ *
+ * The context card has carried a `screenshot` ref all along and rendered none of it, so an operator
+ * decided whether to claim a stuck session from a sentence — while the picture of why it stopped sat
+ * one field away. Deciding to take a live banking session is exactly the decision that should not be
+ * made blind.
+ */
+function thumbnail(card) {
+  if (!card.screenshot || !card.evidence) return "";
+  const parts = String(card.evidence).split("/").filter(Boolean);
+  const runId = parts[parts.length - 1];
+  const kind = parts[parts.length - 2];
+  const name = String(card.screenshot).split("/").pop();
+  if (!runId || !kind || !name) return "";
+  return `<img class="intervention-thumb" loading="lazy"
+    src="${escapeHtml(api.runScreenshotUrl(kind, runId, name))}"
+    alt="The screen when this run stopped">`;
 }
 
 function railQueue(list) {
@@ -192,6 +249,7 @@ function railQueue(list) {
         <p style="font-size:var(--text-sm);color:var(--text-secondary);">stopped at
           <code class="mono">${escapeHtml(c.stopped_at || "?")}</code> — ${escapeHtml(c.because || "")}
         </p>
+        ${thumbnail(c)}
       </div>
       <div style="padding:0 var(--space-5) var(--space-5);">
         <button class="btn btn-primary" style="width:100%;" data-claim="${escapeHtml(
@@ -232,7 +290,7 @@ function wireReleaseButton(container, ctx) {
   if (!btn) return;
   btn.addEventListener("click", async () => {
     const ok = await ctx.confirmDialog({
-      title: "Release to automation?",
+      title: "Hand back to automation?",
       message: "The executor will reconcile the session and resume at the right step.",
       confirmLabel: "Release",
       tone: "human",

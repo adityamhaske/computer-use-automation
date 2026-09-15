@@ -32,7 +32,7 @@ A second confusion: "recoverable" is not a way for a *run* to end. It is a class
 *What we observed at a point in time:*
 
 ```python
-ObservationClass = EXPECTED | BUSINESS_OUTCOME | RECOVERABLE | HARD_FAILURE | UNEXPECTED_STATE
+ObservationClass = EXPECTED | BUSINESS_OUTCOME | RECOVERABLE | UNEXPECTED_STATE
 ```
 
 *How the run terminated:*
@@ -44,7 +44,9 @@ RunStatus = SUCCESS | BUSINESS_OUTCOME | NEEDS_HUMAN | FAILED
 Rules connecting them:
 
 - `RECOVERABLE` is **never terminal**. It triggers a bounded, *declared* remedy with `max_attempts`.
-  Exhausting attempts converts it to `RECOVERY_EXHAUSTED`, a `HARD_FAILURE`. Recovery can never loop.
+  Exhausting attempts converts it to `RECOVERY_EXHAUSTED`, a `FailureCode`. Recovery can never loop.
+  Note this is a *failure code*, not an observation class: a hard failure is expressed as
+  `RunStatus.FAILED` plus a `FailureCode`, which is why the taxonomy has four classes and not five.
 - `UNEXPECTED_STATE` **fails closed**: per `escalation.policy` it becomes `NEEDS_HUMAN` (default) or
   `FAILED(UNEXPECTED_STATE)`. It never becomes "continue."
 - `TARGET_AMBIGUOUS` follows the same rule: the resolver refuses rather than picking a candidate.

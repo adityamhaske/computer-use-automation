@@ -65,7 +65,8 @@ itself" argument applies to the frontend).
 ## Review checklist, before calling any UI work done
 
 - [ ] Built only from existing tokens/components, or a deliberate, documented addition to them
-- [ ] No blue or purple introduced as a non-semantic color (info-blue is fine; brand-blue is not)
+- [ ] No blue or purple anywhere, semantic or otherwise. Neutrals are warm (hue ~35°); the only
+      hues on screen are emerald, amber and brick, and each one means something.
 - [ ] Populated / loading / empty / error states all designed
 - [ ] Keyboard-only pass: every control reachable, every focus state visible
 - [ ] Both themes checked, not just the one the browser happened to default to

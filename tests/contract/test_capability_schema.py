@@ -8,6 +8,7 @@ agent-facing tool contract.
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pytest
@@ -117,9 +118,19 @@ def test_tampering_is_detected(capability: Capability) -> None:
         load_capability(to_yaml(tampered))
 
 
+def _as_draft(text: str) -> str:
+    """The same artifact with its seal removed.
+
+    These tests need *a* draft, not specifically the reviewed artifact. Reading the fixture raw
+    made them depend on it being unsealed, so sealing it -- which is what a reviewed artifact
+    should be -- broke two tests that had nothing to do with the change.
+    """
+    return re.sub(r"^content_hash:.*$", "", text, flags=re.M).rstrip() + "\n"
+
+
 def test_unsealed_draft_is_accepted(capability: Capability) -> None:
-    """A hand-authored artifact with no hash is a draft, not a tampered document."""
-    assert load_capability(FIXTURE.read_text()).content_hash == ""
+    """An artifact with no hash is a draft, not a tampered document."""
+    assert load_capability(_as_draft(FIXTURE.read_text())).content_hash == ""
 
 
 # ------------------------------------------------------------ immutability

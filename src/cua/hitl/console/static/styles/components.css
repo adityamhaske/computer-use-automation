@@ -951,10 +951,12 @@ dialog.confirm-dialog::backdrop {
   align-items: center;
   justify-content: center;
   gap: var(--space-3);
-  color: #9aa0b3;
+  /* Tokens, not literals: hard-coded cool greys here meant the empty viewport stayed a blue-black
+     panel in the light theme, which was the one surface that ignored the palette entirely. */
+  color: var(--text-tertiary);
   text-align: center;
   padding: var(--space-5);
-  background: radial-gradient(circle at 50% 30%, #1a1c24, #0a0b0e 75%);
+  background: var(--surface-2);
 }
 
 .viewport-empty svg {
@@ -1211,4 +1213,18 @@ dialog.confirm-dialog::backdrop {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* The screen as it was when a run stopped, on its queue card. Small on purpose: it is a cue for
+   deciding whether to claim, not a substitute for the live view you get once you do. */
+.intervention-thumb {
+  display: block;
+  width: 100%;
+  max-height: 128px;
+  object-fit: cover;
+  object-position: top center;
+  margin-top: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
 }

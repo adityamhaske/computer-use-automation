@@ -135,7 +135,7 @@ def build_rig(
         config = config.model_copy(update={"allowlist": allowlist})
 
     redactor = Redactor(config.redaction)
-    secrets = SecretResolver()
+    secrets = SecretResolver(redactor=redactor)
 
     run_dir = fresh_run_dir(kind, run_id)
     evidence = EvidenceBus(run_dir, redactor, run_id=run_id)
@@ -172,6 +172,17 @@ class SupervisedSession:
     evidence: EvidenceBus
     run_dir: Path
 
+    dispatcher: Dispatcher | None = None
+    """The same chokepoint the broker routes operator input through.
+
+    Exposed so the console can run a real capability against this session -- without it the only
+    reference is `broker.dispatch`, typed `object`, and an escalation could never be produced on the
+    surface an operator is watching.
+    """
+
+    redactor: Redactor | None = None
+    config: PolicyConfig | None = None
+
     def close(self) -> None:
         self.session.call(self.driver.close)
         self.session.stop()
@@ -203,21 +214,27 @@ def build_supervised_session(
     thread.start()
 
     def boot() -> PlaywrightCdpDriver:
-        instance = PlaywrightCdpDriver(headless=headless, session_id=run_id)
-        instance.page.goto(target, wait_until="load")
-        return instance
+        return PlaywrightCdpDriver(headless=headless, session_id=run_id)
 
     driver = thread.call(boot)
-    broker = SessionBroker(
-        session_id=run_id,
+    dispatcher = Dispatcher(
+        driver=driver,
+        policy=PolicyEngine(config),
+        resolver=TargetResolver(allow_vision=False),
         evidence=evidence,
-        dispatch=Dispatcher(
-            driver=driver,
-            policy=PolicyEngine(config),
-            resolver=TargetResolver(allow_vision=False),
-            evidence=evidence,
-        ),
+        secrets=SecretResolver(redactor=redactor),
     )
+    # Opened after the dispatcher exists, so the navigation is allowlist-checked and recorded
+    # rather than driven straight off the raw page handle.
+    thread.call(lambda: dispatcher.open_entrypoint(target, session_id=run_id))
+    broker = SessionBroker(session_id=run_id, evidence=evidence, dispatch=dispatcher)
     return SupervisedSession(
-        broker=broker, driver=driver, session=thread, evidence=evidence, run_dir=run_dir
+        broker=broker,
+        driver=driver,
+        session=thread,
+        evidence=evidence,
+        run_dir=run_dir,
+        dispatcher=dispatcher,
+        redactor=redactor,
+        config=config,
     )

@@ -64,8 +64,10 @@ class CatalogEntry:
         whose artifact has been edited on disk should be told exactly that, not told it does not
         exist. It is refused at `load()` -- the point where serving it would do harm.
 
-        `draft` is a capability with no hash at all: what the compiler emits before review. A
-        legitimate state, so it loads, but it is never allowed to look identical to a sealed one.
+        `draft` is a capability with no hash at all -- a hand-authored artifact nobody has sealed
+        yet. A legitimate state, so it loads, but never allowed to look identical to a sealed one.
+        Note this axis is integrity, not review: `CapabilityApproval` is what gates unattended
+        replay, and a sealed artifact can still be unapproved.
         """
         if not self.capability.content_hash:
             return "draft"

@@ -16,6 +16,7 @@ import os
 from dataclasses import dataclass, field
 
 from cua.domain.values import SecretRef
+from cua.policy.redact import Redactor
 
 
 class SecretNotFoundError(RuntimeError):
@@ -38,6 +39,15 @@ class SecretResolver:
 
     prefix: str = "CUA_SECRET_"
     overrides: dict[str, str] = field(default_factory=dict)
+    redactor: Redactor | None = None
+    """The redactor every issued value is registered with, at the moment it is issued.
+
+    Pattern matching cannot recognise an arbitrary password, so the literal has to be handed to the
+    redactor explicitly. Doing it *here* rather than at the call site is deliberate: `resolve()` is
+    the single point every secret passes through, so no future caller can obtain a value without the
+    redactor learning about it. Optional only so a resolver can be constructed in a unit test.
+    """
+
     _issued: set[str] = field(default_factory=set, init=False)
 
     def resolve(self, ref: SecretRef) -> str:
@@ -56,6 +66,8 @@ class SecretResolver:
             value = found
 
         self._issued.add(value)
+        if self.redactor is not None:
+            self.redactor.register_secret(value)
         return value
 
     @property

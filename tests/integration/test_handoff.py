@@ -10,6 +10,7 @@ last and deliberately: the control-transfer model is what is graded, and the pix
 
 from __future__ import annotations
 
+import json
 import socket
 import threading
 import time
@@ -21,7 +22,7 @@ import pytest
 import uvicorn
 from apps.mock_bank.server import VALID_PW, VALID_USER, create_app
 
-from cua.domain.action import Click, RawInput, RawInputKind
+from cua.domain.action import Click, RawInput, RawInputKind, Type
 from cua.domain.actor import Actor
 from cua.domain.capability import Capability
 from cua.domain.result import FailureCode, RunStatus
@@ -476,3 +477,126 @@ def test_a_run_authorized_before_the_handoff_cannot_resume_on_its_old_epoch(
     assert result.status is RunStatus.FAILED
     assert result.error is not None
     assert result.error.code is FailureCode.LEASE_LOST
+
+
+def _operator_completes_the_search(broker, driver, base_url: str, member: str) -> None:
+    """The operator does steps 0 and 1 by hand and leaves the member record on screen."""
+    content = driver.page.frame(name="content")
+    content.goto(f"{base_url}/search")
+    driver.page.wait_for_load_state()
+    broker.human_action(
+        Type(
+            target=TargetDescriptor(
+                role="textbox",
+                name=NameMatch(value="Member Number"),
+                scope=NodeScope(frame="content"),
+            ),
+            value=member,
+        )
+    )
+    broker.human_action(
+        Click(
+            target=TargetDescriptor(
+                role="button", name=NameMatch(value="Search"), scope=NodeScope(frame="content")
+            )
+        )
+    )
+    driver.page.wait_for_load_state()
+
+
+def test_a_resumed_run_finishes_on_the_operators_session(
+    rig: tuple, capability: Capability, app: tuple[str, int]
+) -> None:
+    """The half of the handoff the brief actually asks for: control comes *back*.
+
+    Escalate, let a person drive the same session by hand, hand control back, and require the run to
+    *complete* -- with its declared outputs -- rather than merely computing where it could have
+    continued. For a long time `reconcile()` returned a resume plan that no caller consumed, so the
+    system could pause and cede control but never finish.
+    """
+    broker, dispatcher, driver, bus = rig
+    base_url, _ = app
+
+    request = _escalate(broker, driver, capability)
+    broker.claim(request.intervention_id, "operator-1")
+    _operator_completes_the_search(broker, driver, base_url, "67890")
+    broker.release(snapshot_after=driver.observe())
+    broker.resume()
+
+    # `from_index` is where the run stopped -- `_escalate` reports `submit_search`, index 1.
+    result = ReplayExecutor(dispatcher=dispatcher, evidence=bus, broker=broker).resume(
+        capability, {"member_id": "67890"}, from_index=1
+    )
+
+    assert result.status is RunStatus.SUCCESS, result.summary
+    assert result.outputs["savings_balance"] == "18730.00", result.outputs
+
+    # The operator already submitted the search, so the executor must not have re-submitted it.
+    trace = (bus.run_dir / "trace.jsonl").read_text().splitlines()
+    notes = [json.loads(line) for line in trace if '"re-anchor after handoff"' in line]
+    assert notes, "a resume must record where it re-anchored"
+    assert notes[-1]["resume_index"] == 2, notes[-1]
+    assert "submit_search" in notes[-1]["skipped"], notes[-1]
+
+
+def test_a_resume_adopts_the_epoch_the_handoff_produced(
+    rig: tuple, capability: Capability, app: tuple[str, int]
+) -> None:
+    """The counterpart to the stale-epoch test above.
+
+    A full handoff advances the lease four times, so an executor still holding the epoch it was
+    authorized under is stale *by construction* -- `run()` is required to refuse it. Resuming is the
+    one case where re-adopting is correct, and it has to be explicit: without it every dispatch in a
+    resumed run would be refused with LEASE_LOST and the handoff could never complete.
+    """
+    broker, dispatcher, driver, bus = rig
+    base_url, _ = app
+
+    request = _escalate(broker, driver, capability)
+    stale = broker.lease.epoch
+    broker.claim(request.intervention_id, "operator-1")
+    _operator_completes_the_search(broker, driver, base_url, "12345")
+    broker.release(snapshot_after=driver.observe())
+    resumed_epoch = broker.resume()
+
+    assert resumed_epoch > stale, "every transition moved the epoch on"
+
+    executor = ReplayExecutor(dispatcher=dispatcher, evidence=bus, broker=broker, lease_epoch=stale)
+    result = executor.resume(capability, {"member_id": "12345"}, from_index=1)
+
+    assert executor.lease_epoch == resumed_epoch, "resume must re-adopt the epoch it handed back at"
+    assert result.status is RunStatus.SUCCESS, result.summary
+
+
+def test_a_lapsed_operator_hold_is_reclaimed(rig: tuple, capability: Capability) -> None:
+    """A session an operator walked away from has to come back on its own.
+
+    `Lease.reclaim_expired` and `InterventionQueue.abandon` both existed and neither had a caller,
+    so the expiry the lease docstring promises could never fire: a hold taken and never released
+    pinned the session forever, and automation stayed locked out with `LEASE_LOST`.
+
+    The intervention returns as ABANDONED rather than silently reopening — the next operator needs
+    to know a person had this and stopped, which is not the same as a run nobody has looked at.
+    """
+    from datetime import timedelta
+
+    from cua.domain.actor import Actor
+    from cua.hitl.intervention import InterventionState
+
+    broker, _dispatcher, driver, _bus = rig
+
+    request = _escalate(broker, driver, capability)
+    broker.claim(request.intervention_id, "operator-who-left", hold_for=timedelta(seconds=-1))
+    assert broker.lease.state is ControlState.HUMAN_CONTROL
+    assert broker.lease.expired, "the hold was taken with a deadline already in the past"
+
+    reclaimed = broker.sweep()
+
+    assert reclaimed is True
+    assert broker.lease.state is ControlState.PAUSED, "back to PAUSED, not RUNNING"
+    assert broker.lease.holder is Actor.SYSTEM
+    assert broker.lease.operator is None
+    assert broker.queue.requests[request.intervention_id].state is InterventionState.ABANDONED
+    # Idempotent: a second sweep with nothing expired is a no-op, which is what makes it safe to
+    # call from a polled endpoint.
+    assert broker.sweep() is False

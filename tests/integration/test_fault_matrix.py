@@ -145,7 +145,10 @@ def test_success_returns_typed_outputs(
 
     assert result.status is RunStatus.SUCCESS, result.summary
     assert result.exit_code == 0
-    assert result.outputs["savings_balance"] == "$18,730.00"
+    # "18730.00", not "$18,730.00": the artifact declares `transform: money` on this extraction,
+    # and the output spec publishes `format: money`. Honouring the declaration is what makes the
+    # typed-output contract a promise instead of a label -- the field was read by nothing before.
+    assert result.outputs["savings_balance"] == "18730.00"
     assert result.outputs["account_status"] == "Active"
     assert result.outputs["as_of"]
 
@@ -440,3 +443,196 @@ def test_an_extraction_with_no_readable_value_fails_rather_than_returning_empty(
     assert result.error.code is FailureCode.ACTION_FAILED, result.error.message
     assert "no readable value" in result.error.message
     assert result.error.step_id == "read_balance"
+
+
+def test_assert_and_wait_for_steps_execute(
+    replay: ReplayExecutor, capability: Capability, app: tuple[str, int]
+) -> None:
+    """Both are members of the closed action space and named in the artifact's `allowed_actions`.
+
+    Neither reaches a driver -- they are evaluated against the snapshot, which the driver's own
+    comment already said. It said so while returning "not a driver-level action" for both, so a
+    capability using either hard-failed the run. This replays a capability with one of each.
+    """
+    from cua.domain.action import Assert, WaitFor
+    from cua.domain.capability import Step
+    from cua.domain.predicates import NodeExists, NodeQuery
+    from cua.domain.snapshot import NodeScope
+
+    reset(app)
+    on_the_record = NodeExists(
+        query=NodeQuery(
+            role="cell", name_contains="Savings Balance", scope=NodeScope(frame="content")
+        )
+    )
+    steps = list(capability.steps)
+    # after the search, before the reads
+    steps.insert(
+        2,
+        Step(
+            id="wait_for_record",
+            description="wait for the member record",
+            action=WaitFor(until=on_the_record, timeout_ms=5000),
+        ),
+    )
+    steps.insert(
+        3,
+        Step(
+            id="assert_on_record",
+            description="assert we are on the record",
+            action=Assert(that=on_the_record),
+        ),
+    )
+    augmented = capability.model_copy(update={"steps": tuple(steps)})
+
+    result = replay.run(augmented, {"member_id": "67890"})
+
+    assert result.status is RunStatus.SUCCESS, result.summary
+    assert result.outputs["savings_balance"] == "18730.00", result.outputs
+
+
+def test_a_failing_assert_stops_the_run(
+    replay: ReplayExecutor, capability: Capability, app: tuple[str, int]
+) -> None:
+    """And an assertion that does not hold is a stop, not a shrug."""
+    from cua.domain.action import Assert
+    from cua.domain.capability import Step
+    from cua.domain.predicates import NodeExists, NodeQuery
+
+    reset(app)
+    steps = list(capability.steps)
+    steps.insert(
+        2,
+        Step(
+            id="assert_impossible",
+            description="assert something untrue",
+            action=Assert(that=NodeExists(query=NodeQuery(role="cell", name="No Such Cell"))),
+        ),
+    )
+    augmented = capability.model_copy(update={"steps": tuple(steps)})
+
+    result = replay.run(augmented, {"member_id": "67890"})
+
+    assert result.status is RunStatus.FAILED, result.summary
+    assert result.error is not None
+    assert result.error.code is FailureCode.PRECONDITION_FAILED
+
+
+def test_an_escalation_is_as_debuggable_as_a_failure(
+    replay: ReplayExecutor, capability: Capability, app: tuple[str, int]
+) -> None:
+    """NEEDS_HUMAN is the path where debuggability matters most, and it had the least.
+
+    A FAILED run returned a `FailureDetail` — code, step, expected, observed. An escalating run
+    returned free text and an intervention id, so the one result that exists because a *person* has
+    to look at it was the one that told them least. `_shape_matches_status` never forbade it; the
+    constructor simply omitted it.
+    """
+    reset(app)
+    arm(app, "undeclared_dialog", count=4)
+    result = replay.run(capability, {"member_id": "12345"})
+    reset(app)
+
+    assert result.status is RunStatus.NEEDS_HUMAN, result.summary
+    assert result.intervention is not None
+    assert result.error is not None, "an escalation must carry the same detail a failure does"
+    assert result.error.code is FailureCode.UNEXPECTED_STATE
+    assert result.error.step_id == "enter_member_id"
+    assert result.error.expected, "the operator needs to know what the step wanted"
+
+
+def test_an_unresolvable_target_explains_itself(
+    replay: ReplayExecutor, capability: Capability, app: tuple[str, int]
+) -> None:
+    """`ResolutionDebug` exists for TARGET_NOT_FOUND and TARGET_AMBIGUOUS, and reached neither.
+
+    It was derived only from a *successful* `Resolution`, so on the two failures it is named for
+    there was nothing to derive it from and the caller got "could not find the button". The detail
+    went to the evidence trace, which means debugging required leaving the result and reading JSONL.
+    """
+    from cua.domain.action import Click
+    from cua.domain.capability import Step
+    from cua.domain.target import NameMatch, TargetDescriptor
+
+    reset(app)
+    steps = list(capability.steps)
+    steps.insert(
+        2,
+        Step(
+            id="click_nothing",
+            description="click a control that is not there",
+            action=Click(
+                target=TargetDescriptor(
+                    role="button", name=NameMatch(value="No Such Button Anywhere")
+                )
+            ),
+        ),
+    )
+    result = replay.run(
+        capability.model_copy(update={"steps": tuple(steps)}), {"member_id": "67890"}
+    )
+
+    assert result.error is not None, result.summary
+    assert result.error.code is FailureCode.TARGET_NOT_FOUND
+    debug = result.error.resolution
+    assert debug is not None, "a targeting failure must say why targeting failed"
+    assert "No Such Button Anywhere" in debug.target_description
+    assert debug.strategies_tried, "which rungs were tried is the first question asked"
+
+
+SUBACCOUNT = Path(__file__).resolve().parents[1] / "fixtures/capabilities/open_subaccount.yaml"
+
+
+@pytest.fixture
+def subaccount(app: tuple[str, int]) -> Capability:
+    """The brief's second example goal: a multi-field form with a confirmation step."""
+    return TenantBinding.model_validate(
+        {
+            "capability_ref": "corebank.member.open_subaccount@1.0.0",
+            "tenant": "test",
+            "vars": {"base_url": app[0]},
+        }
+    ).apply(load_capability(SUBACCOUNT.read_text()))
+
+
+def test_a_submitting_form_reaches_its_confirmation(
+    replay: ReplayExecutor, subaccount: Capability, app: tuple[str, int]
+) -> None:
+    """A different flow shape from the lookup: several fields, then a confirmation screen.
+
+    Every control on this form is nameless -- no `title`, no `<label for>`, no id -- so each target
+    resolves structurally, by the label cell beside it. That is the legacy-surface case the whole
+    targeting ladder exists for, and the lookup capability never exercised it for a *write*.
+    """
+    reset(app)
+    result = replay.run(
+        subaccount,
+        {"member_id": "12345", "account_type": "savings", "initial_deposit": "500.00"},
+    )
+
+    assert result.status is RunStatus.SUCCESS, result.summary
+    assert result.outputs["reference"] == "SA-12345-SAV", result.outputs
+
+
+def test_a_rejected_submission_is_a_business_outcome(
+    replay: ReplayExecutor, subaccount: Capability, app: tuple[str, int]
+) -> None:
+    """ "Validation errors" is one of the seven runtime conditions the brief names, and it was the
+    only one with no capability behind it -- the lookup flow submits nothing, so nothing could be
+    rejected. The taxonomy row existed; nothing drove it.
+
+    A form the core system refuses is an answer the caller needs, not a crash and not a page at 2am.
+    Exit 0, `validation_rejected`, no escalation.
+    """
+    reset(app)
+    arm(app, "validation_error", count=1)
+    result = replay.run(
+        subaccount,
+        {"member_id": "12345", "account_type": "savings", "initial_deposit": "1.00"},
+    )
+    reset(app)
+
+    assert result.status is RunStatus.BUSINESS_OUTCOME, result.summary
+    assert result.outcome is not None
+    assert result.outcome.code == "validation_rejected"
+    assert result.exit_code == 0, "a refusal the caller asked for is not a failure"

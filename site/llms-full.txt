@@ -9,7 +9,7 @@
 ## 1. Overview
 CUA is an enterprise computer-use automation system engineered for regulated financial back-offices (banks and credit unions). An LLM is permitted to explore an arbitrary legacy application with no API exactly once. That exploration trace is compiled into an immutable, typed, content-hashed Capability Artifact. All subsequent runs execute deterministically with zero model calls in the loop.
 
-Built for mission-critical back-office applications at banks and credit unions, where the only path to automation is driving the live UI with strict regulatory compliance, complete auditability, and zero data leakage.
+Built for the back-office applications banks and credit unions run when there is no API and the only way in is to drive the UI. Every action is authorized at one chokepoint and recorded on an evidence bus; every sink -- logs, artifacts, snapshots, screenshots and outbound model prompts -- passes through the redactor. The limits of that are stated in REPORT.md section 6: free-text redaction is patterns plus registered literals, so a member name is protected only where a capability declares the field sensitive.
 
 ```
 Goal + Target ──► LLM Discovery Run ──► Capability Artifact ──► Deterministic Replay ──► Typed Outputs
@@ -45,7 +45,7 @@ make setup          # Creates venv, installs dependencies, installs Chromium
 ### Testing
 ```bash
 make check          # lint + strict typecheck + invariants + tests
-make test           # 100% offline test suite (0 external calls)
+make test           # the offline suite -- no API key, no network
 ```
 
 ---

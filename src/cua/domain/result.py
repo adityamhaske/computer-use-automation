@@ -37,9 +37,6 @@ class ObservationClass(StrEnum):
     """Matches a declared recovery rule. Remediate and retry, bounded by `max_attempts`.
     NOT terminal -- exhausting attempts converts it to RECOVERY_EXHAUSTED."""
 
-    HARD_FAILURE = "hard_failure"
-    """A defect. Stop and surface something debuggable."""
-
     UNEXPECTED_STATE = "unexpected_state"
     """Matches nothing the capability declares.
 
@@ -149,6 +146,24 @@ class InterventionRef(BaseModel):
     intervention_id: str
     reason: str
     step_id: str | None = None
+
+    step_index: int | None = None
+    """Which step stopped, by position.
+
+    `step_id` names it, but a resume needs to scan forward *from* it, and nothing else in the
+    system maps an id back to an index. Carrying the number is what lets a caller hand the run
+    back to the executor without re-deriving position by string matching -- and scanning from 0
+    instead is actively wrong once a flow has advanced, because the early steps' preconditions no
+    longer hold.
+    """
+
+    outputs_so_far: dict[str, str] = Field(default_factory=dict)
+    """What the run had already extracted when it stopped.
+
+    A NEEDS_HUMAN result used to return nothing here, so everything read before the escalation was
+    discarded and a resumed run would have to re-read it -- or, worse, complete with outputs the
+    caller never received.
+    """
 
 
 class RunResult(BaseModel):

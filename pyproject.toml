@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Computer-use automation: LLM discovers a flow once, compiles it to a typed capability artifact, then replays it deterministically without the model in the loop."
 readme = "README.md"
 requires-python = ">=3.11,<3.13"
-license = { text = "Proprietary" }
+license = { text = "MIT" }
 
 dependencies = [
     "pydantic>=2.7,<3",

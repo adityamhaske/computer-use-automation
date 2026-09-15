@@ -113,7 +113,7 @@ steps:
           frame: content
         anchor:
           relation: adjacent_to
-          text: $812.30
+          text: Status
           match: normalized
         fingerprint: a565b77dfbd0bf06
         recorded_strategy: structural_anchor
@@ -140,14 +140,7 @@ checkpoint:
     - assert: node_exists
       query:
         role: cell
-        name: Active
-        scope:
-          frame: content
-      min_count: 1
-    - assert: node_exists
-      query:
-        role: cell
-        name: $812.30
+        name: Status
       min_count: 1
 escalation:
   triggers:
@@ -163,8 +156,8 @@ policy:
 provenance:
   discovered_by:
     model: fake/scripted
-    run_id: disc-b35e353483
-    at: '2026-09-12T16:14:18.459355+00:00'
+    run_id: disc-d45c1ad1bd
+    at: '2026-09-15T12:19:11.457582+00:00'
   transcript_ref: evidence/discovery/demo-discovery/trace.jsonl
   notes: "Compiled from a single discovery run. Before approving, a reviewer should confirm:\n\n  1. Outcomes.\
     \ This run saw only the successful path, so NO business outcomes are declared. Every\n     legitimate\
@@ -177,4 +170,4 @@ provenance:
     \ Checkpoint. It asserts the shape of the extracted outputs. Confirm that is genuinely specific\n\
     \     to this goal rather than true of any page in the application.\n\nThese are gaps, not omissions:\
     \ inventing detectors a run never observed would produce a capability\nwhose error handling is fiction."
-content_hash: sha256:82e98cb3a3f768a444aa65724902210d6c5c0b2887f35c946b905bfacf310139
+content_hash: sha256:2fb7e000ceb1875bf3e7b96a8578e122e82db1fc8b5c70f59cb936b533768ab6

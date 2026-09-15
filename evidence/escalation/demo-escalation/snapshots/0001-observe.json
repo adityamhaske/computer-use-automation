@@ -1,6 +1,6 @@
 {
-  "snapshot_id": "snap-1059020e33",
-  "url": "http://127.0.0.1:50165/",
+  "snapshot_id": "snap-f5bb6e0e1e",
+  "url": "http://127.0.0.1:60308/",
   "title": "MemberDesk",
   "nodes": [
     {
@@ -37,7 +37,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "73"
+        "native": "74"
       },
       "fingerprint": "dac0da6641c0fbca"
     },
@@ -55,7 +55,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "74"
+        "native": "75"
       },
       "fingerprint": "dac0da6641c0fbca"
     },
@@ -78,7 +78,121 @@
       "fingerprint": "d3a596dc8cf2c44a"
     },
     {
-      "node_id": "nav:/table[4]",
+      "node_id": "nav:/generic[4]",
+      "role": "generic",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/generic[4]/text[0]"
+      ],
+      "hints": {
+        "native": "83"
+      },
+      "fingerprint": "a8ff80b0f161e267"
+    },
+    {
+      "node_id": "nav:/generic[4]/text[0]",
+      "role": "text",
+      "name": "MemberDesk",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/generic[4]",
+      "child_ids": [],
+      "hints": {
+        "native": "103"
+      },
+      "fingerprint": "06d59be9b77f218f"
+    },
+    {
+      "node_id": "nav:/generic[5]",
+      "role": "generic",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/generic[5]/text[0]"
+      ],
+      "hints": {
+        "native": "84"
+      },
+      "fingerprint": "a8ff80b0f161e267"
+    },
+    {
+      "node_id": "nav:/generic[5]/text[0]",
+      "role": "text",
+      "name": "Core Banking System v2.4",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/generic[5]",
+      "child_ids": [],
+      "hints": {
+        "native": "104"
+      },
+      "fingerprint": "0a382f79a9b7333e"
+    },
+    {
+      "node_id": "nav:/generic[6]",
+      "role": "generic",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/generic[6]/text[0]"
+      ],
+      "hints": {
+        "native": "85"
+      },
+      "fingerprint": "a8ff80b0f161e267"
+    },
+    {
+      "node_id": "nav:/generic[6]/text[0]",
+      "role": "text",
+      "name": "WORKFLOWS",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/generic[6]",
+      "child_ids": [],
+      "hints": {
+        "native": "105"
+      },
+      "fingerprint": "c402e295accdbf69"
+    },
+    {
+      "node_id": "nav:/table[7]",
       "role": "table",
       "name": null,
       "value": null,
@@ -91,13 +205,13 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "80"
+        "native": "86"
       },
       "fingerprint": "71449859354b6cef"
     },
     {
-      "node_id": "nav:/row[5]",
-      "role": "row",
+      "node_id": "nav:/generic[8]",
+      "role": "generic",
       "name": null,
       "value": null,
       "states": [],
@@ -108,37 +222,18 @@
       },
       "parent_id": null,
       "child_ids": [
-        "nav:/row[5]/cell[0]"
+        "nav:/generic[8]/text[0]",
+        "nav:/generic[8]/text[1]"
       ],
       "hints": {
-        "native": "82"
+        "native": "101"
       },
-      "fingerprint": "fa1f5bbbdad001d1"
+      "fingerprint": "a8ff80b0f161e267"
     },
     {
-      "node_id": "nav:/row[5]/cell[0]",
-      "role": "cell",
-      "name": "Functions",
-      "value": null,
-      "states": [],
-      "bounds": null,
-      "scope": {
-        "frame": "nav",
-        "region": null
-      },
-      "parent_id": "nav:/row[5]",
-      "child_ids": [
-        "nav:/row[5]/cell[0]/text[0]"
-      ],
-      "hints": {
-        "native": "83"
-      },
-      "fingerprint": "a6860dcb7608e989"
-    },
-    {
-      "node_id": "nav:/row[5]/cell[0]/text[0]",
+      "node_id": "nav:/generic[8]/text[0]",
       "role": "text",
-      "name": "Functions",
+      "name": "\u2022",
       "value": null,
       "states": [],
       "bounds": null,
@@ -146,78 +241,17 @@
         "frame": "nav",
         "region": null
       },
-      "parent_id": "nav:/row[5]/cell[0]",
+      "parent_id": "nav:/generic[8]",
       "child_ids": [],
       "hints": {
-        "native": "94"
+        "native": "111"
       },
-      "fingerprint": "e4dad854fe14f36d"
+      "fingerprint": "c79329f8d8d2d557"
     },
     {
-      "node_id": "nav:/row[6]",
-      "role": "row",
-      "name": null,
-      "value": null,
-      "states": [],
-      "bounds": null,
-      "scope": {
-        "frame": "nav",
-        "region": null
-      },
-      "parent_id": null,
-      "child_ids": [
-        "nav:/row[6]/cell[0]"
-      ],
-      "hints": {
-        "native": "85"
-      },
-      "fingerprint": "fa1f5bbbdad001d1"
-    },
-    {
-      "node_id": "nav:/row[6]/cell[0]",
-      "role": "cell",
-      "name": "Member Search",
-      "value": null,
-      "states": [],
-      "bounds": null,
-      "scope": {
-        "frame": "nav",
-        "region": null
-      },
-      "parent_id": "nav:/row[6]",
-      "child_ids": [
-        "nav:/row[6]/cell[0]/link[0]"
-      ],
-      "hints": {
-        "native": "86"
-      },
-      "fingerprint": "d50d2553ca8865ec"
-    },
-    {
-      "node_id": "nav:/row[6]/cell[0]/link[0]",
-      "role": "link",
-      "name": "Member Search",
-      "value": null,
-      "states": [],
-      "bounds": null,
-      "scope": {
-        "frame": "nav",
-        "region": null
-      },
-      "parent_id": "nav:/row[6]/cell[0]",
-      "child_ids": [
-        "nav:/row[6]/cell[0]/link[0]/text[0]"
-      ],
-      "hints": {
-        "css": "a[href=\"#\"]",
-        "native": "87"
-      },
-      "fingerprint": "c5ec08a2c78d2403"
-    },
-    {
-      "node_id": "nav:/row[6]/cell[0]/link[0]/text[0]",
+      "node_id": "nav:/generic[8]/text[1]",
       "role": "text",
-      "name": "Member Search",
+      "name": "Online \u00b7 Fixture Ready",
       "value": null,
       "states": [],
       "bounds": null,
@@ -225,15 +259,15 @@
         "frame": "nav",
         "region": null
       },
-      "parent_id": "nav:/row[6]/cell[0]/link[0]",
+      "parent_id": "nav:/generic[8]",
       "child_ids": [],
       "hints": {
-        "native": "95"
+        "native": "112"
       },
-      "fingerprint": "46ba5b490b98688e"
+      "fingerprint": "bdad67387a00acff"
     },
     {
-      "node_id": "nav:/row[7]",
+      "node_id": "nav:/row[9]",
       "role": "row",
       "name": null,
       "value": null,
@@ -245,7 +279,7 @@
       },
       "parent_id": null,
       "child_ids": [
-        "nav:/row[7]/cell[0]"
+        "nav:/row[9]/cell[0]"
       ],
       "hints": {
         "native": "88"
@@ -253,9 +287,9 @@
       "fingerprint": "fa1f5bbbdad001d1"
     },
     {
-      "node_id": "nav:/row[7]/cell[0]",
+      "node_id": "nav:/row[9]/cell[0]",
       "role": "cell",
-      "name": "Reports",
+      "name": "Member Search",
       "value": null,
       "states": [],
       "bounds": null,
@@ -263,19 +297,19 @@
         "frame": "nav",
         "region": null
       },
-      "parent_id": "nav:/row[7]",
+      "parent_id": "nav:/row[9]",
       "child_ids": [
-        "nav:/row[7]/cell[0]/link[0]"
+        "nav:/row[9]/cell[0]/link[0]"
       ],
       "hints": {
         "native": "89"
       },
-      "fingerprint": "c7133279a03177da"
+      "fingerprint": "d50d2553ca8865ec"
     },
     {
-      "node_id": "nav:/row[7]/cell[0]/link[0]",
+      "node_id": "nav:/row[9]/cell[0]/link[0]",
       "role": "link",
-      "name": "Reports",
+      "name": "Member Search",
       "value": null,
       "states": [],
       "bounds": null,
@@ -283,20 +317,20 @@
         "frame": "nav",
         "region": null
       },
-      "parent_id": "nav:/row[7]/cell[0]",
+      "parent_id": "nav:/row[9]/cell[0]",
       "child_ids": [
-        "nav:/row[7]/cell[0]/link[0]/text[0]"
+        "nav:/row[9]/cell[0]/link[0]/text[0]"
       ],
       "hints": {
-        "css": "a[href=\"#\"]",
+        "css": "a.nav-link-btn",
         "native": "90"
       },
-      "fingerprint": "eea752b2f3040250"
+      "fingerprint": "c5ec08a2c78d2403"
     },
     {
-      "node_id": "nav:/row[7]/cell[0]/link[0]/text[0]",
+      "node_id": "nav:/row[9]/cell[0]/link[0]/text[0]",
       "role": "text",
-      "name": "Reports",
+      "name": "Member Search",
       "value": null,
       "states": [],
       "bounds": null,
@@ -304,15 +338,15 @@
         "frame": "nav",
         "region": null
       },
-      "parent_id": "nav:/row[7]/cell[0]/link[0]",
+      "parent_id": "nav:/row[9]/cell[0]/link[0]",
       "child_ids": [],
       "hints": {
-        "native": "96"
+        "native": "106"
       },
-      "fingerprint": "e9b643b64b9fb7bf"
+      "fingerprint": "46ba5b490b98688e"
     },
     {
-      "node_id": "nav:/row[8]",
+      "node_id": "nav:/row[10]",
       "role": "row",
       "name": null,
       "value": null,
@@ -324,7 +358,7 @@
       },
       "parent_id": null,
       "child_ids": [
-        "nav:/row[8]/cell[0]"
+        "nav:/row[10]/cell[0]"
       ],
       "hints": {
         "native": "91"
@@ -332,9 +366,9 @@
       "fingerprint": "fa1f5bbbdad001d1"
     },
     {
-      "node_id": "nav:/row[8]/cell[0]",
+      "node_id": "nav:/row[10]/cell[0]",
       "role": "cell",
-      "name": "Administration",
+      "name": "Reports Core",
       "value": null,
       "states": [],
       "bounds": null,
@@ -342,19 +376,19 @@
         "frame": "nav",
         "region": null
       },
-      "parent_id": "nav:/row[8]",
+      "parent_id": "nav:/row[10]",
       "child_ids": [
-        "nav:/row[8]/cell[0]/link[0]"
+        "nav:/row[10]/cell[0]/link[0]"
       ],
       "hints": {
         "native": "92"
       },
-      "fingerprint": "72fe99457961cc31"
+      "fingerprint": "66987dac872f321c"
     },
     {
-      "node_id": "nav:/row[8]/cell[0]/link[0]",
+      "node_id": "nav:/row[10]/cell[0]/link[0]",
       "role": "link",
-      "name": "Administration",
+      "name": "Reports Core",
       "value": null,
       "states": [],
       "bounds": null,
@@ -362,18 +396,111 @@
         "frame": "nav",
         "region": null
       },
-      "parent_id": "nav:/row[8]/cell[0]",
-      "child_ids": [
-        "nav:/row[8]/cell[0]/link[0]/text[0]"
-      ],
+      "parent_id": "nav:/row[10]/cell[0]",
+      "child_ids": [],
       "hints": {
-        "css": "a[href=\"#\"]",
+        "css": "a.nav-link-disabled",
         "native": "93"
       },
-      "fingerprint": "3e0ca16cb2e51805"
+      "fingerprint": "57694f773dac3ffa"
     },
     {
-      "node_id": "nav:/row[8]/cell[0]/link[0]/text[0]",
+      "node_id": "nav:/row[11]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/row[11]/cell[0]"
+      ],
+      "hints": {
+        "native": "96"
+      },
+      "fingerprint": "fa1f5bbbdad001d1"
+    },
+    {
+      "node_id": "nav:/row[11]/cell[0]",
+      "role": "cell",
+      "name": "Administration Core",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[11]",
+      "child_ids": [
+        "nav:/row[11]/cell[0]/link[0]"
+      ],
+      "hints": {
+        "native": "97"
+      },
+      "fingerprint": "f56beefd1c51c710"
+    },
+    {
+      "node_id": "nav:/row[11]/cell[0]/link[0]",
+      "role": "link",
+      "name": "Administration Core",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[11]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "css": "a.nav-link-disabled",
+        "native": "98"
+      },
+      "fingerprint": "9121073edbb9c685"
+    },
+    {
+      "node_id": "nav:/text[12]",
+      "role": "text",
+      "name": "Reports",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "107"
+      },
+      "fingerprint": "ca4c1a686b35aada"
+    },
+    {
+      "node_id": "nav:/text[13]",
+      "role": "text",
+      "name": "Core",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "108"
+      },
+      "fingerprint": "03cff1e7f00ab099"
+    },
+    {
+      "node_id": "nav:/text[14]",
       "role": "text",
       "name": "Administration",
       "value": null,
@@ -383,15 +510,33 @@
         "frame": "nav",
         "region": null
       },
-      "parent_id": "nav:/row[8]/cell[0]/link[0]",
+      "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "97"
+        "native": "109"
       },
-      "fingerprint": "c28b3d03a05cec35"
+      "fingerprint": "3a9c4d5892cb41ff"
     },
     {
-      "node_id": "content:/document[9]",
+      "node_id": "nav:/text[15]",
+      "role": "text",
+      "name": "Core",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "110"
+      },
+      "fingerprint": "03cff1e7f00ab099"
+    },
+    {
+      "node_id": "content:/document[16]",
       "role": "document",
       "name": "Service Unavailable",
       "value": null,
@@ -409,7 +554,7 @@
       "fingerprint": "2036af81e670b643"
     },
     {
-      "node_id": "content:/table[10]",
+      "node_id": "content:/table[17]",
       "role": "table",
       "name": null,
       "value": null,
@@ -422,12 +567,12 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "102"
+        "native": "117"
       },
       "fingerprint": "f6d07955fec5f341"
     },
     {
-      "node_id": "content:/row[11]",
+      "node_id": "content:/row[18]",
       "role": "row",
       "name": null,
       "value": null,
@@ -439,15 +584,15 @@
       },
       "parent_id": null,
       "child_ids": [
-        "content:/row[11]/cell[0]"
+        "content:/row[18]/cell[0]"
       ],
       "hints": {
-        "native": "104"
+        "native": "119"
       },
       "fingerprint": "13ca239244183fe8"
     },
     {
-      "node_id": "content:/row[11]/cell[0]",
+      "node_id": "content:/row[18]/cell[0]",
       "role": "cell",
       "name": "502 \u2014 Service Temporarily Unavailable",
       "value": null,
@@ -457,17 +602,17 @@
         "frame": "content",
         "region": null
       },
-      "parent_id": "content:/row[11]",
+      "parent_id": "content:/row[18]",
       "child_ids": [
-        "content:/row[11]/cell[0]/text[0]"
+        "content:/row[18]/cell[0]/text[0]"
       ],
       "hints": {
-        "native": "105"
+        "native": "120"
       },
       "fingerprint": "c394caaebdfce97b"
     },
     {
-      "node_id": "content:/row[11]/cell[0]/text[0]",
+      "node_id": "content:/row[18]/cell[0]/text[0]",
       "role": "text",
       "name": "502 \u2014 Service Temporarily Unavailable",
       "value": null,
@@ -477,15 +622,15 @@
         "frame": "content",
         "region": null
       },
-      "parent_id": "content:/row[11]/cell[0]",
+      "parent_id": "content:/row[18]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "109"
+        "native": "124"
       },
       "fingerprint": "a760c5991922e47e"
     },
     {
-      "node_id": "content:/row[12]",
+      "node_id": "content:/row[19]",
       "role": "row",
       "name": null,
       "value": null,
@@ -497,15 +642,15 @@
       },
       "parent_id": null,
       "child_ids": [
-        "content:/row[12]/cell[0]"
+        "content:/row[19]/cell[0]"
       ],
       "hints": {
-        "native": "107"
+        "native": "122"
       },
       "fingerprint": "13ca239244183fe8"
     },
     {
-      "node_id": "content:/row[12]/cell[0]",
+      "node_id": "content:/row[19]/cell[0]",
       "role": "cell",
       "name": "The application server did not respond. Please try again.",
       "value": null,
@@ -515,17 +660,17 @@
         "frame": "content",
         "region": null
       },
-      "parent_id": "content:/row[12]",
+      "parent_id": "content:/row[19]",
       "child_ids": [
-        "content:/row[12]/cell[0]/text[0]"
+        "content:/row[19]/cell[0]/text[0]"
       ],
       "hints": {
-        "native": "108"
+        "native": "123"
       },
       "fingerprint": "1933f3b8613c4c07"
     },
     {
-      "node_id": "content:/row[12]/cell[0]/text[0]",
+      "node_id": "content:/row[19]/cell[0]/text[0]",
       "role": "text",
       "name": "The application server did not respond. Please try again.",
       "value": null,
@@ -535,14 +680,14 @@
         "frame": "content",
         "region": null
       },
-      "parent_id": "content:/row[12]/cell[0]",
+      "parent_id": "content:/row[19]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "110"
+        "native": "125"
       },
       "fingerprint": "faaa60e7413fd03b"
     }
   ],
-  "captured_at": "2026-09-12T16:14:21.996800Z",
+  "captured_at": "2026-09-15T12:19:15.198094Z",
   "http_status": 502
 }

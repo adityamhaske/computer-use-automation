@@ -81,3 +81,7 @@ along. The caller knows where it escalated and has to say so.
 | **Screencast + input injection is the fiddliest build in the project** | Build 1–4 first and prove headless. Pixels last. Documented fallback above. |
 | `raw_input` is awkward to authorize semantically | Police it on coarse attributes (scope, resulting navigation). Stated as a limit rather than papered over. |
 | Re-anchor skips a step it shouldn't | Skip only when a precondition is *positively satisfied*; ambiguity fails closed. |
+
+---
+
+**Superseded where it differs from what shipped.** This is the phase *plan*; [`docs/design/control-transfer.md`](../../design/control-transfer.md) describes the built system. The notable difference: continuous CDP screencast streaming was cut, and resume is executed by `ReplayExecutor.resume()` rather than left as a computed plan.

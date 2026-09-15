@@ -62,6 +62,19 @@ knowing exactly what it is about to act on. The invariant was never "policy runs
 *Why:* a guardrail with one bypass is not a guardrail. Discovery, replay, and human intervention all
 take the same path, which is how we know production behaves like the tests.
 
+*The one carve-out, stated rather than hidden.* Putting a **fixture** into its starting state is not
+an automation decision, and three places drive the browser directly to do it: `cli/mock_login.py`
+(the `--sign-in` flag), `cli/demo.py`'s own sign-in, and `evals/harness.py`. They exist because the
+capabilities here are recorded against an already-authenticated frameset, and making every artifact
+declare a login step would encode the fixture's auth into every capability. They are opt-in, scoped
+to the mock app's fixed demo credentials, and never pointed at a real target.
+
+Entrypoint navigation used to sit in that carve-out too and no longer does. `--target` is
+caller-supplied and the allowlist exists precisely to constrain where the browser may go, so
+`cua discover` and the operator console now open their target through
+`Dispatcher.open_entrypoint`, which runs the ordinary path and refuses a host outside the allowlist
+(`tests/integration/test_dispatcher.py::test_an_entrypoint_outside_the_allowlist_is_refused`).
+
 *Enforced by:* `.importlinter` contract `policy-chokepoint`;
 `tests/invariants/test_policy_chokepoint.py` (a hand-constructed action is rejected, and every
 dispatch event in a run record must have a matching authorization event).
@@ -131,8 +144,12 @@ must be classified into exactly one of:
 | --- | --- | --- |
 | `BUSINESS_OUTCOME` | A real answer from the application (`member_not_found`, `account_closed`) | yes |
 | `RECOVERABLE` | A bounded, declared transient condition (`transient_load`, `session_expired`) | no — remediate and retry, then `RECOVERY_EXHAUSTED` |
-| `HARD_FAILURE` | A debuggable defect (`target_not_found`, `checkpoint_failed`) | yes |
 | `UNEXPECTED_STATE` | Matches nothing the capability declares | yes — fail closed |
+
+A debuggable defect (`target_not_found`, `checkpoint_failed`) is **not** a fifth class: it is
+`RunStatus.FAILED` carrying a `FailureCode`. Listing it here as one was drift — `classify()` has
+no branch that returns it, so an observation class nobody can observe is a claim about the
+taxonomy that the taxonomy does not make.
 
 *Why:* the brief names conflating the first and third as the most common design mistake in this
 problem, and it is: it turns a normal business answer into a page at 2am, and a real defect into a

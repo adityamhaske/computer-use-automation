@@ -97,8 +97,13 @@ re-anchoring resume, and the fact that the human drives the same browser session
 using. The scope note in the brief asks for "a minimal but real handoff… plus a clear design for the
 rest" — the control-transfer model is the part that had to be real, and it is.
 
-**Build order (deliberate).** Phase 09 builds the lease, the policed `raw_input` path, and
-re-anchoring **first**, and proves them headless. CDP screencast pixel streaming is added **last**.
-The control-transfer model is what's graded; the pixels are polish, and they are also the single
-largest completion risk in the project. If they are cut, the fallback is headful Chromium with a
-claim/release API — still the same live session, still policed, still evidenced.
+**Build order (deliberate), and what shipped.** The lease, the policed `raw_input` path and
+re-anchoring were built **first** and proven headless. Continuous CDP screencast streaming was the
+last item and is the one that was cut: the console sends a still frame on connect and re-captures it
+after every policed gesture, which is enough to see the page and act on it, and is not co-browsing.
+
+Resume is *executed*, not merely computed. `ReplayExecutor.resume()` re-anchors against the live
+screen and continues the run on the operator's session — skipping the entrypoint navigation, adopting
+the epoch the handoff produced, and carrying forward outputs and spent recovery attempts. For a while
+`reconcile()` returned a plan that no caller consumed, which meant the system could pause and cede
+control but never finish.

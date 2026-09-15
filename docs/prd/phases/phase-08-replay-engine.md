@@ -26,7 +26,7 @@ Reference: [design/error-taxonomy.md](../../design/error-taxonomy.md).
 1. Satisfies precondition/checkpoint?  → EXPECTED, proceed
 2. Matches a declared outcome?         → BUSINESS_OUTCOME, return to caller (exit 0)
 3. Matches a declared recovery rule?   → RECOVERABLE, remediate (bounded)
-4. Known hard-failure condition?       → HARD_FAILURE, stop
+4. Nothing declared explains it?       → UNEXPECTED_STATE, fail closed
 5. Otherwise                           → UNEXPECTED_STATE, FAIL CLOSED
 ```
 

@@ -41,25 +41,25 @@ Which rung of the ladder won, summed across runs:
 
 | Inputs | Status | Outputs / outcome | Drift |
 |---|---|---|---|
-| member_id=12345 | success | account_status=Active, as_of=09/11/2026, savings_balance=$4,210.55 | 0.00 |
-| member_id=67890 | success | account_status=Active, as_of=09/11/2026, savings_balance=$18,730.00 | 0.00 |
-| member_id=24680 | success | account_status=Closed, as_of=09/11/2026, savings_balance=$0.00 | 0.00 |
+| member_id=12345 | success | account_status=Active, as_of=09/11/2026, savings_balance=4210.55 | 0.00 |
+| member_id=67890 | success | account_status=Active, as_of=09/11/2026, savings_balance=18730.00 | 0.00 |
+| member_id=24680 | success | account_status=Closed, as_of=09/11/2026, savings_balance=0.00 | 0.00 |
 | member_id=99999 | business_outcome | `member_not_found` | 0.00 |
-| member_id=12345 | success | account_status=Active, as_of=09/11/2026, savings_balance=$4,210.55 | 0.00 |
-| member_id=67890 | success | account_status=Active, as_of=09/11/2026, savings_balance=$18,730.00 | 0.00 |
-| member_id=24680 | success | account_status=Closed, as_of=09/11/2026, savings_balance=$0.00 | 0.00 |
+| member_id=12345 | success | account_status=Active, as_of=09/11/2026, savings_balance=4210.55 | 0.00 |
+| member_id=67890 | success | account_status=Active, as_of=09/11/2026, savings_balance=18730.00 | 0.00 |
+| member_id=24680 | success | account_status=Closed, as_of=09/11/2026, savings_balance=0.00 | 0.00 |
 | member_id=99999 | business_outcome | `member_not_found` | 0.00 |
-| member_id=12345 | success | account_status=Active, as_of=09/11/2026, savings_balance=$4,210.55 | 0.00 |
-| member_id=67890 | success | account_status=Active, as_of=09/11/2026, savings_balance=$18,730.00 | 0.00 |
-| member_id=24680 | success | account_status=Closed, as_of=09/11/2026, savings_balance=$0.00 | 0.00 |
+| member_id=12345 | success | account_status=Active, as_of=09/11/2026, savings_balance=4210.55 | 0.00 |
+| member_id=67890 | success | account_status=Active, as_of=09/11/2026, savings_balance=18730.00 | 0.00 |
+| member_id=24680 | success | account_status=Closed, as_of=09/11/2026, savings_balance=0.00 | 0.00 |
 | member_id=99999 | business_outcome | `member_not_found` | 0.00 |
-| member_id=12345 | success | account_status=Active, as_of=09/11/2026, savings_balance=$4,210.55 | 0.00 |
-| member_id=67890 | success | account_status=Active, as_of=09/11/2026, savings_balance=$18,730.00 | 0.00 |
-| member_id=24680 | success | account_status=Closed, as_of=09/11/2026, savings_balance=$0.00 | 0.00 |
+| member_id=12345 | success | account_status=Active, as_of=09/11/2026, savings_balance=4210.55 | 0.00 |
+| member_id=67890 | success | account_status=Active, as_of=09/11/2026, savings_balance=18730.00 | 0.00 |
+| member_id=24680 | success | account_status=Closed, as_of=09/11/2026, savings_balance=0.00 | 0.00 |
 | member_id=99999 | business_outcome | `member_not_found` | 0.00 |
-| member_id=12345 | success | account_status=Active, as_of=09/11/2026, savings_balance=$4,210.55 | 0.00 |
-| member_id=67890 | success | account_status=Active, as_of=09/11/2026, savings_balance=$18,730.00 | 0.00 |
-| member_id=24680 | success | account_status=Closed, as_of=09/11/2026, savings_balance=$0.00 | 0.00 |
+| member_id=12345 | success | account_status=Active, as_of=09/11/2026, savings_balance=4210.55 | 0.00 |
+| member_id=67890 | success | account_status=Active, as_of=09/11/2026, savings_balance=18730.00 | 0.00 |
+| member_id=24680 | success | account_status=Closed, as_of=09/11/2026, savings_balance=0.00 | 0.00 |
 | member_id=99999 | business_outcome | `member_not_found` | 0.00 |
 
 ## Notes

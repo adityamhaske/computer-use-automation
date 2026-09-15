@@ -7,6 +7,7 @@ reason they are content-addressed in the first place.
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pytest
@@ -104,6 +105,16 @@ def test_an_artifact_edited_in_place_is_refused(store: CapabilityStore) -> None:
     assert "content hash" in str(raised.value)
 
 
+def _as_draft(text: str) -> str:
+    """The same artifact with its seal removed.
+
+    These tests need *a* draft, not specifically the reviewed artifact. Reading the fixture raw
+    made them depend on it being unsealed, so sealing it -- which is what a reviewed artifact
+    should be -- broke two tests that had nothing to do with the change.
+    """
+    return re.sub(r"^content_hash:.*$", "", text, flags=re.M).rstrip() + "\n"
+
+
 def test_an_unsealed_draft_loads_but_is_flagged(store: CapabilityStore) -> None:
     """A draft is a legitimate state, so it is served -- and visibly marked.
 
@@ -111,7 +122,9 @@ def test_an_unsealed_draft_loads_but_is_flagged(store: CapabilityStore) -> None:
     produced. Serving one silently would let an unreviewed capability look identical to a reviewed
     one. `cua catalog list` prints the distinction.
     """
-    (store.root / "savings.yaml").write_text(FIXTURE.read_text(encoding="utf-8"), encoding="utf-8")
+    (store.root / "savings.yaml").write_text(
+        _as_draft(FIXTURE.read_text(encoding="utf-8")), encoding="utf-8"
+    )
     entry = store.resolve("corebank.member.savings_balance")
     assert entry.capability.content_hash == ""
     assert not entry.capability.hash_is_valid()

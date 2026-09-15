@@ -4,16 +4,18 @@ from __future__ import annotations
 
 import json
 import uuid
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 
 import typer
+from dotenv import load_dotenv
 
 from cua.agent.llm import LlmError, OpenRouterLlm
 from cua.agent.loop import DiscoveryAgent
 from cua.agent.stop import Budget
 from cua.domain.capability import Capability
-from cua.domain.result import RunResult
+from cua.domain.result import RunResult, RunStatus
 from cua.domain.serde import dump_capability
 from cua.recorder.compile import compile_capability
 from cua.runtime.wiring import build_rig
@@ -22,6 +24,19 @@ app = typer.Typer(
     add_completion=False,
     help="Computer-use automation: discover once with an LLM, replay deterministically.",
 )
+
+
+@app.callback()
+def _bootstrap() -> None:
+    """Load `.env` before any command runs.
+
+    `OpenRouterLlm` reads its key through a `default_factory`, so the environment is consulted when
+    the client is *constructed*, not when this module is imported -- which is why loading here, in a
+    Typer callback that runs before every subcommand, is enough. Without it `.env` was documented in
+    the README and read by nothing, and `make demo` silently fell back to the recorded transcript
+    while a perfectly good key sat in the file.
+    """
+    load_dotenv()
 
 
 @app.command()
@@ -49,7 +64,7 @@ def discover(
 
     rig = build_rig(run_id=run_id, kind="discovery", headless=headless, allow_vision=True)
     try:
-        rig.driver.page.goto(target, wait_until="load")
+        rig.dispatcher.open_entrypoint(target, session_id=run_id)
         agent = DiscoveryAgent(
             llm=llm,
             dispatcher=rig.dispatcher,
@@ -237,10 +252,107 @@ def _replay_once(
             evidence=rig.evidence,
             capture=FailureCapture(driver=rig.driver, evidence=rig.evidence),
             allow_irreversible=allow_irreversible,
+            # From the policy file rather than the dataclass defaults, so `budgets` and
+            # `replay_gates` in config/policy.yaml are settings rather than documentation.
+            max_recovery_attempts_total=rig.config.budgets.max_recovery_attempts_total,
+            replay_gates=rig.config.replay_gates,
         ).run(capability, inputs)
     finally:
         rig.close()
     return result, rig.run_dir
+
+
+def _parse_inputs(pairs: list[str] | None) -> dict[str, str]:
+    """`--input name=value`, repeated, into a dict."""
+    supplied: dict[str, str] = {}
+    for pair in pairs or []:
+        if "=" not in pair:
+            typer.secho(f"--input expects name=value, got {pair!r}", fg=typer.colors.RED, err=True)
+            raise typer.Exit(code=2)
+        name, _, value = pair.partition("=")
+        supplied[name] = value
+    return supplied
+
+
+def _supervised_run(
+    supervised: Any,
+    *,
+    capability: str,
+    base_url: str,
+    inputs: dict[str, str],
+    arm_fault: str | None,
+    sign_in: bool,
+) -> Capability:
+    """Run a capability on the console's own session, so an escalation lands in its queue.
+
+    Everything here goes through `supervised.session.call`. Synchronous Playwright is bound to the
+    thread that created it, and the console serves requests from a threadpool -- driving the surface
+    from this thread would fail on the first action with a greenlet error.
+
+    The run happens before the server starts rather than beside it: it escalates within a second or
+    two, and a queue that is already populated when the first page loads is a better demonstration
+    than one that appears while the reviewer is reading an empty state.
+    """
+    from cua.catalog.store import CapabilityStore
+    from cua.domain.serde import load_capability
+    from cua.domain.tenant_binding import TenantBinding
+    from cua.policy.config import ReplayGates
+    from cua.replay.executor import ReplayExecutor
+    from cua.runtime.capture import FailureCapture
+
+    path = Path(capability)
+    loaded = (
+        load_capability(path.read_text(encoding="utf-8"))
+        if path.suffix in {".yaml", ".yml"} and path.exists()
+        else CapabilityStore().load(capability)
+    )
+    bound = TenantBinding(
+        capability_ref=loaded.ref, tenant="console", vars={"base_url": base_url}
+    ).apply(loaded)
+
+    if sign_in:
+        from cua.cli.mock_login import sign_in as do_sign_in
+
+        supervised.session.call(
+            lambda: do_sign_in(_BorrowedRig(supervised.driver), base_url)  # type: ignore[arg-type]
+        )
+
+    if arm_fault:
+        import httpx
+
+        httpx.post(f"{base_url}/_control/arm", json={"fault": arm_fault, "count": 4}, timeout=5)
+        typer.echo(f"  armed       : {arm_fault}")
+
+    executor = ReplayExecutor(
+        dispatcher=supervised.dispatcher,
+        evidence=supervised.evidence,
+        capture=FailureCapture(driver=supervised.driver, evidence=supervised.evidence),
+        broker=supervised.broker,
+        max_recovery_attempts_total=supervised.config.budgets.max_recovery_attempts_total
+        if supervised.config
+        else 6,
+        replay_gates=supervised.config.replay_gates if supervised.config else ReplayGates(),
+    )
+    result = supervised.session.call(lambda: executor.run(bound, inputs))
+    if arm_fault:
+        import httpx
+
+        httpx.post(f"{base_url}/_control/reset", timeout=5)
+
+    typer.echo(f"  supervised  : {bound.ref} -> {result.summary}")
+    if result.status is RunStatus.NEEDS_HUMAN:
+        typer.secho(
+            "  An intervention is waiting. Open the console and claim it.",
+            fg=typer.colors.YELLOW,
+        )
+    return bound
+
+
+@dataclass
+class _BorrowedRig:
+    """Just enough of a `Rig` for `mock_login.sign_in`, which only wants the driver."""
+
+    driver: Any
 
 
 @app.command()
@@ -250,17 +362,50 @@ def console(
         "http://localhost:8811/"
     ),
     headless: Annotated[bool, typer.Option(help="Run the supervised browser headless.")] = True,
+    capability: Annotated[
+        str | None,
+        typer.Option(
+            help=(
+                "Run this capability against the supervised session before serving, so the console "
+                "opens with something to act on. A ref from the catalog, or a path to a YAML."
+            )
+        ),
+    ] = None,
+    arm_fault: Annotated[
+        str | None,
+        typer.Option(
+            help=(
+                "Arm a fault on the mock app first (e.g. undeclared_dialog) so the run escalates "
+                "and an intervention is waiting. Requires --capability."
+            )
+        ),
+    ] = None,
+    input: Annotated[  # noqa: A002 - reads naturally on the command line
+        list[str] | None, typer.Option("--input", help="name=value for --capability, repeatable.")
+    ] = None,
+    sign_in: Annotated[
+        bool, typer.Option("--sign-in", help="Sign in to the mock app first. See `cua replay`.")
+    ] = False,
 ) -> None:
     """Run the operator console over a supervised live session.
 
     Single operator, no authentication, local only -- a documented cut (REPORT.md §5). What is real:
     the operator drives the same Chromium session automation uses, their input travels the same
     policy chokepoint, and every action is recorded with actor=HUMAN.
+
+    With `--capability` the console does not just *watch* a session, it supervises a real run on it.
+    Without that, nothing on the session can ever escalate, so the intervention queue stays empty
+    and the one flow this console exists for is unreachable from the served UI -- the handoff only
+    ever happened inside `cua demo`, headless, as printed text.
     """
     import uvicorn
 
     from cua.hitl.console.server import ConsoleDeps, create_console
     from cua.runtime.wiring import build_supervised_session
+
+    if arm_fault and not capability:
+        typer.secho("--arm-fault needs --capability to run.", fg=typer.colors.RED, err=True)
+        raise typer.Exit(code=2)
 
     run_id = f"con-{uuid.uuid4().hex[:10]}"
     supervised = build_supervised_session(run_id=run_id, target=target, headless=headless)
@@ -268,6 +413,17 @@ def console(
     typer.secho(f"Operator console on http://127.0.0.1:{port}", fg=typer.colors.GREEN)
     typer.echo(f"  supervising : {target}")
     typer.echo(f"  evidence    : {supervised.run_dir}")
+
+    supervising: Capability | None = None
+    if capability:
+        supervising = _supervised_run(
+            supervised,
+            capability=capability,
+            base_url=target.rstrip("/"),
+            inputs=_parse_inputs(input),
+            arm_fault=arm_fault,
+            sign_in=sign_in,
+        )
     try:
         uvicorn.run(
             create_console(
@@ -275,6 +431,8 @@ def console(
                     broker=supervised.broker,
                     driver=supervised.driver,
                     session=supervised.session,
+                    # So the live view can honour the capability's `sensitive` declarations.
+                    supervising=supervising,
                 )
             ),
             host="127.0.0.1",

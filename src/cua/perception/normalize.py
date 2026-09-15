@@ -18,6 +18,47 @@ import hashlib
 import re
 from collections.abc import Sequence
 
+# ------------------------------------------------------------- value shapes
+#
+# Lives here, at the bottom of the stack, because two layers need it and they cannot reach each
+# other: `cua.targeting` asks "is this text a label or a datum?" when synthesizing an anchor, and
+# `cua.recorder` asks "what shape is this value?" when inferring a type or a checkpoint. The
+# layering contract puts recorder above targeting, so the shared vocabulary has to sit under both.
+#
+# Pure regex over already-extracted text -- no DOM, no surface, so the `surface-neutral-targeting`
+# contract is unaffected.
+
+MONEY = re.compile(r"^-?\$-?[\d,]+\.\d{2}$|^-?[\d]{1,3}(?:,\d{3})+\.\d{2}$")
+"""Requires a currency symbol or thousands grouping.
+
+A bare `4210.55` is left as `number`: two decimal places alone is equally consistent with an
+interest rate or a fee multiplier, and a type is a claim to a calling agent rather than a hint."""
+DATE = re.compile(r"^\d{1,2}/\d{1,2}/\d{4}$|^\d{4}-\d{2}-\d{2}$")
+INTEGER = re.compile(r"^-?\d+$")
+NUMBER = re.compile(r"^-?\d+\.\d+$")
+
+
+def looks_like_value(text: str | None) -> bool:
+    """Whether text reads as a *datum* rather than a field label.
+
+    Used to keep a recorded anchor honest. On a legacy screen a value is identified by the label
+    beside it, so "the cell next to the one reading 'Savings Balance'" survives a different member.
+    "The cell next to the one reading '$812.30'" does not -- it encodes one member's data as though
+    it were structure, and replays only for the member it was recorded on.
+
+    Deliberately narrow. It answers "is this unmistakably a datum?", not "is this a good label",
+    because a false positive here discards a perfectly good anchor. A bare integer is only treated
+    as a datum at four digits or more: "Account" and "2024" are not the same kind of word, but "12"
+    could be either a quantity or part of a label.
+    """
+    if not text:
+        return False
+    stripped = text.strip()
+    if MONEY.match(stripped) or DATE.match(stripped) or NUMBER.match(stripped):
+        return True
+    return bool(INTEGER.match(stripped) and len(stripped.lstrip("-")) >= 4)
+
+
 # --------------------------------------------------------------------- roles
 
 ROLE_ALIASES: dict[str, str] = {
@@ -38,7 +79,13 @@ ROLE_ALIASES: dict[str, str] = {
     "img": "image",
     "graphicsdocument": "image",
     "listbox": "combobox",
-    "menulistpopup": "combobox",
+    # NOT "combobox". A native `<select>` is exposed as a combobox *containing* a menulistpopup,
+    # so mapping the popup to the control's own role made one dropdown appear as two identical
+    # candidates -- and the resolver, correctly refusing to guess between them, made every
+    # `<select>` on a legacy form unresolvable. The popup is the dropdown, not a second control.
+    # Left under its own role rather than marked noise, because noise drops the subtree and the
+    # options inside it are worth seeing.
+    "menulistpopup": "menulistpopup",
     "menulistoption": "option",
     # --- Windows UI Automation (the desktop driver this design is meant to allow) ---
     # Listed to make the portability claim concrete: these are the mappings a UIA driver would use,

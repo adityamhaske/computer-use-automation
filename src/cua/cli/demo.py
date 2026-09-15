@@ -29,9 +29,10 @@ import typer
 from cua.agent.fake import FakeLlm, ScriptedCall
 from cua.agent.llm import LlmError, LlmPort, OpenRouterLlm
 from cua.agent.loop import DiscoveryAgent
-from cua.agent.stop import Budget
-from cua.domain.action import RawInput, RawInputKind, Type
+from cua.agent.stop import Budget, StopReason
+from cua.domain.action import Click, RawInput, RawInputKind, Type
 from cua.domain.capability import Capability
+from cua.domain.discovery import DiscoveryRun
 from cua.domain.result import FailureCode, RunResult, RunStatus
 from cua.domain.run_record import RunKind
 from cua.domain.serde import dump_capability
@@ -40,7 +41,6 @@ from cua.domain.target import NameMatch, TargetDescriptor
 from cua.domain.tenant_binding import TenantBinding
 from cua.evidence.record import build_run_record, write_run_record
 from cua.hitl.broker import SessionBroker
-from cua.hitl.reanchor import reconcile
 from cua.policy.config import PolicyConfig, parse_policy
 from cua.recorder.compile import compile_capability
 from cua.replay.executor import ReplayExecutor
@@ -72,7 +72,13 @@ RECORDED_FLOW = [
         "read the account status",
         role="cell",
         name="Active",
-        occurrence=1,
+        # The third cell reading "Active", not the second. The first two are rows of the Accounts
+        # Overview grid, where the cell before a status is a *balance* -- and the compiler describes
+        # a value by the label beside it. Recording from there produced `adjacent_to "$812.30"`,
+        # member 12345's checking balance, baked into the artifact as though it were structure. The
+        # third is the label/value summary table the capability is actually about, where the
+        # preceding cell reads "Status" and the descriptor survives a different member.
+        occurrence=2,
         arguments={"output_name": "account_status"},
     ),
     ScriptedCall(
@@ -235,13 +241,29 @@ class Demo:
                 )
                 self.say("Mock back-office running", f"hostile frameset app at {base_url}")
 
-                run = DiscoveryAgent(
-                    llm=llm,
-                    dispatcher=rig.dispatcher,
-                    evidence=rig.evidence,
-                    redactor=rig.redactor,
-                    budget=Budget(max_steps=25),
-                ).run(goal=GOAL, target_url=f"{base_url}/")
+                def discover(port: LlmPort) -> DiscoveryRun:
+                    return DiscoveryAgent(
+                        llm=port,
+                        dispatcher=rig.dispatcher,
+                        evidence=rig.evidence,
+                        redactor=rig.redactor,
+                        budget=Budget(max_steps=25),
+                    ).run(goal=GOAL, target_url=f"{base_url}/")
+
+                run = discover(llm)
+                if self.live_model and run.stop_reason is StopReason.ERROR:
+                    # A key can be present and still not work: an unreachable gateway, a revoked
+                    # key, a model id the provider does not serve. The loop turns that into
+                    # StopReason.ERROR rather than raising, so it has to be checked rather than
+                    # caught. Falling back here as well as at construction keeps the demo runnable
+                    # on any machine, and keeps it honest about which of the two happened -- the
+                    # difference matters to whoever reads the evidence afterwards.
+                    self.live_model = False
+                    mode = (
+                        "RECORDED TRANSCRIPT — a key is configured but the model could not be "
+                        "reached (see the run's trace for the provider error)"
+                    )
+                    run = discover(FakeLlm(script=list(RECORDED_FLOW)))
             finally:
                 rig.close()
 
@@ -440,8 +462,39 @@ class Demo:
             content = driver.page.frame(name="content")
             if content is None:  # pragma: no cover -- the frameset shell always has it
                 raise RuntimeError("content frame missing")
-            if not content.url.endswith("/search"):
-                content.goto(f"{base_url}/search")
+
+            # Re-fetch unless the search form is actually *there*. Testing the URL is not enough:
+            # the injected interstitial is served at the same path, so `content.url` already ends
+            # with "/search" while the body on screen is the dialog that caused the escalation.
+            # Asking the snapshot what is on the page -- rather than what the address bar says --
+            # is also what a real operator does, and it keeps the no-op case free of the
+            # same-URL navigation race noted above.
+            def search_form_ready() -> bool:
+                return any(
+                    node.role == "textbox"
+                    and node.name == "Member Number"
+                    and node.scope.frame == "content"
+                    for node in driver.observe().nodes
+                )
+
+            if not search_form_ready():
+                # Through the broker, not `content.goto`. This is an operator acting on a session an
+                # operator holds, so it belongs on the policed path alongside their click and their
+                # typing -- and this stage generates the escalation evidence, so an unpoliced
+                # navigation here is the one gap visible in the artifact a reviewer reads.
+                #
+                # A `Navigate` would be wrong even so: it moves the top-level page and would replace
+                # the frameset, where what is wanted is the *content frame*. Clicking the navigation
+                # link is both the policed action and the one a real operator would perform.
+                broker.human_action(
+                    Click(
+                        target=TargetDescriptor(
+                            role="link",
+                            name=NameMatch(value="Member Search"),
+                            scope=NodeScope(frame="nav"),
+                        )
+                    )
+                )
                 driver.page.wait_for_load_state()
             broker.human_action(
                 Type(
@@ -460,8 +513,21 @@ class Demo:
                 f"epoch {epoch} — {delta.summary() if delta else 'no delta'}",
             )
 
-            plan = reconcile(
-                capability, driver.observe(), inputs={"member_id": "12345"}, from_index=0
+            # Hand the run back to the executor rather than merely computing where it could go.
+            # `from_index` comes off the intervention: scanning from 0 is the documented footgun --
+            # once a flow has advanced, the early steps' preconditions no longer hold and a scan
+            # from the start reports the session unrecognizable when it is simply further along.
+            resumed = ReplayExecutor(
+                dispatcher=rig.dispatcher,
+                evidence=rig.evidence,
+                capture=FailureCapture(driver=driver, evidence=rig.evidence),
+                broker=broker,
+            ).resume(
+                capability,
+                {"member_id": "12345"},
+                from_index=result.intervention.step_index or 0,
+                prior_outputs=dict(result.intervention.outputs_so_far),
+                prior_recovery_attempts=result.recovery_attempts,
             )
 
             # Re-derive the record now that the operator's actions are in the trace. The executor
@@ -476,11 +542,12 @@ class Demo:
                 sensitive_keys=rig.evidence.sensitive_keys,
             )
             self.say(
-                "Re-anchored after the handoff",
-                plan.reason if plan.can_resume else f"fails closed: {plan.reason[:90]}",
+                "Re-anchored, and the run finished on the operator's session",
+                f"{resumed.summary}  outputs={resumed.outputs}",
+                ok=resumed.status is RunStatus.SUCCESS,
             )
             _ = before
-            return True
+            return resumed.status is RunStatus.SUCCESS
         finally:
             rig.close()
 
@@ -520,9 +587,9 @@ class Demo:
         typer.echo()
         if not self.live_model:
             typer.secho(
-                "  NOTE: discovery ran from a RECORDED TRANSCRIPT because OPENROUTER_API_KEY is\n"
-                "  not set. Everything after it is model-free by construction. Set the key and\n"
-                "  re-run for a genuine LLM-driven discovery.",
+                "  NOTE: discovery ran from a RECORDED TRANSCRIPT, not a live model — see stage 2\n"
+                "  for which reason. Everything after it is model-free by construction. Configure\n"
+                "  a reachable model in .env and re-run for a genuine LLM-driven discovery.",
                 fg=typer.colors.YELLOW,
             )
         typer.echo(f"\n  evidence: {EVIDENCE.resolve()}")

@@ -113,7 +113,7 @@ class DiscoveryAgent:
                     }
                 )
                 self.budget.record_step(
-                    tokens=response.total_tokens, page_changed=False, denied=False
+                    tokens=response.total_tokens, progressed=False, denied=False
                 )
                 continue
 
@@ -144,12 +144,17 @@ class DiscoveryAgent:
 
             after = self.dispatcher.observe() if step.ok else snapshot
             page_changed = after.url != snapshot.url or len(after.nodes) != len(snapshot.nodes)
+            # An extraction is a *read*. It cannot change the page, and it is the goal rather than
+            # a detour -- a flow whose whole purpose is to read three fields off one screen would
+            # otherwise look like three steps of getting nowhere and trip the dead-end detector on
+            # its way to succeeding. Progress is "the page moved, or we learned something".
+            progressed = page_changed or step.extracted is not None
 
             history.append(self._assistant_turn(response.text, call))
             history.append({"role": "tool", "tool_call_id": call.id, "content": feedback})
 
             self.budget.record_step(
-                tokens=response.total_tokens, page_changed=page_changed, denied=denied
+                tokens=response.total_tokens, progressed=progressed, denied=denied
             )
 
         run = DiscoveryRun(
@@ -279,14 +284,30 @@ class DiscoveryAgent:
         step.descriptor_verified = self._verify(synthesis.descriptor, snapshot, node_id)
 
         if not step.descriptor_verified:
-            # The description we would record does not find the node it describes. Recording it
-            # anyway would produce an artifact that fails on its very first replay.
+            # The description we would record does not find the node it describes, so recording it
+            # produces an artifact that fails on its first replay.
+            #
+            # The note went to the evidence bus and nowhere else: the one party who could pick a
+            # different control -- the model, mid-run -- was never told. It is appended to the tool
+            # result below so the next turn can act on it, which is the only moment the choice is
+            # still open. Not raised: a control that resists description is often still the right
+            # one, and refusing the step would strand a run that is otherwise going fine.
             self.evidence.emit(
                 EventType.NOTE,
                 note="descriptor synthesis did not round-trip",
                 node_id=node_id,
                 descriptor=synthesis.descriptor.describe(),
             )
+        warning = (
+            ""
+            if step.descriptor_verified
+            else (
+                f"\n\nWARNING: this control cannot be described in a way that finds it again "
+                f"({synthesis.descriptor.describe()}). A capability recorded from it will fail on "
+                f"replay. Prefer a control with a distinct accessible name, or one with a clear "
+                f"label beside it, if either will do."
+            )
+        )
 
         # `extract` reads from the snapshot; it never touches the surface.
         if call.name == "extract":
@@ -296,12 +317,12 @@ class DiscoveryAgent:
             step.ok = True
             step.extracted = (name, value)
             step.detail = f"recorded {name}"
-            return step, f"Recorded {name} = {self.redactor.text(value)}", False
+            return step, f"Recorded {name} = {self.redactor.text(value)}{warning}", False
 
         action = self._action_for(call, synthesis.descriptor)
         if action is None:
             step.detail = f"{call.name} is not executable"
-            return step, step.detail, False
+            return step, step.detail + warning, False
 
         outcome = self.dispatcher.execute(
             action,
@@ -313,7 +334,7 @@ class DiscoveryAgent:
         step.ok = outcome.ok
         step.detail = outcome.message or outcome.status.value
         denied = outcome.status is DispatchStatus.DENIED
-        return step, self._feedback(outcome.ok, step.detail), denied
+        return step, self._feedback(outcome.ok, step.detail) + warning, denied
 
     def _verify(self, descriptor: TargetDescriptor, snapshot: UiSnapshot, node_id: str) -> bool:
         """Does the description we would record actually find the node it describes?"""

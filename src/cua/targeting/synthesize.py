@@ -28,6 +28,8 @@ from cua.domain.target import (
     ResolutionStrategy,
     TargetDescriptor,
 )
+from cua.perception.normalize import looks_like_value
+from cua.targeting.candidates import ordinal_pool
 
 
 @dataclass(frozen=True)
@@ -71,6 +73,18 @@ def _preceding_label(node: UiNode, snapshot: UiSnapshot) -> str | None:
 
     Right for a value: a legacy screen states facts as label-then-value in adjacent cells, and in a
     multi-column grid the cell before is the only one that identifies this column's meaning.
+
+    **A cell holding a datum is not a label.** This used to accept the first named sibling
+    unconditionally -- correct on a label/value table, wrong on an n-column grid, where the cell
+    before a status is a *balance*. The compiler then recorded `adjacent_to "$812.30"`, one member's
+    checking balance, as though it were structure, and the capability replayed only for the member
+    it was discovered on.
+
+    Skipping datum-shaped siblings and continuing the scan is the fix. When nothing label-shaped
+    remains we return None and let the caller fall down the ladder, because the real label in that
+    layout is a column header this function cannot see. Refusing to describe a node beats describing
+    it with data: the descriptor is then flagged `unique=False` and the compiler warns, instead of
+    producing an artifact that looks right and is not.
     """
     parent = snapshot.parent(node)
     if parent is None:
@@ -80,7 +94,7 @@ def _preceding_label(node: UiNode, snapshot: UiSnapshot) -> str | None:
     if index is None:
         return None
     for candidate in reversed(siblings[:index]):
-        if candidate.name:
+        if candidate.name and not looks_like_value(candidate.name):
             return candidate.name
     return None
 
@@ -116,7 +130,9 @@ def synthesize_descriptor(node: UiNode, snapshot: UiSnapshot) -> Synthesis:
     would be ambiguous the moment both are on screen.
     """
     scope = NodeScope(frame=node.scope.frame, region=node.scope.region)
-    in_scope = [n for n in snapshot.nodes if n.role == node.role and n.scope.frame == scope.frame]
+    # Counted over the resolver's own pool, so a recorded ordinal means on replay exactly what it
+    # meant at discovery. See `ordinal_pool`.
+    in_scope = ordinal_pool(snapshot, TargetDescriptor(role=node.role, scope=scope))
 
     # 1. Role + accessible name, if that is unique.
     if node.name:

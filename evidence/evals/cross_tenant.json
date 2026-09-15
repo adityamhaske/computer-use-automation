@@ -1,6 +1,6 @@
 {
   "capability": "corebank.member.savings_balance@1.0.0",
-  "content_hash": "sha256:cc19f732193aaf2e8f70f3c9e0c37c7ff01afb79362894a9e993d8805806d1d6",
+  "content_hash": "sha256:ba25fc49c0bfc0a8eb17dadd57a9dcb5988236326cbb8953768733834ed84521",
   "metrics": {
     "determinism_holds": true,
     "escalations": 0,
@@ -27,7 +27,7 @@
       "outputs": {
         "account_status": "Active",
         "as_of": "09/11/2026",
-        "savings_balance": "$4,210.55"
+        "savings_balance": "4210.55"
       },
       "status": "success",
       "strategy_mix": {
@@ -43,7 +43,7 @@
       "outputs": {
         "account_status": "Active",
         "as_of": "09/11/2026",
-        "savings_balance": "$18,730.00"
+        "savings_balance": "18730.00"
       },
       "status": "success",
       "strategy_mix": {
@@ -59,7 +59,7 @@
       "outputs": {
         "account_status": "Closed",
         "as_of": "09/11/2026",
-        "savings_balance": "$0.00"
+        "savings_balance": "0.00"
       },
       "status": "success",
       "strategy_mix": {
@@ -86,7 +86,7 @@
       "outputs": {
         "account_status": "Active",
         "as_of": "09/11/2026",
-        "savings_balance": "$4,210.55"
+        "savings_balance": "4210.55"
       },
       "status": "success",
       "strategy_mix": {
@@ -102,7 +102,7 @@
       "outputs": {
         "account_status": "Active",
         "as_of": "09/11/2026",
-        "savings_balance": "$18,730.00"
+        "savings_balance": "18730.00"
       },
       "status": "success",
       "strategy_mix": {
@@ -118,7 +118,7 @@
       "outputs": {
         "account_status": "Closed",
         "as_of": "09/11/2026",
-        "savings_balance": "$0.00"
+        "savings_balance": "0.00"
       },
       "status": "success",
       "strategy_mix": {
@@ -145,7 +145,7 @@
       "outputs": {
         "account_status": "Active",
         "as_of": "09/11/2026",
-        "savings_balance": "$4,210.55"
+        "savings_balance": "4210.55"
       },
       "status": "success",
       "strategy_mix": {
@@ -161,7 +161,7 @@
       "outputs": {
         "account_status": "Active",
         "as_of": "09/11/2026",
-        "savings_balance": "$18,730.00"
+        "savings_balance": "18730.00"
       },
       "status": "success",
       "strategy_mix": {
@@ -177,7 +177,7 @@
       "outputs": {
         "account_status": "Closed",
         "as_of": "09/11/2026",
-        "savings_balance": "$0.00"
+        "savings_balance": "0.00"
       },
       "status": "success",
       "strategy_mix": {
@@ -204,7 +204,7 @@
       "outputs": {
         "account_status": "Active",
         "as_of": "09/11/2026",
-        "savings_balance": "$4,210.55"
+        "savings_balance": "4210.55"
       },
       "status": "success",
       "strategy_mix": {
@@ -220,7 +220,7 @@
       "outputs": {
         "account_status": "Active",
         "as_of": "09/11/2026",
-        "savings_balance": "$18,730.00"
+        "savings_balance": "18730.00"
       },
       "status": "success",
       "strategy_mix": {
@@ -236,7 +236,7 @@
       "outputs": {
         "account_status": "Closed",
         "as_of": "09/11/2026",
-        "savings_balance": "$0.00"
+        "savings_balance": "0.00"
       },
       "status": "success",
       "strategy_mix": {
@@ -263,7 +263,7 @@
       "outputs": {
         "account_status": "Active",
         "as_of": "09/11/2026",
-        "savings_balance": "$4,210.55"
+        "savings_balance": "4210.55"
       },
       "status": "success",
       "strategy_mix": {
@@ -279,7 +279,7 @@
       "outputs": {
         "account_status": "Active",
         "as_of": "09/11/2026",
-        "savings_balance": "$18,730.00"
+        "savings_balance": "18730.00"
       },
       "status": "success",
       "strategy_mix": {
@@ -295,7 +295,7 @@
       "outputs": {
         "account_status": "Closed",
         "as_of": "09/11/2026",
-        "savings_balance": "$0.00"
+        "savings_balance": "0.00"
       },
       "status": "success",
       "strategy_mix": {

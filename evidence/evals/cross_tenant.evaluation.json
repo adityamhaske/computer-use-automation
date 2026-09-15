@@ -1,6 +1,6 @@
 {
   "capability_ref": "corebank.member.savings_balance@1.0.0",
-  "content_hash": "sha256:cc19f732193aaf2e8f70f3c9e0c37c7ff01afb79362894a9e993d8805806d1d6",
+  "content_hash": "sha256:ba25fc49c0bfc0a8eb17dadd57a9dcb5988236326cbb8953768733834ed84521",
   "tenant": "northgate-fcu",
   "runs": 20,
   "successes": 15,

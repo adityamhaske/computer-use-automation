@@ -62,10 +62,16 @@ evals-runs/          the traces behind those reports (gitignored: 16MB of workin
 ```
 
 `capabilities/` holding two artifacts is deliberate. `memberdesk.savings_balance` is what the
-compiler produced from one discovery run — a **draft**, declaring no outcomes and no recovery rules,
-with review notes saying exactly why. `corebank.member.savings_balance` is the **reviewed**
-counterpart, declaring both. That pair is the `draft → approved` gate made visible, and
-`cua catalog list` marks which is which.
+compiler produced from one discovery run: it declares **no** outcomes and **no** recovery rules,
+because a successful run never observed a failure path, and its review notes say exactly that.
+`corebank.member.savings_balance` is the **reviewed** counterpart, where a person added the three
+business outcomes and two recovery rules that run could not have seen. Reading them side by side is
+the point — the gap between them is precisely the work review has to do.
+
+Both are `sealed` in `cua catalog list`, which reports *content-hash integrity* (`sealed` / `draft`
+for unhashed / `TAMPERED` for edited-on-disk), not review status. Approval is a separate axis
+(`CapabilityApproval`, `draft → approved`) and is what gates unattended replay of an irreversible
+capability.
 
 Each run directory:
 

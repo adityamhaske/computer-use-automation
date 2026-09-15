@@ -17,77 +17,87 @@ not as a collision, because there is only ever the one non-neutral hue on screen
 :root {
   color-scheme: light;
 
-  /* surfaces */
-  --bg: #fafaf9;           /* page background — warm, not clinical white */
-  --surface: #ffffff;       /* cards, panels */
-  --surface-2: #f4f4f3;     /* sunken areas, hover states */
-  --border: #e4e4e1;
-  --border-strong: #d0d0cc;
-  --overlay: rgba(20, 20, 18, 0.45);
+  /* surfaces — warm neutrals (hue ~35°), never the cool blue-grey dashboards default to */
+  --bg: #faf9f7;
+  --surface: #ffffff;
+  --surface-2: #f4f2ef;
+  --surface-raised: #ffffff;
+  --border: #e8e4de;
+  --border-strong: #d4cec6;
+  --overlay: rgba(28, 26, 23, 0.38);
 
   /* text */
-  --text: #16160f;
-  --text-secondary: #56564d;
-  --text-tertiary: #8a8a7e;
+  --text: #1c1a17;
+  --text-secondary: #59544c;
+  --text-tertiary: #6e685f;
   --text-on-accent: #ffffff;
 
-  /* accent — emerald, not blue/purple */
-  --accent: #0f7a5c;
-  --accent-hover: #0c6249;
-  --accent-active: #0a4f3b;
-  --accent-soft: #e6f5ef;
-  --accent-soft-strong: #cdebe0;
-  --accent-text: #0c6249;
-  --focus-ring: #0f7a5c;
+  /* accent — deep emerald. No blue, no purple, anywhere. */
+  --accent: #146b52;
+  --accent-hover: #10583f;
+  --accent-active: #0d4633;
+  --accent-soft: #e8f2ed;
+  --accent-soft-strong: #d2e7dd;
+  --accent-text: #10583f;
+  --focus-ring: #146b52;
 
-  /* semantic status — used ONLY for status, never as decoration */
-  --success: #157a4a;
-  --success-soft: #e6f6ec;
-  --info: #3f6b8a;          /* a desaturated slate-blue is fine here: status blue, not brand blue */
-  --info-soft: #eaf1f6;
-  --warning: #92660a;
-  --warning-soft: #fdf1de;
-  --danger: #a52c2c;
-  --danger-soft: #fbeaea;
-  --neutral-soft: #eeeeec;
+  /* semantic status — status only, never decoration */
+  --success: #2f6b46;
+  --success-soft: #e7f2ea;
+  --running: #6b665d;        /* neutral graphite: a run simply proceeding asks nothing of anyone */
+  --running-soft: #f0ede8;
+  --human: #146b52;
+  --human-soft: #e8f2ed;
+  --warning: #8a6410;
+  --warning-soft: #fbf1dd;
+  --danger: #9c3428;
+  --danger-soft: #f9eae7;
+  --neutral-soft: #f0ede8;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-    --bg: #14140f;
-    --surface: #1c1c16;
-    --surface-2: #232319;
-    --border: #302f26;
-    --border-strong: #403e30;
-    --overlay: rgba(8, 8, 6, 0.6);
+/* Dark is OPT-IN, never automatic — there is no prefers-color-scheme block. This console is read
+   in daylit back offices; it does not follow the OS into dark mode on its own. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
 
-    --text: #f2f2ec;
-    --text-secondary: #b8b8aa;
-    --text-tertiary: #7d7c6e;
+  --bg: #12110f;
+  --surface: #1a1816;
+  --surface-2: #211f1c;
+  --surface-raised: #24211e;
+  --border: #302c28;
+  --border-strong: #423d37;
+  --overlay: rgba(8, 7, 6, 0.62);
 
-    --accent: #3fd6a0;
-    --accent-hover: #5ce0af;
-    --accent-active: #6ee6ba;
-    --accent-soft: rgba(63, 214, 160, 0.14);
-    --accent-soft-strong: rgba(63, 214, 160, 0.22);
-    --accent-text: #6ee6ba;
-    --focus-ring: #3fd6a0;
+  --text: #f0ede8;
+  --text-secondary: #b5aea4;
+  --text-tertiary: #928b81;
+  --text-on-accent: #10231c;
 
-    --success: #3fd693;
-    --success-soft: rgba(63, 214, 147, 0.13);
-    --info: #8fb4cc;
-    --info-soft: rgba(143, 180, 204, 0.13);
-    --warning: #f0b23f;
-    --warning-soft: rgba(240, 178, 63, 0.13);
-    --danger: #ff7a7a;
-    --danger-soft: rgba(255, 122, 122, 0.13);
-    --neutral-soft: #262620;
-  }
+  --accent: #5cbf99;
+  --accent-hover: #74cfab;
+  --accent-active: #8bd9bb;
+  --accent-text: #74cfab;
+  --focus-ring: #5cbf99;
+
+  --success: #57bd8b;
+  --running: #9d968c;
+  --human: #5cbf99;
+  --warning: #d9a441;
+  --danger: #e08b80;
+  --neutral-soft: #262320;
 }
-/* :root[data-theme="dark"] repeats the block above; :root[data-theme="light"] just sets
-   color-scheme: light. See tokens.css for the full four-block pattern and why each exists. */
 ```
+
+**Two rules this palette is built on.**
+
+*Hue carries meaning, or it is not used.* Green is healthy and human-held, amber wants attention,
+brick is failure — and `--running` is a neutral graphite on purpose, because a run that is simply
+proceeding is not asking the operator for anything. Reaching for a colour to distinguish a state
+nobody needs to act on is how a status palette stops meaning anything.
+
+*Light is the default, unconditionally.* Every value above clears WCAG AA on every surface it is
+used on, in both themes — verified, not assumed.
+
 
 **Rule:** if a screen needs a second non-neutral color for something that isn't a status, that's a
 sign the layout needs better hierarchy, not another hue. Take it to [principles.md](principles.md)

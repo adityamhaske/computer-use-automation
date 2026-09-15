@@ -69,22 +69,29 @@ excluded from evidence, blurred in screenshots, and stripped from outbound LLM p
 
 ### Steps
 
+<!-- validates: Step -->
 ```yaml
-steps:
-  - id: enter_member_id
-    action: { type: type, value: { $input: member_id } }
-    target:            # see design/target-resolution.md
-      role: textbox
-      name: { match: exact, value: "Member Number" }
-      scope: { frame: content, region: search_form }
-      anchor: { relation: row_of, cell_text: "Member Number" }
-      hints: { css: "...", node_path: "..." }   # unverified cache — never trusted alone
-      fingerprint: "sha256:…"
-      recorded_strategy: semantic_exact         # drift baseline
-    precondition:  { assert: node_exists, role: textbox, name: "Member Number" }
-    wait:          { for: snapshot_stable, timeout_ms: 5000 }
-    postcondition: { assert: node_has_value, value: { $input: member_id } }
-    risk: safe                                  # safe | elevated | irreversible
+id: enter_member_id
+description: Type the member number into the search field.
+action:
+  type: type
+  value: {$input: member_id}
+  target:                       # the target lives on the ACTION, not the step
+    role: textbox
+    name: {value: Member Number, match: exact}
+    scope: {frame: content}
+    anchor: {relation: row_of, text: Member Number}
+    hints: {css: 'input[name="memno"]'}   # unverified cache — never trusted alone
+    recorded_strategy: semantic_exact     # drift baseline
+precondition:
+  assert: node_exists
+  query: {role: textbox, name: Member Number, scope: {frame: content}}
+wait: {for: snapshot_stable, timeout_ms: 3000}
+postcondition:
+  assert: node_has_value
+  query: {role: textbox, name: Member Number}
+  value: {$input: member_id}
+risk: safe                      # safe | elevated | irreversible
 ```
 
 Every step asserts both before and after. A step that only acts is a step that assumes the click
@@ -94,21 +101,41 @@ worked, and assuming is what this system exists not to do.
 
 Three separate concepts, deliberately (ADR 0003):
 
+<!-- validates: Predicate -->
 ```yaml
-checkpoint:          # did we actually reach the state we wanted?
-  all_of:
-    - { assert: node_exists,  role: heading, name_contains: "Member Detail" }
-    - { assert: node_matches, role: cell, name_matches: '^\$[0-9,]+\.[0-9]{2}$' }
-
-outcomes:            # legitimate answers the caller needs — NOT failures
-  - { code: member_not_found, detect: { text_present: "No records found" },
-      terminal: true, returns: { member_id: { $input: member_id } } }
-  - { code: account_closed,   detect: { ... }, terminal: true }
-
-recovery:            # bounded, declared remediation — never open-ended
-  - { id: transient_load, detect: { http_status_in: [502,503,504] },
-      remedy: [ { reload: {} } ], max_attempts: 3, backoff: exponential }
+# checkpoint — did we actually reach the state we wanted?
+assert: all_of
+of:
+  - assert: node_exists
+    query: {role: cell, name_contains: Savings Balance}
+  - assert: node_exists
+    query: {role: cell, name_matches: '^\$[0-9,]+\.[0-9]{2}$'}
 ```
+
+Outcomes are legitimate answers the caller needs, not failures. Recovery is bounded, declared
+remediation — never open-ended. Both are top-level keys, separate from the checkpoint and from each
+other (ADR 0003):
+
+<!-- validates: Outcome -->
+```yaml
+code: member_not_found
+description: No member exists with that number.
+detect: {assert: text_present, value: No records found}
+returns: {member_id: {$input: member_id}}
+```
+
+<!-- validates: RecoveryRule -->
+```yaml
+id: transient_load
+description: The app server returned a gateway error. Re-fetch and continue.
+detect: {assert: http_status_in, codes: [502, 503, 504]}
+remedy:
+  - {type: reload}
+max_attempts: 3
+backoff: exponential
+scope: any_step
+```
+
 
 ### Guardrails and provenance
 
