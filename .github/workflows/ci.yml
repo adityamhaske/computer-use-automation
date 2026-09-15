@@ -56,3 +56,14 @@ jobs:
 
       - name: Tests (offline; live tests deselected)
         run: make test
+
+      # The suite above tests the system from the inside; none of it runs the command the README
+      # puts in front of a first-time reader. That gap is how `./start.sh ui` came to serve a
+      # console with an empty queue while every component under it stayed green.
+      - name: Reviewer path (smoke)
+        run: make smoke
+
+      # The twelve-stage story is what this submission is assessed on. If it stops running, that
+      # should fail here rather than in front of someone reading the README.
+      - name: The demo a reviewer runs
+        run: make demo

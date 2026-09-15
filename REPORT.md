@@ -169,94 +169,76 @@ the queue a reviewer opens has something in it.
 One chokepoint, three enforcements (§1), applied identically to all three actors.
 
 **Allowlist** — domains, URL patterns, action types, step and duration caps, in
-[`config/policy.yaml`](config/policy.yaml). Navigation outside it is `NAVIGATION_BLOCKED`, for humans
-too. A capability's own `allowed_domains` **narrows** the global list. Two gaps closed here, both the
-same shape — a check that covered the stated intent and missed the actual outcome. Entrypoint
-navigation now goes through the ordinary path rather than the raw page handle, because `--target` is
-caller-supplied. And the allowlist is re-checked against where the session *landed* after any action
-that navigated, not only against a `navigate`'s declared URL: a click on a link, on a page whose
-content is untrusted, carries no URL to check up front.
+[`config/policy.yaml`](config/policy.yaml). Navigation outside it is `NAVIGATION_BLOCKED`, for
+humans too, and a capability's own `allowed_domains` only ever *narrows* the global list. It is
+checked twice, because checking intent is not checking outcome: once on a `navigate`'s declared
+URL, and again against where the session actually landed after any action that navigated. A click
+on a link, on a page whose content is untrusted, carries no URL to check up front.
 
-**Risk tiers** — `safe → elevated → irreversible`, from three independent signals (action type ×
-target semantics × artifact annotation), because any one alone is fooled. Automation is blocked from
-irreversible actions, and replay requires an approved capability **and** a caller opt-in — two gates,
-because either alone is one accident away from a wire transfer.
+**Risk tiers** — `safe → elevated → irreversible`, derived from three independent signals (action
+type × target semantics × artifact annotation), because any one alone is fooled. Automation is
+blocked from irreversible actions outright, and replay requires an approved capability **and** a
+caller opt-in — two gates, because either alone is one accident away from a wire transfer.
 
-**Redaction at every sink, including outbound model prompts.** "Every sink" is load-bearing and has
-been untrue twice. `run_record.json` was once written straight to disk under different rules than the
-trace beside it; `write_run_record` now *requires* a redactor. And `Redactor.register_secret` — the
-literal path that exists because no pattern recognises an arbitrary password — had no production
-caller: only tests called it, so `extra_secrets` was empty in every real run. `SecretResolver.resolve()`
-now registers each value as it issues it, and the invariant test asserts through the resolver instead
-of performing the registration itself.
+**Redaction at every sink, including outbound model prompts.** "Every sink" is load-bearing, and it
+has been untrue twice during this build — once where a run record was written under different rules
+than the trace beside it, once where the registration path for arbitrary secrets had no production
+caller and so ran empty. Both are now structural: writing a run record *requires* a redactor, and
+the secret resolver registers each value as it issues it. Over-redaction is a failure in the same
+family and is tested in both directions: `id@version` once matched the email pattern, so every run
+record named the capability that ran as `<redacted:email>`.
 
-Over-redaction is a failure too: `id@version` matched the email pattern, so every run record read
-`<redacted:email>` in the one field naming which capability ran. Tested both directions now.
-
-The operator's live view is redacted the same way an evidence screenshot is, from the supervised
-capability's own `sensitive` declarations — it was the one sink showing regulated data in the clear,
-and the one most likely to be on a second monitor. A hold that lapses is reclaimed to `PAUSED` and its
-intervention returned to the queue as `ABANDONED`; the expiry the lease describes previously had no
-caller, so a session an operator walked away from stayed pinned forever.
+The operator's live view is redacted from the supervised capability's own `sensitive` declarations,
+the same way an evidence screenshot is. It was the one sink showing regulated data in the clear,
+and the one most likely to be on a second monitor.
 
 **Limits, stated rather than claimed away.** Free-text redaction is patterns plus registered
-literals, so a member *name* is protected only where a capability declares the field `sensitive`, not
-by shape. Screenshot redaction has the same dependency: it can only paint over what a declaration can
-locate. Prompt injection is scoped, not solved — closed action space, policy evaluated *outside*
-the model, no authority to widen the allowlist — but a model talked into a *permitted* action on a
-*permitted* target still performs it. Fixture sign-in (`--sign-in`, the demo, the eval harness)
-drives the browser directly: the one documented carve-out, opt-in and scoped to the mock app's fixed
-credentials. No real credentials or PII exist in this repository.
+literals, so a member *name* is protected only where a capability declares that field `sensitive`,
+not by shape; screenshot redaction inherits the same dependency, since it can only paint over what
+a declaration can locate. Prompt injection is scoped, not solved — a closed action space, policy
+evaluated *outside* the model, and no authority to widen the allowlist — but a model talked into a
+*permitted* action on a *permitted* target still performs it. Fixture sign-in (`--sign-in`, the
+demo, the eval harness) drives the browser directly: the one documented carve-out, opt-in and
+scoped to the mock app's fixed credentials. No real credentials or PII exist in this repository.
 
 ## 7. Cuts
 
-**Built after the critical path.** `cua eval` turned §4's central claim into a measurement and
-immediately falsified part of it: an overlay could retarget a control but not restate the step's
-precondition or the checkpoint, so every Variant B run failed closed on an assertion written for a
-different bank. `StepOverride` now carries them. The catalog refuses a tampered artifact while still
-*listing* it as `TAMPERED`, because an operator whose artifact was edited needs telling.
-
 **Scope the brief did not ask for.** §3.6 scopes a co-browsing console out and invites a mock; I
-built a working one because control transfer is the part I most wanted to prove end to end. That is
-~5,000 lines nobody asked for, plus a docs site and a UI/UX guide that are presentation, not system
-design. Cutting to the brief's stated preference for "a small, correct, well-argued system", those go
-first.
+built a working one, because control transfer is the part I most wanted to prove end to end. That
+is ~5,000 lines nobody asked for, plus a documentation site. Against the brief's stated preference
+for "a small, correct, well-argued system", those are the first things I would cut.
 
-**Still cut, in restore order.** Continuous pixel streaming — the console sends a still frame on
-connect and after each policed gesture, enough to see and act on the page but not co-browsing. A
-desktop surface — interface-only stub on purpose; declaring the seam and enforcing the import rule is
-what it is worth here. Multi-operator routing, SSO, audit sign-off — designed, not built. Assisted
-LLM fallback on replay failure — would breach the no-model-in-replay invariant without a separate
-policed path.
+**Not built, in the order I would restore them.** Continuous pixel streaming — the console sends a
+still frame on connect and after each policed gesture, enough to see and act on but not
+co-browsing. A desktop surface — an interface-only stub, because declaring the seam and enforcing
+the import rule is what it is worth here. Multi-operator routing, SSO, audit sign-off — designed,
+not built. An assisted LLM fallback when replay fails — it would breach the no-model-in-replay
+invariant without a separate policed path.
 
-**The discovery evidence is a real model run.** [`evidence/discovery/disc-e0aa86b951/`](evidence/discovery/disc-e0aa86b951/)
-is a genuine LLM-driven run against the live frameset app, routed through a self-hosted OpenAI-compatible gateway:
-six model calls, 10,215 tokens, each carrying the gateway's own provider and request id so the run
-can be checked against the gateway's logs rather than taken on trust. The model signed in, searched,
-read the balance, status and as-of date off the member record and stopped -- three effective steps.
-The artifact the compiler produced from it, [`memberdesk.savings_balance@1.0.0`](evidence/capabilities/),
-replays for members that run never saw: 12345, 67890 and the closed account 24680, model-free, at
-zero drift.
+**The discovery evidence is a real model run.**
+[`evidence/discovery/disc-e0aa86b951/`](evidence/discovery/disc-e0aa86b951/) is a genuine
+LLM-driven run against the live frameset, routed through an OpenAI-compatible gateway: six calls,
+10,215 tokens, each carrying the gateway's own provider and request id, so the run can be
+reconciled against that gateway's logs rather than taken on trust. The artifact compiled from it,
+[`memberdesk.savings_balance@1.0.0`](evidence/capabilities/), replays at zero drift for members
+that run never saw. `make demo` never publishes over an artifact already in the catalog, so a
+scripted run cannot quietly overwrite that evidence.
 
-Publication is the part worth stating precisely, because getting it wrong would quietly turn that
-claim into a fiction. `cua discover` publishes into the catalog; `make demo` never publishes over an
-artifact that is already there. The condition is the catalog's, not the model's -- an earlier version
-gated on whether a model had run, which held only until a key was configured and the demo went live
-too, at which point it republished over the discovery it was supposed to protect. A fresh clone with
-an empty catalog still sees record -> compile -> publish -> replay end to end.
+**Known weaknesses.** The compiler describes a value by the label beside it — right on a
+label/value table, wrong in an n-column grid where the neighbour is another datum. It refuses a
+datum-shaped anchor and falls back to a positional descriptor flagged for review, but it cannot yet
+read a *column header*, which is the correct answer there. `raw_input` is authorized as a declared
+tier (`elevated` in `config/policy.yaml`) rather than by classifying what it touches, because a
+mouse-move has no resolved target to reason about; that is defensible for drag and scroll, but it
+means a human's raw click is authorized more coarsely than a semantic action. `budgets` and
+`replay_gates` in `config/policy.yaml` are parsed and displayed but not yet read by the executor.
 
-One defect worth naming because it survived until the artifact was replayed against a different hostname: the compiler copied the discovery host into `entrypoint.url_pattern` verbatim, so `--base-url` had no placeholder to substitute and was silently ignored. The artifact worked on the machine that recorded it and nowhere else -- which also made the portability claim untrue, since a `TenantBinding` exists precisely so one artifact can run against another deployment. The origin is now parameterised at compile time, with a test.
-
-**Known weaknesses.** The compiler describes a value by the label beside it — right on a label/value
-table, wrong in an n-column grid where the neighbour is another datum. It now refuses a datum-shaped
-anchor and falls to a positional descriptor flagged for review, but cannot yet read a *column
-header*, which is the correct answer there. `raw_input` is authorized as a
-*declared tier* (`elevated` in `config/policy.yaml`) rather than by classifying what it touches: a
-mouse-move has no resolved target to reason about. That is defensible for drag and scroll, but it
-means a human's raw click is authorized far more coarsely than a semantic action, and the allowlist
-is checked on a `navigate`'s *intent* rather than on where the session actually lands — a click that
-navigates is not re-checked afterwards. `config/policy.yaml`'s `budgets`
-and `replay_gates` are parsed and displayed but not yet read by the executor.
+**The bug that got furthest.** The compiler wrote the discovery host into
+`entrypoint.url_pattern` verbatim, so `--base-url` had nothing to substitute and was silently
+ignored: the artifact worked on the machine that recorded it and nowhere else, making §4's
+portability claim untrue. Parameterised at compile time now, with a test. It is the clearest
+example of the gap this system otherwise exists to close — every unit underneath was green, and
+the thing a user would actually do was broken.
 
 ---
 

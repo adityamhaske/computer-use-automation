@@ -87,8 +87,12 @@ test: require-venv ## Full test suite, offline, no API key required
 test-live: ## The one test that spends real tokens (needs OPENROUTER_API_KEY)
 	$(PY) -m pytest -m live
 
+.PHONY: smoke
+smoke: require-venv ## Boot `./start.sh ui` and assert a reviewer gets a working console
+	bash scripts/smoke_reviewer_path.sh
+
 .PHONY: check
-check: require-venv lint typecheck invariants test ## Everything CI runs
+check: require-venv lint typecheck invariants test smoke ## Everything CI runs
 
 # ------------------------------------------------------------------ running
 

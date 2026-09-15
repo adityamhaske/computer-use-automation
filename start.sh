@@ -143,6 +143,20 @@ run_app_variant_b() {
 run_console() {
   ensure_setup
 
+  # The supervised session drives the app through the policy chokepoint, and config/policy.yaml
+  # allowlists the default ports and nothing else. Overriding them used to fail several seconds
+  # later with a NavigationBlockedError from inside the executor, which reads like a defect in the
+  # system rather than a flag that needs a matching policy entry. Say so here instead.
+  if [[ "$MOCK_APP_PORT" != "8811" || "$CONSOLE_PORT" != "8812" ]]; then
+    if ! grep -q "$MOCK_APP_PORT" config/policy.yaml; then
+      echo "start.sh: the console drives the app through the policy allowlist, and" >&2
+      echo "  127.0.0.1:${MOCK_APP_PORT} is not in it. Either use the default ports, or add the" >&2
+      echo "  host to 'allowlist' in config/policy.yaml. (\`./start.sh app --app-port\` is fine --" >&2
+      echo "  it is only the supervised console that dispatches through policy.)" >&2
+      exit 2
+    fi
+  fi
+
   echo "==> Starting the mock back-office in the background on :${MOCK_APP_PORT}"
   "$PY" -m apps.mock_bank.server --port "$MOCK_APP_PORT" &
   local app_pid=$!
