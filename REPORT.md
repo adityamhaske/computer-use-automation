@@ -208,12 +208,33 @@ built a working one, because control transfer is the part I most wanted to prove
 is ~5,000 lines nobody asked for, plus a documentation site. Against the brief's stated preference
 for "a small, correct, well-argued system", those are the first things I would cut.
 
+**Stretch goals: one taken seriously.** §8 invites at most one or two, and the one I took is
+cross-tenant reuse (§4) — the hardest to fake and the only one that tests whether the artifact is
+portable or merely a recording. Variant B rebrands every label and restyles every element, and the
+same artifact serves it through a four-line overlay, measured at zero wrong actions across 20 runs.
+
+The rest fell out of making that claim checkable rather than being chosen for their own sake. You
+cannot assert an artifact is portable without a way to invoke it by name (§2's catalog and tool
+schema), a way to measure whether it holds (`cua eval`), or a way to gate the ones that have not
+been measured (`cua catalog approve`, refusing an approval the evidence does not support and
+losing it the moment the artifact is edited). `cua codegen` emits a runnable Playwright test from
+an artifact, which is the same portability argument aimed outward: if the document is complete
+enough to drive replay, it is complete enough to describe a test that outlives this system, and CI
+runs the generated file rather than trusting it.
+
+Assisted recovery is the one I would have left out. `cua replay --assist` asks a model for a
+single corrective step after a deterministic run has already failed, dispatches it through the
+policy chokepoint, and resumes. It lives in `cua.assist`, above both `cua.agent` and `cua.replay`,
+because the obvious implementation — a fallback inside the replay engine — would make §3's central
+claim false while leaving every test green. Bounds are code rather than prompt text: one call per
+run, a closed tool set with no `navigate`, irreversible actions refused outright. A replay without
+the flag still makes zero model calls, and that is asserted rather than described.
+
 **Not built, in the order I would restore them.** Continuous pixel streaming — the console sends a
 still frame on connect and after each policed gesture, enough to see and act on but not
 co-browsing. A desktop surface — an interface-only stub, because declaring the seam and enforcing
 the import rule is what it is worth here. Multi-operator routing, SSO, audit sign-off — designed,
-not built. An assisted LLM fallback when replay fails — it would breach the no-model-in-replay
-invariant without a separate policed path.
+not built.
 
 **The discovery evidence is a real model run.**
 [`evidence/discovery/disc-e0aa86b951/`](evidence/discovery/disc-e0aa86b951/) is a genuine
@@ -232,6 +253,16 @@ tier (`elevated` in `config/policy.yaml`) rather than by classifying what it tou
 mouse-move has no resolved target to reason about; that is defensible for drag and scroll, but it
 means a human's raw click is authorized more coarsely than a semantic action. `budgets` and
 `replay_gates` in `config/policy.yaml` are parsed and displayed but not yet read by the executor.
+
+**The contracts were not running.** `make invariants` invoked import-linter through
+`python -m importlinter.cli`, which is not a runnable entry point: it prints nothing, checks
+nothing and exits 0. Every claim on this page that says "mechanically enforced" was, for as long
+as that line existed, enforced by a command that did nothing. It runs `lint-imports` now, and once
+it did, one contract was genuinely broken — the console was classed as HITL domain logic when it
+is a web application that serves it. Both fixed, and the contracts verified to bite.
+
+That is the most instructive failure in this project, and it is the same shape as the others
+below: the check existed, the test was green, and nothing was actually being checked.
 
 **The bug that got furthest.** The compiler wrote the discovery host into
 `entrypoint.url_pattern` verbatim, so `--base-url` had nothing to substitute and was silently

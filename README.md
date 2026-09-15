@@ -82,6 +82,20 @@ cua replay evidence/capabilities/corebank.member.savings_balance@1.0.0.yaml \
 #   -> BUSINESS OUTCOME - member_not_found   (exit 0)
 ```
 
+## The rest of the surface
+
+```bash
+cua catalog list                       # what an agent can call, with integrity and approval state
+cua catalog approve <ref> --from-eval  # gate unattended replay; refused if the evidence is thin
+cua codegen <ref> --input member_id=12345 --out test_gen.py   # a runnable Playwright test
+cua replay <artifact> --assist         # one policed model-chosen step, only after a failure
+cua eval                               # 20 replays + a second tenant, written to evidence/evals/
+```
+
+Approval is pinned to the artifact's content hash, so editing it invalidates the approval rather
+than inheriting it. `--assist` is opt-in and never a default: a plain `cua replay` makes zero model
+calls, which is the guarantee the rest of the system rests on.
+
 ## See the handoff
 
 The requirement most submissions fake. This runs a capability on the console's own session with a
