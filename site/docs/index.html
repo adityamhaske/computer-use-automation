@@ -40,204 +40,16 @@
   }
   </script>
 
+  <link rel="stylesheet" href="../assets/site.css">
   <style>
+    /* Documentation-only tokens. Everything else comes from ../assets/site.css. */
     :root {
-      /* Sleek High-Contrast Monochrome Black & White Palette */
-      --bg: #ffffff;
-      --bg-warm: #fafafa;
-      --bg-card: #ffffff;
-      --bg-code: #f4f4f5;
-      --bg-highlight: #f4f4f5;
-      --bg-sidebar: #fafafa;
-
-      --text: #09090b;
-      --text-secondary: #3f3f46;
-      --text-muted: #71717a;
-      --text-faint: #a1a1aa;
-
-      /* Sleek High-Contrast Black & White Monochrome */
-      --accent: #09090b;          /* Pure stark black */
-      --accent-light: #27272a;    /* Charcoal */
-      --accent-glow: rgba(0, 0, 0, 0.08);
-      --accent-bg: #f4f4f5;       /* Subtle neutral gray tint */
-      --accent-border: #e4e4e7;   /* Clean zinc border */
-      --accent-subtle: #fafafa;
-
-      --btn-primary-bg: #09090b;
-      --btn-primary-text: #ffffff;
-
-      --border: #e4e4e7;
-      --border-strong: #d4d4d8;
-
-      /* Hue carries meaning here, exactly as it does in the operator console: emerald for
-         healthy, amber for attention, brick for failure, warm graphite for anything merely
-         in progress. Every neutral is warm (hue ~35). */
-      --color-mint: #157a4a;
-      --color-mint-bg: #e7f2ea;
-      --color-mint-border: #c4e2d1;
-
-      --color-neutral: #6b665d;   /* warm graphite */
-      --color-neutral-bg: #f2f0ec;
-      --color-neutral-border: #ddd8d0;
-
-      --color-seal: #146b52;
-      --color-seal-bg: #e8f2ed;
-      --color-seal-border: #cfe4d9;
-
-      --color-red: #9c3428;
-      --color-red-bg: #f9eae7;
-      --color-red-border: #edcdc7;
-
-      --success: #157a4a;
-      --warning: #8a6410;
-      --danger: #9c3428;
-      --info: #6b665d;
-
-      --radius: 8px;
-      --radius-sm: 6px;
-
-      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-      --font-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
-      --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
-
-      --nav-height: 58px;
       --sidebar-width: 270px;
+      --bg-sidebar: #f4f2ef;
     }
 
-    /* Dark Mode - Obsidian & Crisp White with Subtle Accents */
     [data-theme="dark"] {
-      --bg: #09090b;
-      --bg-warm: #111114;
-      --bg-card: #141418;
-      --bg-code: #111114;
-      --bg-highlight: #18181b;
-      --bg-sidebar: #0e0e11;
-
-      --text: #fafafa;
-      --text-secondary: #d4d4d8;
-      --text-muted: #8e8e93;
-      --text-faint: #52525b;
-
-      /* Crisp White & Charcoal Monochrome */
-      --accent: #ffffff;          /* Pure crisp white */
-      --accent-light: #f4f4f5;
-      --accent-glow: rgba(255, 255, 255, 0.15);
-      --accent-bg: rgba(255, 255, 255, 0.08);
-      --accent-border: rgba(255, 255, 255, 0.2);
-      --accent-subtle: rgba(255, 255, 255, 0.03);
-
-      --btn-primary-bg: #ffffff;
-      --btn-primary-text: #09090b;
-
-      --border: #27272a;
-      --border-strong: #3f3d48;
-
-      /* Dark values for the same tokens. */
-      --color-mint: #57bd8b;
-      --color-mint-bg: rgba(87, 189, 139, 0.14);
-      --color-mint-border: rgba(87, 189, 139, 0.28);
-
-      --color-neutral: #9d968c;
-      --color-neutral-bg: rgba(157, 150, 140, 0.14);
-      --color-neutral-border: rgba(157, 150, 140, 0.28);
-
-      --color-seal: #5cbf99;
-      --color-seal-bg: rgba(92, 191, 153, 0.14);
-      --color-seal-border: rgba(92, 191, 153, 0.28);
-
-      --color-red: #e08b80;
-      --color-red-bg: rgba(224, 139, 128, 0.13);
-      --color-red-border: rgba(224, 139, 128, 0.28);
-
-      --success: #57bd8b;
-      --warning: #d9a441;
-      --danger: #e08b80;
-      --info: #9d968c;
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
-
-    body {
-      font-family: var(--font-sans);
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.7;
-      font-size: 15px;
-    }
-
-    /* NAV */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      height: var(--nav-height);
-      background: rgba(255, 255, 255, 0.88);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: center;
-      padding: 0 clamp(40px, 6vw, 100px);
-      transition: background 0.2s ease;
-    }
-    [data-theme="dark"] nav {
-      background: rgba(9, 9, 11, 0.88);
-    }
-    .nav-inner {
-      max-width: 1280px; width: 100%;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .nav-brand-group {
-      display: flex; align-items: center; gap: 10px; text-decoration: none;
-      color: inherit;   /* otherwise the anchor resolves to the UA default link blue */
-    }
-    .brand-logo-wrap {
-      display: flex; align-items: center; justify-content: center;
-      width: 32px; height: 32px; border-radius: 7px;
-      background: var(--bg-highlight); border: 1px solid var(--border);
-      flex-shrink: 0;
-    }
-    .nav-brand-text {
-      display: flex; align-items: baseline; gap: 8px;
-    }
-    .nav-brand-title {
-      font-weight: 700; font-size: 15px; color: var(--text);
-      letter-spacing: -0.02em;
-    }
-    .nav-brand-subtitle {
-      color: var(--text-muted); font-weight: 400; font-size: 13px;
-    }
-    .nav-right {
-      display: flex; gap: 14px; align-items: center;
-    }
-    .nav-link {
-      font-size: 13px; color: var(--text-secondary); text-decoration: none;
-      font-weight: 500; transition: color 0.15s;
-    }
-    .nav-link:hover { color: var(--text); }
-    .nav-link.active {
-      color: var(--text); font-weight: 600;
-      border-bottom: 2px solid var(--text); padding-bottom: 2px;
-    }
-
-    .nav-github-btn {
-      display: inline-flex; align-items: center; gap: 7px;
-      border: 1px solid var(--border-strong); padding: 5px 12px;
-      border-radius: 6px; font-size: 12px; font-weight: 600;
-      color: var(--text); background: var(--bg-card);
-      text-decoration: none; transition: all 0.15s;
-    }
-    .nav-github-btn:hover {
-      border-color: var(--border-strong); color: var(--text);
-      background: var(--bg-highlight);
-    }
-    .theme-toggle {
-      background: transparent; border: 1px solid var(--border);
-      border-radius: 6px; width: 32px; height: 32px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; color: var(--text-secondary);
-      transition: all 0.15s;
-    }
-    .theme-toggle:hover {
-      border-color: var(--border-strong); color: var(--text);
+      --bg-sidebar: #191714;
     }
 
     /* LAYOUT: Centered with generous side margins from left and right */
@@ -432,47 +244,53 @@
 <body>
 
 <!-- NAV -->
-<nav>
-  <div class="nav-inner">
-  <a href="../report/index.html" class="nav-link" style="margin-right:12px;">Design write-up</a>
-  <a href="../index.html" class="nav-brand-group" aria-label="CUA Home">
-    <div class="brand-logo-wrap">
-      <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="16,2.5 28.5,9.5 28.5,22.5 16,29.5 3.5,22.5 3.5,9.5" fill="var(--accent)" fill-opacity="0.18" stroke="var(--accent)" stroke-width="2.2" stroke-linejoin="round"/>
-        <polygon points="16,7.5 23.5,16 16,24.5 8.5,16" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>
-        <circle cx="16" cy="16" r="3.2" fill="var(--accent)"/>
-      </svg>
-    </div>
-    <div class="nav-brand-text">
-      <span class="nav-brand-title">CUA</span>
-      <span class="nav-brand-subtitle">Documentation</span>
-    </div>
-  </a>
+  <nav>
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand-group" aria-label="CUA home">
+        <div class="brand-logo-wrap">
+          <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="16,2.5 28.5,9.5 28.5,22.5 16,29.5 3.5,22.5 3.5,9.5" fill="var(--accent)"
+              fill-opacity="0.18" stroke="var(--accent)" stroke-width="2.2" stroke-linejoin="round" />
+            <polygon points="16,7.5 23.5,16 16,24.5 8.5,16" fill="none" stroke="var(--accent)" stroke-width="2"
+              stroke-linejoin="round" />
+            <circle cx="16" cy="16" r="3.2" fill="var(--accent)" />
+          </svg>
+        </div>
+        <div class="nav-brand-text">
+          <span class="nav-brand-title">CUA</span>
+          <span class="nav-brand-subtitle">Computer-Use Automation</span>
+        </div>
+      </a>
 
-  <div class="nav-right">
-    <a href="index.html" class="nav-link active">Docs</a>
-    <a href="https://github.com/adityamhaske/interface.ai" class="nav-github-btn" target="_blank" rel="noopener" aria-label="GitHub Repository">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-      </svg>
-      <span>GitHub</span>
-    </a>
-    <button class="theme-toggle" id="themeToggle" title="Toggle color theme" aria-label="Toggle theme">
-      <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="5"></circle>
-        <line x1="12" y1="1" x2="12" y2="3"></line>
-        <line x1="12" y1="21" x2="12" y2="23"></line>
-        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-        <line x1="1" y1="12" x2="3" y2="12"></line>
-        <line x1="21" y1="12" x2="23" y2="12"></line>
-        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-      </svg>
-    </button>
-  </div>
-  </div>
-</nav>
+      <div class="nav-right">
+        <a href="../index.html" class="nav-link">Overview</a>
+        <a href="../docs/index.html" class="nav-link active">Documentation</a>
+        <a href="../report/index.html" class="nav-link">Design write-up</a>
+        <a href="https://github.com/adityamhaske/interface.ai" class="nav-github-btn" target="_blank" rel="noopener"
+          aria-label="GitHub repository">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+          </svg>
+          <span>GitHub</span>
+        </a>
+        <button class="theme-toggle" id="themeToggle" title="Toggle colour theme" aria-label="Toggle theme">
+          <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </nav>
 
 <!-- MOBILE TOGGLE -->
 <button class="sidebar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')" aria-label="Toggle navigation menu">
@@ -1470,16 +1288,6 @@ cua replay &lt;artifact&gt; --fault session_timeout           <span class="comme
     <li>Rising <code>drift_score</code> for one tenant → add a <code>TenantBinding</code> overlay, or re-record</li>
   </ul>
 </div>
-
-  <footer style="margin-top: 64px; padding-top: 24px; padding-bottom: 24px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-    <span>CUA &middot; Computer-Use Automation &middot; MIT Licensed</span>
-    <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
-      <a href="../sitemap.xml" style="color: var(--text-muted); text-decoration: none;">Sitemap</a>
-      <a href="../llms.txt" style="color: var(--color-neutral); font-family: var(--font-mono); text-decoration: none;">llms.txt</a>
-      <a href="../llms-full.txt" style="color: var(--text-muted); font-family: var(--font-mono); text-decoration: none;">Full Markdown</a>
-      <a href="https://github.com/adityamhaske/interface.ai" target="_blank" rel="noopener" style="color: var(--text); text-decoration: none; font-weight: 500;">GitHub Repository &rarr;</a>
-    </div>
-  </footer>
 </main>
 </div>
 
@@ -1536,31 +1344,23 @@ window.addEventListener('hashchange', applyHash);
 window.addEventListener('popstate', applyHash);
 applyHash();
 
-// Theme Toggle with persistence
-const themeToggle = document.getElementById('themeToggle');
-const themeIcon = document.getElementById('themeIcon');
-
-function applyTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme);
-  localStorage.setItem('cua-theme', theme);
-  if (theme === 'dark') {
-    themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
-  } else {
-    themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
-  }
-}
-
-// Light by default, unconditionally — the OS preference is not consulted. Dark is a
-// deliberate choice via the toggle, and it persists once made.
-const savedTheme = localStorage.getItem('cua-theme') || 'light';
-applyTheme(savedTheme);
-
-themeToggle.addEventListener('click', () => {
-  const current = document.documentElement.getAttribute('data-theme');
-  applyTheme(current === 'dark' ? 'light' : 'dark');
-});
-
 </script>
 
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-left">
+        <span>Computer-use automation for regulated back-offices · <a href="https://github.com/adityamhaske/interface.ai">adityamhaske/interface.ai</a></span>
+      </div>
+      <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+        <a href="../report/index.html">Design write-up</a>
+        <a href="../docs/index.html">Documentation</a>
+        <a href="../llms.txt" style="font-family: var(--font-mono); font-size: 12px;">llms.txt</a>
+        <a href="../llms-full.txt" style="font-family: var(--font-mono); font-size: 12px;">llms-full.txt</a>
+        <a href="https://github.com/adityamhaske/interface.ai" target="_blank" rel="noopener">GitHub Repository →</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../assets/theme.js"></script>
 </body>
 </html>

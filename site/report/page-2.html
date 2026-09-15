@@ -3,85 +3,124 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Determinism, errors & scale — CUA design write-up</title>
 <meta name="description" content="Design write-up for the CUA computer-use automation system.">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
 <style>
-:root{
-  --bg:#faf9f7; --surface:#fff; --surface-2:#f4f2ef; --border:#e8e4de; --border-strong:#d4cec6;
-  --text:#1c1a17; --text-secondary:#59544c; --text-tertiary:#6e685f;
-  --accent:#146b52; --accent-soft:#e8f2ed; --warning:#8a6410; --danger:#9c3428;
-  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
-  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
-  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:var(--serif);
-  font-size:17px;line-height:1.62;-webkit-font-smoothing:antialiased}
-.wrap{max-width:820px;margin:0 auto;padding:0 20px 4rem}
-header.top{border-bottom:1px solid var(--border);background:var(--surface);margin-bottom:2.5rem}
-header.top .bar{max-width:820px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;
-  gap:14px;flex-wrap:wrap;font-family:var(--sans);font-size:13px}
-header.top a{color:var(--text-secondary);text-decoration:none}
-header.top a:hover{color:var(--accent)}
-header.top .brand{font-weight:700;color:var(--text);letter-spacing:-.01em}
-header.top .spacer{flex:1}
-.eyebrow{font-family:var(--sans);font-size:.72rem;font-weight:600;letter-spacing:.13em;
-  text-transform:uppercase;color:var(--text-tertiary);margin-bottom:.5rem}
-h1,h2,h3{font-family:var(--sans);text-wrap:balance;letter-spacing:-.018em;margin:0}
-h1{font-size:clamp(1.9rem,4.5vw,2.5rem);font-weight:700;line-height:1.1;margin-bottom:1.5rem}
-h2{font-size:1.4rem;font-weight:700;margin:2.4rem 0 .9rem;padding-bottom:.45rem;
+/* Page-specific only. The palette, page chrome, buttons and footer come from
+   ../assets/site.css, which every page of this site loads -- so the write-up is the same
+   design as the landing page and the documentation rather than a third one.
+
+   Type follows the same rule as the rest of the site: serif for display, sans for reading.
+   This page had it inverted, setting long-form body copy in serif against sans headings,
+   which is precisely backwards from the other two pages. */
+body{font-family:var(--font-sans);font-size:16px;line-height:1.65}
+/* The nav is fixed, so every page has to reserve its height; this one never did and the
+   first screen of the write-up rendered underneath it. */
+.wrap{max-width:820px;margin:0 auto;padding:calc(var(--nav-height) + 2.5rem) 20px 4rem}
+.eyebrow{font-family:var(--font-sans);font-size:.72rem;font-weight:600;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--text-muted);margin-bottom:.5rem}
+h1,h2,h3{font-family:var(--font-serif);text-wrap:balance;letter-spacing:-.018em;margin:0}
+h1{font-size:clamp(1.9rem,4.5vw,2.5rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem}
+h2{font-size:1.45rem;font-weight:600;margin:2.4rem 0 .9rem;padding-bottom:.45rem;
   border-bottom:1px solid var(--border)}
-h3{font-size:1.05rem;font-weight:600;margin:1.8rem 0 .6rem}
-p{margin:0 0 1rem}
-blockquote{margin:0 0 1.6rem;padding:1rem 1.25rem;background:var(--accent-soft);
-  border-left:3px solid var(--accent);border-radius:3px;color:var(--text)}
-blockquote p:last-child{margin:0}
-code{font-family:var(--mono);font-size:.85em;background:var(--surface-2);padding:.1em .38em;
+h3{font-size:1.1rem;font-weight:600;margin:1.8rem 0 .6rem}
+p{margin:0 0 1rem;color:var(--text-secondary)}
+strong{color:var(--text);font-weight:600}
+blockquote{margin:0 0 1.6rem;padding:1rem 1.25rem;background:var(--accent-bg);
+  border-left:3px solid var(--accent);border-radius:var(--radius-sm);color:var(--text)}
+blockquote p:last-child{margin:0;color:var(--text)}
+code{font-family:var(--font-mono);font-size:.85em;background:var(--bg-code);padding:.1em .38em;
   border-radius:3px;word-break:break-word}
-pre{background:var(--surface-2);border:1px solid var(--border);border-radius:4px;
+pre{background:var(--bg-code);border:1px solid var(--border);border-radius:var(--radius-sm);
   padding:1rem 1.15rem;overflow-x:auto;margin:0 0 1.4rem}
 pre code{background:none;padding:0;font-size:.78rem;line-height:1.55}
-table{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:.88rem;
-  margin:0 0 1.5rem;
-  background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden}
+table{border-collapse:collapse;width:100%;font-size:.88rem;margin:0 0 1.5rem;
+  background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);
+  overflow:hidden}
 th,td{text-align:left;padding:.55rem .8rem;border-bottom:1px solid var(--border)}
-th{background:var(--surface-2);font-size:.7rem;font-weight:700;letter-spacing:.08em;
-  text-transform:uppercase;color:var(--text-tertiary)}
+th{background:var(--bg-code);font-size:.7rem;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--text-muted)}
+td{color:var(--text-secondary)}
 tbody tr:last-child td{border-bottom:none}
 a{color:var(--accent)}
-ul,ol{margin:0 0 1.2rem;padding-left:1.3rem}
+ul,ol{margin:0 0 1.2rem;padding-left:1.3rem;color:var(--text-secondary)}
 li{margin-bottom:.4rem}
 hr{border:0;border-top:1px solid var(--border);margin:2rem 0}
-.downloads{display:flex;gap:.6rem;flex-wrap:wrap;margin:0 0 2rem;font-family:var(--sans)}
-.downloads a{display:inline-flex;align-items:center;gap:.4rem;font-size:.82rem;font-weight:600;
-  text-decoration:none;padding:.45rem .85rem;border-radius:5px;
-  border:1px solid var(--border-strong);
-  background:var(--surface);color:var(--text-secondary)}
-.downloads a:hover{border-color:var(--accent);color:var(--accent)}
+
+/* The download row uses the shared .btn shapes so it reads as the same control as every other
+   button on the site, rather than a fourth button style that exists only here. */
+.downloads{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 2rem}
 .pager{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-top:3rem;
-  padding-top:1.2rem;border-top:1px solid var(--border);font-family:var(--sans);font-size:.85rem}
-.pager a{text-decoration:none;font-weight:600}
-.pager .disabled{color:var(--text-tertiary);opacity:.5}
-.steps{display:flex;gap:.4rem;font-family:var(--sans);font-size:.78rem;margin-bottom:2rem;
-  flex-wrap:wrap}
+  padding-top:1.2rem;border-top:1px solid var(--border);font-size:.85rem}
+.pager a{text-decoration:none;font-weight:600;color:var(--accent)}
+.pager .disabled{color:var(--text-muted);opacity:.6}
+.steps{display:flex;gap:.4rem;font-size:.78rem;margin-bottom:2rem;flex-wrap:wrap}
 .steps a,.steps span{padding:.3rem .7rem;border-radius:99px;border:1px solid var(--border);
-  text-decoration:none;color:var(--text-secondary);background:var(--surface)}
+  text-decoration:none;color:var(--text-secondary);background:var(--bg-card)}
+.steps a:hover{border-color:var(--accent);color:var(--accent)}
 .steps .here{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
 @media print{
-  header.top,.downloads,.pager,.steps{display:none}
+  nav,.downloads,.pager,.steps,footer{display:none}
   body{background:#fff;font-size:11.5pt}
   .wrap{max-width:none;padding:0}
   h2{page-break-after:avoid} pre,table,blockquote{page-break-inside:avoid}
   .page-break{page-break-before:always}
 }
 </style></head><body>
-<header class="top"><div class="bar">
-  <a class="brand" href="../index.html">CUA</a>
-  <a href="../index.html">Home</a><a href="../docs/index.html">Documentation</a>
-  <span class="spacer"></span>
-  <a href="https://github.com/adityamhaske/interface.ai">GitHub</a>
-</div></header><div class="wrap"><nav class="steps"><a href="index.html">1. Architecture & the artifact</a><span class="here">2. Determinism, errors & scale</span><a href="page-3.html">3. Escalation, safety & cuts</a></nav><div class="downloads">
-  <a href="REPORT.pdf" download>Download PDF</a>
-  <a href="REPORT.md" download>Download Markdown</a>
-  <a href="https://github.com/adityamhaske/interface.ai/blob/main/REPORT.md">View on GitHub</a>
+  <nav>
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand-group" aria-label="CUA home">
+        <div class="brand-logo-wrap">
+          <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="16,2.5 28.5,9.5 28.5,22.5 16,29.5 3.5,22.5 3.5,9.5" fill="var(--accent)"
+              fill-opacity="0.18" stroke="var(--accent)" stroke-width="2.2" stroke-linejoin="round" />
+            <polygon points="16,7.5 23.5,16 16,24.5 8.5,16" fill="none" stroke="var(--accent)" stroke-width="2"
+              stroke-linejoin="round" />
+            <circle cx="16" cy="16" r="3.2" fill="var(--accent)" />
+          </svg>
+        </div>
+        <div class="nav-brand-text">
+          <span class="nav-brand-title">CUA</span>
+          <span class="nav-brand-subtitle">Computer-Use Automation</span>
+        </div>
+      </a>
+
+      <div class="nav-right">
+        <a href="../index.html" class="nav-link">Overview</a>
+        <a href="../docs/index.html" class="nav-link">Documentation</a>
+        <a href="../report/index.html" class="nav-link active">Design write-up</a>
+        <a href="https://github.com/adityamhaske/interface.ai" class="nav-github-btn" target="_blank" rel="noopener"
+          aria-label="GitHub repository">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+          </svg>
+          <span>GitHub</span>
+        </a>
+        <button class="theme-toggle" id="themeToggle" title="Toggle colour theme" aria-label="Toggle theme">
+          <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </nav><div class="wrap"><nav class="steps"><a href="index.html">1. Architecture & the artifact</a><span class="here">2. Determinism, errors & scale</span><a href="page-3.html">3. Escalation, safety & cuts</a></nav><div class="downloads">
+  <a class="btn btn-primary" href="REPORT.pdf" download><span>Download PDF</span></a>
+  <a class="btn btn-secondary" href="REPORT.md" download><span>Download Markdown</span></a>
+  <a class="btn btn-github" href="https://github.com/adityamhaske/interface.ai/blob/main/REPORT.md"
+    target="_blank" rel="noopener"><span>View on GitHub</span></a>
 </div><h1>Determinism, errors & scale</h1><h2>3. Determinism &amp; error handling</h2>
 <p>Two type families, deliberately separate — <em>what we observed</em> and <em>how the run ended</em>:</p>
 <table>
@@ -152,4 +191,18 @@ the anchor text <em>is</em> the label cell and gets relabeled too — so the hon
 not vocabulary change, and vocabulary is what the overlay is for. One limit that leaves: drift is
 computed against the <em>effective</em> capability, so an overlay reports zero drift for a surface that
 genuinely differs.</p>
-<div class="pager"><a href="index.html">← Architecture & the artifact</a><a href="page-3.html">Escalation, safety & cuts →</a></div></div></body></html>
+<div class="pager"><a href="index.html">← Architecture & the artifact</a><a href="page-3.html">Escalation, safety & cuts →</a></div></div>  <footer>
+    <div class="footer-inner">
+      <div class="footer-left">
+        <span>Computer-use automation for regulated back-offices · <a href="https://github.com/adityamhaske/interface.ai">adityamhaske/interface.ai</a></span>
+      </div>
+      <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+        <a href="index.html">Design write-up</a>
+        <a href="../docs/index.html">Documentation</a>
+        <a href="../llms.txt" style="font-family: var(--font-mono); font-size: 12px;">llms.txt</a>
+        <a href="../llms-full.txt" style="font-family: var(--font-mono); font-size: 12px;">llms-full.txt</a>
+        <a href="https://github.com/adityamhaske/interface.ai" target="_blank" rel="noopener">GitHub Repository →</a>
+      </div>
+    </div>
+  </footer>
+<script src="../assets/theme.js"></script></body></html>

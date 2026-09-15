@@ -1,0 +1,426 @@
+/* The shared layer for every page of this site: landing, documentation, design write-up.
+ *
+ * These three pages had drifted into three designs -- different tokens, three different
+ * navigation bars, and a serif body on the write-up against sans everywhere else. Anything a
+ * reader carries between pages lives here now and is defined exactly once: the palette, the
+ * page chrome, the buttons, the footer. Page-specific styling stays in the page.
+ *
+ * Load this FIRST, then the page's own <style>, so a page can still specialise. */
+
+/* ---------------------------------------------------- tokens, reset, nav */
+
+:root {
+  --bg: #faf9f7;
+  --bg-warm: #f4f2ef;
+  --bg-card: #ffffff;
+  --bg-code: #f4f2ef;
+  --bg-highlight: #f4f2ef;
+
+  --text: #1c1a17;
+  --text-secondary: #59544c;
+  --text-muted: #6e685f;
+  --text-faint: #9a938a;
+
+  --accent: #146b52;
+  --accent-light: #18805f;
+  --accent-glow: rgba(20, 107, 82, 0.10);
+  --accent-bg: #e8f2ed;
+  --accent-border: #cfe4d9;
+  --accent-subtle: #f4f9f6;
+
+  --btn-primary-bg: #146b52;
+  --btn-primary-text: #ffffff;
+
+  --border: #e8e4de;
+  --border-strong: #d4cec6;
+
+  /* One palette across the whole product, console included: warm neutrals at hue ~35 and a
+     single emerald accent. Hue then carries meaning rather than decoration -- emerald for
+     healthy, amber for attention, brick for failure, warm graphite for merely in progress. */
+  --color-mint: #157a4a;
+  --color-mint-bg: #e7f2ea;
+  --color-mint-border: #c4e2d1;
+
+  --color-neutral: #6b665d;   /* warm graphite */
+  --color-neutral-bg: #f2f0ec;
+  --color-neutral-border: #ddd8d0;
+
+  --color-seal: #146b52;
+  --color-seal-bg: #e8f2ed;
+  --color-seal-border: #cfe4d9;
+
+  --color-red: #9c3428;
+  --color-red-bg: #f9eae7;
+  --color-red-border: #edcdc7;
+
+  --success: #157a4a;
+  --warning: #8a6410;
+  --danger: #9c3428;
+  --info: #6b665d;
+
+  --radius: 8px;
+  --radius-sm: 6px;
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+
+  --nav-height: 60px;
+  --nav-bg: rgba(250, 249, 247, 0.88);
+  --content-max-width: 1120px;
+}
+
+/* Dark Mode - Obsidian & Crisp White with Subtle Accents */
+[data-theme="dark"] {
+  --bg: #12110f;
+  --bg-warm: #191714;
+  --bg-card: #1a1815;
+  --bg-code: #191714;
+  --bg-highlight: #201d19;
+
+  --text: #f2efe9;
+  --text-secondary: #c4bdb2;
+  --text-muted: #9a938a;
+  --text-faint: #6b665d;
+
+  --accent: #5cbf99;
+  --accent-light: #7fd0b1;
+  --accent-glow: rgba(92, 191, 153, 0.16);
+  --accent-bg: rgba(92, 191, 153, 0.12);
+  --accent-border: rgba(92, 191, 153, 0.26);
+  --accent-subtle: rgba(92, 191, 153, 0.05);
+
+  --btn-primary-bg: #5cbf99;
+  --btn-primary-text: #10241c;
+
+  --border: #2b2721;
+  --border-strong: #3d372f;
+  --nav-bg: rgba(18, 17, 15, 0.88);
+
+  /* Dark values for the same tokens. */
+  --color-mint: #57bd8b;
+  --color-mint-bg: rgba(87, 189, 139, 0.14);
+  --color-mint-border: rgba(87, 189, 139, 0.28);
+
+  --color-neutral: #9d968c;
+  --color-neutral-bg: rgba(157, 150, 140, 0.14);
+  --color-neutral-border: rgba(157, 150, 140, 0.28);
+
+  --color-seal: #5cbf99;
+  --color-seal-bg: rgba(92, 191, 153, 0.14);
+  --color-seal-border: rgba(92, 191, 153, 0.28);
+
+  --color-red: #e08b80;
+  --color-red-bg: rgba(224, 139, 128, 0.13);
+  --color-red-border: rgba(224, 139, 128, 0.28);
+
+  --success: #57bd8b;
+  --warning: #d9a441;
+  --danger: #e08b80;
+  --info: #9d968c;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  font-size: 15px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+/* The site's top bar.
+ *
+ * Scoped to a direct child of <body> on purpose. As a bare `nav` element selector this also
+ * matched the design write-up's page-switcher, which is a <nav> too -- pinning it fixed at the
+ * top of the viewport, on top of the real bar, so both were unreadable. Any page-level <nav>
+ * nested inside content is left alone. */
+body > nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: var(--nav-height);
+  background: var(--nav-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 clamp(36px, 6vw, 100px);
+  transition: background 0.2s ease;
+}
+
+[data-theme="dark"] body > nav {
+  background: var(--nav-bg);
+}
+
+.nav-inner {
+  max-width: var(--content-max-width);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-brand-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  /* Without this the anchor itself resolves to the UA default link blue. The child spans
+     happen to cover it today, so it renders correctly and is still wrong -- any text added
+     directly to the link would come out blue, in a palette that has no blue in it. */
+  color: inherit;
+}
+
+.brand-logo-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+  background: var(--bg-highlight);
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.nav-brand-text {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.nav-brand-title {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.nav-brand-subtitle {
+  color: var(--text-muted);
+  font-weight: 400;
+  font-size: 13px;
+}
+
+.nav-right {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.nav-link {
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.15s;
+}
+
+.nav-link:hover {
+  color: var(--text);
+}
+
+/* Marks the page you are on. Only the documentation page defined this, so "you are here" was a
+   documentation-only idea; now every page can say it the same way. Underlined in the accent
+   rather than in text colour, so the current page reads as selected and not merely bold. */
+.nav-link.active {
+  color: var(--text);
+  font-weight: 600;
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 2px;
+}
+
+/* GitHub Button in Nav */
+.nav-github-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--border-strong);
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--bg-card);
+  text-decoration: none;
+  transition: all 0.15s;
+}
+
+.nav-github-btn:hover {
+  border-color: var(--border-strong);
+  color: var(--text);
+  background: var(--bg-highlight);
+}
+
+.nav-github-btn svg {
+  flex-shrink: 0;
+}
+
+.theme-toggle {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.15s;
+}
+
+.theme-toggle:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+  background: var(--bg-highlight);
+}
+
+/* MAIN CONTAINER - Generous horizontal padding from left and right */
+.container,
+.page-container {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 0 clamp(32px, 6vw, 100px);
+}
+
+/* ------------------------------------------------------------------ buttons */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+
+.btn-primary {
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  border: 1px solid var(--btn-primary-bg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:hover {
+  background: var(--accent-light);
+  border-color: var(--accent-light);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="dark"] .btn-primary:hover {
+  /* Was a literal zinc, left over from the monochrome palette -- the one place a hover
+     stepped outside the token set and landed on a different hue than the button itself. */
+  background: var(--accent-light);
+  border-color: var(--accent-light);
+}
+
+.btn-github {
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  background: var(--bg-card);
+}
+
+.btn-github:hover {
+  border-color: var(--border-strong);
+  color: var(--text);
+  background: var(--bg-highlight);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  background: transparent;
+}
+
+.btn-secondary:hover {
+  background: var(--bg-warm);
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+
+/* ------------------------------------------------------- section headings */
+
+.section-title {
+  font-family: var(--font-serif);
+  font-size: 30px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+  text-align: left;
+}
+
+.section-subtitle {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 36px;
+  max-width: 740px;
+  text-align: left;
+}
+
+
+/* ------------------------------------------------------------------- footer */
+
+footer {
+  border-top: 1px solid var(--border);
+  padding: 36px clamp(40px, 7vw, 110px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.footer-inner {
+  max-width: var(--content-max-width);
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+footer a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.15s;
+  font-weight: 500;
+}
+
+footer a:hover {
+  color: var(--text);
+}
+
+/* RESPONSIVE */
+

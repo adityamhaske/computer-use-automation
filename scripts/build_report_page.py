@@ -31,70 +31,68 @@ PAGES: list[tuple[str, tuple[int, ...]]] = [
     ("Escalation, safety & cuts", (5, 6, 7)),
 ]
 
+FONTS = (
+    "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800"
+    "&family=JetBrains+Mono:wght@400;500;600"
+    "&family=Newsreader:ital,wght@0,400;0,600;1,400&display=swap"
+)
+
 STYLE = """
-:root{
-  --bg:#faf9f7; --surface:#fff; --surface-2:#f4f2ef; --border:#e8e4de; --border-strong:#d4cec6;
-  --text:#1c1a17; --text-secondary:#59544c; --text-tertiary:#6e685f;
-  --accent:#146b52; --accent-soft:#e8f2ed; --warning:#8a6410; --danger:#9c3428;
-  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
-  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
-  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:var(--serif);
-  font-size:17px;line-height:1.62;-webkit-font-smoothing:antialiased}
-.wrap{max-width:820px;margin:0 auto;padding:0 20px 4rem}
-header.top{border-bottom:1px solid var(--border);background:var(--surface);margin-bottom:2.5rem}
-header.top .bar{max-width:820px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;
-  gap:14px;flex-wrap:wrap;font-family:var(--sans);font-size:13px}
-header.top a{color:var(--text-secondary);text-decoration:none}
-header.top a:hover{color:var(--accent)}
-header.top .brand{font-weight:700;color:var(--text);letter-spacing:-.01em}
-header.top .spacer{flex:1}
-.eyebrow{font-family:var(--sans);font-size:.72rem;font-weight:600;letter-spacing:.13em;
-  text-transform:uppercase;color:var(--text-tertiary);margin-bottom:.5rem}
-h1,h2,h3{font-family:var(--sans);text-wrap:balance;letter-spacing:-.018em;margin:0}
-h1{font-size:clamp(1.9rem,4.5vw,2.5rem);font-weight:700;line-height:1.1;margin-bottom:1.5rem}
-h2{font-size:1.4rem;font-weight:700;margin:2.4rem 0 .9rem;padding-bottom:.45rem;
+/* Page-specific only. The palette, page chrome, buttons and footer come from
+   ../assets/site.css, which every page of this site loads -- so the write-up is the same
+   design as the landing page and the documentation rather than a third one.
+
+   Type follows the same rule as the rest of the site: serif for display, sans for reading.
+   This page had it inverted, setting long-form body copy in serif against sans headings,
+   which is precisely backwards from the other two pages. */
+body{font-family:var(--font-sans);font-size:16px;line-height:1.65}
+/* The nav is fixed, so every page has to reserve its height; this one never did and the
+   first screen of the write-up rendered underneath it. */
+.wrap{max-width:820px;margin:0 auto;padding:calc(var(--nav-height) + 2.5rem) 20px 4rem}
+.eyebrow{font-family:var(--font-sans);font-size:.72rem;font-weight:600;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--text-muted);margin-bottom:.5rem}
+h1,h2,h3{font-family:var(--font-serif);text-wrap:balance;letter-spacing:-.018em;margin:0}
+h1{font-size:clamp(1.9rem,4.5vw,2.5rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem}
+h2{font-size:1.45rem;font-weight:600;margin:2.4rem 0 .9rem;padding-bottom:.45rem;
   border-bottom:1px solid var(--border)}
-h3{font-size:1.05rem;font-weight:600;margin:1.8rem 0 .6rem}
-p{margin:0 0 1rem}
-blockquote{margin:0 0 1.6rem;padding:1rem 1.25rem;background:var(--accent-soft);
-  border-left:3px solid var(--accent);border-radius:3px;color:var(--text)}
-blockquote p:last-child{margin:0}
-code{font-family:var(--mono);font-size:.85em;background:var(--surface-2);padding:.1em .38em;
+h3{font-size:1.1rem;font-weight:600;margin:1.8rem 0 .6rem}
+p{margin:0 0 1rem;color:var(--text-secondary)}
+strong{color:var(--text);font-weight:600}
+blockquote{margin:0 0 1.6rem;padding:1rem 1.25rem;background:var(--accent-bg);
+  border-left:3px solid var(--accent);border-radius:var(--radius-sm);color:var(--text)}
+blockquote p:last-child{margin:0;color:var(--text)}
+code{font-family:var(--font-mono);font-size:.85em;background:var(--bg-code);padding:.1em .38em;
   border-radius:3px;word-break:break-word}
-pre{background:var(--surface-2);border:1px solid var(--border);border-radius:4px;
+pre{background:var(--bg-code);border:1px solid var(--border);border-radius:var(--radius-sm);
   padding:1rem 1.15rem;overflow-x:auto;margin:0 0 1.4rem}
 pre code{background:none;padding:0;font-size:.78rem;line-height:1.55}
-table{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:.88rem;
-  margin:0 0 1.5rem;
-  background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden}
+table{border-collapse:collapse;width:100%;font-size:.88rem;margin:0 0 1.5rem;
+  background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);
+  overflow:hidden}
 th,td{text-align:left;padding:.55rem .8rem;border-bottom:1px solid var(--border)}
-th{background:var(--surface-2);font-size:.7rem;font-weight:700;letter-spacing:.08em;
-  text-transform:uppercase;color:var(--text-tertiary)}
+th{background:var(--bg-code);font-size:.7rem;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--text-muted)}
+td{color:var(--text-secondary)}
 tbody tr:last-child td{border-bottom:none}
 a{color:var(--accent)}
-ul,ol{margin:0 0 1.2rem;padding-left:1.3rem}
+ul,ol{margin:0 0 1.2rem;padding-left:1.3rem;color:var(--text-secondary)}
 li{margin-bottom:.4rem}
 hr{border:0;border-top:1px solid var(--border);margin:2rem 0}
-.downloads{display:flex;gap:.6rem;flex-wrap:wrap;margin:0 0 2rem;font-family:var(--sans)}
-.downloads a{display:inline-flex;align-items:center;gap:.4rem;font-size:.82rem;font-weight:600;
-  text-decoration:none;padding:.45rem .85rem;border-radius:5px;
-  border:1px solid var(--border-strong);
-  background:var(--surface);color:var(--text-secondary)}
-.downloads a:hover{border-color:var(--accent);color:var(--accent)}
+
+/* The download row uses the shared .btn shapes so it reads as the same control as every other
+   button on the site, rather than a fourth button style that exists only here. */
+.downloads{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 2rem}
 .pager{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-top:3rem;
-  padding-top:1.2rem;border-top:1px solid var(--border);font-family:var(--sans);font-size:.85rem}
-.pager a{text-decoration:none;font-weight:600}
-.pager .disabled{color:var(--text-tertiary);opacity:.5}
-.steps{display:flex;gap:.4rem;font-family:var(--sans);font-size:.78rem;margin-bottom:2rem;
-  flex-wrap:wrap}
+  padding-top:1.2rem;border-top:1px solid var(--border);font-size:.85rem}
+.pager a{text-decoration:none;font-weight:600;color:var(--accent)}
+.pager .disabled{color:var(--text-muted);opacity:.6}
+.steps{display:flex;gap:.4rem;font-size:.78rem;margin-bottom:2rem;flex-wrap:wrap}
 .steps a,.steps span{padding:.3rem .7rem;border-radius:99px;border:1px solid var(--border);
-  text-decoration:none;color:var(--text-secondary);background:var(--surface)}
+  text-decoration:none;color:var(--text-secondary);background:var(--bg-card)}
+.steps a:hover{border-color:var(--accent);color:var(--accent)}
 .steps .here{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
 @media print{
-  header.top,.downloads,.pager,.steps{display:none}
+  nav,.downloads,.pager,.steps,footer{display:none}
   body{background:#fff;font-size:11.5pt}
   .wrap{max-width:none;padding:0}
   h2{page-break-after:avoid} pre,table,blockquote{page-break-inside:avoid}
@@ -128,6 +126,44 @@ def _absolutise(html: str) -> str:
         return f'href="{base}{href}"'
 
     return re.sub(r'href="([^"]+)"', repoint, html)
+
+
+LANDING = ROOT / "site/index.html"
+
+
+def _shared_chrome() -> tuple[str, str]:
+    """The site's navigation bar and footer, lifted from the landing page at build time.
+
+    Read rather than copied. These three pages had drifted into three different headers, and a
+    second copy of the markup living in this script would simply restart that drift -- silently,
+    because nothing would fail when the landing page changed. Parsing it here means the write-up
+    cannot disagree with the rest of the site: there is one copy, and this is not it.
+
+    Only the link depth and the current-page marker differ, which is what the rewriting below is
+    for -- these pages sit one directory down.
+    """
+    html = LANDING.read_text(encoding="utf-8")
+    nav = re.search(r"[ \t]*<nav>.*?</nav>", html, re.S)
+    footer = re.search(r"[ \t]*<footer>.*?</footer>", html, re.S)
+    if nav is None or footer is None:  # pragma: no cover - the landing page is in the repository
+        raise SystemExit("site/index.html has no <nav>/<footer> to share")
+
+    nav_html = nav.group(0)
+    for href in ("index.html", "docs/index.html", "report/index.html"):
+        nav_html = nav_html.replace(f'href="{href}"', f'href="../{href}"')
+    nav_html = nav_html.replace(
+        '<a href="../index.html" class="nav-link active">Overview</a>',
+        '<a href="../index.html" class="nav-link">Overview</a>',
+    ).replace(
+        '<a href="../report/index.html" class="nav-link">Design write-up</a>',
+        '<a href="../report/index.html" class="nav-link active">Design write-up</a>',
+    )
+
+    footer_html = footer.group(0)
+    footer_html = footer_html.replace('href="report/index.html"', 'href="index.html"')
+    for href in ("docs/index.html", "llms.txt", "llms-full.txt"):
+        footer_html = footer_html.replace(f'href="{href}"', f'href="../{href}"')
+    return nav_html, footer_html
 
 
 def _render(md_text: str) -> str:
@@ -165,34 +201,34 @@ def _chrome(index: int, title: str, inner: str, *, for_print: bool = False) -> s
         if index < len(PAGES) - 1
         else '<span class="disabled">End of the write-up</span>'
     )
-    head = (
-        ""
-        if for_print
-        else """<header class="top"><div class="bar">
-  <a class="brand" href="../index.html">CUA</a>
-  <a href="../index.html">Home</a><a href="../docs/index.html">Documentation</a>
-  <span class="spacer"></span>
-  <a href="https://github.com/adityamhaske/interface.ai">GitHub</a>
-</div></header>"""
-    )
+    nav_html, footer_html = _shared_chrome()
+    head = "" if for_print else nav_html
     downloads = (
         ""
         if for_print
         else """<div class="downloads">
-  <a href="REPORT.pdf" download>Download PDF</a>
-  <a href="REPORT.md" download>Download Markdown</a>
-  <a href="https://github.com/adityamhaske/interface.ai/blob/main/REPORT.md">View on GitHub</a>
+  <a class="btn btn-primary" href="REPORT.pdf" download><span>Download PDF</span></a>
+  <a class="btn btn-secondary" href="REPORT.md" download><span>Download Markdown</span></a>
+  <a class="btn btn-github" href="https://github.com/adityamhaske/interface.ai/blob/main/REPORT.md"
+    target="_blank" rel="noopener"><span>View on GitHub</span></a>
 </div>"""
     )
     steps = "" if for_print else f'<nav class="steps">{nav}</nav>'
     pager = "" if for_print else f'<div class="pager">{prev}{nxt}</div>'
+    footer = "" if for_print else footer_html
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title} — CUA design write-up</title>
 <meta name="description" content="Design write-up for the CUA computer-use automation system.">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="{FONTS}">
+<link rel="stylesheet" href="../assets/site.css">
 <style>{STYLE}</style></head><body>
-{head}<div class="wrap">{steps}{downloads}{inner}{pager}</div></body></html>"""
+{head}<div class="wrap">{steps}{downloads}{inner}{pager}</div>{footer}
+<script src="../assets/theme.js"></script></body></html>"""
 
 
 def main() -> int:
