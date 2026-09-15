@@ -5,7 +5,7 @@
 > that never needs it again.
 
 Every claim below is backed by something runnable: an enforced import contract, a test, or a file in
-[`evidence/`](evidence/). What is not built says so in §7.
+[`evidence/`](https://github.com/adityamhaske/interface.ai/tree/main/evidence/). What is not built says so in §7.
 
 ---
 
@@ -55,7 +55,7 @@ reviewer has to read one without running anything.
 ## 2. Artifact schema
 
 The focal point. `cua.capability/v1` — Pydantic, YAML, immutable, content-addressed. Examples in
-[`evidence/capabilities/`](evidence/capabilities/).
+[`evidence/capabilities/`](https://github.com/adityamhaske/interface.ai/tree/main/evidence/capabilities/).
 
 **Targets are semantic, never selectors.** A `TargetDescriptor` is role, accessible name, structural
 anchor, scope, ordinal. A CSS selector may appear only under `hints` — a cache accepted only if the
@@ -125,7 +125,7 @@ tomorrow. **`cua.targeting` and `cua.perception` may not import Playwright or `c
 Tenants are an **overlay, never a fork**: `TenantBinding` supplies vars and per-step overrides,
 resolved at load into an effective capability whose content hash covers the overlay.
 
-The no-CSS claim is **measured**, in [`evidence/evals/cross_tenant.md`](evidence/evals/cross_tenant.md).
+The no-CSS claim is **measured**, in [`evidence/evals/cross_tenant.md`](https://github.com/adityamhaske/interface.ai/blob/main/evidence/evals/cross_tenant.md).
 Variant B relabels controls *and* restyles markup, so every `hints.css` in the artifact names a
 selector that does not exist there — and the runs succeed anyway: 100%, zero wrong actions. Markup
 churn is carried by `semantic_exact`; rebranding by `structural_anchor` plus the overlay. Both rungs
@@ -170,7 +170,7 @@ the queue a reviewer opens has something in it.
 One chokepoint, three enforcements (§1), applied identically to all three actors.
 
 **Allowlist** — domains, URL patterns, action types, step and duration caps, in
-[`config/policy.yaml`](config/policy.yaml). Navigation outside it is `NAVIGATION_BLOCKED`, for humans
+[`config/policy.yaml`](https://github.com/adityamhaske/interface.ai/blob/main/config/policy.yaml). Navigation outside it is `NAVIGATION_BLOCKED`, for humans
 too. A capability's own `allowed_domains` **narrows** the global list. Two gaps closed here, both the
 same shape — a check that covered the stated intent and missed the actual outcome. Entrypoint
 navigation now goes through the ordinary path rather than the raw page handle, because `--target` is
@@ -230,12 +230,12 @@ what it is worth here. Multi-operator routing, SSO, audit sign-off — designed,
 LLM fallback on replay failure — would breach the no-model-in-replay invariant without a separate
 policed path.
 
-**The discovery evidence is a real model run.** [`evidence/discovery/disc-0a7e7b7ccd/`](evidence/discovery/disc-0a7e7b7ccd/)
+**The discovery evidence is a real model run.** [`evidence/discovery/disc-0a7e7b7ccd/`](https://github.com/adityamhaske/interface.ai/tree/main/evidence/discovery/disc-0a7e7b7ccd/)
 is a genuine LLM-driven run against the live frameset app, routed through a self-hosted OpenAI-compatible gateway:
 six model calls, 10,215 tokens, each carrying the gateway's own provider and request id so the run
 can be checked against the gateway's logs rather than taken on trust. The model signed in, searched,
 read the balance, status and as-of date off the member record and stopped -- three effective steps.
-The artifact the compiler produced from it, [`memberdesk.savings_balance@1.0.0`](evidence/capabilities/),
+The artifact the compiler produced from it, [`memberdesk.savings_balance@1.0.0`](https://github.com/adityamhaske/interface.ai/tree/main/evidence/capabilities/),
 replays for members that run never saw: 12345, 67890 and the closed account 24680, model-free, at
 zero drift.
 
@@ -263,12 +263,12 @@ and `replay_gates` are parsed and displayed but not yet read by the executor.
 
 | | |
 |---|---|
-| The artifact | [`evidence/capabilities/`](evidence/capabilities/) |
-| The handoff, with actors and epochs | [`evidence/escalation/demo-escalation/trace.jsonl`](evidence/escalation/demo-escalation/trace.jsonl) |
-| All four terminal statuses | [`evidence/replay/`](evidence/replay/), [`evidence/escalation/`](evidence/escalation/) |
-| The invariants, enforced | [`.importlinter`](.importlinter), [`tests/invariants/`](tests/invariants/) |
+| The artifact | [`evidence/capabilities/`](https://github.com/adityamhaske/interface.ai/tree/main/evidence/capabilities/) |
+| The handoff, with actors and epochs | [`evidence/escalation/demo-escalation/trace.jsonl`](https://github.com/adityamhaske/interface.ai/blob/main/evidence/escalation/demo-escalation/trace.jsonl) |
+| All four terminal statuses | [`evidence/replay/`](https://github.com/adityamhaske/interface.ai/tree/main/evidence/replay/), [`evidence/escalation/`](https://github.com/adityamhaske/interface.ai/tree/main/evidence/escalation/) |
+| The invariants, enforced | [`.importlinter`](https://github.com/adityamhaske/interface.ai/blob/main/.importlinter), [`tests/invariants/`](https://github.com/adityamhaske/interface.ai/tree/main/tests/invariants/) |
 | The whole story, one command | `make demo` |
-| The numbers behind §3 and §4 | [`evidence/evals/`](evidence/evals/) |
+| The numbers behind §3 and §4 | [`evidence/evals/`](https://github.com/adityamhaske/interface.ai/tree/main/evidence/evals/) |
 
 ---
 

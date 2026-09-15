@@ -13,7 +13,6 @@ Outputs under `site/report/`: `index.html`, `page-2.html`, `page-3.html`, `REPOR
 from __future__ import annotations
 
 import re
-import shutil
 import sys
 from pathlib import Path
 
@@ -166,6 +165,19 @@ def _shared_chrome() -> tuple[str, str]:
     return nav_html, footer_html
 
 
+def _absolutise_markdown(md_text: str) -> str:
+    """The same repository-relative -> GitHub rewrite as `_absolutise`, for Markdown link syntax."""
+
+    def repoint(match: re.Match[str]) -> str:
+        label, href = match.group(1), match.group(2)
+        if href.startswith(("http://", "https://", "#", "mailto:")):
+            return match.group(0)
+        base = REPO_TREE if href.endswith("/") else REPO_BLOB
+        return f"[{label}]({base}{href})"
+
+    return re.sub(r"\[([^\]]*)\]\(([^)]+)\)", repoint, md_text)
+
+
 def _render(md_text: str) -> str:
     html = MarkdownIt("commonmark", {"html": True}).enable("table").render(md_text)
     return _absolutise(html)
@@ -239,7 +251,13 @@ def main() -> int:
         return 1
 
     OUT.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(SOURCE, OUT / "REPORT.md")
+    # Not a straight copy. REPORT.md's links are written relative to the repository root, which
+    # is right where it lives and wrong the moment someone downloads it from the site: every
+    # `evidence/` and `config/` link in the downloaded file pointed at nothing. The published
+    # copy gets the same absolutising the HTML pages get.
+    OUT.joinpath("REPORT.md").write_text(
+        _absolutise_markdown(SOURCE.read_text(encoding="utf-8")), encoding="utf-8"
+    )
 
     for index, (title, numbers) in enumerate(PAGES):
         body = "".join(sections[n] for n in numbers)
