@@ -31,6 +31,7 @@ from cua.domain.capability import Capability
 from cua.domain.run_record import RunKind
 from cua.evidence.record import build_run_record
 from cua.hitl.broker import SessionBroker
+from cua.hitl.lease import ControlState
 from cua.hitl.session_thread import SessionThread
 from cua.policy.config import parse_policy
 from cua.runtime.capture import FailureCapture
@@ -131,11 +132,24 @@ def create_console(deps: ConsoleDeps) -> FastAPI:
 
     @app.post("/api/claim/{intervention_id}")
     def claim(intervention_id: str, operator: str = "operator") -> dict[str, Any]:
-        epoch = deps.broker.claim(intervention_id, operator)
+        try:
+            epoch = deps.broker.claim(intervention_id, operator)
+        except ValueError as exc:
+            # Claiming something already claimed, resolved or abandoned is a *conflict*, not a
+            # server fault: the queue is shared state and losing a race for it is an ordinary
+            # outcome, the one this console exists to arbitrate. Letting the ValueError escape
+            # answered it with a 500 and a stack trace -- which reads to the operator as "the
+            # console is broken" rather than "someone else got there first", and buries a real
+            # fault among the expected ones in the log.
+            raise HTTPException(409, str(exc)) from exc
         return {"epoch": epoch, "state": deps.broker.lease.state.value}
 
     @app.post("/api/release")
     def release() -> dict[str, Any]:
+        if deps.broker.lease.state is not ControlState.HUMAN_CONTROL:
+            # Same reasoning as claim: releasing a session nobody holds is a stale button, not a
+            # server fault.
+            raise HTTPException(409, "no operator holds this session")
         delta = deps.on_session(lambda: deps.broker.release(snapshot_after=deps.driver.observe()))
         epoch = deps.broker.resume()
         return {

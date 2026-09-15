@@ -2,7 +2,7 @@
   "run_id": "demo-business-outcome",
   "kind": "replay",
   "capability_ref": "corebank.member.savings_balance@1.0.0",
-  "capability_content_hash": "sha256:88530e380518c0301262389e61f90b60145f942ff51f94b1837a4ff8dd71350e",
+  "capability_content_hash": "sha256:e1707a18428653e3fd9ba2b2f2624f7c8bb1c8b34dba3efb2fb427e925f2ff8a",
   "tenant": null,
   "goal": null,
   "inputs": {
@@ -19,7 +19,7 @@
       "policy_decision": "safe (default)",
       "observation": null,
       "resolution": null,
-      "started_at": "2026-09-15T12:19:12.750599Z",
+      "started_at": "2026-09-15T12:39:29.513209Z",
       "duration_ms": 10,
       "recovery_rule_applied": null,
       "error_code": null,
@@ -44,7 +44,7 @@
         "ambiguity_score": null,
         "fingerprint_matched": null
       },
-      "started_at": "2026-09-15T12:19:12.766710Z",
+      "started_at": "2026-09-15T12:39:29.528651Z",
       "duration_ms": 2,
       "recovery_rule_applied": null,
       "error_code": null,
@@ -69,7 +69,7 @@
         "ambiguity_score": null,
         "fingerprint_matched": null
       },
-      "started_at": "2026-09-15T12:19:12.853526Z",
+      "started_at": "2026-09-15T12:39:29.610296Z",
       "duration_ms": 0,
       "recovery_rule_applied": null,
       "error_code": null,
@@ -81,7 +81,7 @@
     "status": "business_outcome",
     "capability_id": "corebank.member.savings_balance",
     "capability_version": "1.0.0",
-    "run_id": "rep-1292b18e61",
+    "run_id": "rep-9cc71728a8",
     "outputs": {},
     "outcome": {
       "code": "member_not_found",
@@ -93,7 +93,7 @@
     "intervention": null,
     "steps_executed": 2,
     "steps_total": 5,
-    "duration_ms": 147,
+    "duration_ms": 140,
     "drift_score": 0.0,
     "strategy_mix": {
       "semantic_exact": 2
@@ -101,8 +101,8 @@
     "recovery_attempts": 0,
     "evidence_ref": "evidence/replay/demo-business-outcome"
   },
-  "started_at": "2026-09-15T12:19:12.727913Z",
-  "duration_ms": 147,
+  "started_at": "2026-09-15T12:39:29.490635Z",
+  "duration_ms": 140,
   "evidence_ref": "evidence/replay/demo-business-outcome",
   "model_name": null,
   "tokens_used": null,

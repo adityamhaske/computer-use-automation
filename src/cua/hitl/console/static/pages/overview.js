@@ -5,16 +5,7 @@
 
 import { api } from "../api.js";
 import { icon } from "../icons.js";
-import {
-  statusPill,
-  statusLabel,
-  escapeHtml,
-  truncate,
-  fmtRelative,
-  fmtDuration,
-  fmtPercent,
-  emptyState,
-} from "../util.js";
+import { emptyState, escapeHtml, fmtDuration, fmtPercent, fmtRelative, setHtml, statusLabel, statusPill, truncate } from "../util.js";
 
 const RUN_STATUSES = ["success", "business_outcome", "needs_human", "failed"];
 const RECENT_LIMIT = 8;
@@ -38,8 +29,9 @@ export async function render(container, ctx) {
   }
 
   function paint(store) {
-    container.innerHTML = pageHtml(store, runsState);
-    wire(container, ctx);
+    // Re-binds listeners only when `setHtml` actually replaced the DOM. On a tick where nothing
+    // changed this is a no-op, which is the point: focus and transitions survive the poll.
+    if (setHtml(container, pageHtml(store, runsState))) wire(container, ctx);
   }
 
   paint(ctx.getStore());

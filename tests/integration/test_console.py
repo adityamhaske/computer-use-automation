@@ -161,6 +161,35 @@ def test_state_reports_who_holds_the_session(console: tuple) -> None:
     assert state["operator"] == "alex"
 
 
+def test_losing_the_race_for_an_intervention_is_a_conflict_not_a_crash(console: tuple) -> None:
+    """Two operators reaching for the same intervention is the case this console exists to settle.
+
+    The queue is shared state, so the second claim has to lose -- but losing is an ordinary
+    outcome, not a server fault. It used to escape as an unhandled ValueError, which answered the
+    second operator with a 500 and a stack trace: it reads as "the console is broken" rather than
+    "someone else got there first", and it buries real faults among the expected ones in the log.
+
+    Release is asserted alongside it because it fails the same way for the same reason: a button
+    that is merely stale is not a fault either.
+    """
+    client, broker, driver, session = console
+    request = _open_one(broker, driver, session)
+
+    assert client.post(f"/api/claim/{request.intervention_id}?operator=alex").status_code == 200
+
+    second = client.post(f"/api/claim/{request.intervention_id}?operator=sam")
+    assert second.status_code == 409
+    assert "claimed" in second.json()["detail"]
+
+    # The first operator still holds it -- a refused claim must not disturb the lease.
+    state = client.get("/api/state").json()
+    assert state["state"] == ControlState.HUMAN_CONTROL.value
+    assert state["operator"] == "alex"
+
+    assert client.post("/api/release").status_code == 200
+    assert client.post("/api/release").status_code == 409
+
+
 def test_handing_back_reconciles_and_reports_what_changed(console: tuple) -> None:
     """Handing back works from a web request thread -- the case that actually breaks without
     marshalling, and the one a real operator hits on their first click."""

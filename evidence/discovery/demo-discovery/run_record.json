@@ -25,8 +25,8 @@
         "ambiguity_score": null,
         "fingerprint_matched": null
       },
-      "started_at": "2026-09-15T12:19:11.304037Z",
-      "duration_ms": 4,
+      "started_at": "2026-09-15T12:39:19.540130Z",
+      "duration_ms": 7,
       "recovery_rule_applied": null,
       "error_code": null,
       "snapshot_ref": null,
@@ -50,8 +50,8 @@
         "ambiguity_score": null,
         "fingerprint_matched": null
       },
-      "started_at": "2026-09-15T12:19:11.324393Z",
-      "duration_ms": 0,
+      "started_at": "2026-09-15T12:39:21.881760Z",
+      "duration_ms": 3,
       "recovery_rule_applied": null,
       "error_code": null,
       "snapshot_ref": null,
@@ -59,11 +59,11 @@
     }
   ],
   "result": null,
-  "started_at": "2026-09-15T12:19:11.255774Z",
-  "duration_ms": 176,
+  "started_at": "2026-09-15T12:39:17.178813Z",
+  "duration_ms": 11033,
   "evidence_ref": "evidence/discovery/demo-discovery",
-  "model_name": "fake/scripted",
-  "tokens_used": 5887,
+  "model_name": "auto",
+  "tokens_used": 6496,
   "resolver_config_hash": null,
   "human_actions": 0,
   "lease_transitions": []

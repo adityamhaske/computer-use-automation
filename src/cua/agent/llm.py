@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import json
 import os
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
@@ -44,6 +45,18 @@ class LlmResponse:
     completion_tokens: int = 0
     model: str = ""
     finish_reason: str = ""
+
+    provider: str = ""
+    """Which upstream the gateway actually routed to, as the gateway reported it."""
+
+    request_id: str = ""
+    """The gateway's own id for this exchange.
+
+    Recorded because it is the one part of a run record a scripted stand-in cannot invent: the
+    model name is whatever the caller asked for, but a request id is issued by something else and
+    can be looked up in the gateway's logs afterwards. Evidence that only quotes itself is weak
+    evidence, and the brief's one non-negotiable is that the discovery run was real.
+    """
 
     @property
     def total_tokens(self) -> int:
@@ -124,10 +137,10 @@ class OpenRouterLlm:
             # The body can echo the prompt, so only the status and a short excerpt are surfaced.
             raise LlmError(f"model returned {response.status_code}: {response.text[:200]}")
 
-        return _parse(response.json())
+        return _parse(response.json(), response.headers)
 
 
-def _parse(body: dict[str, Any]) -> LlmResponse:
+def _parse(body: dict[str, Any], headers: Mapping[str, str] | None = None) -> LlmResponse:
     choices = body.get("choices") or []
     if not choices:
         raise LlmError("model returned no choices")
@@ -155,4 +168,19 @@ def _parse(body: dict[str, Any]) -> LlmResponse:
         completion_tokens=int(usage.get("completion_tokens", 0)),
         model=body.get("model", ""),
         finish_reason=choices[0].get("finish_reason", ""),
+        # OpenAI-compatible gateways vary in what they expose; absent headers simply mean the
+        # fields stay empty rather than the parse failing.
+        provider=_header(headers, "x-omniroute-provider", "x-provider", "openai-processing-ms"),
+        request_id=_header(headers, "x-omniroute-request-id", "x-request-id", "request-id"),
     )
+
+
+def _header(headers: Mapping[str, str] | None, *names: str) -> str:
+    """The first of `names` the response actually carried."""
+    if not headers:
+        return ""
+    for name in names:
+        value = headers.get(name)
+        if value:
+            return str(value)
+    return ""

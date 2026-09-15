@@ -1,6 +1,6 @@
 {
-  "snapshot_id": "snap-e8cbdb91c7",
-  "url": "http://127.0.0.1:60308/",
+  "snapshot_id": "snap-bbd309d9ad",
+  "url": "http://127.0.0.1:61889/",
   "title": "MemberDesk",
   "nodes": [
     {
@@ -37,7 +37,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "201"
+        "native": "203"
       },
       "fingerprint": "dac0da6641c0fbca"
     },
@@ -55,7 +55,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "202"
+        "native": "204"
       },
       "fingerprint": "dac0da6641c0fbca"
     },
@@ -73,7 +73,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "194"
+        "native": "196"
       },
       "fingerprint": "d3a596dc8cf2c44a"
     },
@@ -93,7 +93,7 @@
         "nav:/generic[4]/text[0]"
       ],
       "hints": {
-        "native": "210"
+        "native": "212"
       },
       "fingerprint": "a8ff80b0f161e267"
     },
@@ -111,7 +111,7 @@
       "parent_id": "nav:/generic[4]",
       "child_ids": [],
       "hints": {
-        "native": "230"
+        "native": "232"
       },
       "fingerprint": "06d59be9b77f218f"
     },
@@ -131,7 +131,7 @@
         "nav:/generic[5]/text[0]"
       ],
       "hints": {
-        "native": "211"
+        "native": "213"
       },
       "fingerprint": "a8ff80b0f161e267"
     },
@@ -149,7 +149,7 @@
       "parent_id": "nav:/generic[5]",
       "child_ids": [],
       "hints": {
-        "native": "231"
+        "native": "233"
       },
       "fingerprint": "0a382f79a9b7333e"
     },
@@ -169,7 +169,7 @@
         "nav:/generic[6]/text[0]"
       ],
       "hints": {
-        "native": "212"
+        "native": "214"
       },
       "fingerprint": "a8ff80b0f161e267"
     },
@@ -187,7 +187,7 @@
       "parent_id": "nav:/generic[6]",
       "child_ids": [],
       "hints": {
-        "native": "232"
+        "native": "234"
       },
       "fingerprint": "c402e295accdbf69"
     },
@@ -205,7 +205,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "213"
+        "native": "215"
       },
       "fingerprint": "71449859354b6cef"
     },
@@ -226,7 +226,7 @@
         "nav:/generic[8]/text[1]"
       ],
       "hints": {
-        "native": "228"
+        "native": "230"
       },
       "fingerprint": "a8ff80b0f161e267"
     },
@@ -244,7 +244,7 @@
       "parent_id": "nav:/generic[8]",
       "child_ids": [],
       "hints": {
-        "native": "238"
+        "native": "240"
       },
       "fingerprint": "c79329f8d8d2d557"
     },
@@ -262,7 +262,7 @@
       "parent_id": "nav:/generic[8]",
       "child_ids": [],
       "hints": {
-        "native": "239"
+        "native": "241"
       },
       "fingerprint": "bdad67387a00acff"
     },
@@ -282,7 +282,7 @@
         "nav:/row[9]/cell[0]"
       ],
       "hints": {
-        "native": "215"
+        "native": "217"
       },
       "fingerprint": "fa1f5bbbdad001d1"
     },
@@ -302,7 +302,7 @@
         "nav:/row[9]/cell[0]/link[0]"
       ],
       "hints": {
-        "native": "216"
+        "native": "218"
       },
       "fingerprint": "d50d2553ca8865ec"
     },
@@ -323,7 +323,7 @@
       ],
       "hints": {
         "css": "a.nav-link-btn",
-        "native": "217"
+        "native": "219"
       },
       "fingerprint": "c5ec08a2c78d2403"
     },
@@ -341,7 +341,7 @@
       "parent_id": "nav:/row[9]/cell[0]/link[0]",
       "child_ids": [],
       "hints": {
-        "native": "233"
+        "native": "235"
       },
       "fingerprint": "46ba5b490b98688e"
     },
@@ -361,7 +361,7 @@
         "nav:/row[10]/cell[0]"
       ],
       "hints": {
-        "native": "218"
+        "native": "220"
       },
       "fingerprint": "fa1f5bbbdad001d1"
     },
@@ -381,7 +381,7 @@
         "nav:/row[10]/cell[0]/link[0]"
       ],
       "hints": {
-        "native": "219"
+        "native": "221"
       },
       "fingerprint": "66987dac872f321c"
     },
@@ -400,7 +400,7 @@
       "child_ids": [],
       "hints": {
         "css": "a.nav-link-disabled",
-        "native": "220"
+        "native": "222"
       },
       "fingerprint": "57694f773dac3ffa"
     },
@@ -420,7 +420,7 @@
         "nav:/row[11]/cell[0]"
       ],
       "hints": {
-        "native": "223"
+        "native": "225"
       },
       "fingerprint": "fa1f5bbbdad001d1"
     },
@@ -440,7 +440,7 @@
         "nav:/row[11]/cell[0]/link[0]"
       ],
       "hints": {
-        "native": "224"
+        "native": "226"
       },
       "fingerprint": "f56beefd1c51c710"
     },
@@ -459,7 +459,7 @@
       "child_ids": [],
       "hints": {
         "css": "a.nav-link-disabled",
-        "native": "225"
+        "native": "227"
       },
       "fingerprint": "9121073edbb9c685"
     },
@@ -477,7 +477,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "234"
+        "native": "236"
       },
       "fingerprint": "ca4c1a686b35aada"
     },
@@ -495,7 +495,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "235"
+        "native": "237"
       },
       "fingerprint": "03cff1e7f00ab099"
     },
@@ -513,7 +513,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "236"
+        "native": "238"
       },
       "fingerprint": "3a9c4d5892cb41ff"
     },
@@ -531,7 +531,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "237"
+        "native": "239"
       },
       "fingerprint": "03cff1e7f00ab099"
     },
@@ -549,7 +549,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "195"
+        "native": "197"
       },
       "fingerprint": "eba30ff83962866f"
     },
@@ -567,7 +567,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "246"
+        "native": "248"
       },
       "fingerprint": "f6d07955fec5f341"
     },
@@ -587,7 +587,7 @@
         "content:/row[18]/cell[0]"
       ],
       "hints": {
-        "native": "248"
+        "native": "250"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -607,7 +607,7 @@
         "content:/row[18]/cell[0]/table[0]"
       ],
       "hints": {
-        "native": "249"
+        "native": "251"
       },
       "fingerprint": "bb5923d22e1419a1"
     },
@@ -625,7 +625,7 @@
       "parent_id": "content:/row[18]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "250"
+        "native": "252"
       },
       "fingerprint": "db0f241a64a7611f"
     },
@@ -645,7 +645,7 @@
         "content:/row[19]/cell[0]"
       ],
       "hints": {
-        "native": "258"
+        "native": "260"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -665,7 +665,7 @@
         "content:/row[19]/cell[0]/table[0]"
       ],
       "hints": {
-        "native": "259"
+        "native": "261"
       },
       "fingerprint": "1bd1205026807024"
     },
@@ -683,7 +683,7 @@
       "parent_id": "content:/row[19]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "260"
+        "native": "262"
       },
       "fingerprint": "db0f241a64a7611f"
     },
@@ -704,7 +704,7 @@
         "content:/row[20]/cell[1]"
       ],
       "hints": {
-        "native": "252"
+        "native": "254"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -725,7 +725,7 @@
         "content:/row[20]/cell[0]/text[1]"
       ],
       "hints": {
-        "native": "253"
+        "native": "255"
       },
       "fingerprint": "db3531c999a9d575"
     },
@@ -743,7 +743,7 @@
       "parent_id": "content:/row[20]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "276"
+        "native": "278"
       },
       "fingerprint": "ddb193202da1e4c9"
     },
@@ -761,7 +761,7 @@
       "parent_id": "content:/row[20]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "277"
+        "native": "279"
       },
       "fingerprint": "e0bbb5ae6b8cabc8"
     },
@@ -784,7 +784,7 @@
         "content:/row[20]/cell[1]/link[0]"
       ],
       "hints": {
-        "native": "255"
+        "native": "257"
       },
       "fingerprint": "4284a156d8302fc6"
     },
@@ -802,7 +802,7 @@
       "parent_id": "content:/row[20]/cell[1]",
       "child_ids": [],
       "hints": {
-        "native": "278"
+        "native": "280"
       },
       "fingerprint": "819bb6935224d41b"
     },
@@ -820,7 +820,7 @@
       "parent_id": "content:/row[20]/cell[1]",
       "child_ids": [],
       "hints": {
-        "native": "279"
+        "native": "281"
       },
       "fingerprint": "c4e51303c3643336"
     },
@@ -838,7 +838,7 @@
       "parent_id": "content:/row[20]/cell[1]",
       "child_ids": [],
       "hints": {
-        "native": "280"
+        "native": "282"
       },
       "fingerprint": "501fcbbbd30bd5c6"
     },
@@ -859,7 +859,7 @@
       ],
       "hints": {
         "css": "a[href=\"/logout\"]",
-        "native": "257"
+        "native": "259"
       },
       "fingerprint": "b56cffb08b23a60c"
     },
@@ -877,7 +877,7 @@
       "parent_id": "content:/row[20]/cell[1]/link[0]",
       "child_ids": [],
       "hints": {
-        "native": "281"
+        "native": "283"
       },
       "fingerprint": "c508d2200d4b1e2c"
     },
@@ -897,7 +897,7 @@
         "content:/row[21]/cell[0]"
       ],
       "hints": {
-        "native": "262"
+        "native": "264"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -917,7 +917,7 @@
         "content:/row[21]/cell[0]/text[0]"
       ],
       "hints": {
-        "native": "263"
+        "native": "265"
       },
       "fingerprint": "293ac13b6a7f3ab4"
     },
@@ -935,7 +935,7 @@
       "parent_id": "content:/row[21]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "282"
+        "native": "284"
       },
       "fingerprint": "adff22ea7b3bebde"
     },
@@ -956,7 +956,7 @@
         "content:/row[22]/cell[1]"
       ],
       "hints": {
-        "native": "266"
+        "native": "268"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -976,7 +976,7 @@
         "content:/row[22]/cell[0]/text[0]"
       ],
       "hints": {
-        "native": "267"
+        "native": "269"
       },
       "fingerprint": "604a7eb9b7dddc29"
     },
@@ -994,7 +994,7 @@
       "parent_id": "content:/row[22]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "283"
+        "native": "285"
       },
       "fingerprint": "66914960d53ab108"
     },
@@ -1014,7 +1014,7 @@
         "content:/row[22]/cell[1]/textbox[0]"
       ],
       "hints": {
-        "native": "268"
+        "native": "270"
       },
       "fingerprint": "604a7eb9b7dddc29"
     },
@@ -1035,7 +1035,7 @@
       ],
       "hints": {
         "css": "input[name=\"memno\"]",
-        "native": "269"
+        "native": "271"
       },
       "fingerprint": "ea2237aa18a5e0e3"
     },
@@ -1053,7 +1053,7 @@
       "parent_id": "content:/row[22]/cell[1]/textbox[0]",
       "child_ids": [],
       "hints": {
-        "native": "271"
+        "native": "273"
       },
       "fingerprint": "2df0b7969bca5fce"
     },
@@ -1074,7 +1074,7 @@
         "content:/row[23]/cell[1]"
       ],
       "hints": {
-        "native": "272"
+        "native": "274"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -1092,7 +1092,7 @@
       "parent_id": "content:/row[23]",
       "child_ids": [],
       "hints": {
-        "native": "273"
+        "native": "275"
       },
       "fingerprint": "1bd1205026807024"
     },
@@ -1112,7 +1112,7 @@
         "content:/row[23]/cell[1]/button[0]"
       ],
       "hints": {
-        "native": "274"
+        "native": "276"
       },
       "fingerprint": "e075ba34a53453aa"
     },
@@ -1133,7 +1133,7 @@
       ],
       "hints": {
         "css": "input.btn1",
-        "native": "275"
+        "native": "277"
       },
       "fingerprint": "7597c82cb4ec8e3c"
     },
@@ -1151,11 +1151,11 @@
       "parent_id": "content:/row[23]/cell[1]/button[0]",
       "child_ids": [],
       "hints": {
-        "native": "284"
+        "native": "286"
       },
       "fingerprint": "55399652a926d8e4"
     }
   ],
-  "captured_at": "2026-09-15T12:19:12.761218Z",
+  "captured_at": "2026-09-15T12:39:29.523626Z",
   "http_status": 200
 }

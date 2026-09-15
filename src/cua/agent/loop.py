@@ -27,7 +27,7 @@ from typing import Any
 
 from cua.agent.llm import LlmError, LlmPort, ToolCall
 from cua.agent.prompts.system import SYSTEM_PROMPT, goal_message
-from cua.agent.render import render_snapshot
+from cua.agent.render import ACTIONABLE, render_snapshot
 from cua.agent.stop import Budget
 from cua.agent.tools import TOOL_NAMES, TOOLS
 from cua.domain.action import Action, Click, Navigate, PressKey, Select, Type
@@ -58,7 +58,11 @@ class DiscoveryAgent:
     lease_epoch: int = 1
 
     def run(self, *, goal: str, target_url: str) -> DiscoveryRun:
-        run_id = f"disc-{uuid.uuid4().hex[:10]}"
+        # The evidence bus already has a run id -- the one naming the directory this run writes to.
+        # Minting a second one here meant the compiled artifact's `provenance.discovered_by.run_id`
+        # named a run that exists nowhere on disk, while `transcript_ref` pointed at a different
+        # directory. Provenance that cannot be followed back to its own evidence is decoration.
+        run_id = getattr(self.evidence, "run_id", "") or f"disc-{uuid.uuid4().hex[:10]}"
         self.evidence.emit(
             EventType.RUN_START,
             actor=Actor.AUTOMATION,
@@ -96,6 +100,9 @@ class DiscoveryAgent:
                 EventType.LLM_CALL,
                 actor=Actor.AUTOMATION,
                 model=response.model or self.llm.model_name,
+                # Gateway-issued, so a reader can check this run against the gateway's own logs.
+                provider=response.provider or None,
+                request_id=response.request_id or None,
                 prompt_tokens=response.prompt_tokens,
                 completion_tokens=response.completion_tokens,
                 reasoning=response.text[:500],
@@ -274,8 +281,27 @@ class DiscoveryAgent:
         node_id = str(call.arguments.get("node_id", ""))
         node = snapshot.node(node_id)
         if node is None:
+            # The model named a control that is not on the page it was just shown -- a truncated
+            # id, or one carried over from an earlier snapshot.
+            #
+            # This branch used to be the run's one silent exit. It dispatched nothing, so the
+            # trace recorded an `llm_call` followed by an `observe` and no action between them,
+            # and the feedback was a bare "no control with id X" -- which tells the model that it
+            # was wrong but not what would be right. A model given only that repeats itself, and
+            # three repeats is a dead end: a run that failed for a legible reason, recorded as if
+            # nothing had happened.
+            #
+            # So say what is actually there. The ids below come from the same snapshot the model
+            # was shown, so a correction is available without another observe, and the note puts
+            # the dead end in the evidence where it can be read back afterwards.
             step.detail = f"no control with id {node_id!r} on the current page"
-            return step, step.detail, False
+            self.evidence.emit(
+                EventType.NOTE,
+                note="tool call named a control that is not in the current snapshot",
+                node_id=node_id,
+                tool=call.name,
+            )
+            return step, step.detail + _available(snapshot), False
 
         step.node_id = node_id
         synthesis = synthesize_descriptor(node, snapshot)
@@ -368,3 +394,22 @@ class DiscoveryAgent:
         if ok:
             return "Done. The updated page follows."
         return f"That did not work: {detail}"
+
+
+def _available(snapshot: UiSnapshot, limit: int = 12) -> str:
+    """The ids of controls that *are* on this page, for a tool call that named one that is not.
+
+    Bounded on purpose: the point is to give the next turn a correction it can act on, not to
+    re-send the page it was already shown. Actionable roles only -- offering text nodes as
+    alternatives would invite a click on something that cannot be clicked.
+    """
+    usable = [n for n in snapshot.nodes if n.role in ACTIONABLE]
+    if not usable:
+        return "\n\nThere are no actionable controls in this snapshot."
+
+    listed = "\n".join(
+        f"  {n.role} {n.name!r}   #{n.node_id}" if n.name else f"  {n.role}   #{n.node_id}"
+        for n in usable[:limit]
+    )
+    more = f"\n  … and {len(usable) - limit} more" if len(usable) > limit else ""
+    return f"\n\nControls on this page:\n{listed}{more}"

@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Architecture & the artifact — CUA design write-up</title>
+<meta name="description" content="Design write-up for the CUA computer-use automation system.">
+<style>
+:root{
+  --bg:#faf9f7; --surface:#fff; --surface-2:#f4f2ef; --border:#e8e4de; --border-strong:#d4cec6;
+  --text:#1c1a17; --text-secondary:#59544c; --text-tertiary:#6e685f;
+  --accent:#146b52; --accent-soft:#e8f2ed; --warning:#8a6410; --danger:#9c3428;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--serif);
+  font-size:17px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:0 20px 4rem}
+header.top{border-bottom:1px solid var(--border);background:var(--surface);margin-bottom:2.5rem}
+header.top .bar{max-width:820px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;
+  gap:14px;flex-wrap:wrap;font-family:var(--sans);font-size:13px}
+header.top a{color:var(--text-secondary);text-decoration:none}
+header.top a:hover{color:var(--accent)}
+header.top .brand{font-weight:700;color:var(--text);letter-spacing:-.01em}
+header.top .spacer{flex:1}
+.eyebrow{font-family:var(--sans);font-size:.72rem;font-weight:600;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--text-tertiary);margin-bottom:.5rem}
+h1,h2,h3{font-family:var(--sans);text-wrap:balance;letter-spacing:-.018em;margin:0}
+h1{font-size:clamp(1.9rem,4.5vw,2.5rem);font-weight:700;line-height:1.1;margin-bottom:1.5rem}
+h2{font-size:1.4rem;font-weight:700;margin:2.4rem 0 .9rem;padding-bottom:.45rem;
+  border-bottom:1px solid var(--border)}
+h3{font-size:1.05rem;font-weight:600;margin:1.8rem 0 .6rem}
+p{margin:0 0 1rem}
+blockquote{margin:0 0 1.6rem;padding:1rem 1.25rem;background:var(--accent-soft);
+  border-left:3px solid var(--accent);border-radius:3px;color:var(--text)}
+blockquote p:last-child{margin:0}
+code{font-family:var(--mono);font-size:.85em;background:var(--surface-2);padding:.1em .38em;
+  border-radius:3px;word-break:break-word}
+pre{background:var(--surface-2);border:1px solid var(--border);border-radius:4px;
+  padding:1rem 1.15rem;overflow-x:auto;margin:0 0 1.4rem}
+pre code{background:none;padding:0;font-size:.78rem;line-height:1.55}
+table{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:.88rem;
+  margin:0 0 1.5rem;
+  background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden}
+th,td{text-align:left;padding:.55rem .8rem;border-bottom:1px solid var(--border)}
+th{background:var(--surface-2);font-size:.7rem;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--text-tertiary)}
+tbody tr:last-child td{border-bottom:none}
+a{color:var(--accent)}
+ul,ol{margin:0 0 1.2rem;padding-left:1.3rem}
+li{margin-bottom:.4rem}
+hr{border:0;border-top:1px solid var(--border);margin:2rem 0}
+.downloads{display:flex;gap:.6rem;flex-wrap:wrap;margin:0 0 2rem;font-family:var(--sans)}
+.downloads a{display:inline-flex;align-items:center;gap:.4rem;font-size:.82rem;font-weight:600;
+  text-decoration:none;padding:.45rem .85rem;border-radius:5px;
+  border:1px solid var(--border-strong);
+  background:var(--surface);color:var(--text-secondary)}
+.downloads a:hover{border-color:var(--accent);color:var(--accent)}
+.pager{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-top:3rem;
+  padding-top:1.2rem;border-top:1px solid var(--border);font-family:var(--sans);font-size:.85rem}
+.pager a{text-decoration:none;font-weight:600}
+.pager .disabled{color:var(--text-tertiary);opacity:.5}
+.steps{display:flex;gap:.4rem;font-family:var(--sans);font-size:.78rem;margin-bottom:2rem;
+  flex-wrap:wrap}
+.steps a,.steps span{padding:.3rem .7rem;border-radius:99px;border:1px solid var(--border);
+  text-decoration:none;color:var(--text-secondary);background:var(--surface)}
+.steps .here{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+@media print{
+  header.top,.downloads,.pager,.steps{display:none}
+  body{background:#fff;font-size:11.5pt}
+  .wrap{max-width:none;padding:0}
+  h2{page-break-after:avoid} pre,table,blockquote{page-break-inside:avoid}
+  .page-break{page-break-before:always}
+}
+</style></head><body>
+<header class="top"><div class="bar">
+  <a class="brand" href="../index.html">CUA</a>
+  <a href="../index.html">Home</a><a href="../docs/index.html">Documentation</a>
+  <span class="spacer"></span>
+  <a href="https://github.com/adityamhaske/interface.ai">GitHub</a>
+</div></header><div class="wrap"><nav class="steps"><span class="here">1. Architecture & the artifact</span><a href="page-2.html">2. Determinism, errors & scale</a><a href="page-3.html">3. Escalation, safety & cuts</a></nav><div class="downloads">
+  <a href="REPORT.pdf" download>Download PDF</a>
+  <a href="REPORT.md" download>Download Markdown</a>
+  <a href="https://github.com/adityamhaske/interface.ai/blob/main/REPORT.md">View on GitHub</a>
+</div><h1>Design write-up</h1>
+<blockquote>
+<p><strong>Discovery is probabilistic. Execution is deterministic.</strong>
+The model is allowed to be uncertain exactly once. That uncertainty is compiled into an artifact
+that never needs it again.</p>
+</blockquote>
+<p>Every claim below is backed by something runnable: an enforced import contract, a test, or a file in
+<a href="evidence/"><code>evidence/</code></a>. What is not built says so in §7.</p>
+<hr />
+<h2>1. Architecture</h2>
+<p>An LLM drives a live legacy UI to a goal <strong>once</strong>. That run is compiled into a typed, versioned
+<strong>capability artifact</strong>. From then on the artifact is replayed with no model in the decision loop,
+and an AI agent invokes it like a typed function.</p>
+<pre><code>      Action  (from discovery, replay, or a human operator)
+        │
+  ┌─────▼──────┐
+  │TargetResolv│  pure, read-only, over an already-captured snapshot
+  └─────┬──────┘
+  ┌─────▼──────┐
+  │PolicyEngine│  the only thing that can mint an AuthorizedAction
+  └─────┬──────┘
+  ┌─────▼──────┐
+  │SurfaceDrivr│  dispatch(AuthorizedAction) -- accepts nothing else
+  └─────┬──────┘
+  ┌─────▼──────┐
+  │ EvidenceBus│  append-only, redacted, actor-tagged
+  └────────────┘
+</code></pre>
+<p><strong>Discovery, replay, and human intervention are the same path</strong>, differing only in who originates
+the action. That is the answer to &quot;how do you know your guardrails apply in production?&quot; — there is
+one path, so a guardrail cannot be present on one and missing from another.</p>
+<p>Resolution runs <strong>before</strong> policy. I documented it the other way round and implementing it proved me
+wrong: risk classification's second signal is <em>what the control says it does</em> (&quot;Transfer Funds&quot;),
+which needs the resolved node, so authorizing first means authorizing half-blind. The invariant was
+never &quot;policy runs first&quot; — it is <em>nothing reaches a surface without authorization</em>.</p>
+<p>Three enforcements, because an invariant nobody can violate beats one everybody agrees with: an
+<strong>import contract</strong>, a <strong>type guard</strong> (<code>dispatch()</code> takes only an <code>AuthorizedAction</code>), and an <strong>AST
+scan</strong> that has caught four violations the import graph missed. Every fix moved the module; none
+added an exemption.</p>
+<p><strong>Stack.</strong> Python for Pydantic v2, which lets the artifact schema <em>be</em> the type system rather than
+sit beside it. Playwright over CDP because the accessibility tree is the closest browser analogue to
+what UIA or AX exposes, so perception ports. The model sits behind an <code>LlmPort</code> protocol, so the
+provider is one class rather than a dependency; <code>temperature=0</code>. YAML artifacts because a bank
+reviewer has to read one without running anything.</p>
+<h2>2. Artifact schema</h2>
+<p>The focal point. <code>cua.capability/v1</code> — Pydantic, YAML, immutable, content-addressed. Examples in
+<a href="evidence/capabilities/"><code>evidence/capabilities/</code></a>.</p>
+<p><strong>Targets are semantic, never selectors.</strong> A <code>TargetDescriptor</code> is role, accessible name, structural
+anchor, scope, ordinal. A CSS selector may appear only under <code>hints</code> — a cache accepted only if the
+node it finds <em>also</em> satisfies the semantic assertion. <code>role: button, name: &quot;Search&quot;</code> means the same
+in Windows UIA as in ARIA; <code>input.btn1</code> does not.</p>
+<p><strong>Business outcomes, recovery, and failure are three distinct top-level keys</strong> — the brief names
+conflating the first with the third as the most common mistake here, so the schema makes it
+structurally impossible rather than trusting the executor.</p>
+<p><strong>The capability is immutable; everything a <em>run</em> produces lives elsewhere</strong> — <code>RunRecord</code>,
+<code>CapabilityApproval</code>, <code>TenantBinding</code>, keyed by <code>id@version</code>. A definition that accumulates telemetry
+stops being reviewable, and &quot;which version ran?&quot; stops being answerable.</p>
+<p><strong><code>capability.id</code> is namespaced by vendor product, not tenant</strong>, and <code>surface.driver_capabilities</code>
+declares what a driver must <em>be able to do</em> rather than naming a library. Both are preconditions for
+reuse.</p>
+<p>The compiler emits a <strong>draft</strong> and says so in the artifact: one run saw only the happy path, so it
+declares no outcomes and no recovery, with review notes naming what a reviewer must add — inventing
+detectors a run never observed produces error handling that is fiction.</p>
+<div class="pager"><span class="disabled">← Start of the write-up</span><a href="page-2.html">Determinism, errors & scale →</a></div></div></body></html>

@@ -84,7 +84,7 @@ The operator's clicks travel the same policy chokepoint as the machine's. From
 
 | | |
 |---|---|
-| **The design write-up** | [`REPORT.md`](REPORT.md) — architecture, schema, determinism, escalation, safety, cuts |
+| **The design write-up** | [`REPORT.md`](REPORT.md) — architecture, schema, determinism, escalation, safety, cuts. Also [rendered in three pages](https://adityamhaske.github.io/interface.ai/report/index.html), with [PDF](https://adityamhaske.github.io/interface.ai/report/REPORT.pdf) and Markdown downloads |
 | **The artifact** | [`evidence/capabilities/`](evidence/capabilities/) — start here; it is the focal point |
 | **Evidence from every run** | [`evidence/`](evidence/) — all four terminal statuses, with traces |
 | **Everything else** | **[Documentation site](https://adityamhaske.github.io/interface.ai/)** — CLI reference, walkthrough, architecture, ADRs, runbooks |

@@ -156,3 +156,28 @@ export function el(html) {
   t.innerHTML = html.trim();
   return t.content.firstElementChild;
 }
+
+/**
+ * Write markup into an element only when it actually differs from what is already there.
+ *
+ * The console polls every 2.5s and every tick repainted whole regions by assigning `.innerHTML`.
+ * On the overwhelmingly common tick where nothing changed, that tore down and rebuilt identical
+ * markup — which looks like nothing at all and is not: it drops focus, restarts CSS transitions,
+ * and invalidates any element reference held between ticks, by an assistive technology or by a
+ * driver. The sidebar already avoided this by building once and patching; this is the same idea
+ * for regions that genuinely are rebuilt from a template.
+ *
+ * Compares the generated string against the last one written rather than reading `.innerHTML`
+ * back, because the browser normalises what it returns and the two would never match.
+ *
+ * Returns true when it wrote, so a caller can re-bind listeners only when there is new DOM.
+ */
+const lastWritten = new WeakMap();
+
+export function setHtml(element, html) {
+  if (!element) return false;
+  if (lastWritten.get(element) === html) return false;
+  lastWritten.set(element, html);
+  element.innerHTML = html;
+  return true;
+}

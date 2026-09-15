@@ -84,6 +84,10 @@ console: ## Run the human operator console
 demo: ## THE GRADING STORY: discover -> artifact -> replay -> outcome -> fault -> escalate -> takeover -> resume
 	$(PY) -m cua.cli.main demo
 
+.PHONY: report
+report: ## Render REPORT.md to site/report/ as three pages, a PDF and a Markdown download
+	$(PY) scripts/build_report_page.py
+
 .PHONY: eval
 eval: ## Stability + cross-tenant measurement -> evidence/evals/
 	$(PY) -m cua.cli.main eval

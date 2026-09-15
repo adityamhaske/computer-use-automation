@@ -251,18 +251,42 @@ class Demo:
                     ).run(goal=GOAL, target_url=f"{base_url}/")
 
                 run = discover(llm)
-                if self.live_model and run.stop_reason is StopReason.ERROR:
-                    # A key can be present and still not work: an unreachable gateway, a revoked
-                    # key, a model id the provider does not serve. The loop turns that into
-                    # StopReason.ERROR rather than raising, so it has to be checked rather than
-                    # caught. Falling back here as well as at construction keeps the demo runnable
-                    # on any machine, and keeps it honest about which of the two happened -- the
-                    # difference matters to whoever reads the evidence afterwards.
-                    self.live_model = False
-                    mode = (
-                        "RECORDED TRANSCRIPT — a key is configured but the model could not be "
-                        "reached (see the run's trace for the provider error)"
+                if self.live_model and not run.succeeded:
+                    # A key can be present and the live run still not reach the goal, in two quite
+                    # different ways, and the demo has to survive both.
+                    #
+                    # StopReason.ERROR is the gateway: unreachable, revoked key, a model id the
+                    # provider does not serve. The loop turns that into a stop reason rather than
+                    # raising, so it has to be checked rather than caught.
+                    #
+                    # Anything else -- a dead end, an exhausted budget -- is the model. This demo
+                    # opens by saying discovery is probabilistic, and a probabilistic step lands
+                    # badly sometimes; when it did, the whole demonstration exited non-zero at
+                    # stage 2 and showed none of the deterministic machinery that is the actual
+                    # subject. Every stage after this one is model-free, so a live miss is no
+                    # reason not to show them.
+                    #
+                    # Falling back is not the same as papering over: which of the two happened is
+                    # named here, printed at stage 2, and repeated in the closing summary, and the
+                    # failed live attempt stays in the evidence directory to be read back.
+                    reason = (
+                        "the model could not be reached (see the run's trace for the provider "
+                        "error)"
+                        if run.stop_reason is StopReason.ERROR
+                        else (
+                            f"the live run did not reach the goal "
+                            f"({run.stop_reason.value}) — discovery is probabilistic"
+                        )
                     )
+                    self.say("Discovery (live attempt)", reason, ok=False)
+                    self.live_model = False
+                    mode = f"RECORDED TRANSCRIPT — a key is configured but {reason}"
+                    # Back to the entrypoint first. `DiscoveryAgent.run` observes whatever page it
+                    # is handed rather than navigating to one, so without this the recorded script
+                    # would replay against whatever the failed live attempt left on screen -- a
+                    # half-filled form, a detail page -- and fail for a reason that has nothing to
+                    # do with the script.
+                    self.sign_in(rig, base_url)
                     run = discover(FakeLlm(script=list(RECORDED_FLOW)))
             finally:
                 rig.close()
@@ -280,11 +304,26 @@ class Demo:
                 entrypoint_url="{base_url}/",
                 transcript_ref=str(disc_dir / "trace.jsonl"),
             )
+            # The demo must never overwrite an artifact that is already in the catalog.
+            #
+            # Every demo run compiles to the same id, and it writes its trace to a fixed
+            # `demo-discovery` directory that the next run overwrites. Publishing unconditionally
+            # therefore pointed the catalog's artifact at a transcript with a one-run shelf life,
+            # replacing whatever was discovered before it. Gating on "did a model run" did not fix
+            # that -- once a key is configured the demo is live too, so it clobbered the standalone
+            # discovery anyway.
+            #
+            # The condition that actually holds is about the catalog, not about the model: publish
+            # only into an empty slot. A fresh clone still sees the full record -> compile ->
+            # publish -> replay path end to end; a repository that already carries a discovered
+            # artifact keeps it, and this run's compile stays in its own evidence directory where
+            # nothing mistakes it for the published one.
             capabilities = EVIDENCE / "capabilities"
             capabilities.mkdir(parents=True, exist_ok=True)
-            artifact_path = (
+            published = (
                 capabilities / f"{compiled.capability.id}@{compiled.capability.version}.yaml"
             )
+            artifact_path = disc_dir / "compiled.yaml" if published.exists() else published
             artifact_path.write_text(dump_capability(compiled.capability), encoding="utf-8")
             self.say(
                 "Capability compiled and sealed",

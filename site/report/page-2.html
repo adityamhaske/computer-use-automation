@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Determinism, errors & scale — CUA design write-up</title>
+<meta name="description" content="Design write-up for the CUA computer-use automation system.">
+<style>
+:root{
+  --bg:#faf9f7; --surface:#fff; --surface-2:#f4f2ef; --border:#e8e4de; --border-strong:#d4cec6;
+  --text:#1c1a17; --text-secondary:#59544c; --text-tertiary:#6e685f;
+  --accent:#146b52; --accent-soft:#e8f2ed; --warning:#8a6410; --danger:#9c3428;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--serif);
+  font-size:17px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:0 20px 4rem}
+header.top{border-bottom:1px solid var(--border);background:var(--surface);margin-bottom:2.5rem}
+header.top .bar{max-width:820px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;
+  gap:14px;flex-wrap:wrap;font-family:var(--sans);font-size:13px}
+header.top a{color:var(--text-secondary);text-decoration:none}
+header.top a:hover{color:var(--accent)}
+header.top .brand{font-weight:700;color:var(--text);letter-spacing:-.01em}
+header.top .spacer{flex:1}
+.eyebrow{font-family:var(--sans);font-size:.72rem;font-weight:600;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--text-tertiary);margin-bottom:.5rem}
+h1,h2,h3{font-family:var(--sans);text-wrap:balance;letter-spacing:-.018em;margin:0}
+h1{font-size:clamp(1.9rem,4.5vw,2.5rem);font-weight:700;line-height:1.1;margin-bottom:1.5rem}
+h2{font-size:1.4rem;font-weight:700;margin:2.4rem 0 .9rem;padding-bottom:.45rem;
+  border-bottom:1px solid var(--border)}
+h3{font-size:1.05rem;font-weight:600;margin:1.8rem 0 .6rem}
+p{margin:0 0 1rem}
+blockquote{margin:0 0 1.6rem;padding:1rem 1.25rem;background:var(--accent-soft);
+  border-left:3px solid var(--accent);border-radius:3px;color:var(--text)}
+blockquote p:last-child{margin:0}
+code{font-family:var(--mono);font-size:.85em;background:var(--surface-2);padding:.1em .38em;
+  border-radius:3px;word-break:break-word}
+pre{background:var(--surface-2);border:1px solid var(--border);border-radius:4px;
+  padding:1rem 1.15rem;overflow-x:auto;margin:0 0 1.4rem}
+pre code{background:none;padding:0;font-size:.78rem;line-height:1.55}
+table{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:.88rem;
+  margin:0 0 1.5rem;
+  background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden}
+th,td{text-align:left;padding:.55rem .8rem;border-bottom:1px solid var(--border)}
+th{background:var(--surface-2);font-size:.7rem;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--text-tertiary)}
+tbody tr:last-child td{border-bottom:none}
+a{color:var(--accent)}
+ul,ol{margin:0 0 1.2rem;padding-left:1.3rem}
+li{margin-bottom:.4rem}
+hr{border:0;border-top:1px solid var(--border);margin:2rem 0}
+.downloads{display:flex;gap:.6rem;flex-wrap:wrap;margin:0 0 2rem;font-family:var(--sans)}
+.downloads a{display:inline-flex;align-items:center;gap:.4rem;font-size:.82rem;font-weight:600;
+  text-decoration:none;padding:.45rem .85rem;border-radius:5px;
+  border:1px solid var(--border-strong);
+  background:var(--surface);color:var(--text-secondary)}
+.downloads a:hover{border-color:var(--accent);color:var(--accent)}
+.pager{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-top:3rem;
+  padding-top:1.2rem;border-top:1px solid var(--border);font-family:var(--sans);font-size:.85rem}
+.pager a{text-decoration:none;font-weight:600}
+.pager .disabled{color:var(--text-tertiary);opacity:.5}
+.steps{display:flex;gap:.4rem;font-family:var(--sans);font-size:.78rem;margin-bottom:2rem;
+  flex-wrap:wrap}
+.steps a,.steps span{padding:.3rem .7rem;border-radius:99px;border:1px solid var(--border);
+  text-decoration:none;color:var(--text-secondary);background:var(--surface)}
+.steps .here{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+@media print{
+  header.top,.downloads,.pager,.steps{display:none}
+  body{background:#fff;font-size:11.5pt}
+  .wrap{max-width:none;padding:0}
+  h2{page-break-after:avoid} pre,table,blockquote{page-break-inside:avoid}
+  .page-break{page-break-before:always}
+}
+</style></head><body>
+<header class="top"><div class="bar">
+  <a class="brand" href="../index.html">CUA</a>
+  <a href="../index.html">Home</a><a href="../docs/index.html">Documentation</a>
+  <span class="spacer"></span>
+  <a href="https://github.com/adityamhaske/interface.ai">GitHub</a>
+</div></header><div class="wrap"><nav class="steps"><a href="index.html">1. Architecture & the artifact</a><span class="here">2. Determinism, errors & scale</span><a href="page-3.html">3. Escalation, safety & cuts</a></nav><div class="downloads">
+  <a href="REPORT.pdf" download>Download PDF</a>
+  <a href="REPORT.md" download>Download Markdown</a>
+  <a href="https://github.com/adityamhaske/interface.ai/blob/main/REPORT.md">View on GitHub</a>
+</div><h1>Determinism, errors & scale</h1><h2>3. Determinism &amp; error handling</h2>
+<p>Two type families, deliberately separate — <em>what we observed</em> and <em>how the run ended</em>:</p>
+<table>
+<thead>
+<tr>
+<th><code>ObservationClass</code></th>
+<th>meaning</th>
+<th>leads to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>EXPECTED</code></td>
+<td>matches a precondition/checkpoint</td>
+<td>proceed</td>
+</tr>
+<tr>
+<td><code>BUSINESS_OUTCOME</code></td>
+<td>matches a declared outcome</td>
+<td>terminate, <strong>exit 0</strong></td>
+</tr>
+<tr>
+<td><code>RECOVERABLE</code></td>
+<td>matches a declared recovery rule</td>
+<td>bounded remedy, then retry</td>
+</tr>
+<tr>
+<td><code>UNEXPECTED_STATE</code></td>
+<td>matches <strong>nothing</strong> declared</td>
+<td>fail closed</td>
+</tr>
+</tbody>
+</table>
+<p><code>RunStatus</code> is terminal and separate: <code>SUCCESS | BUSINESS_OUTCOME | NEEDS_HUMAN | FAILED</code>.</p>
+<p>&quot;No such member&quot; <strong>exits 0</strong>. It is a successful execution returning a negative answer; treating it
+as a failure turns a routine result into a 2am page and trains everyone to ignore the alert that
+also fires for real defects.</p>
+<p><strong>Fail-closed is the default.</strong> A state matching nothing declared stops the run; it never proceeds
+assuming the click probably worked. Two surviving candidates is <code>TARGET_AMBIGUOUS</code> and the resolver
+<strong>refuses</strong> — there is no similarity threshold to tune, because a tunable threshold is a knob that
+eventually gets turned.</p>
+<p>Determinism is enforced, not asserted: <code>cua.replay</code> may not import <code>cua.agent</code> or any HTTP client;
+the ladder is a fixed order with pure scoring, ties broken by document order, never by dict
+iteration, clock or random; the <code>vision</code> rung is hard-disabled in replay.</p>
+<p><strong>Where a hard failure goes is the artifact's decision, not the executor's</strong> — <code>escalation.triggers</code>
+decides whether it pauses for a human or terminates. Writing the demo I expected an exhausted
+recovery to come back <code>FAILED</code> and it came back <code>NEEDS_HUMAN</code>; the artifact was right and I was
+wrong, which is the point of putting the routing there.</p>
+<p><strong>Drift is measured as descent.</strong> A target recorded at <code>semantic_exact</code> that now resolves only at
+<code>structural_anchor</code> has moved, even though the run still succeeded — so <code>run_record.drift_score</code>
+rises before replays begin to fail, rather than after. <code>make eval</code> reports determinism as a boolean
+per capability, because &quot;94% deterministic&quot; is not a property anyone can act on.</p>
+<h2>4. Heterogeneity &amp; multi-tenant</h2>
+<p>The seam is <code>UiSnapshot</code> — a normalized <code>{node_id, role, name, value, states, bounds, scope}</code> tree.
+Drivers populate it from whatever their surface offers: a CDP accessibility tree today, Windows UIA
+tomorrow. <strong><code>cua.targeting</code> and <code>cua.perception</code> may not import Playwright or <code>cua.surfaces</code></strong>
+(enforced), so neither the artifact nor the resolver can grow web-shaped assumptions.
+<code>surfaces/desktop_uia/</code> is an interface-only stub documenting the UIA→<code>UiSnapshot</code> mapping.</p>
+<p>Tenants are an <strong>overlay, never a fork</strong>: <code>TenantBinding</code> supplies vars and per-step overrides,
+resolved at load into an effective capability whose content hash covers the overlay.</p>
+<p>The no-CSS claim is <strong>measured</strong>, in <a href="evidence/evals/cross_tenant.md"><code>evidence/evals/cross_tenant.md</code></a>.
+Variant B relabels controls <em>and</em> restyles markup, so every <code>hints.css</code> in the artifact names a
+selector that does not exist there — and the runs succeed anyway: 100%, zero wrong actions. Markup
+churn is carried by <code>semantic_exact</code>; rebranding by <code>structural_anchor</code> plus the overlay. Both rungs
+are load-bearing, which is why the ladder has both.</p>
+<p>A Phase-01 spike <strong>disproved my own claim</strong>: <code>structural_anchor</code> does not survive rebranding, because
+the anchor text <em>is</em> the label cell and gets relabeled too — so the honest claim is markup change,
+not vocabulary change, and vocabulary is what the overlay is for. One limit that leaves: drift is
+computed against the <em>effective</em> capability, so an overlay reports zero drift for a surface that
+genuinely differs.</p>
+<div class="pager"><a href="index.html">← Architecture & the artifact</a><a href="page-3.html">Escalation, safety & cuts →</a></div></div></body></html>

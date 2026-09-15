@@ -303,3 +303,58 @@ def test_effective_steps_exclude_the_wandering(rig: tuple) -> None:
     # nothing that failed is ever counted as effective.
     assert all(step.ok for step in run.effective_steps)
     assert all(step.tool not in ("finish", "give_up") for step in run.effective_steps)
+
+
+def test_a_stale_node_id_is_traced_and_answered_with_what_is_there(rig: tuple) -> None:
+    """A tool call naming a control that is not in the snapshot must leave a mark and a way out.
+
+    This is the one branch that dispatched nothing: the trace showed an `llm_call` followed by an
+    `observe` with no action between them, and the model was told only that it was wrong. Given
+    that and nothing else a model repeats itself, and three repeats is a dead end -- a run that
+    failed for a completely legible reason, recorded as if nothing had happened.
+
+    Both halves are asserted, because either alone leaves the failure unactionable: the note makes
+    it readable afterwards, and the controls make it correctable at the only moment that matters,
+    which is the model's next turn.
+    """
+    dispatcher, bus, redactor = rig
+
+    turns: list[list[dict[str, object]]] = []
+
+    class Recording(FakeLlm):
+        """Keeps every message it is handed, so the tool result can be asserted on."""
+
+        def complete(self, *, messages, tools):  # type: ignore[no-untyped-def]
+            turns.append(list(messages))
+            return super().complete(messages=messages, tools=tools)
+
+    llm = Recording(
+        script=[
+            ScriptedCall("click", "click a stale id", arguments={"node_id": "main:/button[999]"}),
+            ScriptedCall("finish", "give up", arguments={"summary": "stale"}),
+        ]
+    )
+    DiscoveryAgent(
+        llm=llm, dispatcher=dispatcher, evidence=bus, redactor=redactor, budget=Budget()
+    ).run(goal="click something stale", target_url="")
+
+    notes = [
+        e
+        for e in bus.read_events()
+        if e["event"] == EventType.NOTE.value and e.get("node_id") == "main:/button[999]"
+    ]
+    assert notes, "a tool call that dispatched nothing must still be traceable"
+
+    # The correction reaches the model as the tool result for that call, on its very next turn.
+    results = [
+        str(m.get("content"))
+        for turn in turns
+        for m in turn
+        if m.get("role") == "tool" and "main:/button[999]" in str(m.get("content"))
+    ]
+    assert results, "the model must be told its id was not on the page"
+    assert "Controls on this page:" in results[0]
+    # Real controls from the page the model was just shown, named with the ids its next call
+    # would have to use -- not a restatement that it was wrong.
+    assert "Member Number" in results[0] and "Search" in results[0]
+    assert "#content:/" in results[0], "alternatives must be ids the next call can actually use"

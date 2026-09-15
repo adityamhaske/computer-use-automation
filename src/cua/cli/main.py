@@ -52,6 +52,18 @@ def discover(
     ),
     max_steps: Annotated[int, typer.Option(help="Hard cap on model turns.")] = 40,
     headless: Annotated[bool, typer.Option(help="Run the browser headless.")] = True,
+    sign_in: Annotated[
+        bool,
+        typer.Option(
+            "--sign-in",
+            help=(
+                "Sign in to the mock back-office first, the same fixture setup `cua replay` and "
+                "`cua console` offer. The capabilities here are recorded against the app's "
+                "authenticated frameset; without it the agent lands on the sign-on screen with no "
+                "credentials and correctly gives up rather than inventing any."
+            ),
+        ),
+    ] = False,
 ) -> None:
     """Drive a live application with a model until the goal is met, and record what worked."""
     run_id = f"disc-{uuid.uuid4().hex[:10]}"
@@ -64,6 +76,10 @@ def discover(
 
     rig = build_rig(run_id=run_id, kind="discovery", headless=headless, allow_vision=True)
     try:
+        if sign_in:
+            from cua.cli.mock_login import sign_in as sign_in_to_mock_app
+
+            sign_in_to_mock_app(rig, target.rstrip("/"))
         rig.dispatcher.open_entrypoint(target, session_id=run_id)
         agent = DiscoveryAgent(
             llm=llm,

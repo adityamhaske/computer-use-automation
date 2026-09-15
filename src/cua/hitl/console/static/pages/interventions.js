@@ -6,7 +6,7 @@
 import { api } from "../api.js";
 import { icon } from "../icons.js";
 import { gesture, onLive, connectLive, disconnectLive, isConnected } from "../ws.js";
-import { statusPill, escapeHtml, truncate } from "../util.js";
+import { escapeHtml, setHtml, statusPill, truncate } from "../util.js";
 
 // The broker's queue drops an intervention from `pending()` the instant it is claimed (it becomes
 // CLAIMED, and `/api/interventions` only ever lists OPEN ones) — so the context a person claimed is
@@ -118,7 +118,7 @@ function paint(container, ctx, store) {
   const state = store.state;
 
   if (!store.connected || !state) {
-    rail.innerHTML = `<div class="card card-pad" style="display:flex;gap:10px;align-items:center;color:var(--text-secondary);"><span class="status-dot" style="background:var(--text-muted);width:6px;height:6px;border-radius:50%;flex:none;"></span> Console offline — retrying…</div>`;
+    setHtml(rail, `<div class="card card-pad" style="display:flex;gap:10px;align-items:center;color:var(--text-secondary);"><span class="status-dot" style="background:var(--text-muted);width:6px;height:6px;border-radius:50%;flex:none;"></span> Console offline — retrying…</div>`);
     return;
   }
 
@@ -126,8 +126,12 @@ function paint(container, ctx, store) {
 
   if (state.state === "human_control") {
     if (!isConnected()) connectLive();
-    rail.innerHTML = railHuman(state, claimedCard);
-    wireReleaseButton(container, ctx);
+    // Bind only when `setHtml` actually replaced the DOM. It skips the write when the markup is
+    // unchanged, which is almost every tick -- and a listener added to a button that survived the
+    // tick is a *second* listener on it. At 2.5s intervals that turns one click into one request
+    // per tick the page had been open, which the server then answers with a conflict for every
+    // request after the first.
+    if (setHtml(rail, railHuman(state, claimedCard))) wireReleaseButton(container, ctx);
     return;
   }
 
@@ -138,9 +142,9 @@ function paint(container, ctx, store) {
 
   if (state.state === "resuming") {
     emptyText.textContent = "The operator released the session. Reconciling before automation continues.";
-    rail.innerHTML = `<div class="card card-pad">${statusPill(
+    setHtml(rail, `<div class="card card-pad">${statusPill(
       "resuming"
-    )}<p style="margin-top:8px;color:var(--text-secondary);font-size:var(--text-sm);">Reconciling the session before automation resumes at the right step.</p></div>`;
+    )}<p style="margin-top:8px;color:var(--text-secondary);font-size:var(--text-sm);">Reconciling the session before automation resumes at the right step.</p></div>`);
     return;
   }
 
@@ -153,12 +157,11 @@ function paint(container, ctx, store) {
       : "Automation owns the session. Nothing is escalated right now — this panel goes live the moment an operator claims control.";
 
   if (!store.interventions.length) {
-    rail.innerHTML = `<div class="card card-pad"><div><strong style="font-size:var(--text-sm);">No open interventions</strong><p style="margin-top:4px;color:var(--text-secondary);font-size:var(--text-sm);">Automation is running normally — nothing needs a person right now.</p></div></div>`;
+    setHtml(rail, `<div class="card card-pad"><div><strong style="font-size:var(--text-sm);">No open interventions</strong><p style="margin-top:4px;color:var(--text-secondary);font-size:var(--text-sm);">Automation is running normally — nothing needs a person right now.</p></div></div>`);
     return;
   }
 
-  rail.innerHTML = railQueue(store.interventions);
-  wireClaimButtons(container, ctx);
+  if (setHtml(rail, railQueue(store.interventions))) wireClaimButtons(container, ctx);
 }
 
 function updateViewportChrome(container, state) {
@@ -169,7 +172,7 @@ function updateViewportChrome(container, state) {
   const live = state.state === "human_control";
 
   conn.dataset.live = String(live);
-  conn.innerHTML = `<span class="status-dot" style="background:${live ? "var(--danger)" : "var(--text-tertiary)"};width:6px;height:6px;border-radius:50%;"></span><span>${live ? "live" : "idle"}</span>`;
+  setHtml(conn, `<span class="status-dot" style="background:${live ? "var(--danger)" : "var(--text-tertiary)"};width:6px;height:6px;border-radius:50%;"></span><span>${live ? "live" : "idle"}</span>`);
   url.textContent = `session ${truncate(state.session || "—", 28)}`;
   owner.hidden = false;
   owner.dataset.owner = state.holder;

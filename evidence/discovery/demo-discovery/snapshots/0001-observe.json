@@ -1,6 +1,6 @@
 {
-  "snapshot_id": "snap-4f8227b331",
-  "url": "http://127.0.0.1:60308/",
+  "snapshot_id": "snap-65223b5056",
+  "url": "http://127.0.0.1:61889/",
   "title": "MemberDesk",
   "nodes": [
     {
@@ -73,7 +73,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "100"
+        "native": "101"
       },
       "fingerprint": "d3a596dc8cf2c44a"
     },
@@ -549,7 +549,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "101"
+        "native": "100"
       },
       "fingerprint": "eba30ff83962866f"
     },
@@ -1156,6 +1156,6 @@
       "fingerprint": "55399652a926d8e4"
     }
   ],
-  "captured_at": "2026-09-15T12:19:11.267425Z",
+  "captured_at": "2026-09-15T12:39:17.189528Z",
   "http_status": 303
 }

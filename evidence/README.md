@@ -61,6 +61,19 @@ evals/               measured reports: stability and cross-tenant
 evals-runs/          the traces behind those reports (gitignored: 16MB of working evidence)
 ```
 
+`discovery/` holds two runs, and the difference matters. `disc-0a7e7b7ccd/` is the one the published
+artifact was compiled from: a real model, via a local OmniRoute gateway, driving the app to the goal.
+Its `run_record.json` carries a non-null `tokens_used`, and every `llm_call` in its trace carries the
+gateway's `provider` and `request_id` -- issued by something other than this process, so the run can
+be verified rather than believed.
+
+`demo-discovery/` is whatever the last `make demo` did, and it is deliberately not durable: the demo
+reuses that one directory, so each run overwrites the last. With a key configured the demo is a live
+run too; without one it falls back to a recorded script and says so, in the output and in its own
+record (`model_name: "fake/scripted"`). Either way it compiles into its own directory and never over
+the catalog -- which is why the published artifact's provenance points at a `disc-` run and not at
+this one. Read it for the shape of a run, not as evidence of a particular one.
+
 `capabilities/` holding two artifacts is deliberate. `memberdesk.savings_balance` is what the
 compiler produced from one discovery run: it declares **no** outcomes and **no** recovery rules,
 because a successful run never observed a failure path, and its review notes say exactly that.

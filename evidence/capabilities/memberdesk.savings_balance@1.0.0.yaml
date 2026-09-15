@@ -1,8 +1,10 @@
 schema_version: 1.0.0
 id: memberdesk.savings_balance
 version: 1.0.0
-title: Read member 12345's savings balance
-description: Look up member 12345 and read their current savings balance
+title: 'Looked up member 12345 (Ada Lovelace) and retrieved their savings account details: balance of
+  $4,210.55, status Active, as of 09/11/2026.'
+description: Look up member 12345 and report their savings account balance, the account status, and the
+  as-of date.
 surface:
   kind: legacy_web
   driver_capabilities:
@@ -12,7 +14,7 @@ surface:
     vendor: acme-core
     product: MemberDesk
 entrypoint:
-  url_pattern: '{base_url}/'
+  url_pattern: http://127.0.0.1:8811
 inputs:
   - name: member_number
     type: string
@@ -34,9 +36,15 @@ outputs:
     source:
       step: read_account_status
     sensitive: false
+  - name: as_of_date
+    type: date
+    description: Observed during discovery as '09/11/2026'.
+    source:
+      step: read_as_of_date
+    sensitive: false
 steps:
   - id: type_text_member_number
-    description: enter the member number
+    description: Enter member number 12345 to search for the member.
     action:
       type: type
       target:
@@ -62,7 +70,7 @@ steps:
       timeout_ms: 3000
     risk: safe
   - id: click_search
-    description: run the search
+    description: Search for member 12345 to retrieve their account information.
     action:
       type: click
       target:
@@ -85,7 +93,7 @@ steps:
       timeout_ms: 8000
     risk: safe
   - id: read_savings_balance
-    description: read the savings balance
+    description: Record the savings account balance for member 12345.
     action:
       type: extract
       target:
@@ -104,7 +112,7 @@ steps:
       timeout_ms: 3000
     risk: safe
   - id: read_account_status
-    description: read the account status
+    description: Record the savings account status for member 12345.
     action:
       type: extract
       target:
@@ -118,6 +126,28 @@ steps:
         fingerprint: a565b77dfbd0bf06
         recorded_strategy: structural_anchor
       into: account_status
+    wait:
+      for: snapshot_stable
+      timeout_ms: 3000
+    risk: safe
+  - id: read_as_of_date
+    description: Record the as-of date for the savings account balance.
+    action:
+      type: extract
+      target:
+        role: cell
+        name:
+          value: 09/11/2026
+          match: exact
+        scope:
+          frame: content
+        anchor:
+          relation: adjacent_to
+          text: As Of
+          match: normalized
+        fingerprint: 2ff3d53e4486a110
+        recorded_strategy: semantic_exact
+      into: as_of_date
     wait:
       for: snapshot_stable
       timeout_ms: 3000
@@ -142,6 +172,18 @@ checkpoint:
         role: cell
         name: Status
       min_count: 1
+    - assert: node_exists
+      query:
+        role: cell
+        name_matches: ^\d{1,2}/\d{1,2}/\d{4}$|^\d{4}-\d{2}-\d{2}$
+        scope:
+          frame: content
+      min_count: 1
+    - assert: node_exists
+      query:
+        role: cell
+        name: As Of
+      min_count: 1
 escalation:
   triggers:
     - target_ambiguous
@@ -155,10 +197,10 @@ policy:
   max_duration_ms: 120000
 provenance:
   discovered_by:
-    model: fake/scripted
-    run_id: disc-d45c1ad1bd
-    at: '2026-09-15T12:19:11.457582+00:00'
-  transcript_ref: evidence/discovery/demo-discovery/trace.jsonl
+    model: auto
+    run_id: disc-0a7e7b7ccd
+    at: '2026-09-15T12:37:40.733380+00:00'
+  transcript_ref: evidence/discovery/disc-0a7e7b7ccd/trace.jsonl
   notes: "Compiled from a single discovery run. Before approving, a reviewer should confirm:\n\n  1. Outcomes.\
     \ This run saw only the successful path, so NO business outcomes are declared. Every\n     legitimate\
     \ non-success answer this flow can return -- record not found, permission denied, a\n     closed account\
@@ -170,4 +212,4 @@ provenance:
     \ Checkpoint. It asserts the shape of the extracted outputs. Confirm that is genuinely specific\n\
     \     to this goal rather than true of any page in the application.\n\nThese are gaps, not omissions:\
     \ inventing detectors a run never observed would produce a capability\nwhose error handling is fiction."
-content_hash: sha256:2fb7e000ceb1875bf3e7b96a8578e122e82db1fc8b5c70f59cb936b533768ab6
+content_hash: sha256:94475021352cb539bf3d827f2a877e1b0615a085274bb79b303e357f3443d9a3
