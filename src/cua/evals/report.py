@@ -26,7 +26,9 @@ def evaluate(suite: SuiteResult) -> CapabilityEvaluation:
     statuses = [r.result.status for r in records if r.result is not None]
     return CapabilityEvaluation(
         capability_ref=suite.capability.ref,
-        content_hash=suite.capability.content_hash or "",
+        # The hash of what was reviewed, not of the bound copy that ran -- see
+        # SuiteResult.source_hash.
+        content_hash=suite.source_hash or suite.capability.content_hash or "",
         tenant=suite.tenant,
         runs=len(records),
         successes=sum(1 for s in statuses if s is RunStatus.SUCCESS),
@@ -165,7 +167,7 @@ def write(suite: SuiteResult, *, report_dir: Path = REPORT_DIR) -> dict[str, Pat
     payload = {
         "suite": suite.name,
         "capability": suite.capability.ref,
-        "content_hash": suite.capability.content_hash,
+        "content_hash": suite.source_hash or suite.capability.content_hash,
         "tenant": suite.tenant,
         "metrics": {
             "wrong_actions": evaluation.wrong_actions,

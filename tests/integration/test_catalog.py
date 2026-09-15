@@ -12,6 +12,7 @@ from pathlib import Path
 
 import pytest
 
+from cua.catalog.approvals import ApprovalStore
 from cua.catalog.store import (
     CapabilityNotFoundError,
     CapabilityStore,
@@ -19,6 +20,8 @@ from cua.catalog.store import (
 )
 from cua.catalog.toolspec import tool_definitions
 from cua.cli.agent_demo import interpret
+from cua.domain.approval import ApprovalState, CapabilityApproval
+from cua.domain.evaluation import CapabilityEvaluation
 from cua.domain.result import (
     BusinessOutcome,
     FailureCode,
@@ -205,3 +208,103 @@ def test_an_agent_surfaces_a_real_failure() -> None:
     )
     assert turn.disposition == "failed"
     assert not turn.ok
+
+
+# --------------------------------------------------------------------- approval
+# Integrity and review are separate axes. These assert they stay separate, and that an approval
+# cannot outlive the exact content somebody approved.
+
+
+def test_a_capability_starts_unapproved(store: CapabilityStore) -> None:
+    """Sealing is not reviewing. A freshly compiled artifact is integral and unapproved."""
+    entry = store.list()[0]
+    assert entry.state == "sealed"
+    assert entry.approval is ApprovalState.DRAFT
+
+
+def test_approval_is_recorded_and_shown(store: CapabilityStore) -> None:
+    entry = store.list()[0]
+    approvals = ApprovalStore(root=store.root, evals_root=store.root)
+    approvals.record(
+        ref=entry.ref,
+        content_hash=entry.capability.content_hash,
+        state=ApprovalState.APPROVED,
+        by="reviewer",
+    )
+    assert store.list()[0].approval is ApprovalState.APPROVED
+
+
+def test_editing_an_approved_artifact_invalidates_the_approval(store: CapabilityStore) -> None:
+    """The property the whole mechanism exists for.
+
+    Approval means "a person reviewed *this* content". The approval record pins a hash so that an
+    edit cannot silently inherit the signature. Checked against the *verified* hash rather than
+    the declared one, because the declared hash is a line in the same file an editor controls --
+    comparing against it let an edited artifact keep reading as approved.
+    """
+    entry = store.list()[0]
+    approvals = ApprovalStore(root=store.root, evals_root=store.root)
+    approvals.record(
+        ref=entry.ref,
+        content_hash=entry.capability.content_hash,
+        state=ApprovalState.APPROVED,
+        by="reviewer",
+    )
+    assert store.list()[0].approval is ApprovalState.APPROVED
+
+    path = entry.path
+    path.write_text(
+        path.read_text(encoding="utf-8").replace(
+            f"title: {entry.capability.title}", f"title: {entry.capability.title} (edited)", 1
+        ),
+        encoding="utf-8",
+    )
+
+    after = store.list()[0]
+    assert after.state == "TAMPERED"
+    assert after.approval is ApprovalState.DRAFT, "an edit must not inherit an approval"
+
+
+def test_revoking_closes_the_gate_again(store: CapabilityStore) -> None:
+    """`revoked` rather than back to `draft`.
+
+    "Withdrawn after a problem" and "never reviewed" are different facts, and an operator
+    reading the catalog needs to be able to tell them apart.
+    """
+    entry = store.list()[0]
+    approvals = ApprovalStore(root=store.root, evals_root=store.root)
+    for state in (ApprovalState.APPROVED, ApprovalState.REVOKED):
+        approvals.record(
+            ref=entry.ref,
+            content_hash=entry.capability.content_hash,
+            state=state,
+            by="reviewer",
+        )
+    assert store.list()[0].approval is ApprovalState.REVOKED
+    stored = approvals.load(entry.ref)
+    assert stored is not None
+    assert not stored.permits_unattended_replay(content_hash=entry.capability.content_hash)
+
+
+def test_a_recommendation_is_refused_without_evidence_for_this_exact_content() -> None:
+    """Evidence measured against a different version is not evidence about this one.
+
+    `cua eval` runs a capability bound to a port, and a tenant suite runs it overlaid -- so the
+    executed capability hashes differently from the published one. Recording the executed hash
+    made every evaluation untraceable to the artifact it was evidence about, and would have let
+    `--from-eval` approve on measurements of different content.
+    """
+    measured = CapabilityEvaluation(
+        capability_ref="x@1.0.0", content_hash="sha256:aaa", runs=20, successes=20
+    )
+    supported, why = CapabilityApproval.recommend(measured)
+    assert supported and "20 runs" in why
+
+    thin = CapabilityEvaluation(capability_ref="x@1.0.0", content_hash="sha256:aaa", runs=2)
+    assert CapabilityApproval.recommend(thin)[0] is False
+
+    wrong = CapabilityEvaluation(
+        capability_ref="x@1.0.0", content_hash="sha256:aaa", runs=50, successes=50, wrong_actions=1
+    )
+    supported, why = CapabilityApproval.recommend(wrong)
+    assert supported is False and "wrong action" in why

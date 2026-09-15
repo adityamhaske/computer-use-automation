@@ -1,0 +1,8 @@
+{
+  "approved_at": "2026-09-15T18:27:33.084036Z",
+  "approved_by": "aditya",
+  "capability_ref": "corebank.member.savings_balance@1.0.0",
+  "content_hash": "sha256:c02fd44b01c3c1a62e83ed2a18d249d6aa7be28e57ff18bcb45ee11d79739547",
+  "notes": "20 runs, 100% stable, zero wrong actions, mean drift 0.00",
+  "state": "approved"
+}

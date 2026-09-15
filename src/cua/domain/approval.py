@@ -9,8 +9,12 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import StrEnum
+from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, ConfigDict
+
+if TYPE_CHECKING:
+    from cua.domain.evaluation import CapabilityEvaluation
 
 
 class ApprovalState(StrEnum):
@@ -46,3 +50,38 @@ class CapabilityApproval(BaseModel):
         the gate on money-moving automation.
         """
         return self.state is ApprovalState.APPROVED and self.content_hash == content_hash
+
+    @staticmethod
+    def recommend(evaluation: CapabilityEvaluation) -> tuple[bool, str]:
+        """What the measured evidence suggests, and why. A proposal, never a decision.
+
+        Deliberately not a method that returns an approved `CapabilityApproval`. Approval is a
+        person taking responsibility for a capability running unattended against a banking system;
+        a function that could hand that out would make the gate decorative. So this returns a
+        recommendation and the sentence behind it, and `cua catalog approve` still requires
+        somebody to type it.
+
+        The threshold is `CapabilityEvaluation.is_trustworthy`, which is strict on purpose: any
+        wrong action at all disqualifies, however good the success rate looks. One wrong click on
+        a financial screen is not averaged away.
+        """
+        if evaluation.runs == 0:
+            return False, "no measured runs -- run `cua eval` first"
+        if evaluation.wrong_actions:
+            return (
+                False,
+                f"{evaluation.wrong_actions} wrong action(s) recorded; "
+                "any wrong action disqualifies regardless of success rate",
+            )
+        if evaluation.runs < 5:
+            return False, f"only {evaluation.runs} run(s) measured; at least 5 are needed"
+        if evaluation.stability_score < 0.95:
+            return (
+                False,
+                f"stability {evaluation.stability_score:.0%} is below the 95% threshold",
+            )
+        return (
+            True,
+            f"{evaluation.runs} runs, {evaluation.stability_score:.0%} stable, "
+            f"zero wrong actions, mean drift {evaluation.mean_drift:.2f}",
+        )

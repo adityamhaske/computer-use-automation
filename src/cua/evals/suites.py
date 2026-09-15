@@ -53,14 +53,39 @@ class SuiteResult:
     name: str
     headline: str
     capability: Capability
+    """The capability as executed: bound to this run's port, and overlaid for a tenant suite."""
+
     tenant: str | None
+    source_hash: str = ""
+    """Hash of the capability *as published*, before binding or overlay.
+
+    The evaluation is evidence about a reviewed document, so it has to name that document.
+    Recording the executed capability's hash instead produced a number matching nothing on
+    disk -- three different hashes for one ref -- which made the evidence impossible to tie
+    back to the artifact, and made `cua catalog approve --from-eval` unable to confirm that
+    what was measured is what is being approved.
+    """
+
     records: list[RunRecord] = field(default_factory=list)
     truth: dict[str, GroundTruth] = field(default_factory=dict)
     notes: list[str] = field(default_factory=list)
 
 
+def _source() -> Capability:
+    """The capability as published, unbound.
+
+    Read from the catalog rather than from the test fixture: an evaluation is evidence offered to
+    a reviewer about the artifact they will approve, and measuring a different copy of it makes
+    the evidence a statement about something else. Falls back to the fixture so the suite still
+    runs in a checkout with an empty catalog.
+    """
+    published = Path("evidence/capabilities/corebank.member.savings_balance@1.0.0.yaml")
+    source = published if published.exists() else FIXTURE
+    return load_capability(source.read_text(encoding="utf-8"))
+
+
 def _reference(base_url: str) -> Capability:
-    """The hand-authored capability, bound to this run's port."""
+    """The published capability, bound to this run's port."""
     binding = TenantBinding.model_validate(
         {
             "capability_ref": "corebank.member.savings_balance@1.0.0",
@@ -68,7 +93,7 @@ def _reference(base_url: str) -> Capability:
             "vars": {"base_url": base_url},
         }
     )
-    return binding.apply(load_capability(FIXTURE.read_text(encoding="utf-8")))
+    return binding.apply(_source())
 
 
 def _truth() -> dict[str, GroundTruth]:
@@ -92,6 +117,7 @@ def replay_stability(*, repeats: int = 5, headless: bool = True) -> SuiteResult:
         headline="Does the same artifact keep working, and does it ever act on the wrong control?",
         capability=capability,
         tenant=None,
+        source_hash=_source().content_hash,
         records=records,
         truth=_truth(),
         notes=[
@@ -177,6 +203,7 @@ def cross_tenant(*, repeats: int = 2, headless: bool = True) -> SuiteResult:
         headline="Does the same artifact serve a second institution without being re-recorded?",
         capability=effective,
         tenant="northgate-fcu",
+        source_hash=_source().content_hash,
         records=records,
         truth=_truth(),
         notes=[

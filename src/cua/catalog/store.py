@@ -15,6 +15,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from cua.catalog.approvals import ApprovalStore
+from cua.domain.approval import ApprovalState
 from cua.domain.capability import Capability
 from cua.domain.serde import load_capability
 
@@ -51,6 +53,14 @@ class CatalogEntry:
 
     capability: Capability
     path: Path
+    approval: ApprovalState | None = None
+    """Review state, filled in by `CapabilityStore.list()`.
+
+    A second axis, not a refinement of `state` below. Integrity asks whether the bytes still
+    match the hash; approval asks whether a person signed this version off for unattended
+    replay. A sealed artifact can be unapproved, and an approved one can later be tampered
+    with -- collapsing them into one word would hide whichever mattered.
+    """
 
     @property
     def ref(self) -> str:
@@ -89,6 +99,8 @@ class CapabilityStore:
     """Capabilities on disk, addressed by `id` or `id@version`."""
 
     root: Path = DEFAULT_ROOT
+    approvals: ApprovalStore | None = None
+    """Where review state is read from. Defaults to beside the artifacts."""
 
     unreadable: list[tuple[Path, str]] = field(default_factory=list)
     """Files that could not be parsed at all, from the most recent `list()`."""
@@ -113,7 +125,24 @@ class CapabilityStore:
             except Exception as exc:
                 self.unreadable.append((path, str(exc).splitlines()[0]))
                 continue
-            entries.append(CatalogEntry(capability, path))
+            store = self.approvals or ApprovalStore(root=self.root)
+            entries.append(
+                CatalogEntry(
+                    capability,
+                    path,
+                    # Verified hash, not the declared one. The declared hash is a line in a
+                    # file the editor also controls: comparing against it meant an edited
+                    # artifact still read as `approved`, which is the precise hole the pinning
+                    # exists to close. An artifact whose bytes no longer match cannot be
+                    # approved, because nobody knows what content was reviewed.
+                    approval=store.state_for(
+                        capability.ref,
+                        content_hash=(
+                            capability.content_hash if capability.hash_is_valid() else ""
+                        ),
+                    ),
+                )
+            )
 
         entries.sort(key=lambda e: (e.capability.id, _version_key(e.capability.version)))
         return entries

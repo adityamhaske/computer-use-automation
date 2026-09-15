@@ -551,13 +551,124 @@ def catalog_list() -> None:
         typer.secho(f"  ! {path.name} could not be read: {why}", fg=typer.colors.RED)
 
     for entry in entries:
-        typer.secho(f"\n{entry.ref}  [{entry.state}]", bold=True)
+        # Two axes, shown as two words. Integrity is about the bytes; approval is about
+        # whether a person signed this version off for unattended replay.
+        badge = f"{entry.state} · {entry.approval.value if entry.approval else 'draft'}"
+        typer.secho(f"\n{entry.ref}  [{badge}]", bold=True)
         typer.echo(f"  {entry.capability.title}")
         typer.echo(f"  {entry.signature}")
         if entry.capability.outcomes:
             codes = ", ".join(o.code for o in entry.capability.outcomes)
             typer.echo(f"  outcomes: {codes}")
     typer.echo()
+
+
+@catalog_app.command("approve")
+def catalog_approve(
+    ref: Annotated[str, typer.Argument(help="Capability `id` or `id@version`.")],
+    by: Annotated[str, typer.Option(help="Who is taking responsibility for this.")] = "operator",
+    notes: Annotated[str, typer.Option(help="Why, for the record.")] = "",
+    from_eval: Annotated[
+        bool,
+        typer.Option(
+            "--from-eval",
+            help=(
+                "Check the measured evidence in evidence/evals/ first and refuse if it does not "
+                "support approval. Without this the decision is taken on your word alone."
+            ),
+        ),
+    ] = False,
+) -> None:
+    """Approve a capability version for unattended replay.
+
+    A person, not a score. `--from-eval` will *refuse* an approval the evidence does not support,
+    but no amount of good evidence approves anything on its own -- approval is somebody accepting
+    responsibility for automation running unattended against a banking system, and a function that
+    could hand that out would make the gate decorative.
+    """
+    from cua.catalog.approvals import ApprovalStore
+    from cua.catalog.store import CapabilityStore
+    from cua.domain.approval import ApprovalState, CapabilityApproval
+
+    try:
+        entry = CapabilityStore().resolve(ref)
+    except LookupError as exc:
+        typer.secho(str(exc), fg=typer.colors.RED, err=True)
+        raise typer.Exit(code=2) from exc
+
+    capability = entry.capability
+    if not capability.content_hash:
+        typer.secho(
+            "this artifact is unsealed, so there is no exact content to pin an approval to",
+            fg=typer.colors.RED,
+            err=True,
+        )
+        raise typer.Exit(code=2)
+
+    store = ApprovalStore()
+    if from_eval:
+        evaluation = store.evaluation_for(capability.ref, content_hash=capability.content_hash)
+        if evaluation is None:
+            typer.secho(
+                f"no measured evidence for {capability.ref} at its current content hash "
+                "-- the artifact has changed since it was last evaluated, or `cua eval` has "
+                "not been run. Re-run `cua eval`.",
+                fg=typer.colors.RED,
+                err=True,
+            )
+            raise typer.Exit(code=1)
+        supported, why = CapabilityApproval.recommend(evaluation)
+        if not supported:
+            typer.secho(f"refused: {why}", fg=typer.colors.RED, err=True)
+            raise typer.Exit(code=1)
+        typer.echo(f"  evidence: {why}")
+        notes = notes or why
+
+    approval = store.record(
+        ref=capability.ref,
+        content_hash=capability.content_hash,
+        state=ApprovalState.APPROVED,
+        by=by,
+        notes=notes,
+    )
+    typer.secho(f"approved {capability.ref}", fg=typer.colors.GREEN, bold=True)
+    typer.echo(f"  by      : {approval.approved_by}")
+    typer.echo(f"  pinned  : {approval.content_hash}")
+    typer.echo(f"  record  : {store.path_for(capability.ref)}")
+    typer.echo("\n  Editing the artifact changes its hash and invalidates this approval.")
+
+
+@catalog_app.command("revoke")
+def catalog_revoke(
+    ref: Annotated[str, typer.Argument(help="Capability `id` or `id@version`.")],
+    by: Annotated[str, typer.Option(help="Who is withdrawing it.")] = "operator",
+    notes: Annotated[str, typer.Option(help="Why, for the record.")] = "",
+) -> None:
+    """Withdraw an approval after a problem is found.
+
+    Recorded as `revoked` rather than reset to `draft`, so the history stays legible: "was approved
+    and someone took it back" is a different fact from "nobody has reviewed this yet".
+    """
+    from cua.catalog.approvals import ApprovalStore
+    from cua.catalog.store import CapabilityStore
+    from cua.domain.approval import ApprovalState
+
+    try:
+        entry = CapabilityStore().resolve(ref)
+    except LookupError as exc:
+        typer.secho(str(exc), fg=typer.colors.RED, err=True)
+        raise typer.Exit(code=2) from exc
+
+    store = ApprovalStore()
+    store.record(
+        ref=entry.capability.ref,
+        content_hash=entry.capability.content_hash,
+        state=ApprovalState.REVOKED,
+        by=by,
+        notes=notes,
+    )
+    typer.secho(f"revoked {entry.capability.ref}", fg=typer.colors.YELLOW, bold=True)
+    typer.echo("  unattended replay of an irreversible step is gated again")
 
 
 @catalog_app.command("show")

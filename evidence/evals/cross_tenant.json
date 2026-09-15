@@ -1,6 +1,6 @@
 {
   "capability": "corebank.member.savings_balance@1.0.0",
-  "content_hash": "sha256:ba25fc49c0bfc0a8eb17dadd57a9dcb5988236326cbb8953768733834ed84521",
+  "content_hash": "sha256:c02fd44b01c3c1a62e83ed2a18d249d6aa7be28e57ff18bcb45ee11d79739547",
   "metrics": {
     "determinism_holds": true,
     "escalations": 0,
