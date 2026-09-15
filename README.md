@@ -2,7 +2,8 @@
 
 [![CI](https://github.com/adityamhaske/interface.ai/actions/workflows/ci.yml/badge.svg)](https://github.com/adityamhaske/interface.ai/actions/workflows/ci.yml)
 
-> **Discovery is probabilistic. Execution is deterministic.**
+> **An LLM is allowed to be uncertain exactly once.** That uncertainty is compiled into a
+> typed artifact, which then runs with no model in the loop.
 
 An LLM works out how to accomplish a goal in a legacy application that has no API — **once**. That
 run is compiled into a typed, versioned **capability artifact**, which is then replayed with no model

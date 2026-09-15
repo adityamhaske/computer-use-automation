@@ -1,6 +1,7 @@
 # Computer-Use Automation System (CUA) — Full Technical Specification & Documentation
 
-> Core Thesis: Discovery is probabilistic. Execution is deterministic.
+> Core thesis: an LLM is allowed to be uncertain exactly once; the run it produces is
+> compiled into a typed artifact that replays with no model in the loop.
 > Canonical URL: https://adityamhaske.github.io/interface.ai/
 > GitHub: https://github.com/adityamhaske/interface.ai
 

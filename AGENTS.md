@@ -10,7 +10,8 @@ Read this before your first edit. `CLAUDE.md` points here.
 
 ## The thesis
 
-> **Discovery is probabilistic. Execution is deterministic.**
+> **An LLM is allowed to be uncertain exactly once.** That uncertainty is compiled into a
+> typed artifact, which then runs with no model in the loop.
 
 An LLM is allowed to be uncertain exactly once — during discovery, when it is figuring out how to
 accomplish a goal in an application it has never seen. That uncertainty is then *compiled* into a

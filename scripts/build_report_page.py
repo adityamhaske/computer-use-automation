@@ -151,11 +151,11 @@ def _shared_chrome() -> tuple[str, str]:
     for href in ("index.html", "docs/index.html", "report/index.html", "walkthrough/index.html"):
         nav_html = nav_html.replace(f'href="{href}"', f'href="../{href}"')
     nav_html = nav_html.replace(
-        '<a href="../index.html" class="nav-link active">Overview</a>',
-        '<a href="../index.html" class="nav-link">Overview</a>',
+        '<a href="../index.html" class="nav-link active">Home</a>',
+        '<a href="../index.html" class="nav-link">Home</a>',
     ).replace(
-        '<a href="../report/index.html" class="nav-link">Design write-up</a>',
-        '<a href="../report/index.html" class="nav-link active">Design write-up</a>',
+        '<a href="../report/index.html" class="nav-link">Design</a>',
+        '<a href="../report/index.html" class="nav-link active">Design</a>',
     )
 
     footer_html = footer.group(0)

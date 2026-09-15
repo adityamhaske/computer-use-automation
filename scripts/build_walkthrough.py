@@ -474,15 +474,44 @@ PARTS: list[Part] = [
 STYLE = """
 /* Page-specific only; palette, nav, buttons and footer come from ../assets/site.css.
    This page is pinned to light (data-theme on <html>, toggle dropped from the nav) because
-   every screenshot in it is light. */
-.wrap{max-width:900px;margin:0 auto;padding:calc(var(--nav-height) + 2.5rem) 20px 4rem}
+   every screenshot in it is light.
+
+   The layout deliberately mirrors the documentation page -- sticky left index, content column
+   to its right, drawer below 860px -- so moving between the two does not feel like moving
+   between two products. The measurements below are the documentation page's. */
+.layout{display:flex;padding-top:var(--nav-height);min-height:100vh;max-width:1280px;
+  margin:0 auto;padding-left:clamp(40px,6vw,100px);padding-right:clamp(40px,6vw,100px)}
+
+.sidebar{width:var(--sidebar-width);flex-shrink:0;position:sticky;top:var(--nav-height);
+  height:calc(100vh - var(--nav-height));overflow-y:auto;border-right:1px solid var(--border);
+  background:var(--bg-sidebar);padding:24px 20px}
+.sidebar-heading{font-family:var(--font-serif);font-size:1.05rem;font-weight:600;
+  margin:0 0 16px;padding-left:4px}
+.sidebar-group{margin-bottom:20px}
+.sidebar-group-label{font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--text-muted);padding-left:4px;margin-bottom:8px;line-height:1.4}
+.sidebar-link{display:flex;gap:8px;padding:5px 10px;margin:1px 0;font-size:13px;line-height:1.45;
+  color:var(--text-secondary);text-decoration:none;border-radius:4px;transition:all .1s;
+  border-left:2px solid transparent}
+.sidebar-link:hover{background:var(--bg-highlight);color:var(--text)}
+.sidebar-link.active{background:var(--accent-bg);color:var(--text);font-weight:600;
+  border-left-color:var(--accent)}
+.sl-num{font-family:var(--font-mono);font-size:11px;color:var(--text-faint);
+  font-variant-numeric:tabular-nums;flex:none;min-width:1.5em;padding-top:1px}
+.sidebar-link.active .sl-num{color:var(--accent)}
+
+.sidebar-toggle{display:none;position:fixed;bottom:20px;left:20px;z-index:200;width:44px;
+  height:44px;border-radius:50%;background:var(--btn-primary-bg);color:var(--btn-primary-text);
+  border:none;font-size:18px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+
+.content{flex:1;min-width:0;padding:40px clamp(36px,4vw,64px) 96px;max-width:860px}
 
 .lede{margin-bottom:2.5rem}
 .eyebrow{font-size:.72rem;font-weight:600;letter-spacing:.13em;text-transform:uppercase;
   color:var(--accent);margin:0 0 .6rem}
-.lede h1{font-family:var(--font-serif);font-size:clamp(2rem,5vw,2.7rem);font-weight:600;
+.lede h1{font-family:var(--font-serif);font-size:clamp(1.9rem,4.5vw,2.5rem);font-weight:600;
   line-height:1.12;letter-spacing:-.02em;margin:0 0 1rem;text-wrap:balance}
-.standfirst{font-size:1.05rem;line-height:1.65;color:var(--text-secondary);margin:0 0 1.5rem;
+.standfirst{font-size:1.02rem;line-height:1.65;color:var(--text-secondary);margin:0 0 1.5rem;
   max-width:70ch}
 .meta{display:flex;flex-direction:column;gap:.35rem;padding:1rem 1.15rem;font-size:.85rem;
   color:var(--text-secondary);background:var(--bg-card);border:1px solid var(--border);
@@ -491,27 +520,14 @@ STYLE = """
 .meta code{font-family:var(--font-mono);font-size:.9em;background:var(--bg-code);
   padding:.08em .34em;border-radius:3px}
 
-.toc{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
-  padding:1.5rem 1.6rem;margin-bottom:3.5rem}
-.toc>h2{font-family:var(--font-serif);font-size:1.3rem;font-weight:600;margin:0 0 1.1rem}
-.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:1.4rem}
-.toc-part h3{font-size:.72rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
-  color:var(--text-muted);margin:0 0 .55rem}
-.toc-part ol{list-style:none;margin:0;padding:0}
-.toc-part li{margin-bottom:.3rem}
-.toc-part a{display:flex;gap:.55rem;text-decoration:none;color:var(--text-secondary);
-  font-size:.9rem;line-height:1.4;padding:.15rem 0}
-.toc-part a:hover{color:var(--accent)}
-.toc-part .num{font-family:var(--font-mono);font-size:.78rem;color:var(--text-faint);
-  font-variant-numeric:tabular-nums;flex:none;min-width:1.4em}
-
-.part{margin:3.5rem 0 2rem;padding-top:1.4rem;border-top:2px solid var(--accent)}
-.part h2{font-family:var(--font-serif);font-size:1.6rem;font-weight:600;margin:0 0 .5rem;
+.part{margin:3rem 0 1.8rem;padding-top:1.3rem;border-top:2px solid var(--accent);
+  scroll-margin-top:calc(var(--nav-height) + 20px)}
+.part h2{font-family:var(--font-serif);font-size:1.5rem;font-weight:600;margin:0 0 .5rem;
   letter-spacing:-.015em}
 .part p{margin:0;color:var(--text-secondary);max-width:72ch}
 
 .step{margin:0 0 3rem;scroll-margin-top:calc(var(--nav-height) + 20px)}
-.step h3{display:flex;gap:.7rem;align-items:baseline;font-size:1.12rem;font-weight:600;
+.step h3{display:flex;gap:.7rem;align-items:baseline;font-size:1.1rem;font-weight:600;
   margin:0 0 1rem;letter-spacing:-.01em}
 .stepnum{font-family:var(--font-mono);font-size:.82rem;font-weight:600;color:var(--accent);
   background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:5px;
@@ -533,13 +549,17 @@ figcaption{margin-top:.75rem;padding-left:.9rem;border-left:3px solid var(--acce
   text-transform:uppercase;color:var(--text-muted);margin-bottom:.25rem}
 
 .closing{margin-top:4rem;padding-top:2rem;border-top:1px solid var(--border)}
-.closing h2{font-family:var(--font-serif);font-size:1.5rem;font-weight:600;margin:0 0 .8rem}
+.closing h2{font-family:var(--font-serif);font-size:1.4rem;font-weight:600;margin:0 0 .8rem}
 .closing p{color:var(--text-secondary);max-width:72ch;line-height:1.7}
 .closing-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:1.5rem}
 
-@media (max-width:640px){
-  .toc{padding:1.2rem}
-  .step h3{flex-wrap:wrap}
+@media (max-width:860px){
+  .layout{padding-left:0;padding-right:0}
+  .sidebar{position:fixed;left:-100%;width:280px;z-index:150;transition:left .25s;
+    box-shadow:4px 0 20px rgba(0,0,0,.1)}
+  .sidebar.open{left:0}
+  .sidebar-toggle{display:flex;align-items:center;justify-content:center}
+  .content{padding:32px 20px 60px}
 }
 """
 
@@ -556,8 +576,8 @@ def _shared_chrome() -> tuple[str, str]:
     for href in ("index.html", "docs/index.html", "report/index.html", "walkthrough/index.html"):
         nav_html = nav_html.replace(f'href="{href}"', f'href="../{href}"')
     nav_html = nav_html.replace(
-        '<a href="../index.html" class="nav-link active">Overview</a>',
-        '<a href="../index.html" class="nav-link">Overview</a>',
+        '<a href="../index.html" class="nav-link active">Home</a>',
+        '<a href="../index.html" class="nav-link">Home</a>',
     )
     nav_html = nav_html.replace(
         '<a href="../walkthrough/index.html" class="nav-link">Walkthrough</a>',
@@ -604,20 +624,20 @@ def _figure(step: Step, number: int) -> str:
 def _render() -> str:
     nav_html, footer_html = _shared_chrome()
 
-    index_rows: list[str] = []
+    sidebar_groups: list[str] = []
     sections: list[str] = []
     n = 0
-    for p, part in enumerate(PARTS, start=1):
+    for i, part in enumerate(PARTS, start=1):
         sections.append(
-            f'<section class="part"><h2>Part {p} · {html.escape(part.title)}</h2>'
+            f'<section class="part" id="part-{i}"><h2>Part {i} · {html.escape(part.title)}</h2>'
             f"<p>{part.blurb}</p></section>"
         )
-        items: list[str] = []
+        links: list[str] = []
         for step in part.steps:
             n += 1
-            items.append(
-                f'<li><a href="#step-{n}"><span class="num">{n}</span>'
-                f"{html.escape(step.title)}</a></li>"
+            links.append(
+                f'<a class="sidebar-link" href="#step-{n}" data-step="{n}">'
+                f'<span class="sl-num">{n}</span>{html.escape(step.title)}</a>'
             )
             body = "".join(f"<p>{para}</p>" for para in step.body)
             sections.append(
@@ -625,9 +645,10 @@ def _render() -> str:
                 f'<h3><span class="stepnum">{n}</span>{html.escape(step.title)}</h3>'
                 f"{_figure(step, n)}{body}</section>"
             )
-        index_rows.append(
-            f'<div class="toc-part"><h3>Part {p} · {html.escape(part.title)}</h3>'
-            f"<ol>{''.join(items)}</ol></div>"
+        sidebar_groups.append(
+            f'<div class="sidebar-group">'
+            f'<div class="sidebar-group-label">Part {i} · {html.escape(part.title)}</div>'
+            f"{''.join(links)}</div>"
         )
 
     return f"""<!doctype html>
@@ -643,45 +664,114 @@ against the running application with screenshots and real captured output.">
 <link rel="stylesheet" href="../assets/site.css">
 <style>{STYLE}</style></head><body>
 {nav_html}
-<div class="wrap">
-  <header class="lede">
-    <p class="eyebrow">End-to-end walkthrough</p>
-    <h1>Every step, against the running system</h1>
-    <p class="standfirst">{n} steps from a locked legacy screen to an agent calling a typed
-      function. Every screenshot below is of the real application or the real operator console;
-      every terminal block is real captured output. Nothing here is a mockup.</p>
-    <div class="meta">
-      <span><strong>Discovery run</strong> disc-e0aa86b951 · 6 model calls · 10,215 tokens</span>
-      <span><strong>Artifact</strong> memberdesk.savings_balance@1.0.0, sealed</span>
-      <span><strong>Reproduce</strong> <code>make app</code>, then
-        <code>make walkthrough</code></span>
-    </div>
-  </header>
+<div class="layout">
+  <aside class="sidebar" id="sidebar" aria-label="Walkthrough contents">
+    <div class="sidebar-heading">Contents</div>
+    {"".join(sidebar_groups)}
+  </aside>
 
-  <nav class="toc" aria-label="Contents">
-    <h2>Contents</h2>
-    <div class="toc-grid">{"".join(index_rows)}</div>
-  </nav>
+  <main class="content">
+    <header class="lede">
+      <p class="eyebrow">End-to-end walkthrough</p>
+      <h1>Every step, against the running system</h1>
+      <p class="standfirst">{n} steps from a locked legacy screen to an agent calling a typed
+        function. Every screenshot below is of the real application or the real operator console;
+        every terminal block is real captured output. Nothing here is a mockup.</p>
+      <div class="meta">
+        <span><strong>Discovery run</strong> disc-e0aa86b951 · 6 model calls · 10,215 tokens</span>
+        <span><strong>Artifact</strong> memberdesk.savings_balance@1.0.0, sealed</span>
+        <span><strong>Reproduce</strong> <code>make app</code>, then
+          <code>make walkthrough</code></span>
+      </div>
+    </header>
 
-  {"".join(sections)}
+    {"".join(sections)}
 
-  <section class="closing">
-    <h2>What this demonstrated</h2>
-    <p>An LLM worked out how to operate a legacy application once, and that run became a typed,
-      versioned, sealed artifact. The artifact replays deterministically against inputs the
-      discovery never saw, distinguishes a negative answer from a fault, bounds its own recovery,
-      fails closed on anything it does not recognise, hands the live session to a person and takes
-      it back, and presents itself to an agent as a function with a declared signature.</p>
-    <div class="closing-links">
-      <a class="btn btn-primary" href="../report/index.html"
-        ><span>Read the design write-up</span></a>
-      <a class="btn btn-secondary" href="../docs/index.html"><span>Documentation</span></a>
-      <a class="btn btn-github" href="{REPO}" target="_blank" rel="noopener"
-        ><span>Source on GitHub</span></a>
-    </div>
-  </section>
+    <section class="closing">
+      <h2>What this demonstrated</h2>
+      <p>An LLM worked out how to operate a legacy application once, and that run became a typed,
+        versioned, sealed artifact. The artifact replays deterministically against inputs the
+        discovery never saw, distinguishes a negative answer from a fault, bounds its own recovery,
+        fails closed on anything it does not recognise, hands the live session to a person and
+        takes it back, and presents itself to an agent as a function with a declared signature.</p>
+      <div class="closing-links">
+        <a class="btn btn-primary" href="../report/index.html"
+          ><span>Read the design write-up</span></a>
+        <a class="btn btn-secondary" href="../docs/index.html"><span>Documentation</span></a>
+        <a class="btn btn-github" href="{REPO}" target="_blank" rel="noopener"
+          ><span>Source on GitHub</span></a>
+      </div>
+    </section>
+  </main>
 </div>
+
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle contents">☰</button>
 {footer_html}
+<script>
+// Highlight the step currently in view, and keep it scrolled into sight in the sidebar. Same
+// affordance the documentation page gives: the sidebar says where you are, not just where you
+// could go.
+//
+// Done by position rather than with IntersectionObserver. The observer version took whichever
+// entry fired last, and entry order is not document order -- jumping several steps at once
+// highlighted an arbitrary one of the steps that had crossed the viewport on the way. Asking
+// "which step has most recently passed the line" is the question actually being asked, and it
+// has one answer at any scroll position.
+(function () {{
+  const steps = [...document.querySelectorAll(".step")];
+  const links = new Map(
+    [...document.querySelectorAll(".sidebar-link")].map((a) => [a.dataset.step, a])
+  );
+  const sidebar = document.getElementById("sidebar");
+  let current = null;
+  let queued = false;
+
+  function update() {{
+    queued = false;
+    const line = 140;                       // a little below the fixed nav
+    let id = steps.length ? steps[0].id : null;
+    for (const step of steps) {{
+      if (step.getBoundingClientRect().top > line) break;
+      id = step.id;
+    }}
+    if (!id) return;
+    const key = id.replace("step-", "");
+    if (key === current) return;
+    links.get(current)?.classList.remove("active");
+    current = key;
+    const link = links.get(key);
+    if (!link) return;
+    link.classList.add("active");
+    // Only chase the link when it has actually scrolled out of the rail, so the sidebar does
+    // not jitter on every step while the reader is moving through the middle of it.
+    const rail = sidebar.getBoundingClientRect();
+    const box = link.getBoundingClientRect();
+    if (box.top < rail.top + 8 || box.bottom > rail.bottom - 8) {{
+      link.scrollIntoView({{ block: "nearest" }});
+    }}
+  }}
+
+  addEventListener(
+    "scroll",
+    () => {{
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(update);
+    }},
+    {{ passive: true }}
+  );
+  addEventListener("resize", update, {{ passive: true }});
+  update();
+
+  document.getElementById("sidebarToggle").addEventListener("click", () => {{
+    sidebar.classList.toggle("open");
+  }});
+  // On a phone the sidebar is a drawer over the content, so close it once it has been used.
+  sidebar.addEventListener("click", (e) => {{
+    if (e.target.closest(".sidebar-link")) sidebar.classList.remove("open");
+  }});
+}})();
+</script>
 </body></html>"""
 
 

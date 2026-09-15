@@ -66,6 +66,9 @@
   --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
 
   --nav-height: 60px;
+  /* The sticky index column, shared by the documentation page and the walkthrough. */
+  --sidebar-width: 270px;
+  --bg-sidebar: #f4f2ef;
   --nav-bg: rgba(250, 249, 247, 0.88);
   --content-max-width: 1120px;
 }
@@ -96,6 +99,7 @@
   --border: #2b2721;
   --border-strong: #3d372f;
   --nav-bg: rgba(18, 17, 15, 0.88);
+  --bg-sidebar: #191714;
 
   /* Dark values for the same tokens. */
   --color-mint: #57bd8b;
@@ -176,6 +180,10 @@ body > nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  /* A floor, not a preference. `space-between` distributes whatever is left over, and once the
+     brand plus the links exceed the bar there is nothing left over -- so they met with a 2px
+     gap and "CUA" ran straight into the first link. A gap cannot be distributed away. */
+  gap: 24px;
 }
 
 .nav-brand-group {
@@ -222,8 +230,14 @@ body > nav {
 
 .nav-right {
   display: flex;
-  gap: 14px;
+  /* The text links carry most of this; the GitHub button gets a wider gap of its own below so
+     the group of links reads as one set and the button as a separate control. */
+  gap: 26px;
   align-items: center;
+}
+
+.nav-right .nav-github-btn {
+  margin-left: 6px;
 }
 
 .nav-link {
@@ -424,3 +438,41 @@ footer a:hover {
 
 /* RESPONSIVE */
 
+
+/* ------------------------------------------------------- the bar at narrow widths
+ *
+ * Four text links and a button do not fit beside the brand much below a laptop, and the bar has
+ * no room to wrap: it is a fixed height. So give ground in the order the content can least
+ * afford to lose it -- first the gaps, then the brand's second line, then the button's label,
+ * which is the one element that still reads perfectly as an icon alone. */
+
+@media (max-width: 900px) {
+  .nav-right {
+    gap: 16px;
+  }
+
+  .nav-right .nav-github-btn {
+    margin-left: 2px;
+  }
+}
+
+@media (max-width: 720px) {
+  .nav-brand-subtitle {
+    display: none;
+  }
+
+  .nav-right {
+    gap: 13px;
+  }
+}
+
+@media (max-width: 560px) {
+  /* Icon only. The mark is recognisable and the link's aria-label still says where it goes. */
+  .nav-github-btn span {
+    display: none;
+  }
+
+  .nav-github-btn {
+    padding: 6px 8px;
+  }
+}

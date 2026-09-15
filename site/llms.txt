@@ -1,6 +1,7 @@
 # Computer-Use Automation System (CUA)
 > Deterministic Execution Engine for Regulated Banking Applications.
-> Core Thesis: Discovery is probabilistic. Execution is deterministic.
+> Core thesis: an LLM is allowed to be uncertain exactly once; the run it produces is
+> compiled into a typed artifact that replays with no model in the loop.
 
 ## Summary
 CUA is an enterprise computer-use automation system engineered for regulated financial back-offices (banks and credit unions). An LLM is permitted to explore an arbitrary legacy application with no API exactly once. That exploration trace is compiled into an immutable, typed, content-hashed Capability Artifact. All subsequent runs execute deterministically with zero model calls in the loop.

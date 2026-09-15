@@ -1,8 +1,7 @@
 # Design write-up
 
-> **Discovery is probabilistic. Execution is deterministic.**
-> The model is allowed to be uncertain exactly once. That uncertainty is compiled into an artifact
-> that never needs it again.
+> **The model is allowed to be uncertain exactly once.** That uncertainty is compiled into a
+> typed artifact that never needs it again, and every run after the first is deterministic.
 
 Every claim below is backed by something runnable: an enforced import contract, a test, or a file in
 [`evidence/`](https://github.com/adityamhaske/interface.ai/tree/main/evidence/). What is not built says so in §7.

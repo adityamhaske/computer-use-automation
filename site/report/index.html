@@ -89,10 +89,10 @@ hr{border:0;border-top:1px solid var(--border);margin:2rem 0}
       </a>
 
       <div class="nav-right">
-        <a href="../index.html" class="nav-link">Overview</a>
+        <a href="../index.html" class="nav-link">Home</a>
         <a href="../walkthrough/index.html" class="nav-link">Walkthrough</a>
-        <a href="../docs/index.html" class="nav-link">Documentation</a>
-        <a href="../report/index.html" class="nav-link active">Design write-up</a>
+        <a href="../docs/index.html" class="nav-link">Docs</a>
+        <a href="../report/index.html" class="nav-link active">Design</a>
         <a href="https://github.com/adityamhaske/interface.ai" class="nav-github-btn" target="_blank" rel="noopener"
           aria-label="GitHub repository">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
@@ -124,9 +124,8 @@ hr{border:0;border-top:1px solid var(--border);margin:2rem 0}
     target="_blank" rel="noopener"><span>View on GitHub</span></a>
 </div><h1>Design write-up</h1>
 <blockquote>
-<p><strong>Discovery is probabilistic. Execution is deterministic.</strong>
-The model is allowed to be uncertain exactly once. That uncertainty is compiled into an artifact
-that never needs it again.</p>
+<p><strong>The model is allowed to be uncertain exactly once.</strong> That uncertainty is compiled into a
+typed artifact that never needs it again, and every run after the first is deterministic.</p>
 </blockquote>
 <p>Every claim below is backed by something runnable: an enforced import contract, a test, or a file in
 <a href="https://github.com/adityamhaske/interface.ai/tree/main/evidence/"><code>evidence/</code></a>. What is not built says so in §7.</p>
