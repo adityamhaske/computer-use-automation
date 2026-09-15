@@ -1,5 +1,5 @@
 {
-  "snapshot_id": "snap-53d3f48c4a",
+  "snapshot_id": "snap-dfd6bd4431",
   "url": "http://127.0.0.1:8811/",
   "title": "MemberDesk",
   "nodes": [
@@ -1178,6 +1178,6 @@
       "fingerprint": "55399652a926d8e4"
     }
   ],
-  "captured_at": "2026-09-15T12:37:04.117326Z",
+  "captured_at": "2026-09-15T16:37:25.264704Z",
   "http_status": 200
 }

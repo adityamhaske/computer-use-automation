@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en" data-theme="light"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>End-to-end walkthrough — CUA</title>
+<meta name="description" content="Every step of the computer-use automation system, demonstrated
+against the running application with screenshots and real captured output.">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+<style>
+/* Page-specific only; palette, nav, buttons and footer come from ../assets/site.css.
+   This page is pinned to light (data-theme on <html>, toggle dropped from the nav) because
+   every screenshot in it is light. */
+.wrap{max-width:900px;margin:0 auto;padding:calc(var(--nav-height) + 2.5rem) 20px 4rem}
+
+.lede{margin-bottom:2.5rem}
+.eyebrow{font-size:.72rem;font-weight:600;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--accent);margin:0 0 .6rem}
+.lede h1{font-family:var(--font-serif);font-size:clamp(2rem,5vw,2.7rem);font-weight:600;
+  line-height:1.12;letter-spacing:-.02em;margin:0 0 1rem;text-wrap:balance}
+.standfirst{font-size:1.05rem;line-height:1.65;color:var(--text-secondary);margin:0 0 1.5rem;
+  max-width:70ch}
+.meta{display:flex;flex-direction:column;gap:.35rem;padding:1rem 1.15rem;font-size:.85rem;
+  color:var(--text-secondary);background:var(--bg-card);border:1px solid var(--border);
+  border-radius:var(--radius)}
+.meta strong{color:var(--text);font-weight:600;margin-right:.4rem}
+.meta code{font-family:var(--font-mono);font-size:.9em;background:var(--bg-code);
+  padding:.08em .34em;border-radius:3px}
+
+.toc{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:1.5rem 1.6rem;margin-bottom:3.5rem}
+.toc>h2{font-family:var(--font-serif);font-size:1.3rem;font-weight:600;margin:0 0 1.1rem}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:1.4rem}
+.toc-part h3{font-size:.72rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--text-muted);margin:0 0 .55rem}
+.toc-part ol{list-style:none;margin:0;padding:0}
+.toc-part li{margin-bottom:.3rem}
+.toc-part a{display:flex;gap:.55rem;text-decoration:none;color:var(--text-secondary);
+  font-size:.9rem;line-height:1.4;padding:.15rem 0}
+.toc-part a:hover{color:var(--accent)}
+.toc-part .num{font-family:var(--font-mono);font-size:.78rem;color:var(--text-faint);
+  font-variant-numeric:tabular-nums;flex:none;min-width:1.4em}
+
+.part{margin:3.5rem 0 2rem;padding-top:1.4rem;border-top:2px solid var(--accent)}
+.part h2{font-family:var(--font-serif);font-size:1.6rem;font-weight:600;margin:0 0 .5rem;
+  letter-spacing:-.015em}
+.part p{margin:0;color:var(--text-secondary);max-width:72ch}
+
+.step{margin:0 0 3rem;scroll-margin-top:calc(var(--nav-height) + 20px)}
+.step h3{display:flex;gap:.7rem;align-items:baseline;font-size:1.12rem;font-weight:600;
+  margin:0 0 1rem;letter-spacing:-.01em}
+.stepnum{font-family:var(--font-mono);font-size:.82rem;font-weight:600;color:var(--accent);
+  background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:5px;
+  padding:.12rem .48rem;flex:none;font-variant-numeric:tabular-nums}
+.step p{color:var(--text-secondary);margin:0 0 .9rem;max-width:72ch;line-height:1.7}
+.step code{font-family:var(--font-mono);font-size:.85em;background:var(--bg-code);
+  padding:.1em .36em;border-radius:3px}
+
+figure{margin:0 0 1.4rem}
+.shot{display:block;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;
+  background:#fff;line-height:0}
+.shot img{width:100%;height:auto;display:block}
+.term{background:var(--bg-code);border:1px solid var(--border);border-radius:var(--radius);
+  padding:1rem 1.15rem;overflow-x:auto;margin:0;font-size:.8rem;line-height:1.6}
+.term code{font-family:var(--font-mono);background:none;padding:0}
+figcaption{margin-top:.75rem;padding-left:.9rem;border-left:3px solid var(--accent);
+  font-size:.9rem;line-height:1.6;color:var(--text-secondary);max-width:72ch}
+.figlabel{display:block;font-size:.68rem;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--text-muted);margin-bottom:.25rem}
+
+.closing{margin-top:4rem;padding-top:2rem;border-top:1px solid var(--border)}
+.closing h2{font-family:var(--font-serif);font-size:1.5rem;font-weight:600;margin:0 0 .8rem}
+.closing p{color:var(--text-secondary);max-width:72ch;line-height:1.7}
+.closing-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:1.5rem}
+
+@media (max-width:640px){
+  .toc{padding:1.2rem}
+  .step h3{flex-wrap:wrap}
+}
+</style></head><body>
+  <nav>
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand-group" aria-label="CUA home">
+        <div class="brand-logo-wrap">
+          <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="16,2.5 28.5,9.5 28.5,22.5 16,29.5 3.5,22.5 3.5,9.5" fill="var(--accent)"
+              fill-opacity="0.18" stroke="var(--accent)" stroke-width="2.2" stroke-linejoin="round" />
+            <polygon points="16,7.5 23.5,16 16,24.5 8.5,16" fill="none" stroke="var(--accent)" stroke-width="2"
+              stroke-linejoin="round" />
+            <circle cx="16" cy="16" r="3.2" fill="var(--accent)" />
+          </svg>
+        </div>
+        <div class="nav-brand-text">
+          <span class="nav-brand-title">CUA</span>
+          <span class="nav-brand-subtitle">Computer-Use Automation</span>
+        </div>
+      </a>
+
+      <div class="nav-right">
+        <a href="../index.html" class="nav-link">Overview</a>
+        <a href="../walkthrough/index.html" class="nav-link active">Walkthrough</a>
+        <a href="../docs/index.html" class="nav-link">Documentation</a>
+        <a href="../report/index.html" class="nav-link">Design write-up</a>
+        <a href="https://github.com/adityamhaske/interface.ai" class="nav-github-btn" target="_blank" rel="noopener"
+          aria-label="GitHub repository">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+          </svg>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+<div class="wrap">
+  <header class="lede">
+    <p class="eyebrow">End-to-end walkthrough</p>
+    <h1>Every step, against the running system</h1>
+    <p class="standfirst">22 steps from a locked legacy screen to an agent calling a typed
+      function. Every screenshot below is of the real application or the real operator console;
+      every terminal block is real captured output. Nothing here is a mockup.</p>
+    <div class="meta">
+      <span><strong>Discovery run</strong> disc-e0aa86b951 · 6 model calls · 10,215 tokens</span>
+      <span><strong>Artifact</strong> memberdesk.savings_balance@1.0.0, sealed</span>
+      <span><strong>Reproduce</strong> <code>make app</code>, then
+        <code>make walkthrough</code></span>
+    </div>
+  </header>
+
+  <nav class="toc" aria-label="Contents">
+    <h2>Contents</h2>
+    <div class="toc-grid"><div class="toc-part"><h3>Part 1 · The target</h3><ol><li><a href="#step-1"><span class="num">1</span>The application is a locked door</a></li><li><a href="#step-2"><span class="num">2</span>Signed in: the member search</a></li><li><a href="#step-3"><span class="num">3</span>The record we need to read</a></li></ol></div><div class="toc-part"><h3>Part 2 · Discovery — the model, exactly once</h3><ol><li><a href="#step-4"><span class="num">4</span>A real model drives the real screens</a></li><li><a href="#step-5"><span class="num">5</span>The model is shown a semantic tree, never raw HTML</a></li></ol></div><div class="toc-part"><h3>Part 3 · The artifact</h3><ol><li><a href="#step-6"><span class="num">6</span>One step of the compiled capability</a></li><li><a href="#step-7"><span class="num">7</span>Sealed, and parameterised by deployment</a></li></ol></div><div class="toc-part"><h3>Part 4 · Deterministic replay</h3><ol><li><a href="#step-8"><span class="num">8</span>Replayed with an input the discovery never saw</a></li></ol></div><div class="toc-part"><h3>Part 5 · Answers that are not failures</h3><ol><li><a href="#step-9"><span class="num">9</span>A member who does not exist</a></li><li><a href="#step-10"><span class="num">10</span>…is reported as an outcome, and exits 0</a></li><li><a href="#step-11"><span class="num">11</span>A closed account is also an answer</a></li><li><a href="#step-12"><span class="num">12</span>Malformed input is refused before anything is touched</a></li></ol></div><div class="toc-part"><h3>Part 6 · Faults, and the limits of retrying</h3><ol><li><a href="#step-13"><span class="num">13</span>A declared recovery rule clears a transient fault</a></li><li><a href="#step-14"><span class="num">14</span>The same fault past its budget escalates instead of grinding</a></li></ol></div><div class="toc-part"><h3>Part 7 · When the screen is not the one we recorded</h3><ol><li><a href="#step-15"><span class="num">15</span>An undeclared screen appears</a></li><li><a href="#step-16"><span class="num">16</span>The operator sees it before anyone reports it</a></li><li><a href="#step-17"><span class="num">17</span>The run stops and asks for a person</a></li></ol></div><div class="toc-part"><h3>Part 8 · Human in the loop — a real handoff</h3><ol><li><a href="#step-18"><span class="num">18</span>The operator takes the session</a></li><li><a href="#step-19"><span class="num">19</span>Every gesture is in the evidence, attributed</a></li><li><a href="#step-20"><span class="num">20</span>The run and its evidence, afterwards</a></li></ol></div><div class="toc-part"><h3>Part 9 · An agent calls it like a function</h3><ol><li><a href="#step-21"><span class="num">21</span>The catalog, typed</a></li><li><a href="#step-22"><span class="num">22</span>…and invoked by name, with declared outcomes</a></li></ol></div></div>
+  </nav>
+
+  <section class="part"><h2>Part 1 · The target</h2><p>A legacy back-office application with no API. Everything after this exists because the only way in is the screen a human operator uses.</p></section><section class="step" id="step-1"><h3><span class="stepnum">1</span>The application is a locked door</h3><figure><a class="shot" href="shots/01-signon.png" target="_blank" rel="noopener"><img src="shots/01-signon.png" alt="The application is a locked door" loading="lazy" width="1180" height="720"></a><figcaption><span class="figlabel">Screenshot 1</span>The mock core-banking app on first contact: a sign-on form inside a frameset, with the navigation column already rendered on the left and the working area on the right. Nothing here is reachable over an API.</figcaption></figure><p>This is the starting condition the brief describes — an enterprise application an AI agent has to operate through its user interface, because there is no other way in.</p><p>The frameset matters more than it looks. Navigation lives in one frame and the working area in another, so a snapshot has to traverse into named frames to see anything at all, and the same accessible name commonly appears in both. Every target recorded later scopes itself to a frame for exactly this reason: resolving to the wrong one is a wrong click, not a failure.</p></section><section class="step" id="step-2"><h3><span class="stepnum">2</span>Signed in: the member search</h3><figure><a class="shot" href="shots/02-search.png" target="_blank" rel="noopener"><img src="shots/02-search.png" alt="Signed in: the member search" loading="lazy" width="1180" height="720"></a><figcaption><span class="figlabel">Screenshot 2</span>After authentication the content frame shows Member Search — one text field labelled by an adjacent table cell rather than a bound label, and a Search button. This is the screen the capability starts from.</figcaption></figure><p>The label sits in a neighbouring cell, not attached to the input. That is how legacy screens are built, and it is why the resolver needs a rung that finds a control by the text identifying it rather than by anything on the control itself.</p></section><section class="step" id="step-3"><h3><span class="stepnum">3</span>The record we need to read</h3><figure><a class="shot" href="shots/03-member-detail.png" target="_blank" rel="noopener"><img src="shots/03-member-detail.png" alt="The record we need to read" loading="lazy" width="1180" height="720"></a><figcaption><span class="figlabel">Screenshot 3</span>Member 12345. The savings balance appears twice on this page — once in the Accounts Overview grid and again in the summary row beside its label — and the status and as-of date sit in label/value pairs underneath.</figcaption></figure><p>The duplication is the interesting part. A naive 'find the balance' rule has two candidates and no principled way to choose, which is precisely where a resolver that guesses eventually reads the wrong number.</p><p>The system refuses ambiguity rather than breaking the tie with a similarity score. A tunable threshold is a knob that eventually gets turned.</p></section><section class="part"><h2>Part 2 · Discovery — the model, exactly once</h2><p>An LLM drives the live application until the goal is met. This is the only place a model is allowed in the loop, and it runs once.</p></section><section class="step" id="step-4"><h3><span class="stepnum">4</span>A real model drives the real screens</h3><figure><pre class="term lang-text"><code>$ make discover
+
+GOAL_MET after 6 step(s)
+  evidence : evidence/discovery/disc-e0aa86b951
+  outputs  : {
+    &quot;savings_balance&quot;: &quot;$4,210.55&quot;,
+    &quot;account_status&quot;: &quot;Active&quot;,
+    &quot;as_of_date&quot;: &quot;09/11/2026&quot;
+  }
+  checkpoint hint: Member Detail page for member 12345 shows Savings Balance:
+                   $4,210.55, Status: Active, As Of: 09/11/2026.
+
+Discovery succeeded.
+  capability : evidence/capabilities/memberdesk.savings_balance@1.0.0.yaml
+  inputs     : [&#x27;member_number&#x27;]
+  outputs    : [&#x27;savings_balance&#x27;, &#x27;account_status&#x27;, &#x27;as_of_date&#x27;]</code></pre><figcaption><span class="figlabel">Captured output 4</span>A genuine LLM-driven run against the live frameset, routed through an OpenAI-compatible gateway: six model calls, 10,215 tokens, three effective steps. The model signed in, searched for the member, and read three values off the record.</figcaption></figure><p>This is the probabilistic half of the system and the only part that costs money or varies between runs. Everything after it is model-free by construction.</p><p>Each call records the gateway's own provider and request id, so the run can be reconciled against the gateway's logs rather than taken on trust. That matters for a claim like 'a real model did this': the evidence is issued by something other than the process making the claim.</p></section><section class="step" id="step-5"><h3><span class="stepnum">5</span>The model is shown a semantic tree, never raw HTML</h3><figure><pre class="term lang-text"><code>CURRENT PAGE  http://127.0.0.1:8811/   MemberDesk
+
+  [nav] link &quot;Member Search&quot;          #nav:/table[7]/row[0]/cell[0]/link[0]
+  [content] heading &quot;Member Search&quot;
+  [content] cell &quot;Member Number&quot;
+  [content] textbox &quot;Member Number&quot;   #content:/row[22]/cell[1]/textbox[0]
+  [content] button &quot;Search&quot;           #content:/row[23]/cell[1]/button[0]</code></pre><figcaption><span class="figlabel">Captured output 5</span>What the model actually receives: roles, accessible names and frame scopes, with an opaque node id per control. No markup, no CSS classes, no coordinates.</figcaption></figure><p>Feeding a model raw HTML teaches it to reach for selectors, and a selector is a promise about markup that a tenant's restyle silently breaks. Giving it a semantic tree means the identity it picks is the identity that gets recorded.</p><p>The same abstraction is what makes the artifact portable to a surface where no CSS exists at all — a desktop accessibility tree has roles and names too.</p></section><section class="part"><h2>Part 3 · The artifact</h2><p>The discovery run is compiled into a typed, versioned, content-addressed document. This is the deliverable everything else is built around.</p></section><section class="step" id="step-6"><h3><span class="stepnum">6</span>One step of the compiled capability</h3><figure><pre class="term lang-yaml"><code>steps:
+- id: type_text_member_number
+  description: Enter member number 12345 to search for the member.
+  action:
+    type: type
+    target:
+      role: textbox                 # semantic identity
+      name: {value: Member Number, match: exact}
+      scope: {frame: content}       # which frame, because names repeat
+      anchor:                       # the label cell beside it
+        relation: row_of
+        text: Member Number
+      hints: {css: &#x27;input[name=&quot;memno&quot;]&#x27;}   # a cache, never an identity
+      fingerprint: ea2237aa18a5e0e3
+      recorded_strategy: semantic_exact     # the drift baseline
+    value: {$input: member_number}  # parameterised, not the literal 12345
+  risk: safe</code></pre><figcaption><span class="figlabel">Captured output 6</span>A single recorded step. The control is identified by role, accessible name, frame scope and an adjacent-label anchor. The CSS selector is present but labelled hints — a fast path, never the identity.</figcaption></figure><p>The literal the model typed, 12345, has become <code>{$input: member_number}</code>. That is what makes the artifact a function rather than a recording.</p><p><code>recorded_strategy</code> is the rung that worked at record time. Replay compares the rung it actually needed against this baseline, which is what turns 'the page changed' from an outage into a measurable drift score.</p><p>A stored hint is only used if the candidate it finds <em>also</em> satisfies the semantic assertion. That check is what stops an artifact from quietly becoming CSS-coupled.</p></section><section class="step" id="step-7"><h3><span class="stepnum">7</span>Sealed, and parameterised by deployment</h3><figure><pre class="term lang-yaml"><code>entrypoint:
+  url_pattern: &#x27;{base_url}/&#x27;
+
+content_hash: sha256:c6667196c835c261f...
+provenance:
+  discovered_by:
+    run_id: disc-e0aa86b951
+    model: auto
+  transcript_ref: evidence/discovery/disc-e0aa86b951/trace.jsonl</code></pre><figcaption><span class="figlabel">Captured output 7</span>The entrypoint names no host: base_url is bound per deployment at replay. The content hash seals the document, and provenance points back at the run that produced it without embedding the transcript.</figcaption></figure><p>The artifact is immutable and content-addressed: running a modified one while recording a version that no longer matches its content would make the audit trail a fiction, so the loader refuses a hash mismatch outright.</p><p>Provenance is a <em>reference</em>, not a copy. The transcript stays in the evidence directory; the artifact stays reviewable.</p></section><section class="part"><h2>Part 4 · Deterministic replay</h2><p>From here on there is no model in the decision loop — not as a fallback, not on failure.</p></section><section class="step" id="step-8"><h3><span class="stepnum">8</span>Replayed with an input the discovery never saw</h3><figure><pre class="term lang-text"><code>SUCCESS - 3 output(s) in 473ms
+  outputs  : {
+  &quot;savings_balance&quot;: &quot;$18,730.00&quot;,
+  &quot;account_status&quot;: &quot;Active&quot;,
+  &quot;as_of_date&quot;: &quot;09/11/2026&quot;
+}
+  evidence : evidence/replay/rep-0bf018922a
+  drift    : 0.00   strategies: {&#x27;semantic_exact&#x27;: 3, &#x27;structural_anchor&#x27;: 2}</code></pre><figcaption><span class="figlabel">Captured output 8</span>The artifact discovered against member 12345, replayed against 67890. Three typed outputs in under half a second, drift 0.00, and the rungs used match the rungs recorded — three by name, two by structural anchor.</figcaption></figure><p>This is the whole thesis in one command: the expensive, uncertain step happened once, and what remains is a deterministic function with a typed signature.</p><p>Drift 0.00 means every control was found by the same rung that found it during discovery. A run that still succeeds but has to fall to a weaker rung reports that as drift, which is the early warning before anything breaks.</p></section><section class="part"><h2>Part 5 · Answers that are not failures</h2><p>The brief names conflating a business outcome with a failure as the most common design mistake in this problem. The schema keeps them apart structurally.</p></section><section class="step" id="step-9"><h3><span class="stepnum">9</span>A member who does not exist</h3><figure><a class="shot" href="shots/04-member-not-found.png" target="_blank" rel="noopener"><img src="shots/04-member-not-found.png" alt="A member who does not exist" loading="lazy" width="1180" height="720"></a><figcaption><span class="figlabel">Screenshot 9</span>The application's own answer for member 99999: a plain 'No member with that number exists' notice, rendered in the content frame where the record would have been.</figcaption></figure><p>Nothing has gone wrong. The system was asked a question and the answer is negative.</p></section><section class="step" id="step-10"><h3><span class="stepnum">10</span>…is reported as an outcome, and exits 0</h3><figure><pre class="term lang-text"><code>BUSINESS OUTCOME - member_not_found
+  data     : {&quot;member_id&quot;: &quot;99999&quot;}
+  evidence : evidence/replay/rep-ac551c9724
+  drift    : 0.00   strategies: {&#x27;semantic_exact&#x27;: 2}</code></pre><figcaption><span class="figlabel">Captured output 10</span>The same situation through the capability: BUSINESS OUTCOME, code member_not_found, structured data naming the member asked about — and an exit code of 0.</figcaption></figure><p>Treating this as a failure turns a routine result into a 2am page, and trains everyone to ignore the alert that also fires for real defects.</p><p><code>ObservationClass</code> (what we saw) and <code>RunStatus</code> (how the run ended) are separate type families precisely so this distinction cannot be collapsed by accident.</p></section><section class="step" id="step-11"><h3><span class="stepnum">11</span>A closed account is also an answer</h3><figure><a class="shot" href="shots/05-closed-account.png" target="_blank" rel="noopener"><img src="shots/05-closed-account.png" alt="A closed account is also an answer" loading="lazy" width="1180" height="720"></a><figcaption><span class="figlabel">Screenshot 11</span>Member 24680: a real record, a zero balance, and a status of Closed. The capability replays against this unchanged and returns $0.00 with status Closed.</figcaption></figure><p>Worth showing because it is the case where a system pattern-matching on 'the balance looks empty' would invent a failure. The values are read off the record, so a legitimately empty account reports as one.</p></section><section class="step" id="step-12"><h3><span class="stepnum">12</span>Malformed input is refused before anything is touched</h3><figure><pre class="term lang-text"><code>FAILED - input_validation_failed: input &#x27;member_id&#x27; = &#x27;not-a-member&#x27; does not match the declared pattern &#x27;^[0-9]{4,10}$&#x27;
+  evidence : evidence/replay/rep-316490b508
+  drift    : 0.00   strategies: {}</code></pre><figcaption><span class="figlabel">Captured output 12</span>A member id of 'not-a-member' against the declared pattern. The run fails with input_validation_failed and exit 1 — before a browser is driven or a single click is dispatched.</figcaption></figure><p>The typed signature is enforced at the boundary, not discovered halfway through a form. Nothing was clicked, so there is nothing to undo.</p></section><section class="part"><h2>Part 6 · Faults, and the limits of retrying</h2><p>Recovery is declared in the artifact and bounded there. Unbounded recovery turns one transient 502 into a thousand retries against a struggling core banking system.</p></section><section class="step" id="step-13"><h3><span class="stepnum">13</span>A declared recovery rule clears a transient fault</h3><figure><pre class="term lang-text"><code>SUCCESS - 3 output(s) in 506ms
+  outputs  : {
+  &quot;savings_balance&quot;: &quot;4210.55&quot;,
+  &quot;account_status&quot;: &quot;Active&quot;,
+  &quot;as_of&quot;: &quot;09/11/2026&quot;
+}
+  evidence : evidence/replay/rep-86c1a491ce
+  drift    : 0.00   strategies: {&#x27;semantic_exact&#x27;: 2, &#x27;structural_anchor&#x27;: 3}</code></pre><figcaption><span class="figlabel">Captured output 13</span>With HTTP 502s injected into the application, the run still succeeds: the declared transient_load rule took one recovery attempt and the condition cleared.</figcaption></figure><p>The rule is part of the artifact, reviewable before approval, and carries a mandatory <code>max_attempts</code>. The schema will not accept an unbounded one.</p></section><section class="step" id="step-14"><h3><span class="stepnum">14</span>The same fault past its budget escalates instead of grinding</h3><figure><pre class="term lang-text"><code>NEEDS HUMAN - recovery rule &#x27;transient_load&#x27; did not clear the condition after 3 attempt(s)
+  evidence : evidence/replay/rep-02156bfa03
+  drift    : 0.00   strategies: {}</code></pre><figcaption><span class="figlabel">Captured output 14</span>With the fault held open, the same rule reaches its declared limit of three attempts and stops: NEEDS HUMAN, exit 2, naming the rule that was tried and how many times.</figcaption></figure><p>This is the difference between a bounded remedy and a retry loop. The run ends in a state a person can act on, with the reason recorded.</p></section><section class="part"><h2>Part 7 · When the screen is not the one we recorded</h2><p>Unknown states stop the run. In banking, an unverified click is an incident.</p></section><section class="step" id="step-15"><h3><span class="stepnum">15</span>An undeclared screen appears</h3><figure><a class="shot" href="shots/06-undeclared-dialog.png" target="_blank" rel="noopener"><img src="shots/06-undeclared-dialog.png" alt="An undeclared screen appears" loading="lazy" width="1180" height="720"></a><figcaption><span class="figlabel">Screenshot 15</span>A 'System Notice' maintenance dialog has taken over the content frame. It is not the search form, and nothing in the artifact declares it — not as an outcome, not as a recoverable condition.</figcaption></figure><p>A system that assumed the click probably worked would type a member number into nothing and carry on. This one stops.</p><p>Two surviving candidates is <code>TARGET_AMBIGUOUS</code> and the resolver refuses; zero is a failed precondition. Both fail closed.</p></section><section class="step" id="step-16"><h3><span class="stepnum">16</span>The operator sees it before anyone reports it</h3><figure><a class="shot" href="shots/07-console-overview.png" target="_blank" rel="noopener"><img src="shots/07-console-overview.png" alt="The operator sees it before anyone reports it" loading="lazy" width="1180" height="720"></a><figcaption><span class="figlabel">Screenshot 16</span>The console's overview at that moment: one intervention waiting, named with the capability and the step it stopped at, the session paused at epoch 2, and the replay drift average across recorded runs sitting at 0%.</figcaption></figure><p>The stop is surfaced, not buried. Nobody has to notice a failed job or read a log to find out that a run needs a person.</p><p>Drift is on this screen for the same reason: it is the number that moves before anything breaks, so it belongs where someone will see it early.</p></section><section class="step" id="step-17"><h3><span class="stepnum">17</span>The run stops and asks for a person</h3><figure><a class="shot" href="shots/08-intervention-queue.png" target="_blank" rel="noopener"><img src="shots/08-intervention-queue.png" alt="The run stops and asks for a person" loading="lazy" width="1180" height="720"></a><figcaption><span class="figlabel">Screenshot 17</span>The operator console with one intervention waiting. The card names the capability, the step it stopped at, the precondition that did not hold, and carries a screenshot of the screen that stopped it. The session is PAUSED at epoch 2 and automation still owns it.</figcaption></figure><p>The failure is legible without reading a log: which capability, which step, what was expected, and a picture of what was actually there.</p><p>Nothing has been handed over yet. The lease still belongs to automation, and the live view stays closed until a person claims it.</p></section><section class="part"><h2>Part 8 · Human in the loop — a real handoff</h2><p>The requirement most submissions describe rather than build. The operator drives the same live browser session the automation was driving.</p></section><section class="step" id="step-18"><h3><span class="stepnum">18</span>The operator takes the session</h3><figure><a class="shot" href="shots/09-operator-in-control.png" target="_blank" rel="noopener"><img src="shots/09-operator-in-control.png" alt="The operator takes the session" loading="lazy" width="1180" height="720"></a><figcaption><span class="figlabel">Screenshot 18</span>After Take control: the state pill reads HUMAN CONTROL · operator owns the session · epoch 3, the live viewport opens showing the actual blocking dialog, and 'Hand back to automation' appears. The epoch has advanced.</figcaption></figure><p>This is a transfer of a lease, not a screenshot viewer. Clicks and keystrokes in that viewport reach the same Chromium session the executor was using, and they travel the same policy chokepoint — authorized, classified and recorded with <code>actor=HUMAN</code>.</p><p>The epoch is what makes the handoff safe. Automation may only act while it holds the current epoch, so a late in-flight action from before the handoff cannot land on a session a person is now driving.</p></section><section class="step" id="step-19"><h3><span class="stepnum">19</span>Every gesture is in the evidence, attributed</h3><figure><pre class="term lang-text"><code> 3 authorize  actor=automation epoch=1  safe (default)
+14 escalate   actor=system     epoch=2  needs_human
+16 lease      actor=human      epoch=3  demo-operator
+18 authorize  actor=human      epoch=3  elevated (action:raw_input)
+19 dispatch   actor=human      epoch=3
+28 lease      actor=human      epoch=4  released
+29 lease      actor=automation epoch=5  resumed</code></pre><figcaption><span class="figlabel">Captured output 19</span>The recorded trace of a handoff. The operator's own input is authorized at elevated risk and dispatched under actor=human, between the escalation that paused the run and the release that resumed it.</figcaption></figure><p>A human action that bypassed policy or evidence would leave a hole in the audit trail exactly where the interesting thing happened. There is no separate path for people.</p><p>On release the executor re-anchors against the current screen and resumes at the right step — not from step 1, and not by assuming the page is where it left it.</p></section><section class="step" id="step-20"><h3><span class="stepnum">20</span>The run and its evidence, afterwards</h3><figure><a class="shot" href="shots/10-runs-evidence.png" target="_blank" rel="noopener"><img src="shots/10-runs-evidence.png" alt="The run and its evidence, afterwards" loading="lazy" width="1180" height="720"></a><figcaption><span class="figlabel">Screenshot 20</span>The console's run history: every run with its terminal status, the capability and version it executed, and a route into the evidence directory it wrote — snapshots, trace and run record.</figcaption></figure><p>Each run writes an append-only, redacted, actor-tagged evidence directory. Secrets and PII are redacted at every sink — logs, artifacts, screenshots and model prompts alike.</p></section><section class="part"><h2>Part 9 · An agent calls it like a function</h2><p>The artifact is the tool contract. There is no second definition to drift.</p></section><section class="step" id="step-21"><h3><span class="stepnum">21</span>The catalog, typed</h3><figure><a class="shot" href="shots/11-capability-catalog.png" target="_blank" rel="noopener"><img src="shots/11-capability-catalog.png" alt="The catalog, typed" loading="lazy" width="1180" height="720"></a><figcaption><span class="figlabel">Screenshot 21</span>The capability catalog in the console: each entry with its id, version, seal state and typed signature. A sealed badge means the content hash still matches the document.</figcaption></figure><p>A tampered artifact shows as tampered rather than running: the state is computed from the content, not stored as a field somebody could set.</p></section><section class="step" id="step-22"><h3><span class="stepnum">22</span>…and invoked by name, with declared outcomes</h3><figure><pre class="term lang-text"><code>The agent&#x27;s view of the catalog
+  tool      corebank_member_savings_balance
+  purpose   Given a member number, retrieve the member record and return the current savings account balance and its as-of date. Returns a business outcome when the member does not exist, has no savings account, or the operator lacks rights to view the record.
+  arguments [&#x27;member_id&#x27;]
+  returns   [&#x27;account_status&#x27;, &#x27;as_of&#x27;, &#x27;savings_balance&#x27;]
+  outcomes  [&#x27;member_not_found&#x27;, &#x27;no_savings_account&#x27;, &#x27;permission_denied&#x27;]
+
+  (all of that came from the artifact -- there is no second tool definition)
+
+  invoke({&#x27;member_id&#x27;: &#x27;12345&#x27;})
+  -&gt; success  [answered]
+     Here is the balance.
+     {&#x27;savings_balance&#x27;: &#x27;4210.55&#x27;, &#x27;account_status&#x27;: &#x27;Active&#x27;, &#x27;as_of&#x27;: &#x27;09/11/2026&#x27;}
+</code></pre><figcaption><span class="figlabel">Captured output 22</span>An agent's view of the same artifact: tool name, purpose, typed arguments, typed returns, and the non-failure outcomes it may receive — all derived from the artifact. Then the call itself, returning structured data.</figcaption></figure><p>The calling agent is told in advance which negative answers are legitimate, so it can distinguish 'no such member' from 'the automation broke' without parsing prose.</p><p>Because the schema is generated from the artifact, a change to the capability changes the tool contract in the same commit. There is nowhere for the two to disagree.</p></section>
+
+  <section class="closing">
+    <h2>What this demonstrated</h2>
+    <p>An LLM worked out how to operate a legacy application once, and that run became a typed,
+      versioned, sealed artifact. The artifact replays deterministically against inputs the
+      discovery never saw, distinguishes a negative answer from a fault, bounds its own recovery,
+      fails closed on anything it does not recognise, hands the live session to a person and takes
+      it back, and presents itself to an agent as a function with a declared signature.</p>
+    <div class="closing-links">
+      <a class="btn btn-primary" href="../report/index.html"
+        ><span>Read the design write-up</span></a>
+      <a class="btn btn-secondary" href="../docs/index.html"><span>Documentation</span></a>
+      <a class="btn btn-github" href="https://github.com/adityamhaske/interface.ai" target="_blank" rel="noopener"
+        ><span>Source on GitHub</span></a>
+    </div>
+  </section>
+</div>
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-left">
+        <span>Computer-use automation for regulated back-offices · <a href="https://github.com/adityamhaske/interface.ai">adityamhaske/interface.ai</a></span>
+      </div>
+      <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+        <a href="../report/index.html">Design write-up</a>
+        <a href="../docs/index.html">Documentation</a>
+        <a href="../llms.txt" style="font-family: var(--font-mono); font-size: 12px;">llms.txt</a>
+        <a href="../llms-full.txt" style="font-family: var(--font-mono); font-size: 12px;">llms-full.txt</a>
+        <a href="https://github.com/adityamhaske/interface.ai" target="_blank" rel="noopener">GitHub Repository →</a>
+      </div>
+    </div>
+  </footer>
+</body></html>

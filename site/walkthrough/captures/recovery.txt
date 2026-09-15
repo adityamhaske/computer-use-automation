@@ -1,0 +1,10 @@
+
+SUCCESS - 3 output(s) in 506ms
+  outputs  : {
+  "savings_balance": "4210.55",
+  "account_status": "Active",
+  "as_of": "09/11/2026"
+}
+  evidence : evidence/replay/rep-86c1a491ce
+  drift    : 0.00   strategies: {'semantic_exact': 2, 'structural_anchor': 3}
+exit=0

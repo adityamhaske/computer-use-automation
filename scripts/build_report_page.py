@@ -148,7 +148,7 @@ def _shared_chrome() -> tuple[str, str]:
         raise SystemExit("site/index.html has no <nav>/<footer> to share")
 
     nav_html = nav.group(0)
-    for href in ("index.html", "docs/index.html", "report/index.html"):
+    for href in ("index.html", "docs/index.html", "report/index.html", "walkthrough/index.html"):
         nav_html = nav_html.replace(f'href="{href}"', f'href="../{href}"')
     nav_html = nav_html.replace(
         '<a href="../index.html" class="nav-link active">Overview</a>',

@@ -14,7 +14,7 @@ surface:
     vendor: acme-core
     product: MemberDesk
 entrypoint:
-  url_pattern: http://127.0.0.1:8811
+  url_pattern: '{base_url}/'
 inputs:
   - name: member_number
     type: string
@@ -198,9 +198,9 @@ policy:
 provenance:
   discovered_by:
     model: auto
-    run_id: disc-0a7e7b7ccd
-    at: '2026-09-15T12:37:40.733380+00:00'
-  transcript_ref: evidence/discovery/disc-0a7e7b7ccd/trace.jsonl
+    run_id: disc-e0aa86b951
+    at: '2026-09-15T16:37:25.544416+00:00'
+  transcript_ref: evidence/discovery/disc-e0aa86b951/trace.jsonl
   notes: "Compiled from a single discovery run. Before approving, a reviewer should confirm:\n\n  1. Outcomes.\
     \ This run saw only the successful path, so NO business outcomes are declared. Every\n     legitimate\
     \ non-success answer this flow can return -- record not found, permission denied, a\n     closed account\
@@ -212,4 +212,4 @@ provenance:
     \ Checkpoint. It asserts the shape of the extracted outputs. Confirm that is genuinely specific\n\
     \     to this goal rather than true of any page in the application.\n\nThese are gaps, not omissions:\
     \ inventing detectors a run never observed would produce a capability\nwhose error handling is fiction."
-content_hash: sha256:94475021352cb539bf3d827f2a877e1b0615a085274bb79b303e357f3443d9a3
+content_hash: sha256:c6667196c835c261f8bc7fad766d08f1bf3a0a13babc4a9e5f41c393b0d863fc

@@ -90,6 +90,16 @@ discover: ## Live LLM-driven discovery against a running `make app` -- needs a m
 	  --goal "Look up member 12345 and report their savings account balance, the account status, and the as-of date." \
 	  --target http://127.0.0.1:$(MOCK_APP_PORT)
 
+.PHONY: walkthrough
+walkthrough: ## Rebuild the end-to-end walkthrough page from its captured screenshots
+	$(PY) scripts/build_walkthrough.py
+
+.PHONY: walkthrough-capture
+walkthrough-capture: ## Re-capture the walkthrough screenshots -- needs `make app` running
+	$(PY) scripts/capture_walkthrough.py app
+	@echo "  console shots: start \`cua console --sign-in --capability ... --arm-fault ...\`,"
+	@echo "  then: $(PY) scripts/capture_walkthrough.py console"
+
 .PHONY: report
 report: ## Render REPORT.md to site/report/ as three pages, a PDF and a Markdown download
 	$(PY) scripts/build_report_page.py

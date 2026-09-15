@@ -1,0 +1,6 @@
+
+BUSINESS OUTCOME - member_not_found
+  data     : {"member_id": "99999"}
+  evidence : evidence/replay/rep-ac551c9724
+  drift    : 0.00   strategies: {'semantic_exact': 2}
+exit=0

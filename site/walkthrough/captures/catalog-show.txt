@@ -1,0 +1,40 @@
+schema_version: 1.0.0
+id: corebank.member.savings_balance
+version: 1.0.0
+title: Look up a member's savings balance
+description: Given a member number, retrieve the member record and return the current savings account
+  balance and its as-of date. Returns a business outcome when the member does not exist, has no savings
+  account, or the operator lacks rights to view the record.
+surface:
+  kind: legacy_web
+  driver_capabilities:
+    - semantic_tree
+    - screenshot
+  app:
+    vendor: acme-core
+    product: MemberDesk
+    version_range: '>=4.2 <5'
+entrypoint:
+  url_pattern: '{base_url}/'
+inputs:
+  - name: member_id
+    type: string
+    required: true
+    description: The member number as printed on the member's statement.
+    pattern: ^[0-9]{4,10}$
+    example: '12345'
+    sensitive: false
+outputs:
+  - name: savings_balance
+    type: money
+    description: Current balance of the member's savings account.
+    source:
+      step: read_balance
+    sensitive: false
+  - name: account_status
+    type: string
+    description: Status of that savings account, e.g. Active or Closed.
+    source:
+      step: read_status
+    sensitive: false
+  - name: as_of

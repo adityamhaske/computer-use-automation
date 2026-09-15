@@ -1,0 +1,11 @@
+
+corebank.member.savings_balance@1.0.0  [sealed]
+  Look up a member's savings balance
+  corebank.member.savings_balance(member_id: string) -> {savings_balance: money, account_status: string, as_of: date}
+  outcomes: member_not_found, no_savings_account, permission_denied
+
+memberdesk.savings_balance@1.0.0  [sealed]
+  Looked up member 12345 (Ada Lovelace) and retrieved their savings account details: balance of $4,210.55, status Active, as of 09/11/2026.
+  memberdesk.savings_balance(member_number: string) -> {savings_balance: money, account_status: string, as_of_date: date}
+
+exit=0

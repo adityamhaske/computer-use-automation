@@ -1,0 +1,5 @@
+
+FAILED - input_validation_failed: input 'member_id' = 'not-a-member' does not match the declared pattern '^[0-9]{4,10}$'
+  evidence : evidence/replay/rep-316490b508
+  drift    : 0.00   strategies: {}
+exit=1

@@ -402,3 +402,35 @@ def test_no_target_is_described_by_a_value_it_observed(compiled) -> None:
         assert not looks_like_value(target.anchor.text), (
             f"step {step.id!r} is anchored to {target.anchor.text!r}, which is a value, not a label"
         )
+
+
+def test_the_discovery_host_does_not_survive_into_the_artifact(run: DiscoveryRun) -> None:
+    """An artifact that names its origin is bound to the machine it was recorded on.
+
+    `cua discover` is driven against one concrete host, and the compiler used to copy that host
+    into `entrypoint.url_pattern` verbatim. Replay then had no `{base_url}` to substitute, so
+    `--base-url` was silently ignored: the run signed in to the host the caller asked for, then
+    navigated to the host baked into the artifact, arrived at a sign-on screen with no session,
+    and failed its first precondition. The error named the resolver, which was not at fault.
+
+    It also made the portability claim untrue -- a `TenantBinding` exists precisely so one
+    artifact can run against another deployment, and it cannot if the origin is a literal.
+    """
+    compiled = compile_capability(
+        run, vendor="acme-core", product="MemberDesk", entrypoint_url="http://127.0.0.1:8811"
+    )
+    pattern = compiled.capability.entrypoint.url_pattern
+    assert pattern.startswith("{base_url}"), pattern
+    assert "127.0.0.1" not in pattern and "8811" not in pattern
+
+    # The path is a property of the capability, not of the deployment, so it is kept.
+    deeper = compile_capability(
+        run, vendor="acme-core", product="MemberDesk", entrypoint_url="http://host:9/app/search"
+    )
+    assert deeper.capability.entrypoint.url_pattern == "{base_url}/app/search"
+
+    # Idempotent: `cua demo` already passes the placeholder and must get it back unchanged.
+    already = compile_capability(
+        run, vendor="acme-core", product="MemberDesk", entrypoint_url="{base_url}/"
+    )
+    assert already.capability.entrypoint.url_pattern == "{base_url}/"

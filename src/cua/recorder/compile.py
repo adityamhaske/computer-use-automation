@@ -29,6 +29,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from urllib.parse import urlparse, urlunparse
 
 from cua.domain.action import Action, Click, Extract, PressKey, Select, Type
 from cua.domain.capability import (
@@ -83,6 +84,35 @@ class CompileResult:
     lifted_inputs: dict[str, str]
     """Input name -> the literal value observed, so a reviewer can see what was generalized."""
     warnings: tuple[str, ...] = ()
+
+
+def _portable_entrypoint(url: str) -> str:
+    """Replace the discovery host with the `{base_url}` placeholder replay binds per deployment.
+
+    A discovery run is driven against one concrete host, and the compiler used to copy that host
+    into the artifact verbatim. The result looked fine and replayed fine -- on the machine it was
+    recorded on. Anywhere else, `--base-url` had no placeholder to substitute, so it was silently
+    ignored: the run signed in to the host the caller asked for and then navigated to the host in
+    the artifact, arriving at a sign-on screen with no session and failing its first precondition.
+    The symptom ("no candidate matched at any rung") pointed at the resolver, which was not wrong
+    about anything.
+
+    That also quietly undercut the portability claim: an artifact that names its origin is bound
+    to one deployment, and the whole point of a `TenantBinding` is that the same artifact runs
+    against another one.
+
+    The path is kept, since which page the capability starts on is a property of the capability.
+    Only the origin is parameterised. Idempotent: a caller that already passes a placeholder --
+    `cua demo` does -- gets it back unchanged.
+    """
+    if "{base_url}" in url:
+        return url
+    parsed = urlparse(url)
+    if not parsed.scheme or not parsed.netloc:
+        return url
+    path = parsed.path.rstrip("/")
+    tail = urlunparse(("", "", path, parsed.params, parsed.query, parsed.fragment))
+    return "{base_url}" + (tail or "/")
 
 
 def compile_capability(
@@ -145,7 +175,7 @@ def compile_capability(
             driver_capabilities=("semantic_tree", "screenshot"),
             app=AppIdentity(vendor=vendor, product=product),
         ),
-        entrypoint=Entrypoint(url_pattern=entrypoint_url),
+        entrypoint=Entrypoint(url_pattern=_portable_entrypoint(entrypoint_url)),
         inputs=tuple(inputs),
         outputs=tuple(outputs),
         steps=tuple(steps),

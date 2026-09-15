@@ -230,7 +230,7 @@ what it is worth here. Multi-operator routing, SSO, audit sign-off — designed,
 LLM fallback on replay failure — would breach the no-model-in-replay invariant without a separate
 policed path.
 
-**The discovery evidence is a real model run.** [`evidence/discovery/disc-0a7e7b7ccd/`](https://github.com/adityamhaske/interface.ai/tree/main/evidence/discovery/disc-0a7e7b7ccd/)
+**The discovery evidence is a real model run.** [`evidence/discovery/disc-e0aa86b951/`](https://github.com/adityamhaske/interface.ai/tree/main/evidence/discovery/disc-e0aa86b951/)
 is a genuine LLM-driven run against the live frameset app, routed through a self-hosted OpenAI-compatible gateway:
 six model calls, 10,215 tokens, each carrying the gateway's own provider and request id so the run
 can be checked against the gateway's logs rather than taken on trust. The model signed in, searched,
@@ -245,6 +245,8 @@ artifact that is already there. The condition is the catalog's, not the model's 
 gated on whether a model had run, which held only until a key was configured and the demo went live
 too, at which point it republished over the discovery it was supposed to protect. A fresh clone with
 an empty catalog still sees record -> compile -> publish -> replay end to end.
+
+One defect worth naming because it survived until the artifact was replayed against a different hostname: the compiler copied the discovery host into `entrypoint.url_pattern` verbatim, so `--base-url` had no placeholder to substitute and was silently ignored. The artifact worked on the machine that recorded it and nowhere else -- which also made the portability claim untrue, since a `TenantBinding` exists precisely so one artifact can run against another deployment. The origin is now parameterised at compile time, with a test.
 
 **Known weaknesses.** The compiler describes a value by the label beside it — right on a label/value
 table, wrong in an n-column grid where the neighbour is another datum. It now refuses a datum-shaped

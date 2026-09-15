@@ -90,6 +90,7 @@ hr{border:0;border-top:1px solid var(--border);margin:2rem 0}
 
       <div class="nav-right">
         <a href="../index.html" class="nav-link">Overview</a>
+        <a href="../walkthrough/index.html" class="nav-link">Walkthrough</a>
         <a href="../docs/index.html" class="nav-link">Documentation</a>
         <a href="../report/index.html" class="nav-link active">Design write-up</a>
         <a href="https://github.com/adityamhaske/interface.ai" class="nav-github-btn" target="_blank" rel="noopener"
@@ -196,7 +197,7 @@ desktop surface — interface-only stub on purpose; declaring the seam and enfor
 what it is worth here. Multi-operator routing, SSO, audit sign-off — designed, not built. Assisted
 LLM fallback on replay failure — would breach the no-model-in-replay invariant without a separate
 policed path.</p>
-<p><strong>The discovery evidence is a real model run.</strong> <a href="https://github.com/adityamhaske/interface.ai/tree/main/evidence/discovery/disc-0a7e7b7ccd/"><code>evidence/discovery/disc-0a7e7b7ccd/</code></a>
+<p><strong>The discovery evidence is a real model run.</strong> <a href="https://github.com/adityamhaske/interface.ai/tree/main/evidence/discovery/disc-e0aa86b951/"><code>evidence/discovery/disc-e0aa86b951/</code></a>
 is a genuine LLM-driven run against the live frameset app, routed through a self-hosted OpenAI-compatible gateway:
 six model calls, 10,215 tokens, each carrying the gateway's own provider and request id so the run
 can be checked against the gateway's logs rather than taken on trust. The model signed in, searched,
@@ -210,6 +211,7 @@ artifact that is already there. The condition is the catalog's, not the model's 
 gated on whether a model had run, which held only until a key was configured and the demo went live
 too, at which point it republished over the discovery it was supposed to protect. A fresh clone with
 an empty catalog still sees record -&gt; compile -&gt; publish -&gt; replay end to end.</p>
+<p>One defect worth naming because it survived until the artifact was replayed against a different hostname: the compiler copied the discovery host into <code>entrypoint.url_pattern</code> verbatim, so <code>--base-url</code> had no placeholder to substitute and was silently ignored. The artifact worked on the machine that recorded it and nowhere else -- which also made the portability claim untrue, since a <code>TenantBinding</code> exists precisely so one artifact can run against another deployment. The origin is now parameterised at compile time, with a test.</p>
 <p><strong>Known weaknesses.</strong> The compiler describes a value by the label beside it — right on a label/value
 table, wrong in an n-column grid where the neighbour is another datum. It now refuses a datum-shaped
 anchor and falls to a positional descriptor flagged for review, but cannot yet read a <em>column

@@ -1,0 +1,16 @@
+
+The agent's view of the catalog
+  tool      corebank_member_savings_balance
+  purpose   Given a member number, retrieve the member record and return the current savings account balance and its as-of date. Returns a business outcome when the member does not exist, has no savings account, or the operator lacks rights to view the record.
+  arguments ['member_id']
+  returns   ['account_status', 'as_of', 'savings_balance']
+  outcomes  ['member_not_found', 'no_savings_account', 'permission_denied']
+
+  (all of that came from the artifact -- there is no second tool definition)
+
+  invoke({'member_id': '12345'})
+  -> success  [answered]
+     Here is the balance.
+     {'savings_balance': '4210.55', 'account_status': 'Active', 'as_of': '09/11/2026'}
+
+exit=0

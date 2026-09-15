@@ -61,7 +61,7 @@ evals/               measured reports: stability and cross-tenant
 evals-runs/          the traces behind those reports (gitignored: 16MB of working evidence)
 ```
 
-`discovery/` holds two runs, and the difference matters. `disc-0a7e7b7ccd/` is the one the published
+`discovery/` holds two runs, and the difference matters. `disc-e0aa86b951/` is the one the published
 artifact was compiled from: a real model, via a self-hosted OpenAI-compatible gateway, driving the app to the goal.
 Its `run_record.json` carries a non-null `tokens_used`, and every `llm_call` in its trace carries the
 gateway's `provider` and `request_id` -- issued by something other than this process, so the run can

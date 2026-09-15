@@ -1,5 +1,5 @@
 {
-  "snapshot_id": "snap-8ddaf9e5b2",
+  "snapshot_id": "snap-2d2759b2ef",
   "url": "http://127.0.0.1:8811/",
   "title": "MemberDesk",
   "nodes": [
@@ -8,7 +8,9 @@
       "role": "document",
       "name": "MemberDesk",
       "value": null,
-      "states": [],
+      "states": [
+        "focused"
+      ],
       "bounds": null,
       "scope": {
         "frame": null,
@@ -538,9 +540,7 @@
       "role": "document",
       "name": "MemberDesk",
       "value": null,
-      "states": [
-        "focused"
-      ],
+      "states": [],
       "bounds": null,
       "scope": {
         "frame": "content",
@@ -1001,7 +1001,7 @@
     {
       "node_id": "content:/row[22]/cell[1]",
       "role": "cell",
-      "name": "12345",
+      "name": "Member Number",
       "value": null,
       "states": [],
       "bounds": null,
@@ -1016,16 +1016,14 @@
       "hints": {
         "native": "271"
       },
-      "fingerprint": "aadbc78a4b5e8a37"
+      "fingerprint": "604a7eb9b7dddc29"
     },
     {
       "node_id": "content:/row[22]/cell[1]/textbox[0]",
       "role": "textbox",
       "name": "Member Number",
-      "value": "12345",
-      "states": [
-        "focused"
-      ],
+      "value": null,
+      "states": [],
       "bounds": null,
       "scope": {
         "frame": "content",
@@ -1053,31 +1051,11 @@
         "region": null
       },
       "parent_id": "content:/row[22]/cell[1]/textbox[0]",
-      "child_ids": [
-        "content:/row[22]/cell[1]/textbox[0]/generic[0]/text[0]"
-      ],
+      "child_ids": [],
       "hints": {
         "native": "274"
       },
       "fingerprint": "2df0b7969bca5fce"
-    },
-    {
-      "node_id": "content:/row[22]/cell[1]/textbox[0]/generic[0]/text[0]",
-      "role": "text",
-      "name": "12345",
-      "value": null,
-      "states": [],
-      "bounds": null,
-      "scope": {
-        "frame": "content",
-        "region": null
-      },
-      "parent_id": "content:/row[22]/cell[1]/textbox[0]/generic[0]",
-      "child_ids": [],
-      "hints": {
-        "native": "290"
-      },
-      "fingerprint": "e9b46ca5d062f662"
     },
     {
       "node_id": "content:/row[23]",
@@ -1178,6 +1156,6 @@
       "fingerprint": "55399652a926d8e4"
     }
   ],
-  "captured_at": "2026-09-15T12:37:17.364606Z",
+  "captured_at": "2026-09-15T16:37:25.215662Z",
   "http_status": 200
 }
