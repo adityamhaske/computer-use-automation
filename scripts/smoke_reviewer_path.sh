@@ -23,7 +23,9 @@ cd "$ROOT"
 # config/policy.yaml allowlists. Anything else is refused by policy, correctly.
 APP_PORT="${MOCK_APP_PORT:-8811}"
 CONSOLE_PORT="${CONSOLE_PORT:-8812}"
-LOG="$(mktemp -t cua-smoke)"
+# An explicit template: `mktemp -t NAME` is fine on BSD/macOS and rejected by GNU mktemp,
+# which wants the X's. CI is Linux; this was written on a Mac.
+LOG="$(mktemp "${TMPDIR:-/tmp}/cua-smoke.XXXXXX")"
 START_PID=""
 
 for port in "$APP_PORT" "$CONSOLE_PORT"; do
