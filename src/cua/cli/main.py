@@ -530,6 +530,55 @@ def eval(  # noqa: A001 -- the command is `cua eval`; shadowing the builtin is l
     raise typer.Exit(code=0 if sound else 1)
 
 
+@app.command()
+def codegen(
+    ref: Annotated[str, typer.Argument(help="Capability `id` or `id@version`.")],
+    out: Annotated[Path, typer.Option(help="Where to write the generated test.")],
+    input: Annotated[  # noqa: A002 - reads naturally on the command line
+        list[str] | None, typer.Option("--input", help="name=value, repeatable.")
+    ] = None,
+    base_url: Annotated[
+        str, typer.Option(help="Default base URL baked into the generated file.")
+    ] = "http://127.0.0.1:8811",
+) -> None:
+    """Emit a runnable Playwright test from a capability artifact.
+
+    The artifact describes every control by role, accessible name and the label beside it, which
+    is close enough to Playwright's own locator vocabulary that the result is a translation rather
+    than an invention. The point is what it demonstrates: the same document that drives
+    deterministic replay also describes a test an engineer can read, run and keep without this
+    system present.
+
+    The CSS hints in the artifact are deliberately not used. A generated test that leaned on them
+    would pass today and break on the first restyle, which is worse than no generated test because
+    it looks like coverage.
+    """
+    from cua.catalog.store import CapabilityStore
+    from cua.recorder.codegen import UnsupportedStepError, render_test
+
+    try:
+        capability = CapabilityStore().load(ref)
+    except (LookupError, ValueError) as exc:
+        typer.secho(str(exc), fg=typer.colors.RED, err=True)
+        raise typer.Exit(code=2) from exc
+
+    supplied = _parse_inputs(input)
+    try:
+        source = render_test(capability, supplied, base_url=base_url)
+    except UnsupportedStepError as exc:
+        typer.secho(
+            f"cannot generate a test for {capability.ref}: {exc}", fg=typer.colors.RED, err=True
+        )
+        raise typer.Exit(code=1) from exc
+
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(source, encoding="utf-8")
+    typer.secho(f"wrote {out}", fg=typer.colors.GREEN, bold=True)
+    typer.echo(f"  from   : {capability.ref}")
+    typer.echo(f"  steps  : {len(capability.steps)}")
+    typer.echo(f"  run it : make app  &&  pytest {out}")
+
+
 catalog_app = typer.Typer(help="The capabilities an agent can call, and their typed signatures.")
 app.add_typer(catalog_app, name="catalog")
 
