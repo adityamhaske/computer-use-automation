@@ -143,6 +143,17 @@ def replay(
     base_url: Annotated[
         str | None, typer.Option(help="Bind {base_url} for this deployment.")
     ] = None,
+    assist: Annotated[
+        bool,
+        typer.Option(
+            "--assist",
+            help=(
+                "On failure, ask a model for ONE corrective step, dispatch it through policy, and "
+                "resume deterministically. Opt-in and never a default: without this flag a replay "
+                "makes zero model calls, which is the guarantee the whole system rests on."
+            ),
+        ),
+    ] = False,
     allow_irreversible: Annotated[
         bool, typer.Option(help="Caller opt-in for an irreversible capability.")
     ] = False,
@@ -200,6 +211,7 @@ def replay(
         # TenantBinding, so it carries no risk of a double-apply.
         sign_in=sign_in,
         sign_in_url=base_url,
+        assist=assist,
     )
 
     colour = {
@@ -232,6 +244,7 @@ def _replay_once(
     headless: bool = True,
     base_url: str | None = None,
     allow_irreversible: bool = False,
+    assist: bool = False,
     sign_in: bool = False,
     sign_in_url: str | None = None,
 ) -> tuple[RunResult, Path]:
@@ -263,7 +276,7 @@ def _replay_once(
             from cua.cli.mock_login import sign_in as sign_in_to_mock_app
 
             sign_in_to_mock_app(rig, sign_in_url)
-        result = ReplayExecutor(
+        executor = ReplayExecutor(
             dispatcher=rig.dispatcher,
             evidence=rig.evidence,
             capture=FailureCapture(driver=rig.driver, evidence=rig.evidence),
@@ -272,7 +285,32 @@ def _replay_once(
             # `replay_gates` in config/policy.yaml are settings rather than documentation.
             max_recovery_attempts_total=rig.config.budgets.max_recovery_attempts_total,
             replay_gates=rig.config.replay_gates,
-        ).run(capability, inputs)
+        )
+        if assist:
+            # Imported here, not at module scope: `cua.assist` pulls in a model client, and a
+            # plain `cua replay` should not load one at all. The separation is the point.
+            from cua.agent.llm import OpenRouterLlm
+            from cua.assist import AssistedReplay
+
+            assisted = AssistedReplay(
+                executor=executor,
+                dispatcher=rig.dispatcher,
+                llm=OpenRouterLlm(),
+                evidence=rig.evidence,
+                redactor=rig.redactor,
+                session_id=run_id,
+            )
+            result = assisted.run(capability, inputs)
+            if assisted.outcome.attempted:
+                typer.secho(
+                    f"\n  assisted recovery: {assisted.outcome.reason}"
+                    f"  ({assisted.outcome.model_calls} model call(s))",
+                    fg=typer.colors.MAGENTA,
+                )
+                if assisted.outcome.action:
+                    typer.echo(f"  model chose      : {assisted.outcome.action}")
+        else:
+            result = executor.run(capability, inputs)
     finally:
         rig.close()
     return result, rig.run_dir

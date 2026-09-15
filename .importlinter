@@ -99,16 +99,30 @@ allow_indirect_imports = False
 
 # --- Layering: the dependency direction of the system. ------------------------
 # Higher layers may import lower ones; never the reverse.
+#
+# `cua.hitl.console` is listed separately from `cua.hitl` because they are different things.
+# The broker, the lease and the intervention queue are domain logic and import nothing above
+# `cua.evidence`. The console is a web application that serves them, and it legitimately
+# needs the catalog and the failure capture. Holding both to the lower position said the
+# console was domain logic, which it is not.
+#
+# `cua.assist` sits above both `cua.agent` and `cua.replay` because it orchestrates the two:
+# it replays deterministically, and only on failure asks a model for one corrective step.
+# Putting it here rather than inside `cua.replay` is what lets an assisted fallback exist
+# without weakening INVARIANT 1 above -- replay still cannot reach a model, and a plain
+# `cua replay` still makes zero model calls.
 
 [importlinter:contract:layers]
 name = Package layering
 type = layers
 layers =
     cua.cli
+    cua.assist
     cua.evals
+    cua.hitl.console
     cua.agent | cua.replay | cua.recorder | cua.catalog
     cua.runtime
-    cua.hitl
+    cua.hitl.broker : cua.hitl.intervention : cua.hitl.lease : cua.hitl.reanchor : cua.hitl.session_thread
     cua.policy
     cua.targeting
     cua.perception

@@ -76,7 +76,11 @@ typecheck: require-venv ## Strict type check
 
 .PHONY: invariants
 invariants: require-venv ## Verify the architectural contracts and that the docs describe what exists
-	$(PY) -m importlinter.cli lint
+	# `lint-imports`, not `python -m importlinter.cli`. The module form is not a runnable
+	# entry point: it prints nothing, runs no contracts and exits 0 -- so this target passed
+	# for as long as it was written that way while enforcing nothing, and the invariants
+	# REPORT.md calls mechanically enforced were not being checked at all.
+	.venv/bin/lint-imports
 	$(PY) scripts/check_traceability.py
 
 .PHONY: test
