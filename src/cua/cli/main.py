@@ -260,6 +260,7 @@ def _replay_once(
     Signing in is not tenant binding -- it is demo-fixture setup that happens to need a URL, and
     every caller already has one in scope regardless of who applied the binding.
     """
+    from cua.catalog.approvals import ApprovalStore
     from cua.domain.tenant_binding import TenantBinding
     from cua.replay.executor import ReplayExecutor
     from cua.runtime.capture import FailureCapture
@@ -268,6 +269,18 @@ def _replay_once(
         capability = TenantBinding(
             capability_ref=capability.ref, tenant="cli", vars={"base_url": base_url}
         ).apply(capability)
+
+    # Neither `cua replay` nor `cua catalog invoke` -- the only two real entry points to this
+    # function -- ever loaded a stored approval before this, so `ReplayExecutor.approval` was
+    # always `None` and an irreversible capability could never actually be replayed unattended,
+    # approved or not: the gate was enforced but structurally unreachable.
+    #
+    # A `--base-url` binding recomputes the capability's content hash (`TenantBinding.apply`
+    # reseals the effective, substituted artifact), so an approval pinned to the sealed base
+    # artifact will not match here and the gate below still refuses -- correctly conservative, not
+    # a regression, but it means today's approval workflow is only satisfiable for a capability
+    # whose entrypoint needs no `{base_url}` substitution. See REPORT.md's known weaknesses.
+    approval = ApprovalStore().load(capability.ref)
 
     rig = build_rig(run_id=run_id, kind="replay", headless=headless, allow_vision=False)
     try:
@@ -285,6 +298,7 @@ def _replay_once(
             # `replay_gates` in config/policy.yaml are settings rather than documentation.
             max_recovery_attempts_total=rig.config.budgets.max_recovery_attempts_total,
             replay_gates=rig.config.replay_gates,
+            approval=approval,
         )
         if assist:
             # Imported here, not at module scope: `cua.assist` pulls in a model client, and a
@@ -687,6 +701,21 @@ def catalog_approve(
     if not capability.content_hash:
         typer.secho(
             "this artifact is unsealed, so there is no exact content to pin an approval to",
+            fg=typer.colors.RED,
+            err=True,
+        )
+        raise typer.Exit(code=2)
+    if entry.state == "TAMPERED":
+        # `CapabilityStore.list()` already guards this for its own `approved` display
+        # (store.py:138-142, comparing against the *verified* hash); this command must refuse the
+        # same way at the point of decision. Without this check, `capability.content_hash` here is
+        # a line in a file the editor also controls: `--from-eval` would happily match it against
+        # an old evaluation recorded under that same stale value and approve content nobody
+        # measured, and a plain approval would pin a decision to a hash that matches nothing this
+        # artifact's own bytes could ever reproduce.
+        typer.secho(
+            f"{capability.ref} does not match its content hash ({entry.path}) -- it was edited "
+            "after it was sealed, so what would be approved is not what was reviewed",
             fg=typer.colors.RED,
             err=True,
         )

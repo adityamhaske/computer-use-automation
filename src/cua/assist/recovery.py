@@ -14,6 +14,7 @@ from cua.domain.result import FailureCode, RunResult, RunStatus
 from cua.domain.target import TargetDescriptor
 from cua.evidence.bus import EventType, EvidenceBus
 from cua.policy.redact import Redactor
+from cua.policy.risk import RiskClassifier
 from cua.replay.executor import ReplayExecutor
 from cua.runtime.dispatcher import Dispatcher
 from cua.targeting.synthesize import synthesize_descriptor
@@ -109,10 +110,17 @@ class AssistedReplay:
 
         # Back to determinism for everything that remains. The model chose one control; it does
         # not get to drive the rest of the run.
+        #
+        # `step_index + 1`, not `step_index`: the dispatch above already performed the failed
+        # step's action. `reconcile` skips a step only when its postcondition already holds, and
+        # a compiled capability declares none, so resuming at `step_index` would find no evidence
+        # the step was done and re-dispatch the very click or type the model just made -- a
+        # double submission on exactly the kind of step this exists to correct. The step's role
+        # ends with the corrective dispatch; replay picks up after it.
         resumed = self.executor.resume(
             capability,
             supplied,
-            from_index=step_index,
+            from_index=step_index + 1,
             prior_outputs=dict(result.outputs),
         )
         self.outcome.succeeded = resumed.status is RunStatus.SUCCESS
@@ -199,9 +207,15 @@ class AssistedReplay:
             self._note(self.outcome.reason)
             return None
 
-        if action.risk is ActionRisk.IRREVERSIBLE:
-            # Refused here as well as at the chokepoint. A model choosing a money-moving control
-            # on a page it has just been shown is not a case to leave to configuration.
+        # `action.risk` alone would never catch this: `_action_for` never sets it, so that check
+        # could not fire regardless of what the model picked. The chokepoint's own classifier also
+        # weighs what the target's name says it does -- a control labelled "Delete" or "Wire
+        # Transfer" is dangerous whatever the constructed `Action` carries -- so this asks the same
+        # classifier the chokepoint uses, with the same resolved node, to refuse here as well as
+        # there. A model choosing a money-moving control on a page it has just been shown is not a
+        # case to leave to a single check.
+        risk = RiskClassifier(self.dispatcher.policy.config.risk).classify(action, target=node)
+        if risk.tier is ActionRisk.IRREVERSIBLE:
             self.outcome.reason = "refused: assisted recovery may not take an irreversible action"
             self._note(self.outcome.reason)
             return None

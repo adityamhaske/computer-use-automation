@@ -29,13 +29,21 @@ from datetime import UTC, datetime
 
 from cua.domain.action import Click, Extract, PressKey, Select, Type
 from cua.domain.capability import Capability
+from cua.domain.predicates import AllOf, NodeExists, NodeQuery, Predicate
+from cua.domain.target import MatchMode
 from cua.domain.values import InputRef, OutputRef, SecretRef
 
 # What a declared output type looks like once read off the screen. The generated test asserts
 # shape, not value: the balance is fixture data and may change, but "money still looks like money"
 # is the assertion that catches a capability reading the wrong cell.
+#
+# The money pattern mirrors `cua.recorder.naming.shape_pattern`'s money branch exactly -- that is
+# the compiler's own answer to "what does a value of this shape look like", used to write a
+# checkpoint's `name_matches`. A narrower copy here (no leading `-?`) once meant this assertion
+# accepted less than the compiler itself would certify as money, so a generated test could pass on
+# a shape the artifact's own checkpoint would refuse.
 SHAPE = {
-    "money": r"^\$?[0-9,]+\.[0-9]{2}$",
+    "money": r"^\$?-?[0-9,]+\.[0-9]{2}$",
     "date": r"^[0-9]{2}/[0-9]{2}/[0-9]{4}$",
     "integer": r"^-?[0-9]+$",
     "number": r"^-?[0-9]+(\.[0-9]+)?$",
@@ -77,6 +85,27 @@ def _frame(step_frame: str | None) -> str:
     return f"frame(page, {_lit(step_frame)})"
 
 
+def _name_arg(value: str, match: MatchMode) -> str:
+    """The `name=` (and, only for `MatchMode.EXACT`, `exact=`) arguments for a role locator.
+
+    Hardcoding `exact=True` regardless of the declared mode used to make every generated locator
+    stricter than the resolver's own default: `Anchor.match` defaults to `NORMALIZED`, so a
+    capability that declares nothing at all still resolves case/whitespace/punctuation-tolerant at
+    replay time, while the generated test demanded a literal match -- a test that could fail on a
+    run replay itself would pass.
+
+    Playwright has no native "normalized" comparator. Its default (no `exact`) already matches
+    case-insensitively and by substring, which is closer to NORMALIZED and CONTAINS than forcing an
+    exact match would be -- an honest approximation, the same trade this generator makes throughout,
+    not a silent guess.
+    """
+    if match is MatchMode.REGEX:
+        return f"name=re.compile({_lit(value)})"
+    if match is MatchMode.EXACT:
+        return f"name={_lit(value)}, exact=True"
+    return f"name={_lit(value)}"
+
+
 def _locator(target: object) -> str:
     """One target, as a Playwright locator expression."""
     role = getattr(target, "role", None)
@@ -86,7 +115,7 @@ def _locator(target: object) -> str:
     frame = _frame(getattr(scope, "frame", None) if scope else None)
 
     if name is not None and getattr(name, "value", None):
-        return f"{frame}.get_by_role({_lit(str(role))}, name={_lit(name.value)}, exact=True)"
+        return f"{frame}.get_by_role({_lit(str(role))}, {_name_arg(name.value, name.match)})"
 
     if anchor is not None and getattr(anchor, "text", None):
         # `adjacent_to` means "the cell immediately after the one holding this label", and it is
@@ -100,7 +129,7 @@ def _locator(target: object) -> str:
         # An XPath axis rather than a CSS selector: this is a structural relation, the same one
         # the resolver's anchor expresses, not a hook into how the page is styled.
         return (
-            f"{frame}.get_by_role('cell', name={_lit(anchor.text)}, exact=True)"
+            f"{frame}.get_by_role('cell', {_name_arg(anchor.text, anchor.match)})"
             f'.locator("xpath=following-sibling::*[1]")'
         )
 
@@ -138,6 +167,67 @@ def _value(action: object, inputs: dict[str, str]) -> str:
             "a later step is not translated yet"
         )
     return _lit(str(raw))
+
+
+def _query_count_expr(query: NodeQuery) -> str:
+    """How many nodes on the page currently match this query, as a Playwright expression.
+
+    A query with no declared `scope.frame` matches in *any* frame -- `NodeQuery.matches` is
+    evaluated over the flat, cross-frame node list a `UiSnapshot` carries, so "no frame declared"
+    means "any frame", not "the main document". Playwright's own locators do not search descendant
+    frames the way `page.locator()` searches the main one, so translating that case as a plain
+    `page.get_by_role(...)` under-counts on this project's frameset applications -- checked by
+    running the generated test, where it read as a checkpoint failure that was never real. Summing
+    across `page.frames` (which includes the main frame) matches the domain's own semantics instead
+    of the narrower one Playwright defaults to.
+    """
+    if query.role is None:
+        raise UnsupportedStepError(f"checkpoint query has no role, so it has no locator: {query!r}")
+
+    if query.name is not None:
+        role_call = f"get_by_role({_lit(query.role)}, name={_lit(query.name)}, exact=True)"
+    elif query.name_contains is not None:
+        # Playwright's own `name=` matches by substring, case-insensitively, unless `exact=True` --
+        # the same tolerance `name_contains` declares, so no `exact` here is the honest translation.
+        role_call = f"get_by_role({_lit(query.role)}, name={_lit(query.name_contains)})"
+    elif query.name_matches is not None:
+        role_call = f"get_by_role({_lit(query.role)}, name=re.compile({_lit(query.name_matches)}))"
+    else:
+        raise UnsupportedStepError(
+            f"checkpoint query has a role but no name condition to locate by: {query!r}"
+        )
+
+    if query.scope and query.scope.frame:
+        return f"{_frame(query.scope.frame)}.{role_call}.count()"
+    return f"sum(f.{role_call}.count() for f in page.frames)"
+
+
+def _checkpoint_asserts(predicate: Predicate) -> list[str]:
+    """Translate the capability's checkpoint into Playwright assertions.
+
+    Only the shapes every shipped capability's checkpoint actually uses -- `all_of` over
+    `node_exists` -- are translated. Anything else is refused rather than silently dropped, for the
+    reason `UnsupportedStepError` exists: a generated test that quietly skipped part of "did we
+    reach the goal state" would pass on a run the real executor would fail closed.
+    """
+    if isinstance(predicate, AllOf):
+        lines: list[str] = []
+        for sub in predicate.of:
+            lines.extend(_checkpoint_asserts(sub))
+        return lines
+
+    if isinstance(predicate, NodeExists):
+        count_expr = _query_count_expr(predicate.query)
+        return [
+            f"assert {count_expr} >= {predicate.min_count}, (",
+            f"    {_lit('checkpoint failed: ' + predicate.describe())}",
+            ")",
+        ]
+
+    raise UnsupportedStepError(
+        f"checkpoint uses {predicate.kind!r}, which codegen does not yet translate: "
+        f"{predicate.describe()}"
+    )
 
 
 def render_test(capability: Capability, inputs: dict[str, str], *, base_url: str) -> str:
@@ -179,6 +269,10 @@ def render_test(capability: Capability, inputs: dict[str, str], *, base_url: str
             body.append(")")
         else:
             body.append(f'assert {name}, "{name} was empty"')
+
+    body.append("")
+    body.append(f"# checkpoint: {capability.checkpoint.describe()}")
+    body.extend(_checkpoint_asserts(capability.checkpoint))
 
     supplied = ", ".join(f"{k}={v!r}" for k, v in sorted(inputs.items()))
     return TEMPLATE.format(

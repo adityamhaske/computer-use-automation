@@ -11,6 +11,7 @@ import re
 from pathlib import Path
 
 import pytest
+import typer
 
 from cua.catalog.approvals import ApprovalStore
 from cua.catalog.store import (
@@ -20,6 +21,7 @@ from cua.catalog.store import (
 )
 from cua.catalog.toolspec import tool_definitions
 from cua.cli.agent_demo import interpret
+from cua.cli.main import catalog_approve
 from cua.domain.approval import ApprovalState, CapabilityApproval
 from cua.domain.evaluation import CapabilityEvaluation
 from cua.domain.result import (
@@ -308,3 +310,56 @@ def test_a_recommendation_is_refused_without_evidence_for_this_exact_content() -
     )
     supported, why = CapabilityApproval.recommend(wrong)
     assert supported is False and "wrong action" in why
+
+
+def test_catalog_approve_refuses_a_tampered_artifact(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Regression: `cua catalog approve --from-eval` trusted the artifact's declared hash.
+
+    A file edited on disk but left claiming its old (still-evaluated) hash would match a prior
+    evaluation and record an approval whose evidence never actually measured this content -- the
+    same defect class `CapabilityStore.load()` already refuses for replay (see
+    `test_an_artifact_edited_in_place_is_refused`), just unreachable from this command's own
+    decision point, since it read `capability.content_hash` directly instead of asking whether that
+    hash still matched the artifact's bytes.
+    """
+    monkeypatch.chdir(tmp_path)
+    capabilities = tmp_path / "evidence" / "capabilities"
+    capabilities.mkdir(parents=True)
+    evals = tmp_path / "evidence" / "evals"
+    evals.mkdir(parents=True)
+
+    sealed_text = dump_capability(load_capability(FIXTURE.read_text(encoding="utf-8")))
+    (capabilities / "savings.yaml").write_text(sealed_text, encoding="utf-8")
+    original_hash = load_capability(sealed_text).content_hash
+
+    (evals / "replay_stability.evaluation.json").write_text(
+        CapabilityEvaluation(
+            capability_ref="corebank.member.savings_balance@1.0.0",
+            content_hash=original_hash,
+            runs=20,
+            successes=20,
+        ).model_dump_json(),
+        encoding="utf-8",
+    )
+
+    # Tamper: edit the sealed file on disk without recomputing its hash -- the exact technique
+    # `test_an_artifact_edited_in_place_is_refused` uses for the replay-side version of this bug.
+    tampered = sealed_text.replace("savings balance", "CHECKING balance", 1)
+    assert tampered != sealed_text, "the edit must actually change the file"
+    (capabilities / "savings.yaml").write_text(tampered, encoding="utf-8")
+
+    with pytest.raises(typer.Exit) as raised:
+        catalog_approve(
+            ref="corebank.member.savings_balance",
+            by="reviewer",
+            notes="",
+            from_eval=True,
+        )
+    assert raised.value.exit_code == 2
+
+    approval_record = capabilities / "corebank.member.savings_balance@1.0.0.approval.json"
+    assert not approval_record.exists(), (
+        "a tampered artifact must not end up with an approval record on disk"
+    )

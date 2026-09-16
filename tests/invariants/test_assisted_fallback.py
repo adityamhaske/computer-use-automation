@@ -20,12 +20,26 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from cua.agent.llm import LlmResponse
+from cua.agent.llm import LlmResponse, ToolCall
 from cua.assist.recovery import ASSISTABLE, AssistedReplay
-from cua.domain.result import FailureCode
+from cua.domain.capability import Capability
+from cua.domain.result import FailureCode, FailureDetail, RunResult, RunStatus
+from cua.domain.serde import load_capability
+from cua.domain.snapshot import UiNode, UiSnapshot
+from cua.evidence.bus import EvidenceBus
+from cua.policy.authorized import AuthorizedAction
+from cua.policy.config import parse_policy
+from cua.policy.engine import PolicyEngine
+from cua.policy.redact import Redactor
+from cua.runtime.dispatcher import Dispatcher
+from cua.surfaces.base import ActionResult, SessionInfo
+from cua.targeting.resolver import TargetResolver
 
 SRC = Path(__file__).resolve().parents[2] / "src/cua/replay"
 BANNED_ROOTS = {"httpx", "openai", "anthropic"}
+REPO_ROOT = Path(__file__).resolve().parents[2]
+POLICY = REPO_ROOT / "config/policy.yaml"
+FIXTURE = REPO_ROOT / "tests/fixtures/capabilities/savings_balance.yaml"
 
 
 @dataclass
@@ -138,3 +152,186 @@ def test_assist_cannot_choose_navigation() -> None:
     assert AssistedReplay._action_for("navigate", target, {"url": "http://x"}) is None
     assert AssistedReplay._action_for("finish", target, {}) is None
     assert AssistedReplay._action_for("click", target, {}) is not None
+
+
+# ------------------------------------------------------------------------------------------
+# The two bugs below shipped in the first cut of assist: resuming at the corrected step
+# instead of after it, and an irreversible-action guard that could never fire. Both need a
+# real dispatcher (resolver + policy engine) to reproduce, since the mistake in each case was
+# only visible once a real snapshot and a real risk classification were in the loop.
+
+
+class _FakeDriver:
+    """Reports one fixed snapshot and accepts whatever authorized action it is given."""
+
+    def __init__(self, snapshot: UiSnapshot) -> None:
+        self._snapshot = snapshot
+
+    def observe(self) -> UiSnapshot:
+        return self._snapshot
+
+    def dispatch(self, action: AuthorizedAction) -> ActionResult:
+        assert isinstance(action, AuthorizedAction), "the driver must only ever see authorized work"
+        return ActionResult(ok=True, duration_ms=1, navigated=False)
+
+    def screenshot(self, *, redact: tuple = ()) -> bytes:
+        return b""
+
+    def bounds_for(self, node_ids: tuple[str, ...]) -> dict[str, Any]:
+        return {}
+
+    def session_info(self) -> SessionInfo:
+        return SessionInfo(session_id="s1", driver="fake", url=self._snapshot.url)
+
+    def close(self) -> None:
+        return None
+
+
+class _OneShotLlm:
+    """Proposes one fixed tool call, whatever it is asked."""
+
+    model_name = "fixed/one-shot"
+
+    def __init__(self, node_id: str, tool: str = "click") -> None:
+        self._node_id = node_id
+        self._tool = tool
+
+    def complete(
+        self, *, messages: list[dict[str, Any]], tools: list[dict[str, Any]]
+    ) -> LlmResponse:
+        return LlmResponse(
+            tool_calls=(ToolCall(id="1", name=self._tool, arguments={"node_id": self._node_id}),),
+            model=self.model_name,
+            finish_reason="tool_calls",
+        )
+
+
+class _FakeExecutor:
+    """`run` returns a fixed failure; `resume` records its arguments rather than replaying."""
+
+    def __init__(self, failed: RunResult, resumed: RunResult) -> None:
+        self._failed = failed
+        self._resumed = resumed
+        self.resume_calls: list[dict[str, Any]] = []
+
+    def run(self, capability: Capability, supplied: dict[str, str]) -> RunResult:
+        return self._failed
+
+    def resume(
+        self,
+        capability: Capability,
+        supplied: dict[str, str],
+        *,
+        from_index: int,
+        prior_outputs: dict[str, str] | None = None,
+        prior_recovery_attempts: int = 0,
+    ) -> RunResult:
+        self.resume_calls.append({"from_index": from_index})
+        return self._resumed
+
+
+def _capability() -> Capability:
+    return load_capability(FIXTURE.read_text(encoding="utf-8"))
+
+
+def _rig(tmp_path: Path, snapshot: UiSnapshot) -> tuple[Dispatcher, EvidenceBus, Redactor]:
+    config = parse_policy(POLICY.read_text(encoding="utf-8"))
+    redactor = Redactor(config.redaction)
+    bus = EvidenceBus(tmp_path, redactor, run_id="assist-test")
+    dispatcher = Dispatcher(
+        driver=_FakeDriver(snapshot),
+        policy=PolicyEngine(config),
+        resolver=TargetResolver(),
+        evidence=bus,
+    )
+    return dispatcher, bus, redactor
+
+
+def test_assist_resumes_after_the_corrected_step_not_at_it(tmp_path: Path) -> None:
+    """Regression: `from_index=step_index` re-dispatched the step the correction just performed.
+
+    `reconcile` only skips a step whose postcondition already holds, and a compiled capability
+    declares none, so resuming at the failed step's own index found no evidence it was done and
+    re-ran it -- a duplicate click on top of the one assist had just made. The fix resumes one
+    step later, where the corrected step's role has already been discharged.
+    """
+    capability = _capability()
+    failed_index = [s.id for s in capability.steps].index("submit_search")
+
+    snapshot = UiSnapshot(
+        snapshot_id="s1",
+        url="http://localhost:8811/search",
+        nodes=(UiNode(node_id="n1", role="button", name="Search"),),
+    )
+    dispatcher, bus, redactor = _rig(tmp_path, snapshot)
+
+    failed = RunResult(
+        capability_id=capability.id,
+        capability_version=capability.version,
+        run_id="run-1",
+        status=RunStatus.FAILED,
+        error=FailureDetail(
+            code=FailureCode.TARGET_NOT_FOUND, message="not found", step_id="submit_search"
+        ),
+    )
+    resumed = RunResult(
+        capability_id=capability.id,
+        capability_version=capability.version,
+        run_id="run-1",
+        status=RunStatus.SUCCESS,
+    )
+    executor = _FakeExecutor(failed, resumed)
+
+    assisted = AssistedReplay(
+        executor=executor,  # type: ignore[arg-type]
+        dispatcher=dispatcher,
+        llm=_OneShotLlm("n1"),  # type: ignore[arg-type]
+        evidence=bus,
+        redactor=redactor,
+    )
+
+    result = assisted.run(capability, {"member_id": "12345"})
+
+    assert executor.resume_calls == [{"from_index": failed_index + 1}]
+    assert result is resumed
+
+
+def test_assist_refuses_an_irreversible_correction(tmp_path: Path) -> None:
+    """Regression: the guard tested `action.risk`, which `_action_for` never sets.
+
+    `Click`/`Type`/`Select` built fresh here carry no risk annotation, so the old check
+    (`action.risk is ActionRisk.IRREVERSIBLE`) could not fire regardless of what the model
+    picked. The fix asks the same classifier the policy chokepoint uses, which also weighs the
+    target's name -- so a model proposing a click on a control the lexicon marks irreversible
+    ("Transfer Funds") is refused here, before a dispatch is ever attempted.
+    """
+    capability = _capability()
+    snapshot = UiSnapshot(
+        snapshot_id="s1",
+        url="http://localhost:8811/search",
+        nodes=(UiNode(node_id="n1", role="button", name="Transfer Funds"),),
+    )
+    dispatcher, bus, redactor = _rig(tmp_path, snapshot)
+
+    result = RunResult(
+        capability_id=capability.id,
+        capability_version=capability.version,
+        run_id="run-1",
+        status=RunStatus.FAILED,
+        error=FailureDetail(
+            code=FailureCode.TARGET_NOT_FOUND, message="not found", step_id="submit_search"
+        ),
+    )
+
+    assisted = AssistedReplay(
+        executor=None,  # type: ignore[arg-type]
+        dispatcher=dispatcher,
+        llm=_OneShotLlm("n1"),  # type: ignore[arg-type]
+        evidence=bus,
+        redactor=redactor,
+    )
+
+    action = assisted._ask(capability, result)
+
+    assert action is None
+    assert "irreversible" in assisted.outcome.reason

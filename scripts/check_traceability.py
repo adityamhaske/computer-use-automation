@@ -30,7 +30,9 @@ TEST_DIRS = ("unit/", "integration/", "contract/", "invariants/", "e2e/")
 SOURCE_DIRS = (
     "cli/",
     "agent/",
+    "assist/",
     "domain/",
+    "evals/",
     "perception/",
     "policy/",
     "recorder/",

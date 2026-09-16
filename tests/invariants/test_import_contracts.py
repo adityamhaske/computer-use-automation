@@ -46,8 +46,17 @@ def test_all_required_contracts_are_declared() -> None:
 
 
 def test_contracts_hold() -> None:
+    # Not `python -m importlinter.cli lint`: that module has no `__main__` guard, so the
+    # module form prints nothing, runs no contracts and exits 0 regardless of what is broken --
+    # the same dead entry point `make invariants` used to call (see the Makefile). Invoking
+    # `lint_imports()` directly runs the same check `lint-imports` does, without depending on
+    # that console script existing on PATH.
     result = subprocess.run(
-        [sys.executable, "-m", "importlinter.cli", "lint"],
+        [
+            sys.executable,
+            "-c",
+            "import sys\nfrom importlinter.cli import lint_imports\nsys.exit(lint_imports())\n",
+        ],
         cwd=REPO_ROOT,
         capture_output=True,
         text=True,

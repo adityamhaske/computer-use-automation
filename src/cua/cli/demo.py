@@ -339,18 +339,21 @@ class Demo:
 
             # 4. Replay with different inputs.
             result = self.replay(base_url, reference, {"member_id": "67890"}, "success")
+            ok = result.status is RunStatus.SUCCESS
             self.say(
                 "Deterministic replay, new inputs",
                 f"{result.summary}  outputs={result.outputs}",
-                ok=result.status is RunStatus.SUCCESS,
+                ok=ok,
             )
 
             # 5. A business outcome.
             outcome = self.replay(base_url, reference, {"member_id": "99999"}, "business-outcome")
+            stage_ok = outcome.status is RunStatus.BUSINESS_OUTCOME
+            ok = stage_ok and ok
             self.say(
                 "Business outcome (exit 0 — an answer, not a crash)",
                 f"{outcome.summary}   exit={outcome.exit_code}",
-                ok=outcome.status is RunStatus.BUSINESS_OUTCOME,
+                ok=stage_ok,
             )
 
             # 6. A transient fault, recovered.
@@ -361,10 +364,12 @@ class Demo:
                 "recovered-fault",
                 fault=("transient_load", 1),
             )
+            stage_ok = recovered.status is RunStatus.SUCCESS
+            ok = stage_ok and ok
             self.say(
                 "Injected 502 — declared recovery cleared it",
                 f"{recovered.summary}  recovery_attempts={recovered.recovery_attempts}",
-                ok=recovered.status is RunStatus.SUCCESS,
+                ok=stage_ok,
             )
 
             # 7. The same fault, past its declared budget. Recovery is bounded by design: three
@@ -378,10 +383,12 @@ class Demo:
                 "recovery-exhausted",
                 fault=("transient_load", 9),
             )
+            stage_ok = exhausted.status is RunStatus.NEEDS_HUMAN
+            ok = stage_ok and ok
             self.say(
                 "Same fault past its declared budget — bounded, so it escalated",
                 f"{exhausted.summary}   exit={exhausted.exit_code}",
-                ok=exhausted.status is RunStatus.NEEDS_HUMAN,
+                ok=stage_ok,
             )
 
             # Typed inputs are a contract, checked before the surface is touched. A caller that
@@ -392,16 +399,20 @@ class Demo:
             rejected = self.replay(
                 base_url, reference, {"member_id": "not-a-member"}, "input-rejected"
             )
+            stage_ok = (
+                rejected.status is RunStatus.FAILED
+                and rejected.error is not None
+                and rejected.error.code is FailureCode.INPUT_VALIDATION_FAILED
+            )
+            ok = stage_ok and ok
             self.say(
                 "Malformed input rejected before acting",
                 f"{rejected.summary}   exit={rejected.exit_code}",
-                ok=rejected.status is RunStatus.FAILED
-                and rejected.error is not None
-                and rejected.error.code is FailureCode.INPUT_VALIDATION_FAILED,
+                ok=stage_ok,
             )
 
             # 8-10. Fail closed, hand to a human, resume.
-            ok = self.escalation(reference, base_url)
+            ok = self.escalation(reference, base_url) and ok
 
             # 11. The other half of the thesis: an agent calls it by name.
             ok = self.calling_agent(base_url) and ok

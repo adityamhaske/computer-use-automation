@@ -27,8 +27,9 @@ import uvicorn
 from apps.mock_bank.server import create_app
 
 from cua.domain.capability import Capability
+from cua.domain.predicates import NodeExists, NodeQuery, TextPresent
 from cua.domain.serde import dump_capability, load_capability
-from cua.domain.target import NameMatch
+from cua.domain.target import MatchMode, NameMatch
 from cua.domain.values import OutputRef, SecretRef
 from cua.recorder.codegen import UnsupportedStepError, render_test
 
@@ -239,3 +240,106 @@ def test_a_secret_or_chained_output_is_refused_not_stringified(capability: Capab
 
     with pytest.raises(UnsupportedStepError, match="savings_balance"):
         render_test(_with_value(OutputRef(output_name="savings_balance")), {}, base_url="http://x")
+
+
+def test_the_generated_test_asserts_the_capabilitys_checkpoint(capability: Capability) -> None:
+    """Regression: codegen used to translate every step but never the checkpoint itself.
+
+    A generated test that only checked each output's shape could pass on a run that never actually
+    reached the goal state -- the per-output assertions and "did we get there" are different
+    claims, and only the checkpoint makes the second one. Asserted on the source containing a
+    reference to the checkpoint's own condition, so this fails for the right reason if the
+    translation is ever silently dropped again rather than just reworded.
+    """
+    source = render_test(capability, {"member_id": "12345"}, base_url="http://127.0.0.1:8811")
+    assert "checkpoint" in source
+    assert ".count()" in source
+    for sub in capability.checkpoint.of:  # type: ignore[attr-defined]
+        assert sub.describe() in source
+
+
+def test_checkpoint_translation_refuses_an_unsupported_predicate(capability: Capability) -> None:
+    """A predicate shape codegen cannot translate must stop generation, not be dropped silently.
+
+    Dropping it would mean the generated test passes on a run whose checkpoint condition never
+    actually held -- the same failure mode `UnsupportedStepError` exists everywhere else in this
+    module to prevent.
+    """
+    untranslatable = capability.model_copy(
+        update={"checkpoint": TextPresent(value="Member Record")}
+    )
+    with pytest.raises(UnsupportedStepError, match="text_present"):
+        render_test(untranslatable, {"member_id": "12345"}, base_url="http://127.0.0.1:8811")
+
+
+def test_checkpoint_translation_covers_a_query_with_no_declared_frame(
+    capability: Capability,
+) -> None:
+    """Regression: a checkpoint query with no `scope.frame` matches in any frame in the domain
+    model, but a plain `page.get_by_role(...)` only searches the main document -- under-counting on
+    this project's frameset applications. This caught a real bug: the first cut of the translation
+    read as a checkpoint failure on a run that had actually reached the goal state.
+    """
+    frame_blind = capability.model_copy(
+        update={"checkpoint": NodeExists(query=NodeQuery(role="cell", name="Status"), min_count=1)}
+    )
+    source = render_test(frame_blind, {"member_id": "12345"}, base_url="http://127.0.0.1:8811")
+    assert "page.frames" in source, "an unscoped checkpoint query must search every frame"
+
+
+def test_locator_only_forces_exact_match_for_match_mode_exact(capability: Capability) -> None:
+    """Regression: `exact=True` was emitted for every locator regardless of the declared mode.
+
+    `Anchor.match` defaults to `NORMALIZED`, so a step that declares nothing at all still resolves
+    case/whitespace/punctuation-tolerant at replay time. Forcing `exact=True` in the generated test
+    made it stricter than the resolver its own artifact would use -- a test that could fail on a run
+    replay itself would pass. Playwright has no native "normalized" comparator, so the honest
+    translation is its own default (no `exact`), not a forced exact match.
+    """
+    read_balance = next(s for s in capability.steps if s.id == "read_balance")
+    assert read_balance.action.target.anchor.match is MatchMode.NORMALIZED, (
+        "this test needs a step whose anchor uses the default (unspecified) match mode"
+    )
+    enter_member_id = next(s for s in capability.steps if s.id == "enter_member_id")
+    assert enter_member_id.action.target.name.match is MatchMode.EXACT, (
+        "this test needs a step whose name declares an explicit exact match"
+    )
+
+    source = render_test(capability, {"member_id": "12345"}, base_url="http://127.0.0.1:8811")
+
+    balance_line = next(line for line in source.splitlines() if "Savings Balance" in line)
+    assert "exact=True" not in balance_line, (
+        f"a NORMALIZED-mode anchor should not force an exact match: {balance_line!r}"
+    )
+
+    member_line = next(line for line in source.splitlines() if "Member Number" in line)
+    assert "exact=True" in member_line, (
+        f"an EXACT-mode name should still force an exact match: {member_line!r}"
+    )
+
+
+def test_locator_translates_a_regex_match_mode(capability: Capability) -> None:
+    """`MatchMode.REGEX` becomes a compiled Python regex, not a literal string comparison."""
+    first = capability.steps[0]
+    regexed = capability.model_copy(
+        update={
+            "steps": (
+                first.model_copy(
+                    update={
+                        "action": first.action.model_copy(
+                            update={
+                                "target": first.action.target.model_copy(
+                                    update={
+                                        "name": NameMatch(value=r"^Member", match=MatchMode.REGEX)
+                                    }
+                                )
+                            }
+                        )
+                    }
+                ),
+                *capability.steps[1:],
+            )
+        }
+    )
+    source = render_test(regexed, {"member_id": "12345"}, base_url="http://127.0.0.1:8811")
+    assert "name=re.compile('^Member')" in source
