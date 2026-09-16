@@ -62,11 +62,47 @@ hr{border:0;border-top:1px solid var(--border);margin:2rem 0}
   text-decoration:none;color:var(--text-secondary);background:var(--bg-card)}
 .steps a:hover{border-color:var(--accent);color:var(--accent)}
 .steps .here{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+/* The submission format: a printed document, not a web page. The screen rules above are tuned
+   for a monitor -- generous line-height, large rem-scaled headings, sans-serif body copy -- and
+   applied to a PDF they cost three pages nobody asked for before the first sentence of content.
+   Print gets its own type scale and spacing entirely, in points rather than rem, because nothing
+   about "readable on a screen" transfers to "compact on a printed page". */
 @media print{
   nav,.downloads,.pager,.steps,footer{display:none}
-  body{background:#fff;font-size:11.5pt}
+  *{box-shadow:none!important;text-shadow:none!important}
+  body{background:#fff;color:#000;font-family:"Times New Roman",Times,"Liberation Serif",serif;
+    font-size:11pt;line-height:1.18}
   .wrap{max-width:none;padding:0}
-  h2{page-break-after:avoid} pre,table,blockquote{page-break-inside:avoid}
+  .eyebrow{display:none}
+  h1,h2,h3{font-family:"Times New Roman",Times,"Liberation Serif",serif;letter-spacing:normal;
+    text-wrap:normal;color:#000}
+  h1{font-size:16pt;font-weight:700;line-height:1.15;margin:0 0 7pt}
+  h2{font-size:12.5pt;font-weight:700;margin:8pt 0 3pt;padding-bottom:2pt;
+    border-bottom:.75pt solid #000;page-break-after:avoid}
+  h3{font-size:11pt;font-weight:700;margin:7pt 0 2pt;page-break-after:avoid}
+  p{margin:0 0 5pt;color:#000;text-align:justify}
+  strong{color:#000;font-weight:700}
+  blockquote{margin:0 0 8pt;padding:3pt 9pt;background:none;border-left:2pt solid #000;
+    border-radius:0;color:#000}
+  blockquote p{text-align:left}
+  blockquote p:last-child{margin:0;color:#000}
+  code{font-family:"Courier New",Courier,monospace;font-size:9pt;background:#eee;
+    padding:0 2pt;border-radius:0}
+  pre{background:#f4f4f4;border:.5pt solid #999;border-radius:0;padding:5pt 7pt;margin:0 0 7pt;
+    page-break-inside:avoid}
+  pre code{font-size:8.5pt;line-height:1.25}
+  table{font-size:9pt;margin:0 0 8pt;border:.5pt solid #999;border-radius:0}
+  /* Rows, not the whole table, hold together -- a table breaking between rows paginates the way
+     a printed table normally does; forcing the entire table to one page is what was bouncing this
+     six-row reference list wholesale onto a page of its own with a few words for company. */
+  tr{page-break-inside:avoid}
+  th,td{padding:1pt 6pt;border-bottom:.5pt solid #ccc}
+  th{background:#eaeaea;font-size:8pt;letter-spacing:.02em}
+  td{color:#000}
+  a{color:#000;text-decoration:underline}
+  ul,ol{margin:0 0 6pt;padding-left:15pt;color:#000}
+  li{margin-bottom:2pt}
+  hr{border-top:.5pt solid #999;margin:6pt 0}
   .page-break{page-break-before:always}
 }
 </style></head><body>
@@ -93,7 +129,7 @@ hr{border:0;border-top:1px solid var(--border);margin:2rem 0}
         <a href="../walkthrough/index.html" class="nav-link">Walkthrough</a>
         <a href="../docs/index.html" class="nav-link">Docs</a>
         <a href="../report/index.html" class="nav-link active">Design</a>
-        <a href="https://github.com/adityamhaske/interface.ai" class="nav-github-btn" target="_blank" rel="noopener"
+        <a href="https://github.com/adityamhaske/computer-use-automation" class="nav-github-btn" target="_blank" rel="noopener"
           aria-label="GitHub repository">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
             <path
@@ -120,7 +156,7 @@ hr{border:0;border-top:1px solid var(--border);margin:2rem 0}
   </nav><div class="wrap"><nav class="steps"><span class="here">1. Architecture & the artifact</span><a href="page-2.html">2. Determinism, errors & scale</a><a href="page-3.html">3. Escalation, safety & cuts</a></nav><div class="downloads">
   <a class="btn btn-primary" href="REPORT.pdf" download><span>Download PDF</span></a>
   <a class="btn btn-secondary" href="REPORT.md" download><span>Download Markdown</span></a>
-  <a class="btn btn-github" href="https://github.com/adityamhaske/interface.ai/blob/main/REPORT.md"
+  <a class="btn btn-github" href="https://github.com/adityamhaske/computer-use-automation/blob/main/REPORT.md"
     target="_blank" rel="noopener"><span>View on GitHub</span></a>
 </div><h1>Design write-up</h1>
 <blockquote>
@@ -128,7 +164,7 @@ hr{border:0;border-top:1px solid var(--border);margin:2rem 0}
 typed artifact that never needs it again, and every run after the first is deterministic.</p>
 </blockquote>
 <p>Every claim below is backed by something runnable: an enforced import contract, a test, or a file in
-<a href="https://github.com/adityamhaske/interface.ai/tree/main/evidence/"><code>evidence/</code></a>. What is not built says so in §7.</p>
+<a href="https://github.com/adityamhaske/computer-use-automation/tree/main/evidence/"><code>evidence/</code></a>. What is not built says so in §7.</p>
 <hr />
 <h2>1. Architecture</h2>
 <p>An LLM drives a live legacy UI to a goal <strong>once</strong>. That run is compiled into a typed, versioned
@@ -149,25 +185,20 @@ and an AI agent invokes it like a typed function.</p>
   │ EvidenceBus│  append-only, redacted, actor-tagged
   └────────────┘
 </code></pre>
-<p><strong>Discovery, replay, and human intervention are the same path</strong>, differing only in who originates
-the action. That is the answer to &quot;how do you know your guardrails apply in production?&quot; — there is
-one path, so a guardrail cannot be present on one and missing from another.</p>
-<p>Resolution runs <strong>before</strong> policy. I documented it the other way round and implementing it proved me
-wrong: risk classification's second signal is <em>what the control says it does</em> (&quot;Transfer Funds&quot;),
-which needs the resolved node, so authorizing first means authorizing half-blind. The invariant was
-never &quot;policy runs first&quot; — it is <em>nothing reaches a surface without authorization</em>.</p>
-<p>Three enforcements, because an invariant nobody can violate beats one everybody agrees with: an
-<strong>import contract</strong>, a <strong>type guard</strong> (<code>dispatch()</code> takes only an <code>AuthorizedAction</code>), and an <strong>AST
-scan</strong> that has caught four violations the import graph missed. Every fix moved the module; none
-added an exemption.</p>
-<p><strong>Stack.</strong> Python for Pydantic v2, which lets the artifact schema <em>be</em> the type system rather than
-sit beside it. Playwright over CDP because the accessibility tree is the closest browser analogue to
-what UIA or AX exposes, so perception ports. The model sits behind an <code>LlmPort</code> protocol, so the
-provider is one class rather than a dependency; <code>temperature=0</code>. YAML artifacts because a bank
-reviewer has to read one without running anything.</p>
+<p><strong>Discovery, replay, and human intervention share one path</strong>, differing only in who originates the
+action, so a guardrail cannot be present on one and missing from another. <strong>Resolution runs before
+policy</strong>: risk classification's second signal is <em>what the control says it does</em> (&quot;Transfer
+Funds&quot;), which needs the resolved node, so authorizing first would mean authorizing half-blind. The
+invariant is not &quot;policy runs first&quot; but <em>nothing reaches a surface without authorization</em> —
+enforced three ways: an <strong>import contract</strong>, a <strong>type guard</strong> (<code>dispatch()</code> accepts only an
+<code>AuthorizedAction</code>), and an <strong>AST scan</strong> that has caught violations the import graph missed.</p>
+<p><strong>Stack.</strong> Pydantic v2 lets the artifact schema <em>be</em> the type system. Playwright over CDP, since
+the accessibility tree is the closest browser analogue to UIA/AX. The model sits behind an
+<code>LlmPort</code> protocol at <code>temperature=0</code>. YAML artifacts, so a bank reviewer reads one without running
+anything.</p>
 <h2>2. Artifact schema</h2>
-<p>The focal point. <code>cua.capability/v1</code> — Pydantic, YAML, immutable, content-addressed. Examples in
-<a href="https://github.com/adityamhaske/interface.ai/tree/main/evidence/capabilities/"><code>evidence/capabilities/</code></a>.</p>
+<p><code>cua.capability/v1</code> — Pydantic, YAML, immutable, content-addressed. Examples in
+<a href="https://github.com/adityamhaske/computer-use-automation/tree/main/evidence/capabilities/"><code>evidence/capabilities/</code></a>.</p>
 <p><strong>Targets are semantic, never selectors.</strong> A <code>TargetDescriptor</code> is role, accessible name, structural
 anchor, scope, ordinal. A CSS selector may appear only under <code>hints</code> — a cache accepted only if the
 node it finds <em>also</em> satisfies the semantic assertion. <code>role: button, name: &quot;Search&quot;</code> means the same
@@ -176,25 +207,25 @@ in Windows UIA as in ARIA; <code>input.btn1</code> does not.</p>
 conflating the first with the third as the most common mistake here, so the schema makes it
 structurally impossible rather than trusting the executor.</p>
 <p><strong>The capability is immutable; everything a <em>run</em> produces lives elsewhere</strong> — <code>RunRecord</code>,
-<code>CapabilityApproval</code>, <code>TenantBinding</code>, keyed by <code>id@version</code>. A definition that accumulates telemetry
-stops being reviewable, and &quot;which version ran?&quot; stops being answerable.</p>
-<p><strong><code>capability.id</code> is namespaced by vendor product, not tenant</strong>, and <code>surface.driver_capabilities</code>
-declares what a driver must <em>be able to do</em> rather than naming a library. Both are preconditions for
-reuse.</p>
-<p>The compiler emits a <strong>draft</strong> and says so in the artifact: one run saw only the happy path, so it
-declares no outcomes and no recovery, with review notes naming what a reviewer must add — inventing
-detectors a run never observed produces error handling that is fiction.</p>
+<code>CapabilityApproval</code>, <code>TenantBinding</code>, keyed by <code>id@version</code> — since a definition that accumulates
+telemetry stops being reviewable, and &quot;which version ran?&quot; stops being answerable.
+<strong><code>capability.id</code> is namespaced by vendor product, not tenant</strong>, and <code>surface.driver_capabilities</code>
+declares what a driver must <em>be able to do</em> rather than naming a library: both preconditions for
+reuse across institutions running the same product.</p>
+<p>The compiler emits a <strong>draft</strong> and says so: one run saw only the happy path, so it declares no
+outcomes and no recovery, with review notes naming what a reviewer must add — inventing detectors a
+run never observed would produce error handling that is fiction.</p>
 <div class="pager"><span class="disabled">← Start of the write-up</span><a href="page-2.html">Determinism, errors & scale →</a></div></div>  <footer>
     <div class="footer-inner">
       <div class="footer-left">
-        <span>Computer-use automation for regulated back-offices · <a href="https://github.com/adityamhaske/interface.ai">adityamhaske/interface.ai</a></span>
+        <span>Computer-use automation for regulated back-offices · <a href="https://github.com/adityamhaske/computer-use-automation">adityamhaske/computer-use-automation</a></span>
       </div>
       <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
         <a href="index.html">Design write-up</a>
         <a href="../docs/index.html">Documentation</a>
         <a href="../llms.txt" style="font-family: var(--font-mono); font-size: 12px;">llms.txt</a>
         <a href="../llms-full.txt" style="font-family: var(--font-mono); font-size: 12px;">llms-full.txt</a>
-        <a href="https://github.com/adityamhaske/interface.ai" target="_blank" rel="noopener">GitHub Repository →</a>
+        <a href="https://github.com/adityamhaske/computer-use-automation" target="_blank" rel="noopener">GitHub Repository →</a>
       </div>
     </div>
   </footer>

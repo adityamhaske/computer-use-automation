@@ -24,7 +24,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "site/walkthrough"
 LANDING = ROOT / "site/index.html"
-REPO = "https://github.com/adityamhaske/interface.ai"
+REPO = "https://github.com/adityamhaske/computer-use-automation"
 
 FONTS = (
     "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800"
@@ -537,8 +537,16 @@ STYLE = """
   padding:.1em .36em;border-radius:3px}
 
 figure{margin:0 0 1.4rem}
-.shot{display:block;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;
-  background:#fff;line-height:0}
+/* A floating card, not a flat clip: every screenshot is real application chrome with no window
+   frame of its own (a headless capture has none to show), so the frame it needs comes from here
+   instead -- a hairline border to hold the edge crisp against the page background, and a soft
+   shadow to lift it the way a real window sits above a desktop. One rule, applied to all eleven
+   shots, so the walkthrough reads as one consistently-presented set rather than raw crops. */
+.shot{display:block;border:1px solid var(--border);border-radius:10px;overflow:hidden;
+  background:#fff;line-height:0;box-shadow:0 1px 2px rgba(15,23,42,.04),
+  0 12px 28px -8px rgba(15,23,42,.18);transition:box-shadow .15s,transform .15s}
+.shot:hover{box-shadow:0 1px 2px rgba(15,23,42,.05),0 18px 36px -8px rgba(15,23,42,.24);
+  transform:translateY(-1px)}
 .shot img{width:100%;height:auto;display:block}
 .term{background:var(--bg-code);border:1px solid var(--border);border-radius:var(--radius);
   padding:1rem 1.15rem;overflow-x:auto;margin:0;font-size:.8rem;line-height:1.6}

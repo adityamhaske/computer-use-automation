@@ -33,6 +33,6 @@ User-agent: CCBot
 Allow: /
 
 # Sitemaps & Machine-readable endpoints
-Sitemap: https://adityamhaske.github.io/interface.ai/sitemap.xml
-# LLM Context: https://adityamhaske.github.io/interface.ai/llms.txt
-# Full Text: https://adityamhaske.github.io/interface.ai/llms-full.txt
+Sitemap: https://adityamhaske.github.io/computer-use-automation/sitemap.xml
+# LLM Context: https://adityamhaske.github.io/computer-use-automation/llms.txt
+# Full Text: https://adityamhaske.github.io/computer-use-automation/llms-full.txt

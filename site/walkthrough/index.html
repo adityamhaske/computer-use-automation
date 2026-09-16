@@ -75,8 +75,16 @@ against the running application with screenshots and real captured output.">
   padding:.1em .36em;border-radius:3px}
 
 figure{margin:0 0 1.4rem}
-.shot{display:block;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;
-  background:#fff;line-height:0}
+/* A floating card, not a flat clip: every screenshot is real application chrome with no window
+   frame of its own (a headless capture has none to show), so the frame it needs comes from here
+   instead -- a hairline border to hold the edge crisp against the page background, and a soft
+   shadow to lift it the way a real window sits above a desktop. One rule, applied to all eleven
+   shots, so the walkthrough reads as one consistently-presented set rather than raw crops. */
+.shot{display:block;border:1px solid var(--border);border-radius:10px;overflow:hidden;
+  background:#fff;line-height:0;box-shadow:0 1px 2px rgba(15,23,42,.04),
+  0 12px 28px -8px rgba(15,23,42,.18);transition:box-shadow .15s,transform .15s}
+.shot:hover{box-shadow:0 1px 2px rgba(15,23,42,.05),0 18px 36px -8px rgba(15,23,42,.24);
+  transform:translateY(-1px)}
 .shot img{width:100%;height:auto;display:block}
 .term{background:var(--bg-code);border:1px solid var(--border);border-radius:var(--radius);
   padding:1rem 1.15rem;overflow-x:auto;margin:0;font-size:.8rem;line-height:1.6}
@@ -123,7 +131,7 @@ figcaption{margin-top:.75rem;padding-left:.9rem;border-left:3px solid var(--acce
         <a href="../walkthrough/index.html" class="nav-link active">Walkthrough</a>
         <a href="../docs/index.html" class="nav-link">Docs</a>
         <a href="../report/index.html" class="nav-link">Design</a>
-        <a href="https://github.com/adityamhaske/interface.ai" class="nav-github-btn" target="_blank" rel="noopener"
+        <a href="https://github.com/adityamhaske/computer-use-automation" class="nav-github-btn" target="_blank" rel="noopener"
           aria-label="GitHub repository">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
             <path
@@ -253,7 +261,7 @@ provenance:
         <a class="btn btn-primary" href="../report/index.html"
           ><span>Read the design write-up</span></a>
         <a class="btn btn-secondary" href="../docs/index.html"><span>Documentation</span></a>
-        <a class="btn btn-github" href="https://github.com/adityamhaske/interface.ai" target="_blank" rel="noopener"
+        <a class="btn btn-github" href="https://github.com/adityamhaske/computer-use-automation" target="_blank" rel="noopener"
           ><span>Source on GitHub</span></a>
       </div>
     </section>
@@ -264,14 +272,14 @@ provenance:
   <footer>
     <div class="footer-inner">
       <div class="footer-left">
-        <span>Computer-use automation for regulated back-offices · <a href="https://github.com/adityamhaske/interface.ai">adityamhaske/interface.ai</a></span>
+        <span>Computer-use automation for regulated back-offices · <a href="https://github.com/adityamhaske/computer-use-automation">adityamhaske/computer-use-automation</a></span>
       </div>
       <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
         <a href="../report/index.html">Design write-up</a>
         <a href="../docs/index.html">Documentation</a>
         <a href="../llms.txt" style="font-family: var(--font-mono); font-size: 12px;">llms.txt</a>
         <a href="../llms-full.txt" style="font-family: var(--font-mono); font-size: 12px;">llms-full.txt</a>
-        <a href="https://github.com/adityamhaske/interface.ai" target="_blank" rel="noopener">GitHub Repository →</a>
+        <a href="https://github.com/adityamhaske/computer-use-automation" target="_blank" rel="noopener">GitHub Repository →</a>
       </div>
     </div>
   </footer>

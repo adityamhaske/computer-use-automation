@@ -90,18 +90,54 @@ hr{border:0;border-top:1px solid var(--border);margin:2rem 0}
   text-decoration:none;color:var(--text-secondary);background:var(--bg-card)}
 .steps a:hover{border-color:var(--accent);color:var(--accent)}
 .steps .here{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+/* The submission format: a printed document, not a web page. The screen rules above are tuned
+   for a monitor -- generous line-height, large rem-scaled headings, sans-serif body copy -- and
+   applied to a PDF they cost three pages nobody asked for before the first sentence of content.
+   Print gets its own type scale and spacing entirely, in points rather than rem, because nothing
+   about "readable on a screen" transfers to "compact on a printed page". */
 @media print{
   nav,.downloads,.pager,.steps,footer{display:none}
-  body{background:#fff;font-size:11.5pt}
+  *{box-shadow:none!important;text-shadow:none!important}
+  body{background:#fff;color:#000;font-family:"Times New Roman",Times,"Liberation Serif",serif;
+    font-size:11pt;line-height:1.18}
   .wrap{max-width:none;padding:0}
-  h2{page-break-after:avoid} pre,table,blockquote{page-break-inside:avoid}
+  .eyebrow{display:none}
+  h1,h2,h3{font-family:"Times New Roman",Times,"Liberation Serif",serif;letter-spacing:normal;
+    text-wrap:normal;color:#000}
+  h1{font-size:16pt;font-weight:700;line-height:1.15;margin:0 0 7pt}
+  h2{font-size:12.5pt;font-weight:700;margin:8pt 0 3pt;padding-bottom:2pt;
+    border-bottom:.75pt solid #000;page-break-after:avoid}
+  h3{font-size:11pt;font-weight:700;margin:7pt 0 2pt;page-break-after:avoid}
+  p{margin:0 0 5pt;color:#000;text-align:justify}
+  strong{color:#000;font-weight:700}
+  blockquote{margin:0 0 8pt;padding:3pt 9pt;background:none;border-left:2pt solid #000;
+    border-radius:0;color:#000}
+  blockquote p{text-align:left}
+  blockquote p:last-child{margin:0;color:#000}
+  code{font-family:"Courier New",Courier,monospace;font-size:9pt;background:#eee;
+    padding:0 2pt;border-radius:0}
+  pre{background:#f4f4f4;border:.5pt solid #999;border-radius:0;padding:5pt 7pt;margin:0 0 7pt;
+    page-break-inside:avoid}
+  pre code{font-size:8.5pt;line-height:1.25}
+  table{font-size:9pt;margin:0 0 8pt;border:.5pt solid #999;border-radius:0}
+  /* Rows, not the whole table, hold together -- a table breaking between rows paginates the way
+     a printed table normally does; forcing the entire table to one page is what was bouncing this
+     six-row reference list wholesale onto a page of its own with a few words for company. */
+  tr{page-break-inside:avoid}
+  th,td{padding:1pt 6pt;border-bottom:.5pt solid #ccc}
+  th{background:#eaeaea;font-size:8pt;letter-spacing:.02em}
+  td{color:#000}
+  a{color:#000;text-decoration:underline}
+  ul,ol{margin:0 0 6pt;padding-left:15pt;color:#000}
+  li{margin-bottom:2pt}
+  hr{border-top:.5pt solid #999;margin:6pt 0}
   .page-break{page-break-before:always}
 }
 """
 
 
-REPO_BLOB = "https://github.com/adityamhaske/interface.ai/blob/main/"
-REPO_TREE = "https://github.com/adityamhaske/interface.ai/tree/main/"
+REPO_BLOB = "https://github.com/adityamhaske/computer-use-automation/blob/main/"
+REPO_TREE = "https://github.com/adityamhaske/computer-use-automation/tree/main/"
 
 
 def _absolutise(html: str) -> str:
@@ -221,7 +257,7 @@ def _chrome(index: int, title: str, inner: str, *, for_print: bool = False) -> s
         else """<div class="downloads">
   <a class="btn btn-primary" href="REPORT.pdf" download><span>Download PDF</span></a>
   <a class="btn btn-secondary" href="REPORT.md" download><span>Download Markdown</span></a>
-  <a class="btn btn-github" href="https://github.com/adityamhaske/interface.ai/blob/main/REPORT.md"
+  <a class="btn btn-github" href="https://github.com/adityamhaske/computer-use-automation/blob/main/REPORT.md"
     target="_blank" rel="noopener"><span>View on GitHub</span></a>
 </div>"""
     )
@@ -266,10 +302,13 @@ def main() -> int:
         (OUT / name).write_text(_chrome(index, title, inner), encoding="utf-8")
         print(f"  site/report/{name}")
 
-    whole = _render(preamble) + "".join(
-        ('<div class="page-break"></div>' if i else "")
-        + _render("".join(sections[n] for n in nums))
-        for i, (_, nums) in enumerate(PAGES)
+    # No forced break between the three web-page groupings here: a fixed break at a content
+    # boundary that does not line up with how much text actually fits leaves whatever remains of
+    # the page nearly empty -- found by counting words per rendered PDF page and seeing one carry
+    # nine lines. Letting Chromium paginate on the real content, with only the CSS break-avoidance
+    # rules above (do not orphan a heading, do not split a table or code block), uses the page.
+    whole = _render(preamble) + _render(
+        "".join(sections[n] for _, nums in PAGES for n in nums)
     )
     print_html = OUT / "_print.html"
     print_html.write_text(_chrome(0, "Design write-up", whole, for_print=True), encoding="utf-8")
@@ -288,7 +327,9 @@ def main() -> int:
                 path=str(OUT / "REPORT.pdf"),
                 format="A4",
                 print_background=True,
-                margin={"top": "18mm", "bottom": "18mm", "left": "16mm", "right": "16mm"},
+                # "Narrow" margins, in the sense a word processor's own narrow-margin preset
+                # means it: 12mm ~= 0.47in, close to Word's 0.5in narrow preset.
+                margin={"top": "9mm", "bottom": "9mm", "left": "11mm", "right": "11mm"},
             )
             browser.close()
         print("  site/report/REPORT.pdf")

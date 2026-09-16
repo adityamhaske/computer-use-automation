@@ -35,7 +35,7 @@ CONSOLE_PORT="${CONSOLE_PORT:-8812}"
 
 usage() {
   cat <<'EOF'
-start.sh — run interface.ai's computer-use automation project end to end.
+start.sh — run the Computer-Use Automation project end to end.
 
 MODES
   demo        (default) The graded story, one command: setup (if needed) + `make demo`.

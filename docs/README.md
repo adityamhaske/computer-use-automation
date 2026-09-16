@@ -2,7 +2,7 @@
 
 Start with [`/README.md`](../README.md) to run the system, and [`/REPORT.md`](../REPORT.md) for the
 design write-up. This tree is the supporting detail, and it is also published, rendered and
-cross-linked, at the **[documentation site](https://adityamhaske.github.io/interface.ai/)** — which
+cross-linked, at the **[documentation site](https://adityamhaske.github.io/computer-use-automation/)** — which
 is where the CLI reference, the demo walkthrough and the getting-started material live now that the
 root README is deliberately short.
 
@@ -45,4 +45,4 @@ architecture map, and the scope discipline. Read it before editing code.
 
 ---
 
-[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)
+[Repository](https://github.com/adityamhaske/computer-use-automation) · [Documentation](https://adityamhaske.github.io/computer-use-automation/) · [Design write-up](https://adityamhaske.github.io/computer-use-automation/report/)

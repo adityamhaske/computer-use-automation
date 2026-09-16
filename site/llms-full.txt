@@ -2,8 +2,8 @@
 
 > Core thesis: an LLM is allowed to be uncertain exactly once; the run it produces is
 > compiled into a typed artifact that replays with no model in the loop.
-> Canonical URL: https://adityamhaske.github.io/interface.ai/
-> GitHub: https://github.com/adityamhaske/interface.ai
+> Canonical URL: https://adityamhaske.github.io/computer-use-automation/
+> GitHub: https://github.com/adityamhaske/computer-use-automation
 
 ---
 
@@ -33,14 +33,14 @@ Goal + Target ──► LLM Discovery Run ──► Capability Artifact ──�
 
 ### Installation
 ```bash
-git clone https://github.com/adityamhaske/interface.ai.git
-cd interface.ai
+git clone https://github.com/adityamhaske/computer-use-automation.git
+cd computer-use-automation
 make setup          # Creates venv, installs dependencies, installs Chromium
 ```
 
 ### Running the Demo
 ```bash
-./start.sh          # Runs the 12-stage verified execution story end to end
+./start.sh          # Runs the 14-stage verified execution story end to end
 ```
 
 ### Testing
@@ -51,9 +51,9 @@ make test           # the offline suite -- no API key, no network
 
 ---
 
-## 3. The 12-Stage Verified Execution Story
+## 3. The 14-Stage Verified Execution Story
 
-The demo executes 12 deterministic stages against a live back-office application:
+The demo executes 14 deterministic stages against a live back-office application:
 1. Mock Back-Office Running: Hostile multi-frame banking application starts on port 8811.
 2. LLM Discovery: Model discovers navigation path to goal once.
 3. Capability Compiled: Trace compiled into typed, frozen, content-hashed artifact.
@@ -66,6 +66,10 @@ The demo executes 12 deterministic stages against a live back-office application
 10. Human Takeover: Operator claims session with exclusive Lease and drives screen.
 11. Re-Anchor Resume: Engine reconciles screen state and resumes without duplicate mutation.
 12. Agent Tool Call: Capability exposed to caller agents as a standard typed function.
+13. Approval Gate: Unattended replay is gated on a human review of the evidence, not just
+    content-hash integrity (`cua catalog approve --from-eval`).
+14. Generated Test: The same artifact emits a runnable pytest + Playwright test, using only
+    role/accessible-name locators -- no CSS -- so it outlives this system (`cua codegen`).
 
 ---
 

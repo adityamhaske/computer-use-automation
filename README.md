@@ -1,6 +1,6 @@
 # Computer-Use Automation (CUA)
 
-[![CI](https://github.com/adityamhaske/interface.ai/actions/workflows/ci.yml/badge.svg)](https://github.com/adityamhaske/interface.ai/actions/workflows/ci.yml)
+[![CI](https://github.com/adityamhaske/computer-use-automation/actions/workflows/ci.yml/badge.svg)](https://github.com/adityamhaske/computer-use-automation/actions/workflows/ci.yml)
 
 > **An LLM is allowed to be uncertain exactly once.** That uncertainty is compiled into a
 > typed artifact, which then runs with no model in the loop.
@@ -74,7 +74,7 @@ make discover
 # 2. Replay the compiled artifact deterministically, with an input discovery never saw.
 cua replay evidence/capabilities/memberdesk.savings_balance@1.0.0.yaml \
            --input member_number=67890 --base-url http://localhost:8811 --sign-in
-#   -> SUCCESS - 2 output(s)   {"savings_balance": "18730.00", ...}
+#   -> SUCCESS - 3 output(s)   {"savings_balance": "$18,730.00", "account_status": "Active", ...}
 
 # A member who does not exist is an answer, not a crash.
 cua replay evidence/capabilities/corebank.member.savings_balance@1.0.0.yaml \
@@ -124,10 +124,10 @@ The operator's clicks travel the same policy chokepoint as the machine's. From
 
 | | |
 |---|---|
-| **The design write-up** | [`REPORT.md`](REPORT.md) — architecture, schema, determinism, escalation, safety, cuts. Also [rendered in three pages](https://adityamhaske.github.io/interface.ai/report/index.html), with [PDF](https://adityamhaske.github.io/interface.ai/report/REPORT.pdf) and Markdown downloads |
+| **The design write-up** | [`REPORT.md`](REPORT.md) — architecture, schema, determinism, escalation, safety, cuts. Also [rendered in three pages](https://adityamhaske.github.io/computer-use-automation/report/index.html), with [PDF](https://adityamhaske.github.io/computer-use-automation/report/REPORT.pdf) and Markdown downloads |
 | **The artifact** | [`evidence/capabilities/`](evidence/capabilities/) — start here; it is the focal point |
 | **Evidence from every run** | [`evidence/`](evidence/) — all four terminal statuses, with traces |
-| **Everything else** | **[Documentation site](https://adityamhaske.github.io/interface.ai/)** — CLI reference, walkthrough, architecture, ADRs, runbooks |
+| **Everything else** | **[Documentation site](https://adityamhaske.github.io/computer-use-automation/)** — CLI reference, walkthrough, architecture, ADRs, runbooks |
 | **Working agreement** | [`AGENTS.md`](AGENTS.md) — the invariants, and how they are enforced |
 
 MIT licensed. The mock application is seeded with fictional data; no real credentials or PII exist in

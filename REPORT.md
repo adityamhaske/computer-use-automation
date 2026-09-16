@@ -31,29 +31,22 @@ and an AI agent invokes it like a typed function.
   └────────────┘
 ```
 
-**Discovery, replay, and human intervention are the same path**, differing only in who originates
-the action. That is the answer to "how do you know your guardrails apply in production?" — there is
-one path, so a guardrail cannot be present on one and missing from another.
+**Discovery, replay, and human intervention share one path**, differing only in who originates the
+action, so a guardrail cannot be present on one and missing from another. **Resolution runs before
+policy**: risk classification's second signal is *what the control says it does* ("Transfer
+Funds"), which needs the resolved node, so authorizing first would mean authorizing half-blind. The
+invariant is not "policy runs first" but *nothing reaches a surface without authorization* —
+enforced three ways: an **import contract**, a **type guard** (`dispatch()` accepts only an
+`AuthorizedAction`), and an **AST scan** that has caught violations the import graph missed.
 
-Resolution runs **before** policy. I documented it the other way round and implementing it proved me
-wrong: risk classification's second signal is *what the control says it does* ("Transfer Funds"),
-which needs the resolved node, so authorizing first means authorizing half-blind. The invariant was
-never "policy runs first" — it is *nothing reaches a surface without authorization*.
-
-Three enforcements, because an invariant nobody can violate beats one everybody agrees with: an
-**import contract**, a **type guard** (`dispatch()` takes only an `AuthorizedAction`), and an **AST
-scan** that has caught four violations the import graph missed. Every fix moved the module; none
-added an exemption.
-
-**Stack.** Python for Pydantic v2, which lets the artifact schema *be* the type system rather than
-sit beside it. Playwright over CDP because the accessibility tree is the closest browser analogue to
-what UIA or AX exposes, so perception ports. The model sits behind an `LlmPort` protocol, so the
-provider is one class rather than a dependency; `temperature=0`. YAML artifacts because a bank
-reviewer has to read one without running anything.
+**Stack.** Pydantic v2 lets the artifact schema *be* the type system. Playwright over CDP, since
+the accessibility tree is the closest browser analogue to UIA/AX. The model sits behind an
+`LlmPort` protocol at `temperature=0`. YAML artifacts, so a bank reviewer reads one without running
+anything.
 
 ## 2. Artifact schema
 
-The focal point. `cua.capability/v1` — Pydantic, YAML, immutable, content-addressed. Examples in
+`cua.capability/v1` — Pydantic, YAML, immutable, content-addressed. Examples in
 [`evidence/capabilities/`](evidence/capabilities/).
 
 **Targets are semantic, never selectors.** A `TargetDescriptor` is role, accessible name, structural
@@ -66,16 +59,15 @@ conflating the first with the third as the most common mistake here, so the sche
 structurally impossible rather than trusting the executor.
 
 **The capability is immutable; everything a *run* produces lives elsewhere** — `RunRecord`,
-`CapabilityApproval`, `TenantBinding`, keyed by `id@version`. A definition that accumulates telemetry
-stops being reviewable, and "which version ran?" stops being answerable.
-
+`CapabilityApproval`, `TenantBinding`, keyed by `id@version` — since a definition that accumulates
+telemetry stops being reviewable, and "which version ran?" stops being answerable.
 **`capability.id` is namespaced by vendor product, not tenant**, and `surface.driver_capabilities`
-declares what a driver must *be able to do* rather than naming a library. Both are preconditions for
-reuse.
+declares what a driver must *be able to do* rather than naming a library: both preconditions for
+reuse across institutions running the same product.
 
-The compiler emits a **draft** and says so in the artifact: one run saw only the happy path, so it
-declares no outcomes and no recovery, with review notes naming what a reviewer must add — inventing
-detectors a run never observed produces error handling that is fiction.
+The compiler emits a **draft** and says so: one run saw only the happy path, so it declares no
+outcomes and no recovery, with review notes naming what a reviewer must add — inventing detectors a
+run never observed would produce error handling that is fiction.
 
 ## 3. Determinism & error handling
 
@@ -90,28 +82,23 @@ Two type families, deliberately separate — *what we observed* and *how the run
 
 `RunStatus` is terminal and separate: `SUCCESS | BUSINESS_OUTCOME | NEEDS_HUMAN | FAILED`.
 
-"No such member" **exits 0**. It is a successful execution returning a negative answer; treating it
-as a failure turns a routine result into a 2am page and trains everyone to ignore the alert that
-also fires for real defects.
+"No such member" **exits 0** — a successful execution returning a negative answer, not a failure;
+collapsing the two turns a routine result into a 2am page and trains everyone to ignore the alert
+that also fires for real defects.
 
-**Fail-closed is the default.** A state matching nothing declared stops the run; it never proceeds
-assuming the click probably worked. Two surviving candidates is `TARGET_AMBIGUOUS` and the resolver
-**refuses** — there is no similarity threshold to tune, because a tunable threshold is a knob that
-eventually gets turned.
-
-Determinism is enforced, not asserted: `cua.replay` may not import `cua.agent` or any HTTP client;
-the ladder is a fixed order with pure scoring, ties broken by document order, never by dict
-iteration, clock or random; the `vision` rung is hard-disabled in replay.
-
-**Where a hard failure goes is the artifact's decision, not the executor's** — `escalation.triggers`
-decides whether it pauses for a human or terminates. Writing the demo I expected an exhausted
-recovery to come back `FAILED` and it came back `NEEDS_HUMAN`; the artifact was right and I was
-wrong, which is the point of putting the routing there.
+**Fail-closed is the default.** A state matching nothing declared stops the run rather than
+proceeding on the assumption a click probably worked; two surviving candidates is
+`TARGET_AMBIGUOUS`, and the resolver **refuses** rather than breaking the tie on a similarity score
+— a tunable threshold is a knob that eventually gets turned. Determinism itself is enforced, not
+asserted: `cua.replay` may not import `cua.agent` or any HTTP client, the resolution ladder scores
+purely with ties broken by document order (never dict iteration, clock or random), and the
+`vision` rung is hard-disabled in replay. Where a hard failure routes — pause for a human, or
+terminate — is `escalation.triggers`' decision, not the executor's.
 
 **Drift is measured as descent.** A target recorded at `semantic_exact` that now resolves only at
-`structural_anchor` has moved, even though the run still succeeded — so `run_record.drift_score`
-rises before replays begin to fail, rather than after. `make eval` reports determinism as a boolean
-per capability, because "94% deterministic" is not a property anyone can act on.
+`structural_anchor` has moved, even though the run still succeeded, so `run_record.drift_score`
+rises before replays begin to fail rather than after — `make eval` reports determinism as a boolean
+per capability, since "94% deterministic" is not a property anyone can act on.
 
 ## 4. Heterogeneity & multi-tenant
 
@@ -124,45 +111,39 @@ tomorrow. **`cua.targeting` and `cua.perception` may not import Playwright or `c
 Tenants are an **overlay, never a fork**: `TenantBinding` supplies vars and per-step overrides,
 resolved at load into an effective capability whose content hash covers the overlay.
 
-The no-CSS claim is **measured**, in [`evidence/evals/cross_tenant.md`](evidence/evals/cross_tenant.md).
-Variant B relabels controls *and* restyles markup, so every `hints.css` in the artifact names a
-selector that does not exist there — and the runs succeed anyway: 100%, zero wrong actions. Markup
-churn is carried by `semantic_exact`; rebranding by `structural_anchor` plus the overlay. Both rungs
-are load-bearing, which is why the ladder has both.
-
-A Phase-01 spike **disproved my own claim**: `structural_anchor` does not survive rebranding, because
-the anchor text *is* the label cell and gets relabeled too — so the honest claim is markup change,
-not vocabulary change, and vocabulary is what the overlay is for. One limit that leaves: drift is
-computed against the *effective* capability, so an overlay reports zero drift for a surface that
-genuinely differs.
+The no-CSS claim is **measured**, in
+[`evidence/evals/cross_tenant.md`](evidence/evals/cross_tenant.md). Variant B relabels controls
+*and* restyles markup, so every `hints.css` in the artifact names a selector that does not exist
+there — and the runs succeed anyway: 100%, zero wrong actions. Markup churn is carried by
+`semantic_exact`; rebranding by `structural_anchor` plus the overlay — both load-bearing, which is
+why the ladder has both. `structural_anchor` does not itself survive rebranding, since the anchor
+text *is* the label cell and gets relabeled too, so the honest claim is markup change, not
+vocabulary change; vocabulary is what the overlay is for. One limit that leaves: drift is computed
+against the *effective* capability, so an overlay reports zero drift for a surface that genuinely
+differs.
 
 ## 5. Escalation & handoff
 
-`NEEDS_HUMAN` is a **first-class terminal status**, not an exception — which is what makes escalation
-architectural rather than bolted on.
+`NEEDS_HUMAN` is a **first-class terminal status**, not an exception — which is what makes
+escalation architectural rather than bolted on.
 
 The operator works the **same live session**, guarded by a `Lease{holder, epoch}`. Automation
-consults it twice per dispatch: **who holds this session**, and **has it changed hands since this run
-was authorized**. Either returns `LEASE_LOST`. Both, because the epoch alone is not enough — and
-assuming it was is how this stayed broken: the check is opt-in, the executor never asked for it, and
-two tests calling the dispatcher directly made it look covered. Before the fix a replay ran to
-`SUCCESS`, reading a balance, while an operator held the session.
+checks it on every dispatch — who holds the session, and has it changed hands since this run was
+authorized — either returns `LEASE_LOST`; both matter, since the epoch alone once left a replay
+running to `SUCCESS` while an operator held the session, because the check was opt-in and unasked.
 
-**Human input does not bypass policy.** The console never injects events into the page. It submits
-`raw_input` actions to the broker, which runs them through the same
-resolve → authorize → dispatch → evidence path under a **`HUMAN` profile**. Escalation widens
-authority deliberately and auditably; the allowlist and redaction apply unchanged.
+**Human input does not bypass policy.** The console never injects events into the page; it submits
+`raw_input` to the broker, through the same resolve → authorize → dispatch → evidence path under a
+**`HUMAN` profile** — escalation widens authority deliberately and auditably, and the allowlist and
+redaction apply unchanged.
 
-**Control comes back.** `ReplayExecutor.resume()` re-anchors against the live screen and continues.
-It is not `run()` with an offset: it skips the entrypoint navigation (which would reload the frameset
-and discard the state the operator just produced), re-adopts the epoch the handoff produced (a full
-cycle advances the lease four times, so the run's own epoch is stale by construction), carries
-forward outputs and spent recovery attempts, and fails closed when the screen matches no step. A step
-is skipped only when its **postcondition** holds — which is why `submit_search` has one; without it a
-resume re-submits the search the operator just ran.
-
-`cua console --capability <ref> --arm-fault <fault>` runs a capability on the supervised session, so
-the queue a reviewer opens has something in it.
+**Control comes back.** `ReplayExecutor.resume()` re-anchors against the live screen rather than
+`run()` with an offset: it skips the entrypoint navigation (which would reload the frameset and
+discard the operator's state), re-adopts the epoch the handoff produced, carries forward outputs
+and spent recovery attempts, and fails closed when the screen matches no step. A step is skipped
+only when its **postcondition** holds — without one, resume would re-submit the search the operator
+just ran. `cua console --capability <ref> --arm-fault <fault>` runs a capability against the
+supervised session, so the queue a reviewer opens has something waiting in it.
 
 ## 6. Safety
 
@@ -170,120 +151,84 @@ One chokepoint, three enforcements (§1), applied identically to all three actor
 
 **Allowlist** — domains, URL patterns, action types, step and duration caps, in
 [`config/policy.yaml`](config/policy.yaml). Navigation outside it is `NAVIGATION_BLOCKED`, for
-humans too, and a capability's own `allowed_domains` only ever *narrows* the global list. It is
-checked twice, because checking intent is not checking outcome: once on a `navigate`'s declared
-URL, and again against where the session actually landed after any action that navigated. A click
-on a link, on a page whose content is untrusted, carries no URL to check up front.
+humans too; a capability's own `allowed_domains` only ever *narrows* the global list, checked both
+on a `navigate`'s declared URL and again against where the session actually landed, since checking
+intent is not checking outcome.
 
-**Risk tiers** — `safe → elevated → irreversible`, derived from three independent signals (action
-type × target semantics × artifact annotation), because any one alone is fooled. Automation is
-blocked from irreversible actions outright, and replay requires an approved capability **and** a
-caller opt-in — two gates, because either alone is one accident away from a wire transfer.
+**Risk tiers** — `safe → elevated → irreversible`, from three independent signals (action type ×
+target semantics × artifact annotation), since any one alone is fooled. Automation is blocked from
+irreversible actions outright; replay needs an approved capability **and** a caller opt-in, because
+either gate alone is one accident away from a wire transfer.
 
-**Redaction at every sink, including outbound model prompts.** "Every sink" is load-bearing, and it
-has been untrue twice during this build — once where a run record was written under different rules
-than the trace beside it, once where the registration path for arbitrary secrets had no production
-caller and so ran empty. Both are now structural: writing a run record *requires* a redactor, and
-the secret resolver registers each value as it issues it. Over-redaction is a failure in the same
-family and is tested in both directions: `id@version` once matched the email pattern, so every run
-record named the capability that ran as `<redacted:email>`.
-
-The operator's live view is redacted from the supervised capability's own `sensitive` declarations,
-the same way an evidence screenshot is. It was the one sink showing regulated data in the clear,
-and the one most likely to be on a second monitor.
+**Redaction at every sink, including outbound model prompts.** Writing a run record *requires* a
+redactor, and the secret resolver registers each value as it issues it, closing a path where an
+unregistered secret ran the redaction pass empty. Tested in both directions — `id@version` once
+matched the email pattern, so a run record named its own capability `<redacted:email>`. The
+operator's live view is redacted from the same `sensitive` declarations an evidence screenshot is,
+being the sink most likely to sit on a second monitor.
 
 **Limits, stated rather than claimed away.** Free-text redaction is patterns plus registered
 literals, so a member *name* is protected only where a capability declares that field `sensitive`,
-not by shape; screenshot redaction inherits the same dependency, since it can only paint over what
-a declaration can locate. Prompt injection is scoped, not solved — a closed action space, policy
-evaluated *outside* the model, and no authority to widen the allowlist — but a model talked into a
-*permitted* action on a *permitted* target still performs it. Fixture sign-in (`--sign-in`, the
-demo, the eval harness) drives the browser directly: the one documented carve-out, opt-in and
-scoped to the mock app's fixed credentials. No real credentials or PII exist in this repository.
+not by shape. Prompt injection is scoped, not solved: a closed action space and policy evaluated
+*outside* the model, but a model talked into a *permitted* action on a *permitted* target still
+performs it. Fixture sign-in (`--sign-in`) drives the browser directly — the one documented
+carve-out, opt-in and scoped to the mock app's fixed credentials. No real credentials or PII exist
+in this repository.
 
 ## 7. Cuts
 
 **Scope the brief did not ask for.** §3.6 scopes a co-browsing console out and invites a mock; I
-built a working one, because control transfer is the part I most wanted to prove end to end. That
-is ~5,000 lines nobody asked for, plus a documentation site. Against the brief's stated preference
-for "a small, correct, well-argued system", those are the first things I would cut.
+built a working one, because control transfer was the part I most wanted to prove end to end —
+~5,000 lines against the brief's own preference for "small, correct, well-argued", and the first
+thing I would cut. **Not built:** continuous pixel streaming (a still frame on connect and after
+each policed gesture, not co-browsing); a real desktop surface beyond the interface-only UIA stub;
+multi-operator routing, SSO, audit sign-off.
 
-**Stretch goals: one taken seriously.** §8 invites at most one or two, and the one I took is
-cross-tenant reuse (§4) — the hardest to fake and the only one that tests whether the artifact is
-portable or merely a recording. Variant B rebrands every label and restyles every element, and the
-same artifact serves it through a four-line overlay, measured at zero wrong actions across 20 runs.
+**Stretch goals: one taken seriously.** §8 invites at most one or two; I took cross-tenant reuse
+(§4) — the hardest to fake, and the only one testing whether the artifact is portable or merely a
+recording. The rest fell out of making that claim checkable: a catalog and tool schema (§2) to
+invoke a capability by name, `cua eval` to measure portability, `cua catalog approve` to gate what
+is not yet measured (refusing evidence that does not support it, losing it the moment the artifact
+is edited), and `cua codegen`, emitting a runnable Playwright test as the same argument aimed
+outward — CI runs the generated file rather than trusting it. Assisted recovery
+(`cua replay --assist`) is the one I would have left out: one model call after a deterministic run
+has failed, dispatched through the chokepoint from `cua.assist`, above both `cua.agent` and
+`cua.replay` so it cannot make §3's central claim false. A plain replay still makes zero model
+calls, asserted rather than described.
 
-The rest fell out of making that claim checkable rather than being chosen for their own sake. You
-cannot assert an artifact is portable without a way to invoke it by name (§2's catalog and tool
-schema), a way to measure whether it holds (`cua eval`), or a way to gate the ones that have not
-been measured (`cua catalog approve`, refusing an approval the evidence does not support and
-losing it the moment the artifact is edited). `cua codegen` emits a runnable Playwright test from
-an artifact, which is the same portability argument aimed outward: if the document is complete
-enough to drive replay, it is complete enough to describe a test that outlives this system, and CI
-runs the generated file rather than trusting it.
-
-Assisted recovery is the one I would have left out. `cua replay --assist` asks a model for a
-single corrective step after a deterministic run has already failed, dispatches it through the
-policy chokepoint, and resumes. It lives in `cua.assist`, above both `cua.agent` and `cua.replay`,
-because the obvious implementation — a fallback inside the replay engine — would make §3's central
-claim false while leaving every test green. Bounds are code rather than prompt text: one call per
-run, a closed tool set with no `navigate`, irreversible actions refused outright. A replay without
-the flag still makes zero model calls, and that is asserted rather than described.
-
-**Not built, in the order I would restore them.** Continuous pixel streaming — the console sends a
-still frame on connect and after each policed gesture, enough to see and act on but not
-co-browsing. A desktop surface — an interface-only stub, because declaring the seam and enforcing
-the import rule is what it is worth here. Multi-operator routing, SSO, audit sign-off — designed,
-not built.
-
-**The discovery evidence is a real model run.**
+**What the evidence shows.**
 [`evidence/discovery/disc-e0aa86b951/`](evidence/discovery/disc-e0aa86b951/) is a genuine
-LLM-driven run against the live frameset, routed through an OpenAI-compatible gateway: six calls,
-10,215 tokens, each carrying the gateway's own provider and request id, so the run can be
-reconciled against that gateway's logs rather than taken on trust. The artifact compiled from it,
+LLM-driven run: six model calls, 10,215 tokens, each carrying the gateway's own provider and
+request id. The artifact compiled from it,
 [`memberdesk.savings_balance@1.0.0`](evidence/capabilities/), replays at zero drift for members
-that run never saw. `make demo` never publishes over an artifact already in the catalog, so a
-scripted run cannot quietly overwrite that evidence.
+that run never saw.
 
-**Known weaknesses.** The compiler describes a value by the label beside it — right on a
-label/value table, wrong in an n-column grid where the neighbour is another datum. It refuses a
-datum-shaped anchor and falls back to a positional descriptor flagged for review, but it cannot yet
-read a *column header*, which is the correct answer there. `raw_input` is authorized as a declared
-tier (`elevated` in `config/policy.yaml`) rather than by classifying what it touches, because a
-mouse-move has no resolved target to reason about; that is defensible for drag and scroll, but it
-means a human's raw click is authorized more coarsely than a semantic action. `budgets` and
-`replay_gates` in `config/policy.yaml` are parsed and displayed but not yet read by the executor.
+**Known weaknesses, stated rather than hidden.** The compiler reads a value by the label beside it
+— right on a label/value table, wrong in an n-column grid, where it cannot yet read a *column
+header* and falls back to a flagged positional descriptor. `raw_input` is authorized by a declared
+tier rather than by classifying what it touches, since a mouse-move has no resolved target to
+reason about. Global `budgets.max_steps`/`max_duration_ms` are parsed but not yet read by the
+executor. Approval is wired into both replay entry points but stays unsatisfiable for any
+`{base_url}` capability — every shipped one — since `TenantBinding.apply` reseals with a fresh hash
+an approval pinned to the sealed base can never match: fails closed, not open, but what identity
+approval should pin to when the entrypoint is a deployment parameter is not yet decided.
 
-**The contracts were not running.** `make invariants` invoked import-linter through
-`python -m importlinter.cli`, which is not a runnable entry point: it prints nothing, checks
-nothing and exits 0. Every claim on this page that says "mechanically enforced" was, for as long
-as that line existed, enforced by a command that did nothing. It runs `lint-imports` now, and once
-it did, one contract was genuinely broken — the console was classed as HITL domain logic when it
-is a web application that serves it. Both fixed, and the contracts verified to bite.
-
-That is the most instructive failure in this project, and it is the same shape as the others
-below: the check existed, the test was green, and nothing was actually being checked.
-
-**The bug that got furthest.** The compiler wrote the discovery host into
-`entrypoint.url_pattern` verbatim, so `--base-url` had nothing to substitute and was silently
-ignored: the artifact worked on the machine that recorded it and nowhere else, making §4's
-portability claim untrue. Parameterised at compile time now, with a test. It is the clearest
-example of the gap this system otherwise exists to close — every unit underneath was green, and
-the thing a user would actually do was broken.
-
----
+**Two failures of the same shape: a check existed, the test was green, and nothing was actually
+checked.** `make invariants` ran import-linter through `python -m importlinter.cli` — not a
+runnable entry point, so every "mechanically enforced" claim here held only once that became
+`lint-imports`. And the compiler wrote the discovery host into `entrypoint.url_pattern` verbatim,
+so `--base-url` substituted nothing, working only on the recording machine — now parameterised at
+compile time, and pinned under a test.
 
 ### What to look at
 
 | | |
 |---|---|
 | The artifact | [`evidence/capabilities/`](evidence/capabilities/) |
-| The handoff, with actors and epochs | [`evidence/escalation/demo-escalation/trace.jsonl`](evidence/escalation/demo-escalation/trace.jsonl) |
+| The handoff, actors and epochs | [`evidence/escalation/demo-escalation/trace.jsonl`](evidence/escalation/demo-escalation/trace.jsonl) |
 | All four terminal statuses | [`evidence/replay/`](evidence/replay/), [`evidence/escalation/`](evidence/escalation/) |
 | The invariants, enforced | [`.importlinter`](.importlinter), [`tests/invariants/`](tests/invariants/) |
 | The whole story, one command | `make demo` |
 | The numbers behind §3 and §4 | [`evidence/evals/`](evidence/evals/) |
 
----
-
-[Repository](https://github.com/adityamhaske/interface.ai) · [Documentation](https://adityamhaske.github.io/interface.ai/) · [Design write-up](https://adityamhaske.github.io/interface.ai/report/)
+[Repository](https://github.com/adityamhaske/computer-use-automation)

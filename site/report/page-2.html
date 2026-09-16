@@ -62,11 +62,47 @@ hr{border:0;border-top:1px solid var(--border);margin:2rem 0}
   text-decoration:none;color:var(--text-secondary);background:var(--bg-card)}
 .steps a:hover{border-color:var(--accent);color:var(--accent)}
 .steps .here{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+/* The submission format: a printed document, not a web page. The screen rules above are tuned
+   for a monitor -- generous line-height, large rem-scaled headings, sans-serif body copy -- and
+   applied to a PDF they cost three pages nobody asked for before the first sentence of content.
+   Print gets its own type scale and spacing entirely, in points rather than rem, because nothing
+   about "readable on a screen" transfers to "compact on a printed page". */
 @media print{
   nav,.downloads,.pager,.steps,footer{display:none}
-  body{background:#fff;font-size:11.5pt}
+  *{box-shadow:none!important;text-shadow:none!important}
+  body{background:#fff;color:#000;font-family:"Times New Roman",Times,"Liberation Serif",serif;
+    font-size:11pt;line-height:1.18}
   .wrap{max-width:none;padding:0}
-  h2{page-break-after:avoid} pre,table,blockquote{page-break-inside:avoid}
+  .eyebrow{display:none}
+  h1,h2,h3{font-family:"Times New Roman",Times,"Liberation Serif",serif;letter-spacing:normal;
+    text-wrap:normal;color:#000}
+  h1{font-size:16pt;font-weight:700;line-height:1.15;margin:0 0 7pt}
+  h2{font-size:12.5pt;font-weight:700;margin:8pt 0 3pt;padding-bottom:2pt;
+    border-bottom:.75pt solid #000;page-break-after:avoid}
+  h3{font-size:11pt;font-weight:700;margin:7pt 0 2pt;page-break-after:avoid}
+  p{margin:0 0 5pt;color:#000;text-align:justify}
+  strong{color:#000;font-weight:700}
+  blockquote{margin:0 0 8pt;padding:3pt 9pt;background:none;border-left:2pt solid #000;
+    border-radius:0;color:#000}
+  blockquote p{text-align:left}
+  blockquote p:last-child{margin:0;color:#000}
+  code{font-family:"Courier New",Courier,monospace;font-size:9pt;background:#eee;
+    padding:0 2pt;border-radius:0}
+  pre{background:#f4f4f4;border:.5pt solid #999;border-radius:0;padding:5pt 7pt;margin:0 0 7pt;
+    page-break-inside:avoid}
+  pre code{font-size:8.5pt;line-height:1.25}
+  table{font-size:9pt;margin:0 0 8pt;border:.5pt solid #999;border-radius:0}
+  /* Rows, not the whole table, hold together -- a table breaking between rows paginates the way
+     a printed table normally does; forcing the entire table to one page is what was bouncing this
+     six-row reference list wholesale onto a page of its own with a few words for company. */
+  tr{page-break-inside:avoid}
+  th,td{padding:1pt 6pt;border-bottom:.5pt solid #ccc}
+  th{background:#eaeaea;font-size:8pt;letter-spacing:.02em}
+  td{color:#000}
+  a{color:#000;text-decoration:underline}
+  ul,ol{margin:0 0 6pt;padding-left:15pt;color:#000}
+  li{margin-bottom:2pt}
+  hr{border-top:.5pt solid #999;margin:6pt 0}
   .page-break{page-break-before:always}
 }
 </style></head><body>
@@ -93,7 +129,7 @@ hr{border:0;border-top:1px solid var(--border);margin:2rem 0}
         <a href="../walkthrough/index.html" class="nav-link">Walkthrough</a>
         <a href="../docs/index.html" class="nav-link">Docs</a>
         <a href="../report/index.html" class="nav-link active">Design</a>
-        <a href="https://github.com/adityamhaske/interface.ai" class="nav-github-btn" target="_blank" rel="noopener"
+        <a href="https://github.com/adityamhaske/computer-use-automation" class="nav-github-btn" target="_blank" rel="noopener"
           aria-label="GitHub repository">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
             <path
@@ -120,7 +156,7 @@ hr{border:0;border-top:1px solid var(--border);margin:2rem 0}
   </nav><div class="wrap"><nav class="steps"><a href="index.html">1. Architecture & the artifact</a><span class="here">2. Determinism, errors & scale</span><a href="page-3.html">3. Escalation, safety & cuts</a></nav><div class="downloads">
   <a class="btn btn-primary" href="REPORT.pdf" download><span>Download PDF</span></a>
   <a class="btn btn-secondary" href="REPORT.md" download><span>Download Markdown</span></a>
-  <a class="btn btn-github" href="https://github.com/adityamhaske/interface.ai/blob/main/REPORT.md"
+  <a class="btn btn-github" href="https://github.com/adityamhaske/computer-use-automation/blob/main/REPORT.md"
     target="_blank" rel="noopener"><span>View on GitHub</span></a>
 </div><h1>Determinism, errors & scale</h1><h2>3. Determinism &amp; error handling</h2>
 <p>Two type families, deliberately separate — <em>what we observed</em> and <em>how the run ended</em>:</p>
@@ -156,24 +192,21 @@ hr{border:0;border-top:1px solid var(--border);margin:2rem 0}
 </tbody>
 </table>
 <p><code>RunStatus</code> is terminal and separate: <code>SUCCESS | BUSINESS_OUTCOME | NEEDS_HUMAN | FAILED</code>.</p>
-<p>&quot;No such member&quot; <strong>exits 0</strong>. It is a successful execution returning a negative answer; treating it
-as a failure turns a routine result into a 2am page and trains everyone to ignore the alert that
-also fires for real defects.</p>
-<p><strong>Fail-closed is the default.</strong> A state matching nothing declared stops the run; it never proceeds
-assuming the click probably worked. Two surviving candidates is <code>TARGET_AMBIGUOUS</code> and the resolver
-<strong>refuses</strong> — there is no similarity threshold to tune, because a tunable threshold is a knob that
-eventually gets turned.</p>
-<p>Determinism is enforced, not asserted: <code>cua.replay</code> may not import <code>cua.agent</code> or any HTTP client;
-the ladder is a fixed order with pure scoring, ties broken by document order, never by dict
-iteration, clock or random; the <code>vision</code> rung is hard-disabled in replay.</p>
-<p><strong>Where a hard failure goes is the artifact's decision, not the executor's</strong> — <code>escalation.triggers</code>
-decides whether it pauses for a human or terminates. Writing the demo I expected an exhausted
-recovery to come back <code>FAILED</code> and it came back <code>NEEDS_HUMAN</code>; the artifact was right and I was
-wrong, which is the point of putting the routing there.</p>
+<p>&quot;No such member&quot; <strong>exits 0</strong> — a successful execution returning a negative answer, not a failure;
+collapsing the two turns a routine result into a 2am page and trains everyone to ignore the alert
+that also fires for real defects.</p>
+<p><strong>Fail-closed is the default.</strong> A state matching nothing declared stops the run rather than
+proceeding on the assumption a click probably worked; two surviving candidates is
+<code>TARGET_AMBIGUOUS</code>, and the resolver <strong>refuses</strong> rather than breaking the tie on a similarity score
+— a tunable threshold is a knob that eventually gets turned. Determinism itself is enforced, not
+asserted: <code>cua.replay</code> may not import <code>cua.agent</code> or any HTTP client, the resolution ladder scores
+purely with ties broken by document order (never dict iteration, clock or random), and the
+<code>vision</code> rung is hard-disabled in replay. Where a hard failure routes — pause for a human, or
+terminate — is <code>escalation.triggers</code>' decision, not the executor's.</p>
 <p><strong>Drift is measured as descent.</strong> A target recorded at <code>semantic_exact</code> that now resolves only at
-<code>structural_anchor</code> has moved, even though the run still succeeded — so <code>run_record.drift_score</code>
-rises before replays begin to fail, rather than after. <code>make eval</code> reports determinism as a boolean
-per capability, because &quot;94% deterministic&quot; is not a property anyone can act on.</p>
+<code>structural_anchor</code> has moved, even though the run still succeeded, so <code>run_record.drift_score</code>
+rises before replays begin to fail rather than after — <code>make eval</code> reports determinism as a boolean
+per capability, since &quot;94% deterministic&quot; is not a property anyone can act on.</p>
 <h2>4. Heterogeneity &amp; multi-tenant</h2>
 <p>The seam is <code>UiSnapshot</code> — a normalized <code>{node_id, role, name, value, states, bounds, scope}</code> tree.
 Drivers populate it from whatever their surface offers: a CDP accessibility tree today, Windows UIA
@@ -182,27 +215,27 @@ tomorrow. <strong><code>cua.targeting</code> and <code>cua.perception</code> may
 <code>surfaces/desktop_uia/</code> is an interface-only stub documenting the UIA→<code>UiSnapshot</code> mapping.</p>
 <p>Tenants are an <strong>overlay, never a fork</strong>: <code>TenantBinding</code> supplies vars and per-step overrides,
 resolved at load into an effective capability whose content hash covers the overlay.</p>
-<p>The no-CSS claim is <strong>measured</strong>, in <a href="https://github.com/adityamhaske/interface.ai/blob/main/evidence/evals/cross_tenant.md"><code>evidence/evals/cross_tenant.md</code></a>.
-Variant B relabels controls <em>and</em> restyles markup, so every <code>hints.css</code> in the artifact names a
-selector that does not exist there — and the runs succeed anyway: 100%, zero wrong actions. Markup
-churn is carried by <code>semantic_exact</code>; rebranding by <code>structural_anchor</code> plus the overlay. Both rungs
-are load-bearing, which is why the ladder has both.</p>
-<p>A Phase-01 spike <strong>disproved my own claim</strong>: <code>structural_anchor</code> does not survive rebranding, because
-the anchor text <em>is</em> the label cell and gets relabeled too — so the honest claim is markup change,
-not vocabulary change, and vocabulary is what the overlay is for. One limit that leaves: drift is
-computed against the <em>effective</em> capability, so an overlay reports zero drift for a surface that
-genuinely differs.</p>
+<p>The no-CSS claim is <strong>measured</strong>, in
+<a href="https://github.com/adityamhaske/computer-use-automation/blob/main/evidence/evals/cross_tenant.md"><code>evidence/evals/cross_tenant.md</code></a>. Variant B relabels controls
+<em>and</em> restyles markup, so every <code>hints.css</code> in the artifact names a selector that does not exist
+there — and the runs succeed anyway: 100%, zero wrong actions. Markup churn is carried by
+<code>semantic_exact</code>; rebranding by <code>structural_anchor</code> plus the overlay — both load-bearing, which is
+why the ladder has both. <code>structural_anchor</code> does not itself survive rebranding, since the anchor
+text <em>is</em> the label cell and gets relabeled too, so the honest claim is markup change, not
+vocabulary change; vocabulary is what the overlay is for. One limit that leaves: drift is computed
+against the <em>effective</em> capability, so an overlay reports zero drift for a surface that genuinely
+differs.</p>
 <div class="pager"><a href="index.html">← Architecture & the artifact</a><a href="page-3.html">Escalation, safety & cuts →</a></div></div>  <footer>
     <div class="footer-inner">
       <div class="footer-left">
-        <span>Computer-use automation for regulated back-offices · <a href="https://github.com/adityamhaske/interface.ai">adityamhaske/interface.ai</a></span>
+        <span>Computer-use automation for regulated back-offices · <a href="https://github.com/adityamhaske/computer-use-automation">adityamhaske/computer-use-automation</a></span>
       </div>
       <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
         <a href="index.html">Design write-up</a>
         <a href="../docs/index.html">Documentation</a>
         <a href="../llms.txt" style="font-family: var(--font-mono); font-size: 12px;">llms.txt</a>
         <a href="../llms-full.txt" style="font-family: var(--font-mono); font-size: 12px;">llms-full.txt</a>
-        <a href="https://github.com/adityamhaske/interface.ai" target="_blank" rel="noopener">GitHub Repository →</a>
+        <a href="https://github.com/adityamhaske/computer-use-automation" target="_blank" rel="noopener">GitHub Repository →</a>
       </div>
     </div>
   </footer>
