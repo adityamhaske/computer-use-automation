@@ -307,9 +307,7 @@ def main() -> int:
     # the page nearly empty -- found by counting words per rendered PDF page and seeing one carry
     # nine lines. Letting Chromium paginate on the real content, with only the CSS break-avoidance
     # rules above (do not orphan a heading, do not split a table or code block), uses the page.
-    whole = _render(preamble) + _render(
-        "".join(sections[n] for _, nums in PAGES for n in nums)
-    )
+    whole = _render(preamble) + _render("".join(sections[n] for _, nums in PAGES for n in nums))
     print_html = OUT / "_print.html"
     print_html.write_text(_chrome(0, "Design write-up", whole, for_print=True), encoding="utf-8")
     print("  site/report/REPORT.md")
