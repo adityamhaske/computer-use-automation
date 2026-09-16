@@ -1,8 +1,7 @@
 # Computer-Use Automation (CUA)
 
 [![CI](https://github.com/adityamhaske/computer-use-automation/actions/workflows/ci.yml/badge.svg)](https://github.com/adityamhaske/computer-use-automation/actions/workflows/ci.yml)
-[![Website](https://img.shields.io/badge/Website-live-146b52?style=for-the-badge)](https://adityamhaske.github.io/computer-use-automation/)
-
+[![Website](https://img.shields.io/badge/Website-github.io%2Fcomputer--use--automation-814552)](https://adityamhaske.github.io/computer-use-automation/)
 > **An LLM is allowed to be uncertain exactly once.** That uncertainty is compiled into a
 > typed artifact, which then runs with no model in the loop.
 
