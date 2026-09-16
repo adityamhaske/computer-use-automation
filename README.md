@@ -1,6 +1,7 @@
 # Computer-Use Automation (CUA)
 
 [![CI](https://github.com/adityamhaske/computer-use-automation/actions/workflows/ci.yml/badge.svg)](https://github.com/adityamhaske/computer-use-automation/actions/workflows/ci.yml)
+[![Website](https://img.shields.io/badge/Website-live-146b52?style=for-the-badge)](https://adityamhaske.github.io/computer-use-automation/)
 
 > **An LLM is allowed to be uncertain exactly once.** That uncertainty is compiled into a
 > typed artifact, which then runs with no model in the loop.
@@ -124,10 +125,10 @@ The operator's clicks travel the same policy chokepoint as the machine's. From
 
 | | |
 |---|---|
-| **The design write-up** | [`REPORT.md`](REPORT.md) — architecture, schema, determinism, escalation, safety, cuts. Also [rendered in three pages](https://adityamhaske.github.io/computer-use-automation/report/index.html), with [PDF](https://adityamhaske.github.io/computer-use-automation/report/REPORT.pdf) and Markdown downloads |
-| **The artifact** | [`evidence/capabilities/`](evidence/capabilities/) — start here; it is the focal point |
-| **Evidence from every run** | [`evidence/`](evidence/) — all four terminal statuses, with traces |
-| **Everything else** | **[Documentation site](https://adityamhaske.github.io/computer-use-automation/)** — CLI reference, walkthrough, architecture, ADRs, runbooks |
+| **The design write-up** | [`REPORT.md`](REPORT.md) — architecture, schema, determinism, escalation, safety, cuts |
+| **The write-up, rendered** | [Three pages, with PDF/Markdown downloads](https://adityamhaske.github.io/computer-use-automation/report/index.html) |
+| **The end-to-end walkthrough** | [Every step, with screenshots](https://adityamhaske.github.io/computer-use-automation/walkthrough/index.html) — the fastest way to see it work without running anything |
+| **The artifact and its evidence** | [`evidence/`](evidence/) — the capability, all four terminal statuses, with traces |
 | **Working agreement** | [`AGENTS.md`](AGENTS.md) — the invariants, and how they are enforced |
 
 MIT licensed. The mock application is seeded with fictional data; no real credentials or PII exist in
