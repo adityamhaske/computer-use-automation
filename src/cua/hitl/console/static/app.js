@@ -235,28 +235,14 @@ function updateSidebarBadges(count) {
 
 buildSidebar();
 
-// sidebar collapse (desktop) + drawer (mobile)
+// mobile drawer navigation
 const shell = document.getElementById("app-shell");
-const SIDEBAR_KEY = "cua-sidebar-collapsed";
+shell.dataset.sidebar = "expanded";
 try {
-  if (localStorage.getItem(SIDEBAR_KEY) === "1") shell.dataset.sidebar = "collapsed";
+  localStorage.removeItem("cua-sidebar-collapsed");
 } catch {
   /* ignore */
 }
-
-const sidebarToggle = document.getElementById("sidebar-toggle");
-sidebarToggle.innerHTML = icon("chevronLeft");
-sidebarToggle.addEventListener("click", () => {
-  const collapsed = shell.dataset.sidebar === "collapsed";
-  shell.dataset.sidebar = collapsed ? "expanded" : "collapsed";
-  sidebarToggle.innerHTML = icon(collapsed ? "chevronLeft" : "chevronRight");
-  try {
-    localStorage.setItem(SIDEBAR_KEY, collapsed ? "0" : "1");
-  } catch {
-    /* ignore */
-  }
-});
-sidebarToggle.innerHTML = icon(shell.dataset.sidebar === "collapsed" ? "chevronRight" : "chevronLeft");
 
 document.getElementById("topbar-menu-btn").innerHTML = icon("menu");
 document.getElementById("topbar-menu-btn").addEventListener("click", () => {

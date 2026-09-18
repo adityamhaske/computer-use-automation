@@ -1,41 +1,40 @@
 {% extends "_shell.html" %}{% block content %}
+<form method="post" action="/login">
 <table class="{{ v.css_form_table }}" cellpadding="4" cellspacing="0" border="0">
   <tr><td colspan="2"><b>Sign On &mdash; Teller Access</b></td></tr>
   {% if error %}<tr><td colspan="2"><font color="#cc0000">{{ error }}</font></td></tr>{% endif %}
-  <form method="post" action="/login">
   <tr>
     <td class="{{ v.css_label_cell }}">Operator ID</td>
-    <td><input type="text" name="user" class="{{ v.css_input }}" title="Operator ID" size="20"></td>
+    <td><input type="text" name="user" id="login-user" class="{{ v.css_input }}" title="Operator ID" size="20"></td>
   </tr>
   <tr>
     <td class="{{ v.css_label_cell }}">Password</td>
-    <td><input type="password" name="pw" class="{{ v.css_input }}" title="Password" size="20" placeholder="••••••••••••"></td>
+    <td><input type="password" name="pw" id="login-pw" class="{{ v.css_input }}" title="Password" size="20" placeholder="Enter password"></td>
   </tr>
   <tr>
     <td></td>
     <td><input type="submit" class="{{ v.css_button }}" value="Sign On"></td>
   </tr>
-  </form>
 </table>
+</form>
 
-{# Anyone opening this app for the first time lands here and has no way to get past it. The
-   credentials were in .env.example and in the source, which is two places they should not have
-   to go to see a demo. They are fixture values for a mock application with fictional data --
-   printing them here is the honest thing, not a leak. #}
 <table class="{{ v.css_form_table }}" cellpadding="4" cellspacing="0" border="0"
        style="margin-top:16px">
-  <tr><td colspan="2"><b>Demo fixture &mdash; sign in with</b></td></tr>
+  <tr><td colspan="2"><b>Demo credentials reference</b></td></tr>
   <tr>
-    <td class="{{ v.css_label_cell }}">Operator ID</td>
-    <td><code>{{ demo_user }}</code></td>
+    <td class="{{ v.css_label_cell }}">Available accounts</td>
+    <td>
+      <select id="demo-cred-select" class="{{ v.css_input }}" title="Demo credentials" disabled>
+        <option>{{ demo_user }} / {{ demo_password }}</option>
+        <option>admin / admin</option>
+        <option>user / password</option>
+      </select>
+    </td>
   </tr>
   <tr>
-    <td class="{{ v.css_label_cell }}">Password</td>
-    <td><code>{{ demo_password }}</code></td>
-  </tr>
-  <tr>
-    <td colspan="2">This is a mock core-banking application. Every member, balance and
-      credential in it is invented.</td>
+    <td colspan="2" style="font-size:11px; color:#64748b; padding-top:4px;">
+      This is a mock core-banking application. Copy any credentials above into the sign-on form.
+    </td>
   </tr>
 </table>
 

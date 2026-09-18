@@ -10,10 +10,6 @@
   transition: grid-template-columns var(--duration-base) var(--ease);
 }
 
-.app-shell[data-sidebar="collapsed"] {
-  grid-template-columns: var(--sidebar-collapsed-width) 1fr;
-}
-
 .app-main {
   display: flex;
   flex-direction: column;
@@ -28,19 +24,8 @@
   margin: 0 auto;
 }
 
-@media (max-width: 1024px) {
-  .app-shell {
-    grid-template-columns: var(--sidebar-collapsed-width) 1fr;
-  }
-  .app-shell .sidebar-label,
-  .app-shell .sidebar-brand-text {
-    display: none;
-  }
-}
-
 @media (max-width: 768px) {
-  .app-shell,
-  .app-shell[data-sidebar="collapsed"] {
+  .app-shell {
     grid-template-columns: 1fr;
   }
   /* #sidebar, not .sidebar: this block is earlier in the file than the base `.sidebar { position:
@@ -201,38 +186,7 @@
   gap: 2px;
 }
 
-.sidebar-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 28px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  border-radius: var(--radius-sm);
-  padding: 0;
-  color: var(--text-tertiary);
-  margin: var(--space-2);
-  cursor: pointer;
-  transition: all var(--duration-fast) var(--ease);
-}
 
-.sidebar-toggle svg {
-  width: 14px;
-  height: 14px;
-  flex: none;
-}
-
-.sidebar-toggle:hover {
-  color: var(--text);
-  border-color: var(--border-strong);
-  background: var(--surface-2);
-}
-
-@media (max-width: 1024px) {
-  .sidebar-toggle {
-    display: none;
-  }
-}
 
 /* ============================================================ topbar =============== */
 
