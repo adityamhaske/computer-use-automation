@@ -143,8 +143,16 @@ def test_determinism_is_judged_per_input_not_across_the_suite() -> None:
     perfectly deterministic system as non-deterministic, which would have sent someone hunting a
     bug that was in the measurement.
     """
+    # Each member is replayed twice: determinism is only *measured* when an input repeats, and an
+    # unrepeated suite reports None ("not measured") rather than a vacuous True.
     records = [
         _record(inputs={"member_id": "12345"}, outputs={"savings_balance": "$4,210.55"}),
+        _record(inputs={"member_id": "12345"}, outputs={"savings_balance": "$4,210.55"}),
+        _record(
+            inputs={"member_id": "99999"},
+            status=RunStatus.BUSINESS_OUTCOME,
+            outcome="member_not_found",
+        ),
         _record(
             inputs={"member_id": "99999"},
             status=RunStatus.BUSINESS_OUTCOME,

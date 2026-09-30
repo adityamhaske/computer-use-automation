@@ -38,7 +38,17 @@ and skips both.
 This kills a real race rather than a theoretical one. Escalation happens *while* an automation step
 is in flight — that is what "stuck" usually means. Without the epoch check, the in-flight step can
 land on the page a half-second after the human has taken over and started typing. With it, the stale
-dispatch is refused and recorded.
+dispatch is refused and recorded — as a *refused attempt*, not as a dispatch: nothing reached the
+surface, so the reconciliation that proves "nothing reaches a surface without authorization" does not
+count it.
+
+**A hold that lapses does not strand the session.** When an operator's hold expires,
+`SessionBroker.sweep()` returns the session to `PAUSED` and the intervention to the queue flagged
+`ABANDONED` — still listed and still claimable, so the next operator can take the session and can see
+that a person had it and stopped. A claim that fails (for example, a `hold_for` that overflows the
+clock) leaves no trace: the request goes back exactly as it was. Releasing is validated by the lease
+*before* anything is recorded, so a refused second release cannot overwrite the record of what the
+first operator did.
 
 ## What "stuck" means
 

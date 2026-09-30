@@ -115,8 +115,11 @@ class Lease:
         """An operator takes the session."""
         if self.state is not ControlState.PAUSED:
             raise LeaseError(f"cannot claim a session that is {self.state.value}")
+        # Computed before anything is assigned: a `hold_for` that overflows the clock raises here,
+        # and assigning the operator first left a PAUSED session naming someone who never held it.
+        expires_at = datetime.now(UTC) + hold_for
         self.operator = operator
-        self.expires_at = datetime.now(UTC) + hold_for
+        self.expires_at = expires_at
         return self._transition(
             holder=Actor.HUMAN, state=ControlState.HUMAN_CONTROL, note=f"claimed by {operator}"
         )

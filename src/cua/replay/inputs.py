@@ -17,6 +17,16 @@ class InputValidationError(ValueError):
     """The caller's arguments do not satisfy the capability's declared contract."""
 
 
+# Only the types with an unambiguous textual form. `money` and `date` are deliberately left to the
+# application and the capability's own `pattern`: their accepted spellings ("$4,210.55",
+# "09/11/2026") are the application's, not something this layer should guess.
+_TYPE_SHAPES: dict[str, str] = {
+    "integer": r"[+-]?[0-9]+",
+    "number": r"[+-]?([0-9]+(\.[0-9]*)?|\.[0-9]+)([eE][+-]?[0-9]+)?",
+    "boolean": r"(?i:true|false)",
+}
+
+
 def validate_inputs(capability: Capability, supplied: dict[str, Any]) -> dict[str, Any]:
     """Check and normalize the caller's arguments against the declared inputs."""
     declared = {spec.name: spec for spec in capability.inputs}
@@ -32,7 +42,9 @@ def validate_inputs(capability: Capability, supplied: dict[str, Any]) -> dict[st
 
     resolved: dict[str, Any] = {}
     for name, spec in declared.items():
-        if name in supplied:
+        # None means "no value", as it already does when a default is chosen below. A JSON
+        # `null` from an agent must not be typed into the application as the letters "None".
+        if supplied.get(name) is not None:
             value = supplied[name]
         elif spec.default is not None:
             value = spec.default
@@ -42,6 +54,11 @@ def validate_inputs(capability: Capability, supplied: dict[str, Any]) -> dict[st
             continue
 
         text = str(value)
+        # The published tool schema says `integer`; replay has to refuse what that schema forbids.
+        # ASCII digits only: `int()` and `\d` both accept every script's digits.
+        shape = _TYPE_SHAPES.get(spec.type)
+        if shape is not None and not re.fullmatch(shape, text):
+            raise InputValidationError(f"input {name!r} = {text!r} is not a valid {spec.type}")
         if spec.pattern and not re.fullmatch(spec.pattern, text):
             raise InputValidationError(
                 f"input {name!r} = {text!r} does not match the declared pattern {spec.pattern!r}"

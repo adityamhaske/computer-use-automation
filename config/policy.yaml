@@ -134,7 +134,12 @@ redaction:
     # record said `<redacted:email>` where it should say which capability ran --
     # which is exactly the question immutable, content-addressed artifacts exist
     # to answer. Found by reading a committed trace, not by a test.
-    - { name: email,          pattern: "[\\w.+-]+@[\\w-]+(?:\\.[\\w-]+)*\\.[a-zA-Z]{2,}" }
+    # The local part is anchored to the start of its run and possessive. Unanchored, every start
+    # offset in a long unbroken token (a base64 blob, a data URI) rescanned the whole remaining run
+    # before failing to find an `@`, so redacting one 400 KB token took minutes. Anchored, it is one
+    # linear pass, and it matches exactly the same addresses: the leftmost candidate was always the
+    # start of the run.
+    - { name: email,          pattern: "(?<![\\w.+-])[\\w.+-]++@[\\w-]+(?:\\.[\\w-]+)*\\.[a-zA-Z]{2,}" }
     - { name: phone,          pattern: "\\b\\(?\\d{3}\\)?[ -]?\\d{3}[ -]?\\d{4}\\b" }
   # Fields marked `sensitive: true` in a capability's inputs/outputs are always
   # masked, excluded from evidence, and blurred in screenshots.

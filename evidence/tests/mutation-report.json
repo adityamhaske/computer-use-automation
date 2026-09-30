@@ -1,0 +1,134 @@
+{
+  "mutations": 16,
+  "killed": 16,
+  "results": [
+    {
+      "invariant": "1. Replay never imports the LLM",
+      "what": "replay imports the discovery agent",
+      "file": "src/cua/replay/inputs.py",
+      "verdict": "KILLED",
+      "caught_by": "Replay must not import the agent or any LLM client",
+      "seconds": 0.1
+    },
+    {
+      "invariant": "2. No action reaches a driver without policy authorization",
+      "what": "a denied action is dispatched anyway",
+      "file": "src/cua/runtime/dispatcher.py",
+      "verdict": "KILLED",
+      "caught_by": "tests/integration/test_dispatcher.py::test_a_denied_action_is_authorized_against_but_never_dispatched",
+      "seconds": 0.5
+    },
+    {
+      "invariant": "2. No action reaches a driver without policy authorization",
+      "what": "the allowlist stops refusing off-list navigation",
+      "file": "src/cua/policy/engine.py",
+      "verdict": "KILLED",
+      "caught_by": "tests/integration/test_dispatcher.py::test_an_entrypoint_outside_the_allowlist_is_refused",
+      "seconds": 0.4
+    },
+    {
+      "invariant": "3. Targets are semantic, never raw selectors",
+      "what": "an exact-name match stops comparing the accessible name",
+      "file": "src/cua/targeting/candidates.py",
+      "verdict": "KILLED",
+      "caught_by": "tests/unit/test_resolver.py::test_normalized_matching_absorbs_cosmetic_differences",
+      "seconds": 0.2
+    },
+    {
+      "invariant": "4. Human input cannot bypass policy",
+      "what": "automation may originate a human-only raw_input",
+      "file": "src/cua/policy/engine.py",
+      "verdict": "KILLED",
+      "caught_by": "tests/invariants/test_human_control_safety.py::test_automation_cannot_originate_raw_input",
+      "seconds": 0.3
+    },
+    {
+      "invariant": "5. Unknown and ambiguous states fail closed",
+      "what": "an ambiguous target is tie-broken to the first candidate",
+      "file": "src/cua/targeting/resolver.py",
+      "verdict": "KILLED",
+      "caught_by": "tests/unit/test_resolver.py::test_ambiguity_is_refused_not_tiebroken",
+      "seconds": 0.2
+    },
+    {
+      "invariant": "6. Every sink is redacted",
+      "what": "the redactor stops applying its pattern rules",
+      "file": "src/cua/policy/redact.py",
+      "verdict": "KILLED",
+      "caught_by": "tests/invariants/test_redaction.py::test_no_sink_retains_seeded_secrets",
+      "seconds": 0.3
+    },
+    {
+      "invariant": "7. Business outcomes are not failures",
+      "what": "'no such member' exits non-zero",
+      "file": "src/cua/domain/result.py",
+      "verdict": "KILLED",
+      "caught_by": "tests/unit/test_taxonomy.py::test_business_outcome_exits_zero",
+      "seconds": 0.5
+    },
+    {
+      "invariant": "8. Automation acts only while it holds the session",
+      "what": "the stale-lease-epoch check is skipped",
+      "file": "src/cua/runtime/dispatcher.py",
+      "verdict": "KILLED",
+      "caught_by": "tests/integration/test_dispatcher.py::test_a_stale_lease_epoch_is_refused_before_anything_else",
+      "seconds": 0.5
+    },
+    {
+      "invariant": "9. Capabilities are immutable and content-hashed",
+      "what": "a tampered artifact is loaded without verifying its hash",
+      "file": "src/cua/domain/serde.py",
+      "verdict": "KILLED",
+      "caught_by": "tests/contract/test_capability_schema.py::test_tampering_is_detected",
+      "seconds": 0.5
+    },
+    {
+      "invariant": "10. domain/ is pure",
+      "what": "the domain layer imports the policy package",
+      "file": "src/cua/domain/ids.py",
+      "verdict": "KILLED",
+      "caught_by": "Domain is pure (no I/O, no other cua packages)",
+      "seconds": 0.1
+    },
+    {
+      "invariant": "Edge-case fixes",
+      "what": "a malformed URL raises out of the allowlist instead of being denied",
+      "file": "src/cua/policy/allowlist.py",
+      "verdict": "KILLED",
+      "caught_by": "tests/unit/test_edge_policy_allowlist.py::test_a_spelling_that_could_name_a_different_host_is_refused[NUL",
+      "seconds": 0.3
+    },
+    {
+      "invariant": "Edge-case fixes",
+      "what": "the wrong-action metric ignores the expected status",
+      "file": "src/cua/evals/scorers.py",
+      "verdict": "KILLED",
+      "caught_by": "tests/unit/test_edge_cli_evals_codegen_scorers.py::test_a_success_where_the_seeded_truth_is_a_business_outcome_is_a_wrong_action",
+      "seconds": 0.3
+    },
+    {
+      "invariant": "Edge-case fixes",
+      "what": "a refused stale-lease attempt is counted as an unauthorized dispatch",
+      "file": "src/cua/evidence/bus.py",
+      "verdict": "KILLED",
+      "caught_by": "tests/integration/test_edge_runtime_dispatch_pipeline.py::test_a_refused_stale_dispatch_is_not_an_unauthorized_dispatch",
+      "seconds": 0.4
+    },
+    {
+      "invariant": "Edge-case fixes",
+      "what": "minted ids may be all digits and get redacted as account numbers",
+      "file": "src/cua/domain/ids.py",
+      "verdict": "KILLED",
+      "caught_by": "tests/unit/test_edge_domain_ids.py::test_an_id_always_contains_a_letter_however_many_are_drawn[8]",
+      "seconds": 0.2
+    },
+    {
+      "invariant": "Edge-case fixes",
+      "what": "an explicit empty container is pruned and the sealed artifact reloads as tampered",
+      "file": "src/cua/domain/serde.py",
+      "verdict": "KILLED",
+      "caught_by": "tests/contract/test_edge_domain_capability_schema.py::test_a_declared_empty_collection_round_trips[driver_capabilities=()]",
+      "seconds": 3.1
+    }
+  ]
+}

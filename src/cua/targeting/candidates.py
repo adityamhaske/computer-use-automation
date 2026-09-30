@@ -63,7 +63,14 @@ def semantic_exact(target: TargetDescriptor, snapshot: UiSnapshot) -> list[UiNod
     if target.name.match is MatchMode.REGEX:
         import re
 
-        return [n for n in pool if n.name and re.search(target.name.value, n.name)]
+        try:
+            pattern = re.compile(target.name.value)
+        except re.error:
+            # A pattern that cannot compile names no control. Resolution is "resolve or refuse", so
+            # this must surface as a typed not-found rather than an exception that ends the run;
+            # schema validation rejects such a pattern at load, so this is the backstop.
+            return []
+        return [n for n in pool if n.name and pattern.search(n.name)]
     return []
 
 

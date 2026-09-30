@@ -50,9 +50,21 @@ same, only the source of truth is harder.
 Building the cross-tenant suite **falsified the reuse claim as it then stood**, which is the best
 argument for having built it. See `REPORT.md` §7.
 
+## The verification evidence
+
+`evidence/tests/` answers a different question from the runs above: not *did the flow work* but *how
+do we know the guarantees would notice if they broke*.
+
+| File | What it shows |
+|---|---|
+| [`tests/test-report.md`](tests/test-report.md) | Every test, by layer, with line and branch coverage per package. Regenerate: `make test-report`. |
+| [`tests/mutation-report.md`](tests/mutation-report.md) | Each of the ten invariants — and every defect fixed in the hardening pass — broken on purpose, and the first test that caught it. Regenerate: `make mutation-check`. |
+| [`tests/edge-case-catalogue.md`](tests/edge-case-catalogue.md) | Every edge case the suite defends, by subsystem, named as the claim it proves. |
+
 ## Layout
 
 ```
+tests/               test report, mutation report, edge-case catalogue (make test-report / mutation-check)
 capabilities/        the compiled draft and the reviewed capability, side by side
 discovery/<run_id>/  the run that discovered the flow
 replay/<run_id>/     deterministic replays: success, business outcome, and error paths

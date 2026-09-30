@@ -24,6 +24,8 @@ dev = [
     "pytest>=8.3,<9",
     "pytest-asyncio>=0.24,<1",
     "pytest-timeout>=2.3,<3",
+    # Line + branch coverage for the test report (scripts/test_report.py).
+    "coverage>=7.6,<8",
     "ruff>=0.6,<1",
     "mypy>=1.11,<2",
     "import-linter>=2.0,<3",
@@ -58,6 +60,9 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["ANN"]
+# The edge-case suites feed homoglyphs, right-to-left text, zero-width and line-separator characters
+# to the system on purpose -- they are the subject under test, so "ambiguous unicode" is the point.
+"tests/**/test_edge_*.py" = ["ANN", "RUF001", "RUF002", "RUF003"]
 "apps/**" = ["ANN"]
 
 [tool.ruff.lint.flake8-tidy-imports]

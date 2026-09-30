@@ -471,7 +471,7 @@ make secrets        <span class="comment"># fail on any key-shaped string in tra
 make discover       <span class="comment"># live LLM discovery against the mock app; needs OMNIROUTE_API_KEY</span>
 make verify-live    <span class="comment"># check the newest discovery run was a live model, not a script</span>
 make eval           <span class="comment"># stability + cross-tenant measurement</span></code></pre>
-  <p>334 tests, <code>mypy --strict</code> clean, five enforced import contracts. The whole suite runs offline with no API key.</p>
+  <p>2,067 tests, <code>mypy --strict</code> clean, five enforced import contracts. The whole suite runs offline with no API key. <code>make test-report</code> writes the counts and coverage to <code>evidence/tests/</code>; <code>make mutation-check</code> breaks each invariant on purpose and proves the suite goes red.</p>
 </div>
 
 <!-- ================================ DEMO ================================ -->
@@ -1112,7 +1112,7 @@ overrides:
   </table>
 
   <h2>Offline by default</h2>
-  <p>Everything except <code>e2e/</code> runs with <strong>no API key and no network</strong>. 334 tests, <code>mypy --strict</code> clean. CI configures no API key on purpose — if a test needs the model, CI must fail rather than silently skip.</p>
+  <p>Everything except <code>e2e/</code> runs with <strong>no API key and no network</strong>. 2,067 tests (1,700+ of them edge cases: boundary, malformed, hostile and out-of-order input), <code>mypy --strict</code> clean. CI configures no API key on purpose — if a test needs the model, CI must fail rather than silently skip.</p>
 
   <h2>Continuous integration</h2>
   <p><code>.github/workflows/ci.yml</code> runs the same targets a contributor runs locally, as separate steps so a failure names its stage:</p>

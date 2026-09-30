@@ -22,7 +22,6 @@ a model is still in the loop and the run can adapt -- rather than at the first r
 from __future__ import annotations
 
 import time
-import uuid
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -34,6 +33,7 @@ from cua.agent.tools import TOOL_NAMES, TOOLS, node_id_from
 from cua.domain.action import Action, Click, Navigate, PressKey, Select, Type
 from cua.domain.actor import Actor
 from cua.domain.discovery import TERMINAL_TOOLS, DiscoveryRun, DiscoveryStep, StopReason
+from cua.domain.ids import new_id
 from cua.domain.run_record import RunKind
 from cua.domain.snapshot import UiSnapshot
 from cua.domain.target import TargetDescriptor
@@ -63,7 +63,7 @@ class DiscoveryAgent:
         # Minting a second one here meant the compiled artifact's `provenance.discovered_by.run_id`
         # named a run that exists nowhere on disk, while `transcript_ref` pointed at a different
         # directory. Provenance that cannot be followed back to its own evidence is decoration.
-        run_id = getattr(self.evidence, "run_id", "") or f"disc-{uuid.uuid4().hex[:10]}"
+        run_id = getattr(self.evidence, "run_id", "") or new_id("disc", 10)
         self.evidence.emit(
             EventType.RUN_START,
             actor=Actor.AUTOMATION,

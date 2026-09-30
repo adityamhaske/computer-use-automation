@@ -68,5 +68,7 @@ class CapabilityEvaluation(BaseModel):
             self.runs >= 5
             and self.wrong_actions == 0
             and self.stability_score >= 0.95
-            and self.determinism_holds is not False
+            # `is True`, not `is not False`: determinism that was never measured (no input replayed
+            # twice) is the absence of evidence, and unattended replay is decided on evidence.
+            and self.determinism_holds is True
         )

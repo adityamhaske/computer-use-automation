@@ -53,6 +53,44 @@ Its risk is fixture drift: recorded transcripts silently diverging from what the
 so CI passes while production is broken. Mitigated by regenerating fixtures from a live run via
 script, plus a contract test asserting fixture shape matches the live `LlmPort` schema.
 
+## Edge-case suites
+
+Alongside the claim-per-test suites above, every subsystem has a `test_edge_<area>_*.py` suite that
+feeds it the input a real deployment eventually will: boundary values, empty and whitespace-only
+input, non-ASCII digits, homoglyphs, right-to-left and zero-width text, 10,000-character strings,
+injection-shaped strings (HTML, SQL, path traversal, format strings, prompt-injection text inside
+page content), malformed and partial structured data, repeated and out-of-order calls, illegal state
+transitions, stale or forged tokens and epochs, and budgets exactly at their limits. Parametrized
+tables keep each claim cheap to read and cheap to extend.
+
+`evidence/tests/edge-case-catalogue.md` lists every claim by name — a test name states the behaviour
+it defends, so the catalogue is the specification of what the system is required to handle.
+
+These suites are how the hardening pass found real defects rather than confirming assumptions. Each
+was written as a strict-`xfail` test first, adversarially checked, then fixed in `src/` with the
+marker removed; none is left open. Among them: a malformed URL that raised out of the allowlist
+instead of being denied; the headline wrong-action metric ignoring the expected status; an
+intermittently all-digit identifier redacted as an account number in the trace; a sealed artifact
+that reloaded as tampered when it declared an empty list; and an email-redaction pattern that took
+minutes on one long unbroken token.
+
+## Does the suite fail when it should? (mutation check)
+
+A passing test only matters if it would fail when the claim stopped being true. `make mutation-check`
+(`scripts/mutation_check.py`) breaks the code on purpose — one change at a time, all ten invariants
+plus a guard for each defect fixed in the hardening pass — runs the tests that defend it, and records
+whether any went red. The source is restored byte-for-byte after each mutation and verified. Anything
+that survives is a hole in the suite and fails the run. The latest result is
+`evidence/tests/mutation-report.md`.
+
+## Coverage, stated honestly
+
+`make test-report` (`scripts/test_report.py`) runs the whole suite under line and branch coverage and
+writes `evidence/tests/test-report.md`. Read it with one caveat: the CLI entry points and the
+browser driver run largely in child processes (`make demo`, the UI smoke test), which an in-process
+measurement cannot see, so `cua.cli` looks far lower than it is exercised. The end-to-end story is
+proven by `make demo`, not by that percentage.
+
 ## What is deliberately not tested
 
 - The mock app's own correctness beyond what fixtures need — it is a fixture, not a deliverable.

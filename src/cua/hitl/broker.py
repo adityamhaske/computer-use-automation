@@ -22,12 +22,12 @@ path, and it arrives in the same shape as everything else, tagged `actor=HUMAN`.
 
 from __future__ import annotations
 
-import uuid
 from dataclasses import dataclass, field
 from datetime import timedelta
 
 from cua.domain.action import Action, RawInput
 from cua.domain.actor import Actor
+from cua.domain.ids import new_id
 from cua.domain.snapshot import UiSnapshot
 from cua.evidence.bus import EventType, EvidenceBus
 from cua.hitl.intervention import InterventionQueue, InterventionRequest
@@ -81,14 +81,18 @@ class SessionBroker:
     ) -> InterventionRequest:
         """Stop, and ask for a person."""
         epoch = self.lease.escalate(reason)
+        redact = self.evidence.redactor.text
         request = self.queue.open(
             InterventionRequest(
-                intervention_id=f"int-{uuid.uuid4().hex[:10]}",
+                intervention_id=new_id("int", 10),
                 session_id=self.session_id,
                 run_id=run_id,
                 capability_ref=capability_ref,
-                goal=goal,
-                reason=reason,
+                # The queue is a sink like any other -- the one a person actually reads -- and
+                # `InterventionRequest` promises its contents are already redacted. `reason` is the
+                # executor's words and can quote page text, so it is redacted here, not trusted.
+                goal=redact(goal),
+                reason=redact(reason),
                 step_id=step_id,
                 failure_code=failure_code,
                 snapshot_ref=snapshot_ref,
@@ -118,8 +122,18 @@ class SessionBroker:
         Any automation action authorized before this point is now stale and will be refused -- which
         is the race this whole mechanism exists to kill.
         """
+        before = self.queue.get(intervention_id)
+        prior = (before.state, before.operator, before.claimed_at) if before else None
         request = self.queue.claim(intervention_id, operator)
-        epoch = self.lease.claim(operator, hold_for=hold_for)
+        try:
+            epoch = self.lease.claim(operator, hold_for=hold_for)
+        except Exception:
+            # The queue was mutated first, so a lease that refuses (or a hold that overflows the
+            # clock) would leave the request CLAIMED by someone who never held the session and the
+            # session PAUSED with nothing left in the queue to claim it by. Put the request back.
+            if prior is not None:
+                request.state, request.operator, request.claimed_at = prior
+            raise
         self.handoff = HandoffRecord(
             intervention_id=request.intervention_id,
             operator=operator,
@@ -201,14 +215,18 @@ class SessionBroker:
         delta = None
         if self.handoff.snapshot_before is not None and snapshot_after is not None:
             delta = diff_snapshots(self.handoff.snapshot_before, snapshot_after)
+
+        # The lease validates the transition BEFORE anything is recorded: a refused second release
+        # used to overwrite the delta and snapshot the real release had already written, so the
+        # audit record of what the operator did could be replaced by a call that was rejected.
+        epoch = self.lease.release()
+        if delta is not None and snapshot_after is not None:
             self.handoff.delta = delta
             self.handoff.snapshot_after = snapshot_after
-
-        epoch = self.lease.release()
         self.queue.release(
             self.handoff.intervention_id,
             human_actions=self.handoff.actions,
-            human_delta=delta.summary() if delta else "not captured",
+            human_delta=self.evidence.redactor.text(delta.summary()) if delta else "not captured",
         )
         self.evidence.emit(
             EventType.LEASE,

@@ -1,0 +1,102 @@
+{
+  "generated": "2026-09-30",
+  "tests": 2067,
+  "passed": 2067,
+  "failed": 0,
+  "skipped_or_deselected": 0,
+  "edge_case_tests": 1733,
+  "tests_by_layer": {
+    "contract": 217,
+    "integration": 1130,
+    "invariants": 188,
+    "unit": 532
+  },
+  "suite_seconds": 114.4,
+  "coverage": {
+    "line_percent": 78.9,
+    "branch_percent": 71.8,
+    "statements": 5395,
+    "packages": {
+      "cua (top level)": {
+        "statements": 1,
+        "line_percent": 100.0,
+        "branch_percent": 100.0
+      },
+      "cua.agent": {
+        "statements": 407,
+        "line_percent": 83.8,
+        "branch_percent": 65.3
+      },
+      "cua.assist": {
+        "statements": 120,
+        "line_percent": 80.8,
+        "branch_percent": 62.5
+      },
+      "cua.catalog": {
+        "statements": 128,
+        "line_percent": 88.3,
+        "branch_percent": 64.3
+      },
+      "cua.cli": {
+        "statements": 658,
+        "line_percent": 14.3,
+        "branch_percent": 8.0
+      },
+      "cua.domain": {
+        "statements": 1141,
+        "line_percent": 95.8,
+        "branch_percent": 87.4
+      },
+      "cua.evals": {
+        "statements": 284,
+        "line_percent": 81.3,
+        "branch_percent": 95.2
+      },
+      "cua.evidence": {
+        "statements": 131,
+        "line_percent": 96.9,
+        "branch_percent": 91.7
+      },
+      "cua.hitl": {
+        "statements": 566,
+        "line_percent": 77.0,
+        "branch_percent": 52.5
+      },
+      "cua.perception": {
+        "statements": 111,
+        "line_percent": 94.6,
+        "branch_percent": 81.2
+      },
+      "cua.policy": {
+        "statements": 380,
+        "line_percent": 95.8,
+        "branch_percent": 91.5
+      },
+      "cua.recorder": {
+        "statements": 270,
+        "line_percent": 89.6,
+        "branch_percent": 76.6
+      },
+      "cua.replay": {
+        "statements": 468,
+        "line_percent": 96.2,
+        "branch_percent": 92.0
+      },
+      "cua.runtime": {
+        "statements": 213,
+        "line_percent": 76.5,
+        "branch_percent": 62.5
+      },
+      "cua.surfaces": {
+        "statements": 296,
+        "line_percent": 67.9,
+        "branch_percent": 59.6
+      },
+      "cua.targeting": {
+        "statements": 221,
+        "line_percent": 89.6,
+        "branch_percent": 75.0
+      }
+    }
+  }
+}

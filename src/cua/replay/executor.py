@@ -20,7 +20,6 @@ Same artifact, same inputs, same application state produces the same decisions.
 from __future__ import annotations
 
 import time
-import uuid
 from collections import Counter
 from collections.abc import Callable
 from dataclasses import dataclass, field
@@ -38,6 +37,7 @@ from cua.domain.capability import (
     WaitPolicy,
 )
 from cua.domain.capability import WaitFor as WaitForPolicy
+from cua.domain.ids import new_id
 from cua.domain.result import (
     BusinessOutcome,
     FailureCode,
@@ -102,7 +102,7 @@ class ReplayExecutor:
     wires the catalog for this. Left unset, such a remedy fails closed as RECOVERY_EXHAUSTED.
     """
 
-    session_id: str = field(default_factory=lambda: f"replay-{uuid.uuid4().hex[:8]}")
+    session_id: str = field(default_factory=lambda: new_id("replay", 8))
 
     replay_gates: ReplayGates = field(default_factory=ReplayGates)
     """Which gates an irreversible capability must clear before it runs unattended.
@@ -251,7 +251,7 @@ class ReplayExecutor:
 
         state = _State(
             capability=capability,
-            run_id=run_id or f"rep-{uuid.uuid4().hex[:10]}",
+            run_id=run_id or new_id("rep", 10),
             started=time.monotonic(),
         )
         try:
@@ -307,7 +307,7 @@ class ReplayExecutor:
         prior_recovery_attempts: int = 0,
         run_id: str | None = None,
     ) -> RunResult:
-        run_id = run_id or f"rep-{uuid.uuid4().hex[:10]}"
+        run_id = run_id or new_id("rep", 10)
         started = time.monotonic()
 
         if self.lease_epoch is None and self.broker is not None:
@@ -886,7 +886,7 @@ class ReplayExecutor:
             and state.capability.escalation.policy.value == "pause_and_request_human"
         )
 
-        intervention_id = f"int-{uuid.uuid4().hex[:8]}"
+        intervention_id = new_id("int", 8)
         if escalates and self.broker is not None:
             # Open a real intervention and pause the lease. From here the session belongs to
             # nobody until an operator claims it -- so any automation action still in flight is

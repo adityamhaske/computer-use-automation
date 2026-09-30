@@ -1,6 +1,6 @@
 {
-  "snapshot_id": "snap-6fd086c957",
-  "url": "http://127.0.0.1:59337/",
+  "snapshot_id": "snap-177fdf496f",
+  "url": "http://127.0.0.1:51826/",
   "title": "MemberDesk",
   "nodes": [
     {
@@ -567,7 +567,7 @@
       "parent_id": null,
       "child_ids": [],
       "hints": {
-        "native": "490"
+        "native": "491"
       },
       "fingerprint": "f6d07955fec5f341"
     },
@@ -587,7 +587,7 @@
         "content:/row[18]/cell[0]"
       ],
       "hints": {
-        "native": "492"
+        "native": "493"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -607,7 +607,7 @@
         "content:/row[18]/cell[0]/table[0]"
       ],
       "hints": {
-        "native": "493"
+        "native": "494"
       },
       "fingerprint": "bb5923d22e1419a1"
     },
@@ -625,7 +625,7 @@
       "parent_id": "content:/row[18]/cell[0]",
       "child_ids": [],
       "hints": {
-        "native": "494"
+        "native": "495"
       },
       "fingerprint": "db0f241a64a7611f"
     },
@@ -764,7 +764,7 @@
         "content:/row[20]/cell[1]"
       ],
       "hints": {
-        "native": "496"
+        "native": "497"
       },
       "fingerprint": "13ca239244183fe8"
     },
@@ -785,7 +785,7 @@
         "content:/row[20]/cell[0]/text[1]"
       ],
       "hints": {
-        "native": "497"
+        "native": "498"
       },
       "fingerprint": "db3531c999a9d575"
     },
@@ -844,7 +844,7 @@
         "content:/row[20]/cell[1]/link[0]"
       ],
       "hints": {
-        "native": "499"
+        "native": "500"
       },
       "fingerprint": "4284a156d8302fc6"
     },
@@ -919,7 +919,7 @@
       ],
       "hints": {
         "css": "a[href=\"/logout\"]",
-        "native": "501"
+        "native": "484"
       },
       "fingerprint": "b56cffb08b23a60c"
     },
@@ -1058,6 +1058,6 @@
       "fingerprint": "7820fe68a4cfd70f"
     }
   ],
-  "captured_at": "2026-09-30T04:09:01.068003Z",
+  "captured_at": "2026-09-30T22:07:12.126181Z",
   "http_status": 200
 }
