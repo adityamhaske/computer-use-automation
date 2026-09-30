@@ -184,9 +184,11 @@ humans too; a capability's own <code>allowed_domains</code> only ever <em>narrow
 on a <code>navigate</code>'s declared URL and again against where the session actually landed, since checking
 intent is not checking outcome.</p>
 <p><strong>Risk tiers</strong> — <code>safe → elevated → irreversible</code>, from three independent signals (action type ×
-target semantics × artifact annotation), since any one alone is fooled. Automation is blocked from
-irreversible actions outright; replay needs an approved capability <strong>and</strong> a caller opt-in, because
-either gate alone is one accident away from a wire transfer.</p>
+target semantics × artifact annotation), since any one alone is fooled. Automation is refused an
+irreversible action unless the step is declared irreversible <strong>and</strong> the run carries an approval of
+that exact content (or of its sealed base, through a <code>--base-url</code>-only binding) <strong>and</strong> a caller
+opt-in — checked by <code>PolicyEngine</code> at the dispatch itself, not only before the run, because either
+gate alone is one accident away from a wire transfer.</p>
 <p><strong>Redaction at every sink, including outbound model prompts.</strong> Writing a run record <em>requires</em> a
 redactor, and the secret resolver registers each value as it issues it, closing a path where an
 unregistered secret ran the redaction pass empty. Tested in both directions — <code>id@version</code> once
@@ -228,11 +230,9 @@ that run never saw.</p>
 — right on a label/value table, wrong in an n-column grid, where it cannot yet read a <em>column
 header</em> and falls back to a flagged positional descriptor. <code>raw_input</code> is authorized by a declared
 tier rather than by classifying what it touches, since a mouse-move has no resolved target to
-reason about. Global <code>budgets.max_steps</code>/<code>max_duration_ms</code> are parsed but not yet read by the
-executor. Approval is wired into both replay entry points but stays unsatisfiable for any
-<code>{base_url}</code> capability — every shipped one — since <code>TenantBinding.apply</code> reseals with a fresh hash
-an approval pinned to the sealed base can never match: fails closed, not open, but what identity
-approval should pin to when the entrypoint is a deployment parameter is not yet decided.</p>
+reason about. Approval pins the sealed base; a <code>--base-url</code> binding is re-derived at the gate and
+covered only because it fills a declared slot — a tenant overlay that overrides steps has no approval
+path of its own yet, so an irreversible capability behind one fails closed.</p>
 <p><strong>Two failures of the same shape: a check existed, the test was green, and nothing was actually
 checked.</strong> <code>make invariants</code> ran import-linter through <code>python -m importlinter.cli</code> — not a
 runnable entry point, so every &quot;mechanically enforced&quot; claim here held only once that became

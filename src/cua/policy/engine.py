@@ -38,6 +38,7 @@ from cua.domain.snapshot import UiNode
 from cua.policy.allowlist import AllowlistCheck
 from cua.policy.authorized import MINT_TOKEN, AuthorizedAction
 from cua.policy.config import PolicyConfig
+from cua.policy.irreversible import IrreversibleGrant
 from cua.policy.risk import RiskAssessment, RiskClassifier
 
 
@@ -57,6 +58,9 @@ class PolicyDecision:
     reason: str
     actor: Actor
     authorized: AuthorizedAction | None = None
+    approved_under: str | None = None
+    """For a step allowed by `allow_if_approved`, the approval and opt-in it ran under -- recorded
+    with the authorization, because "who approved this wire transfer" is the audit question."""
 
     @property
     def allowed(self) -> bool:
@@ -92,6 +96,7 @@ class PolicyEngine:
         capability: Capability | None = None,
         declared_risk: ActionRisk | None = None,
         confirmed: bool = False,
+        grant: IrreversibleGrant | None = None,
     ) -> PolicyDecision:
         """Decide, and on approval mint the only token a driver will accept."""
         decision_id = f"dec-{uuid.uuid4().hex[:12]}"
@@ -154,12 +159,34 @@ class PolicyEngine:
                 actor,
             )
 
+        approved_under: str | None = None
+        if disposition == "allow_if_approved":
+            # Verified here, at the dispatch, not trusted from the executor's pre-flight check. And
+            # only for a step the artifact itself declares at this tier: an approval covers what a
+            # reviewer saw, so a control the lexicon marks irreversible on a step declared `safe`
+            # is exactly the surprise it must not stretch to cover.
+            if (declared_risk or action.risk) is not risk.tier:
+                return deny(
+                    f"{risk.tier.value} action is not declared at that tier by the capability, "
+                    f"so no approval covers it: {risk.explain()}",
+                    risk,
+                )
+            if capability is None or grant is None:
+                return deny(
+                    f"{risk.tier.value} action requires an approved capability: {risk.explain()}",
+                    risk,
+                )
+            if (refusal := grant.refusal(capability, self.config.replay_gates)) is not None:
+                return deny(f"{risk.tier.value} action refused: {refusal}", risk)
+            approved_under = grant.basis(capability)
+
         return PolicyDecision(
             outcome=Outcome.ALLOW,
             decision_id=decision_id,
             risk=risk,
             reason=risk.explain(),
             actor=actor,
+            approved_under=approved_under,
             authorized=AuthorizedAction(
                 action=action,
                 actor=actor,

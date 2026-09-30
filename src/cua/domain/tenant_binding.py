@@ -97,6 +97,17 @@ class TenantBinding(BaseModel):
     rather than patched: a success condition is the one thing that should never be half-inherited.
     """
 
+    @property
+    def substitutes_only(self) -> bool:
+        """Whether this binding does nothing but fill `{placeholder}` slots the base declares.
+
+        The line an approval of the base can be carried across. Filling a declared slot -- the
+        address a tenant runs the product at -- changes *where* the reviewed flow runs, not what it
+        does. An override, an extra recovery rule or a replaced checkpoint changes behaviour the
+        reviewer never saw.
+        """
+        return not self.overrides and not self.recovery_extra and self.checkpoint is None
+
     def apply(self, capability: Capability) -> Capability:
         """Produce the effective capability for this tenant.
 
@@ -152,6 +163,40 @@ class TenantBinding(BaseModel):
         payload = _substitute(payload, self.vars)
         payload["content_hash"] = ""
         return Capability.model_validate(payload).with_hash()
+
+
+class AppliedBinding(BaseModel):
+    """A sealed base capability and the binding applied to it. Runtime context, not an artifact.
+
+    `TenantBinding.apply` reseals the effective capability under a fresh content hash, and that is
+    right: a run record must name exactly what executed. But an approval is pinned to what a
+    reviewer saw, which is the base -- so an approval of any `{base_url}` capability could never
+    match the capability that actually ran. This connects the two without making either mutable:
+    it names the base and the binding, and `verify` proves the capability about to run is exactly
+    their deterministic product rather than taking that on trust.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    base: Capability
+    binding: TenantBinding
+
+    def verify(self, effective: Capability) -> str | None:
+        """Why `effective` is not this binding applied to this sealed base, or None if it is."""
+        if not self.base.hash_is_valid():
+            return f"the base {self.base.ref} does not match its own content hash"
+        if not effective.hash_is_valid():
+            return f"{effective.ref} does not match its own content hash"
+        try:
+            derived = self.binding.apply(self.base)
+        except ValueError as exc:
+            return f"the binding does not apply to {self.base.ref}: {exc}"
+        if derived.content_hash != effective.content_hash:
+            return (
+                f"{effective.ref} is not the binding for tenant {self.binding.tenant!r} applied to "
+                "its base -- it was changed after binding"
+            )
+        return None
 
 
 def _substitute(node: Any, variables: dict[str, str]) -> Any:

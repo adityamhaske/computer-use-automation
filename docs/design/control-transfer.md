@@ -12,9 +12,12 @@ back so the run can finish. This document describes the mechanism.
 RUNNING ──escalate──► PAUSED ──human_claim──► HUMAN_CONTROL
    ▲                  (epoch++)               (epoch++)
    │                                                │
-   └── RESUMING ◄── re-anchor + reconcile ◄── human_release (epoch++)
-       (epoch++)
+   └── resume (epoch++) ◄── RESUMING ◄── human_release (epoch++)
 ```
+
+Re-anchoring happens after the lease is back in `RUNNING`: `ReplayExecutor.resume()` reconciles
+against the live screen before its first action (below). `cua demo` drives that resume; the
+operator console's **Release** returns the lease to automation but does not itself restart the run.
 
 ## The lease
 
@@ -22,10 +25,15 @@ RUNNING ──escalate──► PAUSED ──human_claim──► HUMAN_CONTROL
 Lease(holder: Actor, epoch: int, expires_at: datetime)
 ```
 
-`holder ∈ {AUTOMATION, HUMAN, NONE}`. Every transition increments `epoch` monotonically.
+`holder ∈ {AUTOMATION, HUMAN, SYSTEM}` — `SYSTEM` while the session is `PAUSED` or `RESUMING`, when
+nobody may act. Every transition increments `epoch` monotonically.
 
-**Every `dispatch()` asserts `lease.held_by(actor, epoch)`.** A dispatch carrying a stale epoch is
-rejected with `LEASE_LOST`.
+**Both actors are checked before anything reaches a surface.** An operator's input is refused
+by the broker unless `lease.assert_held(HUMAN, epoch)` passes. An automation run checks that it
+holds the session when it starts (or resumes), then carries its epoch into every dispatch, and the
+dispatcher refuses a stale one with `LEASE_LOST` — every change of holder advances the epoch, so the
+two checks together cover every dispatch. A run with no broker has no lease and no operator to race,
+and skips both.
 
 This kills a real race rather than a theoretical one. Escalation happens *while* an automation step
 is in flight — that is what "stuck" usually means. Without the epoch check, the in-flight step can
@@ -43,7 +51,7 @@ Escalation is triggered by declared conditions, not by a vibe:
 | `CHECKPOINT_FAILED` | Reached the end, didn't reach the state |
 | `RECOVERY_EXHAUSTED` | A transient condition wasn't transient |
 | `UNEXPECTED_STATE` | Fail-closed default |
-| `risky_action_unapproved` | Policy requires a human for an irreversible action |
+| `POLICY_DENIED` | Policy refused an action — e.g. an irreversible step with no approval. Escalates only if listed; the default triggers do not include it |
 
 The capability declares which of these escalate via `escalation.triggers`, and whether the disposition is
 `pause_and_request_human` or `fail_closed`.
@@ -75,16 +83,17 @@ This is the part that is easy to get wrong. The human has been operating the UI.
 Blindly resuming at step *N* would re-run work they already did — at best redundant, at worst a
 double submission.
 
-On `human_release` the executor:
+On `human_release` the broker **snapshot-diffs** pre-handoff against post-handoff and records the
+delta as `human_delta`. When the run is then resumed, `ReplayExecutor.resume()` scans forward from
+the step that escalated (`hitl/reanchor.py`):
 
-1. **Snapshot-diffs** pre-handoff against post-handoff and records the delta as `human_delta`.
-2. **Re-evaluates preconditions** from the current step forward.
-3. **Skips forward** to the first step whose precondition is *not* yet satisfied — so work the human
-   completed is not repeated.
-4. If the state matches **no** step's precondition, that is `UNEXPECTED_STATE` and it **fails
-   closed** rather than picking the nearest step.
+1. A step whose **postcondition already holds** is treated as done and skipped — so work the human
+   completed is not repeated. A step with no postcondition is never skipped.
+2. The first step not visibly done is where the run resumes — **provided its precondition holds**.
+3. If it does not, that is `UNEXPECTED_STATE` and the run **fails closed** rather than picking the
+   nearest step.
 
-Step 4 is the fail-closed rule applied to the handoff seam, and it matters: "the human left the
+Step 3 is the fail-closed rule applied to the handoff seam, and it matters: "the human left the
 session somewhere I don't recognize" is exactly the moment not to improvise.
 
 ## What is mocked, and why

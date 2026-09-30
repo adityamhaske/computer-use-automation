@@ -241,6 +241,34 @@ def test_llm_calls_are_recorded_for_the_artifact_to_reference(rig: tuple) -> Non
     assert all("prompt_tokens" in call for call in calls)
 
 
+def test_the_budget_counts_every_model_call_including_the_one_that_finishes(rig: tuple) -> None:
+    """The budget and the run record must describe the same spend.
+
+    The terminal `finish` call returned before the budget was updated, so a run's own `run_end`
+    budget stopped one call short of the `llm_call` events beside it -- the committed live run
+    reported 8,332 tokens against 10,215 recorded. `tokens_used` in the record is derived from those
+    events, so the two now have to agree exactly: every call counted, none counted twice.
+    """
+    from cua.domain.run_record import RunKind
+    from cua.evidence.record import build_run_record
+
+    _, bus, _ = rig
+    agent, _ = _agent(rig, SAVINGS_FLOW)
+    run = agent.run(goal="Read the savings balance for member 12345", target_url="")
+
+    assert run.succeeded, run.summary
+    calls = [e for e in bus.read_events() if e["event"] == EventType.LLM_CALL.value]
+    assert calls[-1]["tool_calls"] == ["finish"]
+    assert calls[-1]["prompt_tokens"] > 0, "the finish call has to cost something to be missed"
+    spent = sum(e["prompt_tokens"] + e["completion_tokens"] for e in calls)
+
+    assert run.budget["tokens"] == spent
+    assert run.budget["steps"] == len(calls), "one model turn per call"
+    ended = next(e for e in bus.read_events() if e["event"] == EventType.RUN_END.value)
+    assert ended["budget"]["tokens"] == spent
+    assert build_run_record(bus.run_dir, kind=RunKind.DISCOVERY).tokens_used == spent
+
+
 # --------------------------------------------------------------- stopping
 
 

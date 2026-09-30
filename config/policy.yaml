@@ -86,19 +86,26 @@ risk:
 # Escalation WIDENS a human's authority deliberately and auditably. It does not
 # disable the chokepoint: the allowlist, the classification, and the evidence
 # trail apply to a human operator exactly as they do to automation.
+#
+# Values are a closed set, checked at load: allow | allow_if_declared | allow_if_approved |
+# require_confirmation | block_and_escalate. A misspelled value fails loudly rather than permitting.
 dispositions:
   AUTOMATION:
     safe: allow
     elevated: allow_if_declared     # the artifact must annotate the step
-    irreversible: block_and_escalate
+    # Refused, unless the step is declared `risk: irreversible` in the artifact AND the run clears
+    # `replay_gates` below. Checked by PolicyEngine at the dispatch itself, not only before the run.
+    # Discovery and assisted recovery present no approval, so for them this is always a refusal.
+    irreversible: allow_if_approved
   HUMAN:
     safe: allow
     elevated: allow                 # recorded
     irreversible: require_confirmation
 
-# Replay of an irreversible step additionally requires BOTH:
-#   - CapabilityApproval.state == approved for that exact id@version, and
-#   - an explicit caller opt-in on the invocation.
+# What `allow_if_approved` requires of an irreversible step -- BOTH, by default:
+#   - CapabilityApproval.state == approved, pinned to that exact content hash (or to the sealed base
+#     it was derived from by a substitution-only tenant binding, e.g. --base-url), and
+#   - an explicit caller opt-in on the invocation (--allow-irreversible).
 replay_gates:
   irreversible_requires_approval: true
   irreversible_requires_caller_optin: true

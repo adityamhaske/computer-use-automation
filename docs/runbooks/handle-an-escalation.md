@@ -13,7 +13,7 @@ A run stopped because it could not safely proceed. This is a **designed outcome*
 | `CHECKPOINT_FAILED` | The flow ran but didn't reach the goal state |
 | `RECOVERY_EXHAUSTED` | A transient condition wasn't transient |
 | `UNEXPECTED_STATE` | A screen this capability doesn't understand — the fail-closed default |
-| `risky_action_unapproved` | An irreversible action needs a person to decide |
+| `POLICY_DENIED` | Policy refused an action (e.g. an irreversible step with no approval) — only if the capability lists it; the default triggers do not |
 
 ## Taking control
 
@@ -45,12 +45,15 @@ page.
 
 ## Handing back
 
-**Release** returns the lease. The executor then:
+**Release** diffs the session state before and after your work, records `human_delta`, and
+returns the lease to automation. The console does not restart the run itself; when a caller resumes
+it (`ReplayExecutor.resume()`, as `cua demo` does), the executor:
 
-1. Diffs the session state before and after your work → records `human_delta`
-2. Re-evaluates step preconditions from the current step forward
-3. **Skips forward** to the first step whose precondition isn't satisfied — so it does not redo your work
-4. If the state matches **no** step's precondition, stops with `UNEXPECTED_STATE`
+1. Scans forward from the step that escalated
+2. **Skips** a step only if its postcondition already holds — so it does not redo your work; a step
+   with no postcondition is never skipped
+3. Resumes at the first step not visibly done, **provided its precondition holds**
+4. Otherwise stops with `UNEXPECTED_STATE`
 
 Step 4 is not a bug. If you left the session somewhere the capability doesn't recognize, resuming
 would be guessing.

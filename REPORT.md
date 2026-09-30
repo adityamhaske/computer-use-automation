@@ -156,9 +156,11 @@ on a `navigate`'s declared URL and again against where the session actually land
 intent is not checking outcome.
 
 **Risk tiers** — `safe → elevated → irreversible`, from three independent signals (action type ×
-target semantics × artifact annotation), since any one alone is fooled. Automation is blocked from
-irreversible actions outright; replay needs an approved capability **and** a caller opt-in, because
-either gate alone is one accident away from a wire transfer.
+target semantics × artifact annotation), since any one alone is fooled. Automation is refused an
+irreversible action unless the step is declared irreversible **and** the run carries an approval of
+that exact content (or of its sealed base, through a `--base-url`-only binding) **and** a caller
+opt-in — checked by `PolicyEngine` at the dispatch itself, not only before the run, because either
+gate alone is one accident away from a wire transfer.
 
 **Redaction at every sink, including outbound model prompts.** Writing a run record *requires* a
 redactor, and the secret resolver registers each value as it issues it, closing a path where an
@@ -207,11 +209,9 @@ that run never saw.
 — right on a label/value table, wrong in an n-column grid, where it cannot yet read a *column
 header* and falls back to a flagged positional descriptor. `raw_input` is authorized by a declared
 tier rather than by classifying what it touches, since a mouse-move has no resolved target to
-reason about. Global `budgets.max_steps`/`max_duration_ms` are parsed but not yet read by the
-executor. Approval is wired into both replay entry points but stays unsatisfiable for any
-`{base_url}` capability — every shipped one — since `TenantBinding.apply` reseals with a fresh hash
-an approval pinned to the sealed base can never match: fails closed, not open, but what identity
-approval should pin to when the entrypoint is a deployment parameter is not yet decided.
+reason about. Approval pins the sealed base; a `--base-url` binding is re-derived at the gate and
+covered only because it fills a declared slot — a tenant overlay that overrides steps has no approval
+path of its own yet, so an irreversible capability behind one fails closed.
 
 **Two failures of the same shape: a check existed, the test was green, and nothing was actually
 checked.** `make invariants` ran import-linter through `python -m importlinter.cli` — not a

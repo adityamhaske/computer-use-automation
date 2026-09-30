@@ -171,32 +171,36 @@ A capability document contains:
 ## 7. Target Resolution Ladder
 
 ```
-Step 1: Hint match (cached CSS/node-id) -> verify semantic assertion
-Step 2: Role + accessible name match in active frame
-Step 3: Structural anchor match (relative to stable landmark)
-Step 4: Refusal if ambiguous (>1 match) with TARGET_AMBIGUOUS
-Step 5: Refusal if 0 matches with TARGET_NOT_FOUND
+Rung 1: semantic_exact       role + accessible name, exact, in scope
+Rung 2: semantic_normalized  as above, case/whitespace/punctuation folded
+Rung 3: structural_anchor    position relative to nearby label text
+Rung 4: hint_cached          stored CSS hint, accepted only if it also satisfies role/name
+Rung 5: ordinal_in_region    Nth control of a role within a scope
+(vision: not implemented; never used in replay)
 ```
+The first rung that yields any candidate decides: exactly one wins; more than one is refused with
+TARGET_AMBIGUOUS unless the descriptor carries an explicit `ordinal`; none at any rung is
+TARGET_NOT_FOUND. There is no ambiguity threshold and no candidate scoring.
 
-Drift Scoring:
-- Score 0.0: Exact semantic and cached hint match
-- Score 0.1 - 0.4: Semantic match holds, cached hint updated
-- Score 0.5 - 0.7: Anchor match holds, flags warning for maintainer
-- Score > 0.8: Resolution fails closed
+Drift: resolving at a weaker rung than the one recorded at discovery. `drift_score` is the fraction
+of a run's resolutions that drifted (0.0-1.0). It is a signal only -- no threshold on it stops a run.
 
 ---
 
 ## 8. Error Taxonomy & Fault Matrix
 
-| Observable State | Classification | Action Taken | Exit Code |
+| Observable State | Classification / code | Action Taken | RunStatus (exit) |
 |---|---|---|---|
-| `member_found` | `BUSINESS_OUTCOME` | Extract balance, write run record | 0 |
-| `member_not_found` | `BUSINESS_OUTCOME` | Return typed outcome, write record | 0 |
-| `http_502_bad_gateway` | `RECOVERABLE` | Remediate via refresh, retry step | N/A (resumes) |
-| `retry_budget_exceeded`| `HARD_FAILURE` | Escalate to human queue | 1 |
-| `target_not_found` | `HARD_FAILURE` | Record failure with screenshot | 1 |
-| `unknown_screen` | `UNEXPECTED_STATE` | Immediate stop, lock session | 2 |
-| `operator_claimed` | `LEASE_LOST` | Yield session to human | 3 |
+| member record found | `EXPECTED` | Extract outputs, verify checkpoint | `SUCCESS` (0) |
+| `member_not_found` | `BUSINESS_OUTCOME` | Return typed outcome, write record | `BUSINESS_OUTCOME` (0) |
+| HTTP 502 (`transient_load`) | `RECOVERABLE` | Declared remedy (reload), retry step | resumes |
+| session expired (`session_timeout`) | `RECOVERABLE` | `run_capability corebank.auth.sign_on`, retry step | resumes |
+| recovery past `max_attempts` | `RECOVERY_EXHAUSTED` | Escalate if listed in `escalation.triggers` | `NEEDS_HUMAN` (2) |
+| target not found / ambiguous | `TARGET_NOT_FOUND` / `TARGET_AMBIGUOUS` | Escalate if listed in `escalation.triggers` | `NEEDS_HUMAN` (2) or `FAILED` (1) |
+| undeclared screen | `UNEXPECTED_STATE` | Stop; escalate if listed | `NEEDS_HUMAN` (2) or `FAILED` (1) |
+| operator holds / took the session | `LEASE_LOST` | Refuse the dispatch | `FAILED` (1) |
+
+A debuggable defect is `FAILED` carrying a `FailureCode`; there is no separate hard-failure class.
 
 ---
 
@@ -218,8 +222,10 @@ cua replay evidence/capabilities/memberdesk.savings_balance@1.0.0.yaml --input m
 Options:
 - `--input`: Key-value pairs matching capability inputs schema
 - `--base-url`: Override base URL for target environment
-- `--headed`: Run with visible browser window for debugging
-- `--fault`: Inject fault (`session_timeout`, `bad_gateway`, `slow_render`)
+- `--no-headless`: Run with visible browser window for debugging
+- `--allow-irreversible`: Caller opt-in for an irreversible capability (an approval of its exact content is also required)
+- Faults are not a `cua replay` flag: they are armed on the mock app via `POST /_control/arm`
+  (`transient_load`, `session_timeout`, `undeclared_dialog`, `validation_error`)
 
 ### `cua console`
 ```bash

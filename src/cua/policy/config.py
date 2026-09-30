@@ -12,7 +12,7 @@ emptied the danger lexicon would be the worst possible failure here.
 from __future__ import annotations
 
 import re
-from typing import Any
+from typing import Any, Literal
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field
@@ -56,13 +56,30 @@ class RiskPolicy(_Doc):
     lexicon: RiskLexicon = Field(default_factory=RiskLexicon)
 
 
+DispositionValue = Literal[
+    "allow",
+    "allow_if_declared",
+    "allow_if_approved",
+    "require_confirmation",
+    "block_and_escalate",
+]
+"""A closed set, checked at load. As free text, a misspelled value fell through every branch of
+`PolicyEngine.authorize` to *allow* -- so a typo in the one word guarding irreversible actions would
+have been the thing that permitted them."""
+
+
 class Disposition(_Doc):
     """What to do with each risk tier. Keyed by actor, because escalation deliberately widens a
-    human's authority -- auditably -- rather than disabling the chokepoint."""
+    human's authority -- auditably -- rather than disabling the chokepoint.
 
-    safe: str = "allow"
-    elevated: str = "allow"
-    irreversible: str = "block_and_escalate"
+    `allow_if_approved` permits a step only when the artifact declares it at this tier and the run
+    presents a grant that clears `replay_gates` (see `cua.policy.irreversible`). The default stays
+    `block_and_escalate`, so a policy file that omits the entry permits nothing irreversible.
+    """
+
+    safe: DispositionValue = "allow"
+    elevated: DispositionValue = "allow"
+    irreversible: DispositionValue = "block_and_escalate"
 
 
 class ReplayGates(_Doc):
@@ -98,7 +115,7 @@ class PolicyConfig(_Doc):
     budgets: Budgets = Field(default_factory=Budgets)
     redaction: RedactionPolicy = Field(default_factory=RedactionPolicy)
 
-    def disposition_for(self, actor: Actor, risk: ActionRisk) -> str:
+    def disposition_for(self, actor: Actor, risk: ActionRisk) -> DispositionValue:
         """How this actor's action at this tier should be handled.
 
         Unknown actor or tier falls through to the most restrictive answer. A policy lookup that

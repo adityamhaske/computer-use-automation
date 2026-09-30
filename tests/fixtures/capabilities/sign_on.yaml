@@ -1,0 +1,100 @@
+# Re-authentication, hand-authored against the mock back-office.
+#
+# The capability `corebank.member.savings_balance` names as its `session_expired` remedy
+# (`run_capability`). That rule pointed at this id for a long time while no such capability existed
+# anywhere, so the remedy could not have run even had the executor supported it.
+#
+# Run as a remedy it starts on the screen the session was bounced to -- the sign-on form inside the
+# content frame -- and does not navigate, because navigating would discard what it was called to
+# repair. Run on its own, its entrypoint is the frameset, which shows the same form when signed out.
+
+schema_version: "1.0.0"
+id: corebank.auth.sign_on
+version: 1.0.0
+title: Sign the operator back on
+description: >-
+  Sign on with this deployment's operator credentials from the sign-on screen. Declared as the
+  re-authentication remedy of other MemberDesk capabilities. The credentials are secret references,
+  resolved at dispatch from CUA_SECRET_COREBANK_OPERATOR_ID and CUA_SECRET_COREBANK_OPERATOR_PASSWORD
+  and never written to the artifact, the trace or a screenshot.
+
+surface:
+  kind: legacy_web
+  driver_capabilities: [semantic_tree]
+  app:
+    vendor: acme-core
+    product: MemberDesk
+    version_range: ">=4.2 <5"
+
+entrypoint:
+  url_pattern: "{base_url}/"
+
+steps:
+  - id: enter_operator_id
+    description: Type the operator ID into the sign-on form.
+    action:
+      type: type
+      value: {$secret: corebank.operator_id}
+      target:
+        role: textbox
+        name: {value: Operator ID, match: exact}
+        scope: {frame: content}
+        recorded_strategy: semantic_exact
+    precondition:
+      assert: node_exists
+      query: {role: textbox, name: Operator ID, scope: {frame: content}}
+    risk: safe
+
+  - id: enter_password
+    description: Type the operator password.
+    action:
+      type: type
+      value: {$secret: corebank.operator_password}
+      target:
+        role: textbox
+        name: {value: Password, match: exact}
+        scope: {frame: content}
+        recorded_strategy: semantic_exact
+    risk: safe
+
+  - id: submit_sign_on
+    description: Submit the sign-on form.
+    # No postcondition on purpose: refused credentials re-render the form with an error, and a
+    # "form is gone" postcondition would report that as a step failure before the declared
+    # `invalid_credentials` outcome could name it.
+    action:
+      type: click
+      target:
+        role: button
+        name: {value: Sign On, match: exact}
+        scope: {frame: content}
+        recorded_strategy: semantic_exact
+    wait: {for: navigation, timeout_ms: 8000}
+    risk: safe
+
+# Signed in, not merely "the form went away": the banner offers Sign Off only to a live session.
+checkpoint:
+  assert: all_of
+  of:
+    - assert: node_exists
+      query: {role: link, name: Sign Off, scope: {frame: content}}
+    - assert: node_absent
+      query: {role: button, name: Sign On, scope: {frame: content}}
+
+outcomes:
+  - code: invalid_credentials
+    description: The configured operator credentials were refused.
+    detect: {assert: text_present, value: Invalid operator ID or password}
+
+policy:
+  allowed_domains: ["{base_url}"]
+  allowed_actions: [type, click]
+  max_steps: 5
+  max_duration_ms: 30000
+
+provenance:
+  notes: >-
+    Hand-authored as the re-authentication remedy for the reference capability. Credentials are
+    deliberately secret references; there is no literal to review because there is none to leak.
+
+content_hash: sha256:bb69d2cd62483c8fda54b82327792cb14488968453443a80cd8ea21647af2612

@@ -22,6 +22,7 @@ from __future__ import annotations
 import time
 import uuid
 from collections import Counter
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -49,11 +50,13 @@ from cua.domain.result import (
 )
 from cua.domain.run_record import RunKind
 from cua.domain.snapshot import UiSnapshot
+from cua.domain.tenant_binding import AppliedBinding
 from cua.evidence.bus import EventType, EvidenceBus
 from cua.evidence.record import build_run_record, write_run_record
 from cua.hitl.reanchor import reconcile
 from cua.policy.config import ReplayGates
-from cua.replay.bind import UnboundReferenceError, bind_action
+from cua.policy.irreversible import IrreversibleGrant
+from cua.replay.bind import UnboundReferenceError, bind_action, resolve_value
 from cua.replay.classify import classify
 from cua.replay.inputs import InputValidationError, validate_inputs
 from cua.replay.transforms import UnknownTransformError, apply_transform
@@ -75,6 +78,13 @@ class ReplayExecutor:
     irreversible step runs unattended -- two independent gates, because either alone is one
     accident away from a wire transfer."""
 
+    applied_binding: AppliedBinding | None = None
+    """The sealed base and tenant binding the capability being run was derived from, if any.
+
+    Approval pins the base a reviewer saw; a binding reseals the effective capability under a new
+    hash. Without this, an approval of any `{base_url}` capability could never match what ran.
+    """
+
     broker: Any = None
     """An optional `SessionBroker`. When present, an escalating failure opens a real intervention
     and pauses the lease rather than merely returning NEEDS_HUMAN.
@@ -83,6 +93,14 @@ class ReplayExecutor:
     cleanly -- it reports NEEDS_HUMAN and stops, which is the honest answer when there is nobody to
     hand the session to. Typed loosely: `cua.replay` sits above `cua.hitl` in the layering and calls
     it without depending on its type."""
+
+    capabilities: Callable[[str], Capability] | None = None
+    """How a `run_capability` recovery remedy finds the capability it names, by id.
+
+    Injected rather than imported: `cua.replay` may not depend on `cua.catalog`. The source is
+    expected to verify what it returns and bind it to the same deployment as this run -- the CLI
+    wires the catalog for this. Left unset, such a remedy fails closed as RECOVERY_EXHAUSTED.
+    """
 
     session_id: str = field(default_factory=lambda: f"replay-{uuid.uuid4().hex[:8]}")
 
@@ -93,6 +111,16 @@ class ReplayExecutor:
     the operator on the Settings page as live policy, and read by no Python at all -- so turning a
     gate off there changed a displayed value and nothing else. Defaults are both-on, because a
     policy file that fails to load must not be the reason a wire transfer runs unattended.
+    """
+
+    max_steps: int | None = None
+    max_duration_ms: int | None = None
+    """The run's ceilings: `budgets.max_steps` and `budgets.max_duration_ms` in config/policy.yaml.
+
+    A capability's own `policy.max_steps` / `policy.max_duration_ms` may only narrow these, never
+    widen them -- the effective limit is the tighter of the two. `None` reads them from the
+    dispatcher's policy, the same document that authorizes every action, so no wiring path can
+    leave them out. Both were parsed, shown on the Settings page, and read by nothing.
     """
 
     max_recovery_attempts_total: int = 6
@@ -110,15 +138,29 @@ class ReplayExecutor:
     handoff is authorized under the epoch the resume produced rather than a stale one.
     """
 
+    def _step_budget(self, capability: Capability) -> int:
+        """The most steps `capability` may declare: the policy ceiling, narrowed by its own."""
+        ceiling = self.max_steps
+        if ceiling is None:
+            ceiling = self.dispatcher.policy.config.budgets.max_steps
+        return min(ceiling, capability.policy.max_steps)
+
     def _duration_exceeded(self, state: _State) -> str | None:
-        """Whether this run has outlived the budget its own artifact declares."""
-        budget = state.capability.policy.max_duration_ms
-        if budget <= 0:
-            return None
-        elapsed = int((time.monotonic() - state.started) * 1000)
-        if elapsed <= budget:
-            return None
-        return f"run exceeded the declared budget of {budget}ms (elapsed {elapsed}ms)"
+        """Whether this run -- or the run a remedy is serving -- has outlived its budget.
+
+        The budget is the tighter of the policy ceiling and the capability's own declaration; a
+        non-positive value at either level declares no limit at that level.
+        """
+        ceiling = self.max_duration_ms
+        if ceiling is None:
+            ceiling = self.dispatcher.policy.config.budgets.max_duration_ms
+        limits = [b for b in (ceiling, state.capability.policy.max_duration_ms) if b > 0]
+        if limits:
+            budget = min(limits)
+            elapsed = int((time.monotonic() - state.started) * 1000)
+            if elapsed > budget:
+                return f"run exceeded the declared budget of {budget}ms (elapsed {elapsed}ms)"
+        return self._duration_exceeded(state.parent) if state.parent is not None else None
 
     def _epochs(self) -> tuple[int, int | None]:
         """The epoch this run holds, and the lease epoch to check it against.
@@ -292,16 +334,18 @@ class ReplayExecutor:
         if (unavailable := self._lease_available()) is not None:
             return self._fail(state, FailureCode.LEASE_LOST, unavailable)
 
-        # A capability declaring more steps than its own budget allows is a contract violation, and
-        # the cheapest place to catch it is before the browser moves. `policy.max_steps` and
+        # A capability declaring more steps than its budget allows is a contract violation, and the
+        # cheapest place to catch it is before the browser moves. `policy.max_steps` and
         # `max_duration_ms` sat in the schema being read by nothing: a reviewer opening the artifact
-        # reasonably concluded replay was bounded, and it was not.
-        if len(capability.steps) > capability.policy.max_steps:
+        # reasonably concluded replay was bounded, and it was not. The budget is the tighter of the
+        # policy file's ceiling and the capability's own -- an artifact may narrow it, not widen it.
+        if len(capability.steps) > (budget := self._step_budget(capability)):
             return self._fail(
                 state,
                 FailureCode.POLICY_DENIED,
-                f"{capability.ref} declares {len(capability.steps)} steps but its own policy "
-                f"allows {capability.policy.max_steps}",
+                f"{capability.ref} declares {len(capability.steps)} steps but its step budget "
+                f"allows {budget} (the tighter of policy budgets.max_steps and the capability's "
+                f"own policy.max_steps {capability.policy.max_steps})",
             )
 
         try:
@@ -462,6 +506,7 @@ class ReplayExecutor:
             expected_epoch=current,
             capability=state.capability,
             declared_risk=step.risk,
+            grant=self._grant(),
         )
         state.steps_executed = index + 1
 
@@ -580,16 +625,9 @@ class ReplayExecutor:
 
         for remedy in rule.remedy:
             if isinstance(remedy, RunCapability):
-                # Chaining another capability (re-authentication, typically) is designed but not
-                # built. Reported honestly rather than skipped silently, which would leave the run
-                # looping on an unfixed condition until it exhausted its attempts.
-                return self._fail(
-                    state,
-                    FailureCode.RECOVERY_EXHAUSTED,
-                    f"recovery rule {rule.id!r} requires running capability "
-                    f"{remedy.capability_id!r}, which is not implemented",
-                    snapshot=snapshot,
-                )
+                if (failed := self._run_capability(state, rule, remedy, snapshot)) is not None:
+                    return failed
+                continue
             held, current = self._epochs()
             outcome = self.dispatcher.execute(
                 remedy,
@@ -612,6 +650,115 @@ class ReplayExecutor:
                     snapshot=snapshot,
                 )
         return None
+
+    def _run_capability(
+        self, state: _State, rule: RecoveryRule, remedy: RunCapability, snapshot: UiSnapshot
+    ) -> RunResult | None:
+        """Run another capability as a recovery remedy -- re-authentication, typically.
+
+        Through the same step loop as any capability, so each of its actions is resolved, authorized
+        under this run's lease and recorded on this run's evidence bus. Only two things differ. It
+        starts on the screen the condition was detected on rather than navigating to its own
+        entrypoint, because navigating would discard what it was called to repair. And its ending is
+        reported back here, where this run decides whether to retry the step, fail or escalate.
+
+        Bounded three ways: the rule's `max_attempts`, the run's total recovery budget (which the
+        remedy's own recoveries draw from), and one level of depth -- a remedy may not run a
+        capability, so a chain, or a capability naming itself, terminates rather than recursing.
+        """
+
+        def cannot(why: str) -> RunResult:
+            return self._fail(
+                state,
+                FailureCode.RECOVERY_EXHAUSTED,
+                f"recovery rule {rule.id!r} cannot run capability {remedy.capability_id!r}: {why}",
+                snapshot=snapshot,
+            )
+
+        if state.parent is not None:
+            return cannot(
+                "it was reached from inside another recovery capability; remedies do not nest"
+            )
+        if remedy.capability_id == state.capability.id:
+            return cannot("a capability cannot be its own remedy")
+        if self.capabilities is None:
+            return cannot("no capability source is configured for this run")
+        try:
+            capability = self.capabilities(remedy.capability_id)
+        except (LookupError, ValueError) as exc:
+            return cannot(str(exc))
+        if not capability.hash_is_valid():
+            # Looked up by name at run time, so the evidence has to be able to say exactly which
+            # content ran. An unsealed or edited remedy cannot answer that.
+            return cannot(f"{capability.ref} does not match its content hash")
+        if len(capability.steps) > (budget := self._step_budget(capability)):
+            return cannot(
+                f"it declares {len(capability.steps)} steps but its step budget allows {budget}"
+            )
+        try:
+            inputs = validate_inputs(
+                capability,
+                {
+                    name: resolve_value(value, inputs=state.inputs, outputs=state.outputs)
+                    for name, value in remedy.inputs.items()
+                },
+            )
+        except (InputValidationError, UnboundReferenceError) as exc:
+            return cannot(str(exc))
+        if (gate := self._approval_gate(capability)) is not None:
+            return self._fail(
+                state,
+                FailureCode.POLICY_DENIED,
+                f"recovery rule {rule.id!r} cannot run {capability.ref}: {gate}",
+                snapshot=snapshot,
+            )
+
+        self.evidence.emit(
+            EventType.RECOVERY,
+            actor=Actor.AUTOMATION,
+            rule=rule.id,
+            remedy=remedy.type,
+            capability=capability.ref,
+            content_hash=capability.content_hash,
+        )
+
+        remedial = _State(
+            capability=capability,
+            run_id=state.run_id,
+            started=time.monotonic(),
+            inputs=inputs,
+            recovery_attempts=state.recovery_attempts,
+            parent=state,
+        )
+        # The remedy's own `sensitive` declarations have to reach every sink while it runs, without
+        # unmasking this run's once it returns.
+        masked = self.evidence.sensitive_keys
+        self.evidence.sensitive_keys = masked | capability.sensitive_names
+        try:
+            for index, step in enumerate(capability.steps):
+                if (ended := self._run_step(remedial, step, index)) is not None:
+                    break
+            else:
+                ended = self._verify_checkpoint(remedial)
+        finally:
+            self.evidence.sensitive_keys = masked
+            state.recovery_attempts = remedial.recovery_attempts
+
+        if ended.status is RunStatus.SUCCESS:
+            return None
+        why = (
+            ended.error.message
+            if ended.error
+            else f"it ended in declared outcome {ended.outcome.code!r}"
+            if ended.outcome
+            else ended.status.value
+        )
+        return self._fail(
+            state,
+            ended.error.code if ended.error else FailureCode.RECOVERY_EXHAUSTED,
+            f"recovery rule {rule.id!r} ran {capability.ref}, which did not complete: {why}",
+            snapshot=snapshot,
+        )
 
     # ------------------------------------------------------------ checkpoint
 
@@ -637,9 +784,9 @@ class ReplayExecutor:
                 expected=state.capability.checkpoint.describe(),
             )
 
-        self.evidence.emit(
+        self._emit_end(
+            state,
             EventType.RUN_END,
-            actor=Actor.AUTOMATION,
             status=RunStatus.SUCCESS.value,
             outputs=sorted(state.outputs),
             drift_score=state.drift_score,
@@ -667,9 +814,9 @@ class ReplayExecutor:
             key: (state.inputs.get(value.input_name, "") if hasattr(value, "input_name") else value)
             for key, value in outcome.returns.items()
         }
-        self.evidence.emit(
+        self._emit_end(
+            state,
             EventType.RUN_END,
-            actor=Actor.AUTOMATION,
             status=RunStatus.BUSINESS_OUTCOME.value,
             outcome=outcome.code,
         )
@@ -700,8 +847,9 @@ class ReplayExecutor:
         resolution_debug: ResolutionDebug | None = None,
     ) -> RunResult:
         """Terminate. Escalates rather than failing when the capability says a human decides."""
+        remedy = state.parent is not None
         capture_ref = None
-        if snapshot is not None and self.capture is not None:
+        if snapshot is not None and self.capture is not None and not remedy:
             capture_ref = self.capture.capture(
                 snapshot, label=code.value, capability=state.capability, reason=message
             )
@@ -730,8 +878,11 @@ class ReplayExecutor:
             ),
         )
 
+        # A failing remedy never escalates on its own: the run it serves turns this into its own
+        # failure and escalates by *its* triggers, so one failure opens one intervention.
         escalates = (
-            code in state.capability.escalation.triggers
+            not remedy
+            and code in state.capability.escalation.triggers
             and state.capability.escalation.policy.value == "pause_and_request_human"
         )
 
@@ -753,9 +904,9 @@ class ReplayExecutor:
             )
             intervention_id = request.intervention_id
 
-        self.evidence.emit(
+        self._emit_end(
+            state,
             EventType.ESCALATE if escalates else EventType.RUN_END,
-            actor=Actor.AUTOMATION,
             status=(RunStatus.NEEDS_HUMAN if escalates else RunStatus.FAILED).value,
             code=code.value,
             step=step.id if step else None,
@@ -797,32 +948,43 @@ class ReplayExecutor:
             )
         return RunResult(status=RunStatus.FAILED, error=detail, **common)
 
+    def _emit_end(self, state: _State, event: EventType, **fields: Any) -> None:
+        """Record how a run ended -- or, for a capability run as a remedy, how the remedy ended.
+
+        A remedy's ending is not the run's. Emitting RUN_END or ESCALATE from inside one would
+        record the run as over while it carries on, so it is noted against the run instead.
+        """
+        if state.parent is not None:
+            self.evidence.emit(
+                EventType.NOTE,
+                actor=Actor.AUTOMATION,
+                note="recovery capability ended",
+                capability=state.capability.ref,
+                **fields,
+            )
+            return
+        self.evidence.emit(event, actor=Actor.AUTOMATION, **fields)
+
     # ------------------------------------------------------------- approval
 
+    def _grant(self) -> IrreversibleGrant:
+        """What this run presents to policy for an irreversible step. Verified there, every time."""
+        return IrreversibleGrant(
+            approval=self.approval,
+            caller_opt_in=self.allow_irreversible,
+            applied_binding=self.applied_binding,
+        )
+
     def _approval_gate(self, capability: Capability) -> str | None:
-        """Two independent gates on an irreversible capability, or it does not run unattended."""
+        """Two independent gates on an irreversible capability, or it does not run unattended.
+
+        A pre-flight check, so an unapproved capability is refused before the browser moves. It is
+        not the authority: `PolicyEngine` repeats the same check at the irreversible dispatch
+        itself, against the policy file's own `replay_gates`, so the stricter of the two wins.
+        """
         if capability.max_risk is not ActionRisk.IRREVERSIBLE:
             return None
-        if self.replay_gates.irreversible_requires_caller_optin and not self.allow_irreversible:
-            return (
-                "this capability performs an irreversible action and the caller did not opt in "
-                "(allow_irreversible)"
-            )
-        if self.replay_gates.irreversible_requires_approval:
-            # Against the *verified* hash, not the declared one. `capability.content_hash` is a
-            # line in a file the editor also controls: an edited artifact keeps its old declared
-            # hash, so comparing against it meant the stale approval still matched and a tampered
-            # capability ran unattended. `hash_is_valid()` recomputes from the content, which is
-            # the only version of this check that means anything.
-            verified = capability.content_hash if capability.hash_is_valid() else ""
-            if self.approval is None or not self.approval.permits_unattended_replay(
-                content_hash=verified
-            ):
-                return (
-                    f"this capability performs an irreversible action and {capability.ref} is not "
-                    "approved at this exact content hash"
-                )
-        return None
+        return self._grant().refusal(capability, self.replay_gates)
 
 
 @dataclass
@@ -845,6 +1007,12 @@ class _State:
     drifted: int = 0
     recovery_attempts: int = 0
     strategies: Counter[str] = field(default_factory=Counter)
+    parent: _State | None = None
+    """Set when this capability is running as another run's recovery remedy.
+
+    Its ending then belongs to that run: no terminal event, no capture, no escalation of its own --
+    the run it serves decides all three. It also bounds nesting: a remedy may not run another.
+    """
 
     @property
     def elapsed_ms(self) -> int:

@@ -9,18 +9,20 @@ breaks on violation is an invariant.
 
 | Claim | Test | Kind |
 |---|---|---|
-| Replay never calls or imports the LLM | `invariants/test_no_llm_in_replay.py` + `.importlinter:no-llm-in-replay` | static + runtime |
+| Replay never calls or imports the LLM | `invariants/test_import_contracts.py`, `integration/test_fault_matrix.py::test_replay_uses_no_model` + `.importlinter:no-llm-in-replay` | static + runtime |
 | Policy chokepoint is unbypassable | `invariants/test_policy_chokepoint.py` + `.importlinter:policy-chokepoint` | static + runtime |
 | Human control cannot bypass policy or evidence | `invariants/test_human_control_safety.py` | runtime |
-| Stale automation cannot act after takeover | `unit/test_lease.py` | unit |
-| Ambiguous targets are refused, not guessed | `unit/test_resolver_ambiguity.py` | unit |
-| Unknown states fail closed | `integration/test_fail_closed.py` | integration |
-| Replay is deterministic | `invariants/test_determinism.py` | integration |
+| Stale automation cannot act after takeover | `integration/test_handoff.py::test_automation_cannot_act_after_a_human_claims_the_live_session`, `integration/test_dispatcher.py::test_a_stale_lease_epoch_is_refused_before_anything_else` | integration |
+| Ambiguous targets are refused, not guessed | `unit/test_resolver.py::test_ambiguity_is_refused_not_tiebroken` | unit |
+| Unknown states fail closed | `integration/test_fault_matrix.py::test_an_undeclared_screen_fails_closed` | integration |
+| Replay is deterministic | `integration/test_fault_matrix.py::test_repeated_replays_produce_identical_decisions` | integration |
 | Every sink is redacted | `invariants/test_redaction.py` | integration |
 | Business outcomes are not failures | `integration/test_fault_matrix.py` | integration |
 | Targeting is surface-neutral / no CSS dependence | `integration/test_variant_b.py` | integration |
-| Capabilities are immutable and content-addressed | `contract/test_capability_immutability.py` | contract |
-| The artifact is the tool contract | `contract/test_json_schema_export.py` | contract |
+| Capabilities are immutable and content-addressed | `contract/test_capability_schema.py::test_capability_is_frozen`, `::test_tampering_is_detected`, `integration/test_catalog.py::test_an_artifact_edited_in_place_is_refused` | contract |
+| The artifact is the tool contract | `contract/test_capability_schema.py::test_exports_an_agent_callable_tool_schema` | contract |
+| An irreversible step runs only under a verified, scoped approval | `integration/test_irreversible_approval.py` | integration |
+| `run_capability` remedies go through the chokepoint and are bounded | `integration/test_capability_remedy.py`, `integration/test_fault_matrix.py::test_an_expired_session_is_re_authenticated_by_the_declared_remedy` | integration |
 | `domain/` is pure | `.importlinter:pure-domain` | static |
 
 ## Layers

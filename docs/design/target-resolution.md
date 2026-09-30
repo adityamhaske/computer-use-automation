@@ -8,7 +8,9 @@ lost.
 
 ## The ladder
 
-Strategies are tried in this **fixed order**. The first that yields exactly one candidate wins.
+Strategies are tried in this **fixed order**. The first rung that yields any candidate decides:
+exactly one wins; more than one is refused (below) unless the descriptor carries an explicit
+`ordinal`. A rung with several candidates does not fall through to the next.
 
 | # | Strategy | Matches on | Survives |
 |---|---|---|---|
@@ -17,7 +19,7 @@ Strategies are tried in this **fixed order**. The first that yields exactly one 
 | 3 | `structural_anchor` | position relative to nearby text — *"the textbox in the row whose first cell reads 'Member Number'"* | **controls with no usable name at all** |
 | 4 | `hint_cached` | the stored CSS/node-path hint | nothing structural; it is a speed optimization |
 | 5 | `ordinal_in_region` | Nth control of a role within a scope | rebranding; last resort before refusal |
-| 6 | `vision` | OCR / bounding box | **discovery only — hard-disabled in replay** |
+| 6 | `vision` | OCR / bounding box | **not implemented** — no generator exists; replay excludes it by construction |
 
 Rung 3 is the one that makes legacy enterprise apps tractable. Those apps are full of controls with
 no name, no label, and no test ID, sitting in a table cell next to the text that identifies them. A
@@ -45,17 +47,20 @@ already handles it.
 ## Determinism rules
 
 1. Ladder order is fixed and configuration-frozen into the `RunRecord`.
-2. Within a strategy, candidates are scored by a **pure** function of `(descriptor, node, snapshot)`.
-3. Ties break by **snapshot document order** — never by set/dict iteration order, never by a clock,
-   never randomly.
+2. Within a strategy, candidates are *filtered*, not scored, by a **pure** function of
+   `(descriptor, snapshot)`, and returned in **snapshot document order** — never set/dict iteration
+   order, never a clock, never randomly.
+3. There is no tie-break. Several survivors are a refusal; the one exception is an explicit
+   `ordinal` in the descriptor, which indexes into that document order.
 4. `vision` is unreachable in replay (asserted by test, not merely by configuration).
 5. Same artifact + same inputs + same app state ⇒ byte-identical decision trace.
 
 ## Ambiguity is refusal, not a tiebreak
 
-If two or more candidates survive above the ambiguity threshold, the resolver raises
-`TARGET_AMBIGUOUS` and the run stops. It does **not** pick the first, the topmost, or the
-highest-scoring.
+If a rung yields two or more candidates and the descriptor carries no explicit `ordinal`, the
+resolver raises `TARGET_AMBIGUOUS` and the run stops. It does **not** pick the first, the topmost, or
+the highest-scoring. There is no threshold to tune: the reported `ambiguity` figure,
+`(candidates − 1) / candidates`, is for debugging and is never compared against anything.
 
 This is a deliberate trade against convenience. In a back-office banking application, two plausible
 "Submit" buttons mean the screen is not what we think it is, and acting on either is how an
@@ -70,7 +75,7 @@ quality problem; a non-zero wrong-action rate is a safety incident.
 Each resolution records:
 
 ```python
-{ strategy_recorded, strategy_used, candidates_considered, score, ambiguity, fingerprint_match }
+{ strategy_recorded, strategy_used, candidates_considered, ambiguity, fingerprint_match }
 ```
 
 Resolving via a *lower-priority* strategy than the one recorded at discovery is **drift** — a
@@ -116,7 +121,8 @@ There is no automatic recovery here, and that is correct. Inferring that "Saving
 "Savings Balance" is a fuzzy guess, and a system that guesses which row holds a balance will
 eventually read the wrong one. So the designed behaviour is:
 
-1. Resolution fails → `TARGET_NOT_FOUND`, with a high `drift_score` naming the diverged step
+1. Resolution fails → `TARGET_NOT_FOUND`, naming the step and the rungs it tried (there is no
+   drift score for it: drift is measured on resolutions that succeed)
 2. A four-line `TenantBinding` overlay supplies the new label ([ADR 0005](../adr/0005-tenant-overlay-not-fork.md))
 3. The replay succeeds
 

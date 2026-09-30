@@ -32,7 +32,7 @@ from cua.agent.stop import Budget
 from cua.agent.tools import TOOL_NAMES, TOOLS
 from cua.domain.action import Action, Click, Navigate, PressKey, Select, Type
 from cua.domain.actor import Actor
-from cua.domain.discovery import DiscoveryRun, DiscoveryStep, StopReason
+from cua.domain.discovery import TERMINAL_TOOLS, DiscoveryRun, DiscoveryStep, StopReason
 from cua.domain.run_record import RunKind
 from cua.domain.snapshot import UiSnapshot
 from cua.domain.target import TargetDescriptor
@@ -125,6 +125,13 @@ class DiscoveryAgent:
                 continue
 
             call = response.tool_calls[0]
+
+            if call.name in TERMINAL_TOOLS:
+                # The turn that ends the run is a model call like any other, and its tokens were
+                # spent. Both branches below `break` before the accounting at the bottom of the
+                # loop, so the budget used to stop one call short of the trace: the recorded run
+                # reported 8,332 tokens where its own `llm_call` events summed to 10,215.
+                self.budget.record_step(tokens=response.total_tokens, progressed=True, denied=False)
 
             if call.name == "finish":
                 summary = str(call.arguments.get("summary", ""))

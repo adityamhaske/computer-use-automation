@@ -78,6 +78,11 @@ A recovery rule is declared in the artifact with a detector, a remedy, `max_atte
 optional backoff. It cannot be open-ended and it cannot be invented at runtime. Exceeding
 `max_attempts` converts to `RECOVERY_EXHAUSTED`.
 
+A remedy may be an action (`reload`) or `run_capability`, which runs another capability —
+re-authentication, typically — through the same step loop and chokepoint, on the screen where the
+condition was detected. It is one level deep (a remedy may not run a capability of its own), its
+own recoveries draw on the run's total, and its failure becomes the run's failure, escalated once.
+
 This matters because unbounded recovery is how automations turn a transient 503 into a thousand
 retries against a struggling core banking system.
 
@@ -89,8 +94,8 @@ retries against a struggling core banking system.
 |---|---|---|
 | `member_id` with no record | `BUSINESS_OUTCOME` | `member_not_found` |
 | `transient_load` (502 once) | `SUCCESS` | recovered after retry |
-| `transient_load` (502 always) | `FAILED` | `RECOVERY_EXHAUSTED` |
-| `session_timeout` | `SUCCESS` or `NEEDS_HUMAN` | re-auth recovery, else escalate |
+| `transient_load` (502 always) | `NEEDS_HUMAN` | `RECOVERY_EXHAUSTED` (an escalation trigger of the reference capability) |
+| `session_timeout` | `SUCCESS` | re-authenticated by `run_capability corebank.auth.sign_on`; escalates as `RECOVERY_EXHAUSTED` if that capability cannot be found or run |
 | undeclared interstitial dialog | `NEEDS_HUMAN` | `UNEXPECTED_STATE` |
 | `validation_error` on submit | `BUSINESS_OUTCOME` | `validation_rejected` |
 

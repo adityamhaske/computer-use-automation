@@ -23,19 +23,28 @@ cua replay evidence/capabilities/corebank.member.savings_balance@1.0.0.yaml \
 
 ## Exercising the error paths
 
-```bash
-cua replay <artifact> --input member_id=99999           # BUSINESS_OUTCOME(member_not_found)
-cua replay <artifact> --fault transient_load            # RECOVERABLE -> recovered -> SUCCESS
-cua replay <artifact> --fault transient_load --always   # RECOVERY_EXHAUSTED
-cua replay <artifact> --fault undeclared_dialog         # UNEXPECTED_STATE -> fails closed
-cua replay <artifact> --fault session_timeout           # re-auth recovery, else escalate
-```
+Faults are armed on the mock app out of band, never through `cua replay` (it has no fault flag):
+`POST /_control/arm` with `{"fault": <name>, "count": <n>}` (`-1` = every request), after signing
+in. `cua console --capability <ref> --arm-fault <name>` does the same for a supervised run.
+
+| Input / armed fault | Result |
+|---|---|
+| `--input member_id=99999` | `BUSINESS_OUTCOME(member_not_found)` |
+| `transient_load`, count 1 | `RECOVERABLE` -> recovered -> `SUCCESS` |
+| `transient_load`, count -1 | `RECOVERY_EXHAUSTED` -> escalates (`NEEDS_HUMAN`) |
+| `undeclared_dialog` | `UNEXPECTED_STATE` -> fails closed |
+| `session_timeout` | re-authenticated by `run_capability corebank.auth.sign_on` -> `SUCCESS`; escalates if that cannot run |
+
+The `session_timeout` remedy needs `corebank.auth.sign_on` in the catalog
+(`tests/fixtures/capabilities/sign_on.yaml`) and the operator credentials as secrets:
+`CUA_SECRET_COREBANK_OPERATOR_ID` and `CUA_SECRET_COREBANK_OPERATOR_PASSWORD`. Without either it
+fails closed as `RECOVERY_EXHAUSTED`.
 
 ## Debugging a failure
 
-`evidence/replay/<run_id>/run_record.json` carries, per step: the resolution strategy that won, how
-many candidates were considered, the ambiguity score, the fingerprint comparison, and expected vs
-observed at each assertion.
+`evidence/replay/<run_id>/run_record.json` carries, per step: the resolution strategy that won and
+how many candidates were considered. A failure's `error` carries the step, expected and observed,
+and for a targeting failure the rungs tried, the candidates seen and their ambiguity.
 
 | Failure | Usual cause |
 |---|---|
@@ -48,7 +57,9 @@ observed at each assertion.
 ## Determinism
 
 Same artifact + same inputs + same app state ⇒ identical decision trace. If two replays diverge,
-that is a **bug in this system**, not flakiness — `invariants/test_determinism.py` exists to catch it.
+that is a **bug in this system**, not flakiness —
+`integration/test_fault_matrix.py::test_repeated_replays_produce_identical_decisions` exists to
+catch it.
 
 Rising `drift_score` across runs means the UI is moving under the artifact. That is the window in
 which a re-record or a tenant overlay is cheap.

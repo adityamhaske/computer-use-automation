@@ -57,7 +57,7 @@ profile**:
 | Domain allowlist | enforced | **enforced** |
 | `safe` actions | allow | allow |
 | `elevated` actions | allow if declared | allow, recorded |
-| `irreversible` actions | block → escalate | allow **with explicit console confirmation**, recorded |
+| `irreversible` actions | refused, unless the step is declared irreversible **and** the run carries an approval of that exact content plus the caller's opt-in (`allow_if_approved`, checked at dispatch) | allow **with explicit console confirmation**, recorded |
 | Off-artifact navigation | `NAVIGATION_BLOCKED` | allowed within allowlist, recorded |
 | Evidence redaction | applied | **applied** |
 

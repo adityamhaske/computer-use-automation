@@ -33,10 +33,12 @@ cua discover \
 
 ```
 evidence/discovery/<run_id>/
-  trace.jsonl        authorize / resolve / dispatch / observe, actor-tagged
+  trace.jsonl        authorize / resolve / dispatch / observe, actor-tagged;
+                     run_end carries the stop reason and budget (steps, tokens, elapsed)
   snapshots/         UiSnapshot per step
   screenshots/       redacted
-  run_record.json    status, timings, budget
+  run_record.json    timings, model, tokens_used -- summed from the llm_call events,
+                     and equal to the budget's token count
 evidence/capabilities/<id>@<version>.yaml
 ```
 

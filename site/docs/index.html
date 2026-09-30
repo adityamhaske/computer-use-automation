@@ -618,7 +618,7 @@ evidence/         proof that the end-to-end thread actually ran
       <tr><td>Domain allowlist</td><td>enforced</td><td><strong>enforced</strong></td></tr>
       <tr><td><code>safe</code> actions</td><td>allow</td><td>allow</td></tr>
       <tr><td><code>elevated</code> actions</td><td>allow if declared</td><td>allow, recorded</td></tr>
-      <tr><td><code>irreversible</code> actions</td><td>block → escalate</td><td>allow <strong>with confirmation</strong>, recorded</td></tr>
+      <tr><td><code>irreversible</code> actions</td><td>refused, unless the step is declared irreversible <strong>and</strong> the run carries an approval of that exact content plus the caller's opt-in (<code>allow_if_approved</code>, checked at dispatch)</td><td>allow <strong>with confirmation</strong>, recorded</td></tr>
       <tr><td>Off-artifact navigation</td><td>NAVIGATION_BLOCKED</td><td>allowed within allowlist, recorded</td></tr>
       <tr><td>Evidence redaction</td><td>applied</td><td><strong>applied</strong></td></tr>
     </tbody>
@@ -746,7 +746,7 @@ recovery:
   <p class="lead">Resolution is where determinism is won or lost. Turning a semantic TargetDescriptor into a concrete UiNode in the current snapshot.</p>
 
   <h2>The resolution ladder</h2>
-  <p>Strategies are tried in fixed order. The first that yields exactly one candidate wins.</p>
+  <p>Strategies are tried in fixed order. The first rung that yields any candidate decides: exactly one wins; more than one is refused unless the descriptor carries an explicit <code>ordinal</code>. A rung with several candidates does not fall through to the next.</p>
   <table>
     <thead><tr><th>#</th><th>Strategy</th><th>Matches on</th><th>Survives</th></tr></thead>
     <tbody>
@@ -755,7 +755,7 @@ recovery:
       <tr><td>3</td><td><code>structural_anchor</code></td><td>position relative to nearby text</td><td><strong>controls with no usable name at all</strong></td></tr>
       <tr><td>4</td><td><code>hint_cached</code></td><td>stored CSS/node-path hint</td><td>nothing structural; speed optimization</td></tr>
       <tr><td>5</td><td><code>ordinal_in_region</code></td><td>Nth control of a role within a scope</td><td>rebranding; last resort before refusal</td></tr>
-      <tr><td>6</td><td><code>vision</code></td><td>OCR / bounding box</td><td><strong>discovery only — hard-disabled in replay</strong></td></tr>
+      <tr><td>6</td><td><code>vision</code></td><td>OCR / bounding box</td><td><strong>not implemented</strong> — no generator exists; replay excludes it by construction</td></tr>
     </tbody>
   </table>
 
@@ -763,7 +763,7 @@ recovery:
   <p>Rung 4 is a <strong>cache, not an identity</strong>. A hint is accepted only if the node it resolves to also satisfies the semantic assertion.</p>
 
   <h2>Ambiguity is refusal</h2>
-  <p>If two or more candidates survive above the ambiguity threshold, the resolver raises <code>TARGET_AMBIGUOUS</code> and the run stops. It does <strong>not</strong> pick the first, the topmost, or the highest-scoring.</p>
+  <p>If a rung yields two or more candidates and the descriptor carries no explicit <code>ordinal</code>, the resolver raises <code>TARGET_AMBIGUOUS</code> and the run stops. It does <strong>not</strong> pick the first, the topmost, or the highest-scoring. There is no threshold to tune: the reported <code>ambiguity</code> figure, <code>(candidates − 1) / candidates</code>, is for debugging and is never compared against anything.</p>
   <p>Two plausible "Submit" buttons mean the screen is not what we think it is, and acting on either is how an automation posts a transaction to the wrong account. A refusal is recoverable — a wrong click may not be.</p>
 
   <h2>Drift</h2>
@@ -838,8 +838,8 @@ recovery:
     <tbody>
       <tr><td>member_id with no record</td><td><code>BUSINESS_OUTCOME</code></td><td><code>member_not_found</code></td></tr>
       <tr><td>transient_load (502 once)</td><td><code>SUCCESS</code></td><td>recovered after retry</td></tr>
-      <tr><td>transient_load (502 always)</td><td><code>FAILED</code></td><td><code>RECOVERY_EXHAUSTED</code></td></tr>
-      <tr><td>session_timeout</td><td><code>SUCCESS</code> or <code>NEEDS_HUMAN</code></td><td>re-auth or escalate</td></tr>
+      <tr><td>transient_load (502 always)</td><td><code>NEEDS_HUMAN</code></td><td><code>RECOVERY_EXHAUSTED</code> (an escalation trigger of the reference capability)</td></tr>
+      <tr><td>session_timeout</td><td><code>SUCCESS</code></td><td>re-authenticated by <code>run_capability corebank.auth.sign_on</code>; escalates as <code>RECOVERY_EXHAUSTED</code> if that cannot run</td></tr>
       <tr><td>undeclared interstitial</td><td><code>NEEDS_HUMAN</code></td><td><code>UNEXPECTED_STATE</code></td></tr>
       <tr><td>validation_error on submit</td><td><code>BUSINESS_OUTCOME</code></td><td><code>validation_rejected</code></td></tr>
       <tr><td>permission-denied account</td><td><code>BUSINESS_OUTCOME</code></td><td><code>permission_denied</code></td></tr>
@@ -858,11 +858,13 @@ recovery:
   <pre><code>RUNNING ──escalate──► PAUSED ──human_claim──► HUMAN_CONTROL
    ▲                  (epoch++)               (epoch++)
    │                                                │
-   └── RESUMING ◄── re-anchor + reconcile ◄── human_release (epoch++)</code></pre>
+   └── resume (epoch++) ◄── RESUMING ◄── human_release (epoch++)</code></pre>
+  <p>Re-anchoring happens after the lease is back in <code>RUNNING</code>: <code>ReplayExecutor.resume()</code> reconciles against the live screen before its first action. <code>cua demo</code> drives that resume; the operator console's <strong>Release</strong> returns the lease to automation but does not itself restart the run.</p>
 
   <h2>The lease</h2>
   <pre><code><span class="type">Lease</span>(holder: Actor, epoch: int, expires_at: datetime)</code></pre>
-  <p><code>holder ∈ {AUTOMATION, HUMAN, NONE}</code>. Every transition increments <code>epoch</code> monotonically. Every <code>dispatch()</code> asserts <code>lease.held_by(actor, epoch)</code>.</p>
+  <p><code>holder ∈ {AUTOMATION, HUMAN, SYSTEM}</code> — <code>SYSTEM</code> while the session is <code>PAUSED</code> or <code>RESUMING</code>, when nobody may act. Every transition increments <code>epoch</code> monotonically.</p>
+  <p>An operator's input is refused by the broker unless <code>lease.assert_held(HUMAN, epoch)</code> passes. An automation run checks that it holds the session when it starts (or resumes), then carries its epoch into every dispatch, and the dispatcher refuses a stale one with <code>LEASE_LOST</code>. Every change of holder advances the epoch, so the two checks together cover every dispatch.</p>
 
   <h2>Escalation triggers</h2>
   <table>
@@ -873,19 +875,18 @@ recovery:
       <tr><td><code>CHECKPOINT_FAILED</code></td><td>Reached the end, didn't reach the state</td></tr>
       <tr><td><code>RECOVERY_EXHAUSTED</code></td><td>A transient condition wasn't transient</td></tr>
       <tr><td><code>UNEXPECTED_STATE</code></td><td>Fail-closed default</td></tr>
-      <tr><td><code>risky_action_unapproved</code></td><td>Irreversible action needs human approval</td></tr>
+      <tr><td><code>POLICY_DENIED</code></td><td>Policy refused an action (e.g. an irreversible step with no approval) — only if the capability lists it; the default triggers do not</td></tr>
     </tbody>
   </table>
 
   <h2>Re-anchoring after handoff</h2>
-  <p>On <code>human_release</code> the executor:</p>
+  <p>On <code>human_release</code> the broker <strong>snapshot-diffs</strong> pre-handoff against post-handoff and records <code>human_delta</code>. When the run is then resumed, <code>ReplayExecutor.resume()</code> scans forward from the step that escalated:</p>
   <ol>
-    <li><strong>Snapshot-diffs</strong> pre-handoff against post-handoff → records <code>human_delta</code></li>
-    <li><strong>Re-evaluates preconditions</strong> from the current step forward</li>
-    <li><strong>Skips forward</strong> to the first step whose precondition isn't satisfied — doesn't redo human work</li>
-    <li>If the state matches <strong>no</strong> step's precondition → <code>UNEXPECTED_STATE</code>, <strong>fails closed</strong></li>
+    <li>A step whose <strong>postcondition already holds</strong> is skipped — doesn't redo human work. A step with no postcondition is never skipped.</li>
+    <li>The run resumes at the first step not visibly done — <strong>provided its precondition holds</strong></li>
+    <li>Otherwise → <code>UNEXPECTED_STATE</code>, <strong>fails closed</strong></li>
   </ol>
-  <p>Step 4 is the fail-closed rule applied to the handoff seam. "The human left the session somewhere I don't recognize" is exactly the moment not to improvise.</p>
+  <p>Step 3 is the fail-closed rule applied to the handoff seam. "The human left the session somewhere I don't recognize" is exactly the moment not to improvise.</p>
 </div>
 
 <!-- ================================ ADR 0001 ================================ -->
@@ -1078,17 +1079,19 @@ overrides:
   <table>
     <thead><tr><th>Claim</th><th>Test</th><th>Kind</th></tr></thead>
     <tbody>
-      <tr><td>Replay never calls the LLM</td><td><code>invariants/test_no_llm_in_replay.py</code> + <code>.importlinter</code></td><td>static + runtime</td></tr>
+      <tr><td>Replay never calls the LLM</td><td><code>invariants/test_import_contracts.py</code>, <code>integration/test_fault_matrix.py::test_replay_uses_no_model</code> + <code>.importlinter</code></td><td>static + runtime</td></tr>
       <tr><td>Policy chokepoint unbypassable</td><td><code>invariants/test_policy_chokepoint.py</code></td><td>static + runtime</td></tr>
       <tr><td>Human control cannot bypass policy</td><td><code>invariants/test_human_control_safety.py</code></td><td>runtime</td></tr>
-      <tr><td>Stale automation refused</td><td><code>unit/test_lease.py</code></td><td>unit</td></tr>
-      <tr><td>Ambiguous targets refused</td><td><code>unit/test_resolver_ambiguity.py</code></td><td>unit</td></tr>
-      <tr><td>Unknown states fail closed</td><td><code>integration/test_fail_closed.py</code></td><td>integration</td></tr>
-      <tr><td>Replay is deterministic</td><td><code>invariants/test_determinism.py</code></td><td>integration</td></tr>
+      <tr><td>Stale automation refused</td><td><code>integration/test_handoff.py::test_automation_cannot_act_after_a_human_claims_the_live_session</code>, <code>integration/test_dispatcher.py::test_a_stale_lease_epoch_is_refused_before_anything_else</code></td><td>integration</td></tr>
+      <tr><td>Ambiguous targets refused</td><td><code>unit/test_resolver.py::test_ambiguity_is_refused_not_tiebroken</code></td><td>unit</td></tr>
+      <tr><td>Unknown states fail closed</td><td><code>integration/test_fault_matrix.py::test_an_undeclared_screen_fails_closed</code></td><td>integration</td></tr>
+      <tr><td>Replay is deterministic</td><td><code>integration/test_fault_matrix.py::test_repeated_replays_produce_identical_decisions</code></td><td>integration</td></tr>
       <tr><td>Every sink is redacted</td><td><code>invariants/test_redaction.py</code></td><td>integration</td></tr>
       <tr><td>Business outcomes ≠ failures</td><td><code>integration/test_fault_matrix.py</code></td><td>integration</td></tr>
       <tr><td>Targeting is surface-neutral</td><td><code>integration/test_variant_b.py</code></td><td>integration</td></tr>
-      <tr><td>Capabilities immutable</td><td><code>contract/test_capability_immutability.py</code></td><td>contract</td></tr>
+      <tr><td>Capabilities immutable</td><td><code>contract/test_capability_schema.py::test_capability_is_frozen</code>, <code>::test_tampering_is_detected</code></td><td>contract</td></tr>
+      <tr><td>Irreversible steps run only under a verified, scoped approval</td><td><code>integration/test_irreversible_approval.py</code></td><td>integration</td></tr>
+      <tr><td><code>run_capability</code> remedies go through the chokepoint and are bounded</td><td><code>integration/test_capability_remedy.py</code></td><td>integration</td></tr>
       <tr><td><code>domain/</code> is pure</td><td><code>.importlinter:pure-domain</code></td><td>static</td></tr>
     </tbody>
   </table>
@@ -1142,10 +1145,12 @@ make app                 <span class="comment"># the mock back-office on :8811</
 
   <h2>Output</h2>
   <pre><code>evidence/discovery/&lt;run_id&gt;/
-  trace.jsonl        authorize / resolve / dispatch / observe, actor-tagged
+  trace.jsonl        authorize / resolve / dispatch / observe, actor-tagged;
+                     run_end carries the stop reason and budget (steps, tokens, elapsed)
   snapshots/         UiSnapshot per step
   screenshots/       redacted
-  run_record.json    status, timings, budget
+  run_record.json    timings, model, tokens_used -- summed from the llm_call events,
+                     and equal to the budget's token count
 evidence/capabilities/&lt;id&gt;@&lt;version&gt;.yaml</code></pre>
 
   <h2>If it fails</h2>
@@ -1171,11 +1176,18 @@ cua replay evidence/capabilities/corebank.member.savings_balance@1.0.0.yaml \
   --input member_id=67890</code></pre>
 
   <h2>Exercising error paths</h2>
-  <pre><code>cua replay &lt;artifact&gt; --input member_id=99999           <span class="comment"># BUSINESS_OUTCOME(member_not_found)</span>
-cua replay &lt;artifact&gt; --fault transient_load            <span class="comment"># RECOVERABLE → SUCCESS</span>
-cua replay &lt;artifact&gt; --fault transient_load --always   <span class="comment"># RECOVERY_EXHAUSTED</span>
-cua replay &lt;artifact&gt; --fault undeclared_dialog         <span class="comment"># UNEXPECTED_STATE → fails closed</span>
-cua replay &lt;artifact&gt; --fault session_timeout           <span class="comment"># re-auth or escalate</span></code></pre>
+  <p>Faults are armed on the mock app out of band, never through <code>cua replay</code> (it has no fault flag): <code>POST /_control/arm</code> with <code>{"fault": &lt;name&gt;, "count": &lt;n&gt;}</code> (<code>-1</code> = every request), after signing in. <code>cua console --capability &lt;ref&gt; --arm-fault &lt;name&gt;</code> does the same for a supervised run.</p>
+  <table>
+    <thead><tr><th>Input / armed fault</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td><code>--input member_id=99999</code></td><td><code>BUSINESS_OUTCOME(member_not_found)</code></td></tr>
+      <tr><td><code>transient_load</code>, count 1</td><td><code>RECOVERABLE</code> → recovered → <code>SUCCESS</code></td></tr>
+      <tr><td><code>transient_load</code>, count -1</td><td><code>RECOVERY_EXHAUSTED</code> → escalates (<code>NEEDS_HUMAN</code>)</td></tr>
+      <tr><td><code>undeclared_dialog</code></td><td><code>UNEXPECTED_STATE</code> → fails closed</td></tr>
+      <tr><td><code>session_timeout</code></td><td>re-authenticated by <code>run_capability corebank.auth.sign_on</code> → <code>SUCCESS</code>; escalates if that cannot run</td></tr>
+    </tbody>
+  </table>
+  <p>The <code>session_timeout</code> remedy needs <code>corebank.auth.sign_on</code> in the catalog and the operator credentials as secrets (<code>CUA_SECRET_COREBANK_OPERATOR_ID</code>, <code>CUA_SECRET_COREBANK_OPERATOR_PASSWORD</code>). Without either it fails closed as <code>RECOVERY_EXHAUSTED</code>.</p>
 
   <h2>Debugging a failure</h2>
   <table>
@@ -1216,12 +1228,12 @@ cua replay &lt;artifact&gt; --fault session_timeout           <span class="comme
   </table>
 
   <h2>Handing back</h2>
-  <p><strong>Release</strong> returns the lease. The executor then:</p>
+  <p><strong>Release</strong> diffs session state, records <code>human_delta</code>, and returns the lease to automation. The console does not restart the run itself; when a caller resumes it (<code>ReplayExecutor.resume()</code>, as <code>cua demo</code> does), the executor:</p>
   <ol>
-    <li>Diffs session state → records <code>human_delta</code></li>
-    <li>Re-evaluates preconditions from the current step forward</li>
-    <li>Skips forward to the first step whose precondition isn't satisfied</li>
-    <li>If the state matches no step's precondition → stops with <code>UNEXPECTED_STATE</code></li>
+    <li>Scans forward from the step that escalated</li>
+    <li>Skips a step only if its postcondition already holds (a step with no postcondition is never skipped)</li>
+    <li>Resumes at the first step not visibly done, provided its precondition holds</li>
+    <li>Otherwise stops with <code>UNEXPECTED_STATE</code></li>
   </ol>
 
   <h2>Afterwards</h2>

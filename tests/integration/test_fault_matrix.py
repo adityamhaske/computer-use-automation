@@ -239,6 +239,47 @@ def test_a_transient_that_never_clears_is_bounded(
     reset(app)
 
 
+SIGN_ON = Path(__file__).resolve().parents[1] / "fixtures/capabilities/sign_on.yaml"
+
+
+def test_an_expired_session_is_re_authenticated_by_the_declared_remedy(
+    replay: ReplayExecutor, capability: Capability, app: tuple[str, int]
+) -> None:
+    """`session_expired -> run_capability corebank.auth.sign_on`, against the real app's timeout.
+
+    This rule could never fire before: it matched `/login` against the top-level URL, which in a
+    frameset stays `/` while the content frame is bounced to the sign-on form, and the capability
+    it named existed nowhere. A timeout surfaced as UNEXPECTED_STATE instead of being recovered.
+    """
+    from cua.policy.secrets import SecretResolver
+
+    sign_on = TenantBinding(
+        capability_ref="corebank.auth.sign_on@1.0.0", tenant="test", vars={"base_url": app[0]}
+    ).apply(load_capability(SIGN_ON.read_text()))
+    replay.capabilities = {sign_on.id: sign_on}.__getitem__
+    replay.dispatcher.secrets = SecretResolver(
+        overrides={"corebank.operator_id": VALID_USER, "corebank.operator_password": VALID_PW},
+        redactor=replay.evidence.redactor,
+    )
+
+    reset(app)
+    arm(app, "session_timeout", count=1)
+    try:
+        result = replay.run(capability, {"member_id": "12345"})
+    finally:
+        reset(app)
+
+    assert result.status is RunStatus.SUCCESS, result.summary
+    assert result.recovery_attempts == 1, "the timeout was seen and recovered, once"
+    assert result.outputs["savings_balance"] == "4210.55"
+
+    events = replay.evidence.read_events()
+    remedy = [e for e in events if e["event"] == "recovery" and e.get("capability")]
+    assert [e["capability"] for e in remedy] == ["corebank.auth.sign_on@1.0.0"]
+    assert remedy[0]["content_hash"] == sign_on.content_hash
+    assert replay.evidence.unauthorized_dispatches() == [], "the remedy went through policy too"
+
+
 # ======================================================= UNEXPECTED STATE
 
 
@@ -368,6 +409,45 @@ def test_a_run_that_outlives_its_declared_duration_is_stopped(
     assert result.error is not None
     assert result.error.code is FailureCode.TIMEOUT
     assert "declared budget" in result.error.message
+
+
+def _tighten_policy_budgets(replay: ReplayExecutor, **budgets: int) -> None:
+    """Replace the dispatcher's policy with one whose global `budgets` are tighter."""
+    config = replay.dispatcher.policy.config
+    replay.dispatcher.policy = PolicyEngine(
+        config.model_copy(update={"budgets": config.budgets.model_copy(update=budgets)})
+    )
+
+
+def test_the_policy_files_step_budget_caps_a_capability_that_allows_more(
+    replay: ReplayExecutor, capability: Capability
+) -> None:
+    """`budgets.max_steps` in config/policy.yaml was parsed, shown on the Settings page, and read by
+    nothing. A capability may narrow the global ceiling, never widen it."""
+    assert capability.policy.max_steps == 20
+    _tighten_policy_budgets(replay, max_steps=2)
+
+    result = replay.run(capability, {"member_id": "12345"})
+
+    assert result.status is RunStatus.FAILED
+    assert result.error is not None
+    assert result.error.code is FailureCode.POLICY_DENIED
+    assert "allows 2" in result.error.message
+    assert result.steps_executed == 0, "refused before the browser moved"
+
+
+def test_the_policy_files_duration_budget_caps_a_capability_that_allows_more(
+    replay: ReplayExecutor, capability: Capability
+) -> None:
+    assert capability.policy.max_duration_ms == 60_000
+    _tighten_policy_budgets(replay, max_duration_ms=1)
+
+    result = replay.run(capability, {"member_id": "12345"})
+
+    assert result.status is RunStatus.FAILED
+    assert result.error is not None
+    assert result.error.code is FailureCode.TIMEOUT
+    assert "declared budget of 1ms" in result.error.message
 
 
 def test_recovery_is_bounded_across_the_run_not_only_per_rule(

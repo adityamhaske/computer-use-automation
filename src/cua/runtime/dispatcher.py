@@ -38,6 +38,7 @@ from cua.domain.target import TargetDescriptor
 from cua.evidence.bus import EventType, EvidenceBus
 from cua.policy.allowlist import AllowlistCheck
 from cua.policy.engine import Outcome, PolicyDecision, PolicyEngine
+from cua.policy.irreversible import IrreversibleGrant
 from cua.policy.secrets import SecretResolver
 from cua.surfaces.base import ActionResult, SurfaceDriver
 from cua.targeting.resolver import Resolution, TargetResolutionError, TargetResolver
@@ -148,8 +149,13 @@ class Dispatcher:
         capability: Capability | None = None,
         declared_risk: ActionRisk | None = None,
         confirmed: bool = False,
+        grant: IrreversibleGrant | None = None,
     ) -> DispatchOutcome:
-        """Resolve, authorize, dispatch, record. In that order, every time."""
+        """Resolve, authorize, dispatch, record. In that order, every time.
+
+        `grant` is carried to policy, never acted on here: whether it permits anything is
+        `PolicyEngine`'s decision, made against the capability and the resolved target.
+        """
 
         # --- 0. Is this actor still entitled to act? -------------------------
         # Escalation happens *while* a step is in flight, so an authorization minted a moment ago
@@ -229,6 +235,7 @@ class Dispatcher:
             capability=capability,
             declared_risk=declared_risk,
             confirmed=confirmed,
+            grant=grant,
         )
         self.evidence.emit(
             EventType.AUTHORIZE,
@@ -241,6 +248,8 @@ class Dispatcher:
             signals=list(decision.risk.signals),
             reason=decision.reason,
             action_type=action.type,
+            # Only on a step an approval permitted, so every other authorization event is unchanged.
+            **({"approval": decision.approved_under} if decision.approved_under else {}),
         )
 
         if decision.outcome is Outcome.REQUIRE_CONFIRMATION:

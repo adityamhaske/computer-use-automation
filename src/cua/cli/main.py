@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import uuid
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Annotated, Any
@@ -176,7 +177,6 @@ def replay(
 ) -> None:
     """Execute a saved capability deterministically. No model is involved."""
     from cua.domain.serde import load_capability
-    from cua.domain.tenant_binding import TenantBinding
 
     if sign_in and not base_url:
         typer.secho(
@@ -185,10 +185,6 @@ def replay(
         raise typer.Exit(code=2)
 
     capability = load_capability(artifact.read_text(encoding="utf-8"))
-    if base_url:
-        capability = TenantBinding(
-            capability_ref=capability.ref, tenant="cli", vars={"base_url": base_url}
-        ).apply(capability)
 
     supplied: dict[str, str] = {}
     for pair in input or []:
@@ -205,10 +201,11 @@ def replay(
         headless=headless,
         run_id=run_id,
         allow_irreversible=allow_irreversible,
-        # NOT base_url=base_url here: the binding above already applied it to `capability`, and
-        # _replay_once would apply it a second time given the chance. sign_in_url is a separate,
-        # narrower parameter that only ever drives the browser to a login page -- it never touches
-        # TenantBinding, so it carries no risk of a double-apply.
+        # Bound inside _replay_once, not here: that is where the approval is loaded, and an
+        # approval of a `{base_url}` capability can only be checked with the unbound base and the
+        # binding side by side. Binding here as well would apply it twice. sign_in_url is a
+        # separate, narrower parameter that only ever drives the browser to a login page.
+        base_url=base_url,
         sign_in=sign_in,
         sign_in_url=base_url,
         assist=assist,
@@ -254,32 +251,32 @@ def _replay_once(
     took a different path to the executor would be demonstrating something other than what the CLI
     does, which is the failure mode of most "example" code.
 
-    `sign_in_url` is deliberately independent of `base_url`: the latter drives `TenantBinding`
-    (applied here, or already applied by a caller that pre-bound the capability itself -- applying
-    it twice would be a bug, not a no-op, so this function must never assume it owns that step).
-    Signing in is not tenant binding -- it is demo-fixture setup that happens to need a URL, and
-    every caller already has one in scope regardless of who applied the binding.
+    `sign_in_url` is deliberately independent of `base_url`: the latter drives `TenantBinding`,
+    applied here and only here -- callers pass the unbound capability, because the approval gate
+    needs the base and the binding side by side, and applying a binding twice is a bug, not a
+    no-op. Signing in is not tenant binding -- it is demo-fixture setup that happens to need a URL.
     """
     from cua.catalog.approvals import ApprovalStore
-    from cua.domain.tenant_binding import TenantBinding
+    from cua.domain.tenant_binding import AppliedBinding, TenantBinding
     from cua.replay.executor import ReplayExecutor
     from cua.runtime.capture import FailureCapture
 
+    # A `--base-url` binding reseals the effective capability under a new content hash, while the
+    # approval pins the sealed base a reviewer saw. Keeping the base and the binding side by side is
+    # what lets the gate re-derive the one from the other and check the approval against the base,
+    # instead of an approval that could never match any `{base_url}` capability.
+    applied: AppliedBinding | None = None
     if base_url:
-        capability = TenantBinding(
+        binding = TenantBinding(
             capability_ref=capability.ref, tenant="cli", vars={"base_url": base_url}
-        ).apply(capability)
+        )
+        applied = AppliedBinding(base=capability, binding=binding)
+        capability = binding.apply(capability)
 
     # Neither `cua replay` nor `cua catalog invoke` -- the only two real entry points to this
     # function -- ever loaded a stored approval before this, so `ReplayExecutor.approval` was
     # always `None` and an irreversible capability could never actually be replayed unattended,
     # approved or not: the gate was enforced but structurally unreachable.
-    #
-    # A `--base-url` binding recomputes the capability's content hash (`TenantBinding.apply`
-    # reseals the effective, substituted artifact), so an approval pinned to the sealed base
-    # artifact will not match here and the gate below still refuses -- correctly conservative, not
-    # a regression, but it means today's approval workflow is only satisfiable for a capability
-    # whose entrypoint needs no `{base_url}` substitution. See REPORT.md's known weaknesses.
     approval = ApprovalStore().load(capability.ref)
 
     rig = build_rig(run_id=run_id, kind="replay", headless=headless, allow_vision=False)
@@ -299,6 +296,8 @@ def _replay_once(
             max_recovery_attempts_total=rig.config.budgets.max_recovery_attempts_total,
             replay_gates=rig.config.replay_gates,
             approval=approval,
+            applied_binding=applied,
+            capabilities=_capability_source(base_url, tenant="cli"),
         )
         if assist:
             # Imported here, not at module scope: `cua.assist` pulls in a model client, and a
@@ -328,6 +327,29 @@ def _replay_once(
     finally:
         rig.close()
     return result, rig.run_dir
+
+
+def _capability_source(base_url: str | None, *, tenant: str) -> Callable[[str], Capability]:
+    """How a `run_capability` recovery remedy finds the capability it names.
+
+    The catalog, which refuses a tampered artifact on load, bound to the same deployment as the run
+    the remedy serves -- a re-authentication capability has to act on the same host. The replay
+    executor takes this as a callable because `cua.replay` may not import `cua.catalog`.
+    """
+    from cua.catalog.store import CapabilityStore
+    from cua.domain.tenant_binding import TenantBinding
+
+    store = CapabilityStore()
+
+    def load(capability_id: str) -> Capability:
+        found = store.load(capability_id)
+        if not base_url:
+            return found
+        return TenantBinding(
+            capability_ref=found.ref, tenant=tenant, vars={"base_url": base_url}
+        ).apply(found)
+
+    return load
 
 
 def _parse_inputs(pairs: list[str] | None) -> dict[str, str]:
@@ -400,6 +422,7 @@ def _supervised_run(
         if supervised.config
         else 6,
         replay_gates=supervised.config.replay_gates if supervised.config else ReplayGates(),
+        capabilities=_capability_source(base_url, tenant="console"),
     )
     result = supervised.session.call(lambda: executor.run(bound, inputs))
     if arm_fault:
