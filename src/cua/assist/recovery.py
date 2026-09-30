@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 
 from cua.agent.llm import LlmError, LlmPort
 from cua.agent.render import render_snapshot
-from cua.agent.tools import TOOLS
+from cua.agent.tools import TOOLS, node_id_from
 from cua.domain.action import Action, ActionRisk, Click, Select, Type
 from cua.domain.actor import Actor
 from cua.domain.capability import Capability
@@ -194,7 +194,7 @@ class AssistedReplay:
             return None
 
         call = response.tool_calls[0]
-        node = snapshot.node(str(call.arguments.get("node_id", "")))
+        node = snapshot.node(node_id_from(call.arguments))
         if node is None:
             self.outcome.reason = f"model named a control that is not on the page ({call.name})"
             self._note(self.outcome.reason)

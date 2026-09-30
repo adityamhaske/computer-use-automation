@@ -51,6 +51,18 @@ _NODE = {
 }
 
 
+def node_id_from(arguments: dict[str, Any]) -> str:
+    """The snapshot node id a tool call names, read the way the contract above describes it.
+
+    The page view marks each control `#<node_id>`, and this schema and the system prompt both ask
+    for "the #id". A model that copies it exactly sends the `#` too -- and the lookup used the
+    argument verbatim, so the right control on the right screen was reported as "not in the current
+    snapshot" three times and the live run ended as a dead end. The scripted fake never showed it:
+    it reads ids out of the view with the `#` already stripped.
+    """
+    return str(arguments.get("node_id", "")).strip().removeprefix("#")
+
+
 TOOLS: list[dict[str, Any]] = [
     _tool("click", "Click a control.", {"node_id": _NODE}, ["node_id"]),
     _tool(

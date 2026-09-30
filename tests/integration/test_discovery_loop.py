@@ -269,6 +269,43 @@ def test_the_budget_counts_every_model_call_including_the_one_that_finishes(rig:
     assert build_run_record(bus.run_dir, kind=RunKind.DISCOVERY).tokens_used == spent
 
 
+def test_a_model_that_copies_the_id_exactly_as_shown_is_understood(rig: tuple) -> None:
+    """The page view marks controls `#<id>`, and the tool schema asks for "the #id".
+
+    A live model that did exactly that -- right control, right screen, `#` included -- was told the
+    control was not in the snapshot three times running, and the run ended as a dead end. The
+    scripted fake strips the `#` when it reads the view, which is why nothing here noticed.
+    """
+    from dataclasses import replace
+
+    from cua.agent.llm import ToolCall
+
+    class CopiesTheHash(FakeLlm):
+        def complete(self, *, messages, tools):  # type: ignore[no-untyped-def]
+            response = super().complete(messages=messages, tools=tools)
+            return replace(
+                response,
+                tool_calls=tuple(
+                    ToolCall(c.id, c.name, {**c.arguments, "node_id": f"#{c.arguments['node_id']}"})
+                    if "node_id" in c.arguments
+                    else c
+                    for c in response.tool_calls
+                ),
+            )
+
+    dispatcher, bus, redactor = rig
+    run = DiscoveryAgent(
+        llm=CopiesTheHash(script=SAVINGS_FLOW),
+        dispatcher=dispatcher,
+        evidence=bus,
+        redactor=redactor,
+        budget=Budget(),
+    ).run(goal="Read the savings balance for member 12345", target_url="")
+
+    assert run.succeeded, f"stopped at {run.stop_reason}: {run.summary}"
+    assert run.outputs["savings_balance"] == "$4,210.55"
+
+
 # --------------------------------------------------------------- stopping
 
 

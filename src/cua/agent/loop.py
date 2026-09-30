@@ -29,7 +29,7 @@ from cua.agent.llm import LlmError, LlmPort, ToolCall
 from cua.agent.prompts.system import SYSTEM_PROMPT, goal_message
 from cua.agent.render import ACTIONABLE, render_snapshot
 from cua.agent.stop import Budget
-from cua.agent.tools import TOOL_NAMES, TOOLS
+from cua.agent.tools import TOOL_NAMES, TOOLS, node_id_from
 from cua.domain.action import Action, Click, Navigate, PressKey, Select, Type
 from cua.domain.actor import Actor
 from cua.domain.discovery import TERMINAL_TOOLS, DiscoveryRun, DiscoveryStep, StopReason
@@ -285,7 +285,7 @@ class DiscoveryAgent:
                 outcome.status is DispatchStatus.DENIED,
             )
 
-        node_id = str(call.arguments.get("node_id", ""))
+        node_id = node_id_from(call.arguments)
         node = snapshot.node(node_id)
         if node is None:
             # The model named a control that is not on the page it was just shown -- a truncated

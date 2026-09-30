@@ -20,6 +20,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+import pytest
+
 from cua.agent.llm import LlmResponse, ToolCall
 from cua.assist.recovery import ASSISTABLE, AssistedReplay
 from cua.domain.capability import Capability
@@ -247,7 +249,9 @@ def _rig(tmp_path: Path, snapshot: UiSnapshot) -> tuple[Dispatcher, EvidenceBus,
     return dispatcher, bus, redactor
 
 
-def test_assist_resumes_after_the_corrected_step_not_at_it(tmp_path: Path) -> None:
+# "#n1" is the id exactly as the page view renders it, which the tool schema asks for.
+@pytest.mark.parametrize("node_id", ["n1", "#n1"])
+def test_assist_resumes_after_the_corrected_step_not_at_it(tmp_path: Path, node_id: str) -> None:
     """Regression: `from_index=step_index` re-dispatched the step the correction just performed.
 
     `reconcile` only skips a step whose postcondition already holds, and a compiled capability
@@ -285,7 +289,7 @@ def test_assist_resumes_after_the_corrected_step_not_at_it(tmp_path: Path) -> No
     assisted = AssistedReplay(
         executor=executor,  # type: ignore[arg-type]
         dispatcher=dispatcher,
-        llm=_OneShotLlm("n1"),  # type: ignore[arg-type]
+        llm=_OneShotLlm(node_id),  # type: ignore[arg-type]
         evidence=bus,
         redactor=redactor,
     )
