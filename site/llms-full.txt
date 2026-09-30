@@ -45,7 +45,7 @@ make setup          # Creates venv, installs dependencies, installs Chromium
 
 ### Testing
 ```bash
-make check          # lint + strict typecheck + invariants + tests
+make check          # lint + strict typecheck + invariants + secret scan + tests
 make test           # the offline suite -- no API key, no network
 ```
 

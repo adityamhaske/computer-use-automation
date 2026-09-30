@@ -173,6 +173,21 @@ def test_the_loop_completes_a_real_goal(rig: tuple) -> None:
     assert run.checkpoint_hint, "the model must say what proves the goal was reached"
 
 
+def test_every_model_call_records_how_long_it_took(rig: tuple) -> None:
+    """A trace must let a reader tell a live model from a script, without taking anyone's word.
+
+    Request ids and token counts can be scripted; a measured wall-clock latency per exchange is the
+    cheap extra signal, since a network round trip and a canned reply differ by orders of magnitude.
+    """
+    agent, _ = _agent(rig, SAVINGS_FLOW)
+    agent.run(goal="Read the savings balance for member 12345", target_url="")
+
+    calls = [e for e in rig[1].read_events() if e["event"] == EventType.LLM_CALL.value]
+    assert calls, "the run made no model calls"
+    for call in calls:
+        assert isinstance(call["latency_ms"], int) and call["latency_ms"] >= 0
+
+
 def test_every_step_synthesized_a_descriptor_that_resolves(rig: tuple) -> None:
     """Descriptors are verified by use, while the run is still live.
 

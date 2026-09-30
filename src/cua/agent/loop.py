@@ -21,6 +21,7 @@ a model is still in the loop and the run can adapt -- rather than at the first r
 
 from __future__ import annotations
 
+import time
 import uuid
 from dataclasses import dataclass, field
 from typing import Any
@@ -87,6 +88,7 @@ class DiscoveryAgent:
             snapshot = self.dispatcher.observe()
             page_view = render_snapshot(snapshot, redactor=self.redactor)
 
+            started = time.perf_counter()
             try:
                 response = self.llm.complete(
                     messages=self._messages(goal, target_url, history, page_view), tools=TOOLS
@@ -103,6 +105,10 @@ class DiscoveryAgent:
                 # Gateway-issued, so a reader can check this run against the gateway's own logs.
                 provider=response.provider or None,
                 request_id=response.request_id or None,
+                # Wall-clock time of the exchange. A network round trip to a hosted model costs
+                # hundreds of milliseconds; a scripted stand-in costs microseconds. Recording it
+                # lets a reader tell the two apart from the trace alone.
+                latency_ms=round((time.perf_counter() - started) * 1000),
                 prompt_tokens=response.prompt_tokens,
                 completion_tokens=response.completion_tokens,
                 reasoning=response.text[:500],

@@ -134,9 +134,18 @@ exists is as misleading as one that names what does not.
 
 Stated here rather than left to be discovered:
 
-- **`e2e/test_live_discovery.py` is skipped without `OPENROUTER_API_KEY`.** The brief's one
-  non-negotiable is a genuine model-driven run; committed discovery evidence showing
-  `"model_name": "fake/scripted"` is a recorded transcript, not a live run.
+- **`e2e/test_live_discovery.py` is skipped without `OMNIROUTE_API_KEY`** (or the legacy
+  `OPENROUTER_API_KEY`). The brief's one non-negotiable is a genuine model-driven run; committed
+  discovery evidence showing `"model_name": "fake/scripted"` is a recorded transcript, not a live
+  run. `make verify-live` (`scripts/verify_live_run.py`) checks a run mechanically: a named,
+  non-scripted model, tokens spent, a gateway request id on every call, and a latency profile.
+  Two committed runs, read honestly: `discovery/demo-discovery` shows 2.2-3.7 s per model call and
+  is live, but that directory is overwritten by every `make demo`; `discovery/disc-e0aa86b951`,
+  which the published artifact was compiled from, shows ~16 ms between a page observation and the
+  model's reply, which a hosted model does not normally achieve. It carries gateway request ids,
+  so it can be reconciled against the gateway's logs, but it has not been. A fresh `make discover`
+  against the gateway (or the manual *Live discovery* workflow) records a measured `latency_ms` per
+  call and settles the question.
 - **Variant B is exercised by `make eval` and by tests, not by `make demo`.** The cross-tenant story
   is real and measured, but a reviewer sees it in `evidence/evals/cross_tenant.md` rather than in
   the demo output.

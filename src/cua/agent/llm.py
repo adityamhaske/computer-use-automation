@@ -81,20 +81,32 @@ class LlmError(RuntimeError):
     """The model could not be reached or replied unusably."""
 
 
+def api_key_from_env() -> str:
+    """The gateway key. `OMNIROUTE_API_KEY` wins; `OPENROUTER_API_KEY` is kept for compatibility.
+
+    One function rather than two `os.environ.get` calls because the demo, the console's Settings
+    page and the live test each need to answer "is a model configured?", and three copies of that
+    answer would drift the first time a gateway is added.
+    """
+    return os.environ.get("OMNIROUTE_API_KEY") or os.environ.get("OPENROUTER_API_KEY") or ""
+
+
 @dataclass
 class OpenRouterLlm:
     """An OpenAI-compatible chat-completions client.
 
-    Works against OpenRouter, a self-hosted gateway, or anything else that speaks the same
-    /chat/completions shape.
+    Works against OmniRoute, OpenRouter, or anything else that speaks the same /chat/completions
+    shape. Point `CUA_LLM_BASE_URL` at the gateway's `/v1`.
     """
 
-    api_key: str = field(default_factory=lambda: os.environ.get("OPENROUTER_API_KEY", ""))
+    api_key: str = field(default_factory=api_key_from_env)
+    # `or`, not a `get` default: `.env.example` ships these blank, and a blank value is an empty
+    # string that a `get` default would happily return.
     base_url: str = field(
-        default_factory=lambda: os.environ.get("CUA_LLM_BASE_URL", "https://openrouter.ai/api/v1")
+        default_factory=lambda: os.environ.get("CUA_LLM_BASE_URL") or "https://openrouter.ai/api/v1"
     )
     model: str = field(
-        default_factory=lambda: os.environ.get("CUA_LLM_MODEL", "anthropic/claude-sonnet-4.5")
+        default_factory=lambda: os.environ.get("CUA_LLM_MODEL") or "anthropic/claude-sonnet-4.5"
     )
     timeout_s: float = field(
         default_factory=lambda: float(os.environ.get("CUA_LLM_TIMEOUT_S", "120"))
@@ -106,8 +118,8 @@ class OpenRouterLlm:
     def __post_init__(self) -> None:
         if not self.api_key:
             raise LlmError(
-                "OPENROUTER_API_KEY is not set. Discovery needs a model; replay, escalation and "
-                "the whole test suite do not -- see README."
+                "OMNIROUTE_API_KEY (or OPENROUTER_API_KEY) is not set. Discovery needs a model; "
+                "replay, escalation and the whole test suite do not -- see README."
             )
 
     @property

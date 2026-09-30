@@ -438,7 +438,7 @@ make setup</code></pre>
   <table>
     <thead><tr><th>Variable</th><th>Purpose</th></tr></thead>
     <tbody>
-      <tr><td><code>OPENROUTER_API_KEY</code></td><td>Discovery only. Any OpenAI-compatible gateway works.</td></tr>
+      <tr><td><code>OMNIROUTE_API_KEY</code></td><td>Discovery only. Any OpenAI-compatible gateway works; <code>OPENROUTER_API_KEY</code> is still read as a fallback. Pair with <code>CUA_LLM_BASE_URL</code> and <code>CUA_LLM_MODEL</code>.</td></tr>
       <tr><td><code>CUA_LLM_BASE_URL</code></td><td>Defaults to OpenRouter</td></tr>
       <tr><td><code>CUA_LLM_MODEL</code></td><td>Model ID for discovery</td></tr>
       <tr><td><code>CUA_POLICY_FILE</code></td><td>Allowlist and risk policy — defaults to <code>config/policy.yaml</code></td></tr>
@@ -464,7 +464,7 @@ make demo</code></pre>
 ./start.sh eval            <span class="comment"># Run stability and cross-tenant drift evaluations</span></code></pre>
 
   <h2>Development commands (Makefile)</h2>
-  <pre><code>make check          <span class="comment"># lint + typecheck + invariants + tests (CI)</span>
+  <pre><code>make check          <span class="comment"># lint + typecheck + invariants + secret scan + tests (CI)</span>
 make test           <span class="comment"># offline suite; no API key, no network</span>
 make invariants     <span class="comment"># just the architectural contracts</span>
 make eval           <span class="comment"># stability + cross-tenant measurement</span></code></pre>
@@ -496,7 +496,7 @@ make eval           <span class="comment"># stability + cross-tenant measurement
   </table>
 
   <div class="callout callout-info">
-    <strong>No API key required.</strong> Stage 2 falls back to a recorded transcript and says so, in the output and in the evidence. Everything after it is model-free by construction. Set <code>OPENROUTER_API_KEY</code> for a genuine LLM-driven discovery.
+    <strong>No API key required.</strong> Stage 2 falls back to a recorded transcript and says so, in the output and in the evidence. Everything after it is model-free by construction. Set <code>OMNIROUTE_API_KEY</code> for a genuine LLM-driven discovery, then <code>make verify-live</code> to check the run was live.
   </div>
 
   <h2>Fault injection</h2>
@@ -533,7 +533,7 @@ curl -X POST localhost:8811/_control/reset</code></pre>
   --goal "Look up member 12345 and read their current savings balance" \
   --target http://localhost:8811 \
   --out evidence/capabilities/</code></pre>
-  <p>Requires <code>OPENROUTER_API_KEY</code>. The model drives a live UI, the run is compiled into a capability artifact.</p>
+  <p>Requires <code>OMNIROUTE_API_KEY</code>. The model drives a live UI, the run is compiled into a capability artifact.</p>
 
   <h2>Replay</h2>
   <pre><code><span class="comment"># Success case</span>
@@ -1123,7 +1123,7 @@ overrides:
   <p class="lead">Discovery is the probabilistic half: an LLM drives a live UI to a goal and we record what it did. It is the expensive path, run once per capability.</p>
 
   <h2>Prerequisites</h2>
-  <pre><code>cp .env.example .env     <span class="comment"># set OPENROUTER_API_KEY</span>
+  <pre><code>cp .env.example .env     <span class="comment"># set OMNIROUTE_API_KEY, CUA_LLM_BASE_URL, CUA_LLM_MODEL</span>
 make app                 <span class="comment"># the mock back-office on :8811</span></code></pre>
 
   <h2>Run</h2>

@@ -87,8 +87,16 @@ invariants: require-venv ## Verify the architectural contracts and that the docs
 test: require-venv ## Full test suite, offline, no API key required
 	$(PY) -m pytest
 
+.PHONY: secrets
+secrets: ## Fail if anything key-shaped is tracked (add HISTORY=1 to scan every commit too)
+	$(PY) scripts/scan_secrets.py $(if $(HISTORY),--history)
+
+.PHONY: verify-live
+verify-live: require-venv ## Check the newest discovery run was a live model, not a script (or RUN=<dir>)
+	$(PY) scripts/verify_live_run.py $(RUN)
+
 .PHONY: test-live
-test-live: ## The one test that spends real tokens (needs OPENROUTER_API_KEY)
+test-live: ## The one test that spends real tokens (needs OMNIROUTE_API_KEY)
 	$(PY) -m pytest -m live
 
 .PHONY: smoke
@@ -96,7 +104,7 @@ smoke: require-venv ## Boot `./start.sh ui` and assert a reviewer gets a working
 	bash scripts/smoke_reviewer_path.sh
 
 .PHONY: check
-check: require-venv lint typecheck invariants test smoke ## Everything CI runs
+check: require-venv lint typecheck invariants secrets test smoke ## Everything CI runs
 
 # ------------------------------------------------------------------ running
 
@@ -117,7 +125,7 @@ demo: require-venv ## THE GRADING STORY: discover -> artifact -> replay -> outco
 	$(PY) -m cua.cli.main demo
 
 .PHONY: discover
-discover: require-venv ## Live LLM-driven discovery against a running `make app` -- needs a model in .env
+discover: require-venv ## Live LLM-driven discovery against a running `make app` -- needs OMNIROUTE_API_KEY in .env
 	$(PY) -m cua.cli.main discover --sign-in \
 	  --goal "Look up member 12345 and report their savings account balance, the account status, and the as-of date." \
 	  --target http://127.0.0.1:$(MOCK_APP_PORT)

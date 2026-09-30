@@ -11,12 +11,25 @@ env:
   PYTHONUNBUFFERED: "1"
   CUA_HEADLESS: "true"
 
+# Read-only by default: nothing here needs to write to the repo.
+permissions:
+  contents: read
+
+# `push: **` plus `pull_request` runs every PR-branch commit twice, and a superseded run is wasted
+# minutes. Newer pushes cancel the older run on the same ref.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Full history, so the secret scan below can look at every commit and not only the tip.
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -53,6 +66,11 @@ jobs:
 
       - name: Architectural invariants
         run: make invariants
+
+      # This system's safety story is redaction, so a key committed anywhere in history would
+      # undercut it. Cheap, dependency-free, and it never echoes what it found.
+      - name: Secret scan (tree and history)
+        run: make secrets HISTORY=1
 
       - name: Tests (offline; live tests deselected)
         run: make test

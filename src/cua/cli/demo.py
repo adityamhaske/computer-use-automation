@@ -238,7 +238,7 @@ class Demo:
                 mode = (
                     f"live model ({llm.model_name})"
                     if self.live_model
-                    else "RECORDED TRANSCRIPT — no OPENROUTER_API_KEY set"
+                    else "RECORDED TRANSCRIPT — no OMNIROUTE_API_KEY set"
                 )
                 self.say("Mock back-office running", f"hostile frameset app at {base_url}")
 

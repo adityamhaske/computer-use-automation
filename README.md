@@ -31,8 +31,9 @@ make setup && make demo
 That is the whole assessment path: `make setup` builds the venv and installs Chromium, `make demo`
 runs all fourteen stages end to end in about a minute. Everything in this repository works offline
 with no key. The single exception is a live discovery run — copy `.env.example` to `.env` and set
-`OPENROUTER_API_KEY` for that; without one, discovery replays a recorded transcript and says so, in
-the output and in the evidence it writes.
+`OMNIROUTE_API_KEY`, `CUA_LLM_BASE_URL` and `CUA_LLM_MODEL` for that; without a key, discovery
+replays a recorded transcript and says so, in the output and in the evidence it writes.
+`make verify-live` then checks the resulting run was a live model and not a script.
 
 `make` on its own lists every target.
 

@@ -6,7 +6,7 @@ It is the expensive path, run once per capability.
 ## Prerequisites
 
 ```bash
-cp .env.example .env     # set OPENROUTER_API_KEY
+cp .env.example .env     # set OMNIROUTE_API_KEY, CUA_LLM_BASE_URL, CUA_LLM_MODEL
 make app                 # the mock back-office on :8811
 ```
 

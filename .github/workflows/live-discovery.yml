@@ -1,0 +1,82 @@
+name: Live discovery
+
+# The one thing CI cannot do on every commit: spend real tokens. Run it by hand, from the Actions
+# tab, when the discovery evidence needs refreshing.
+#
+# One-time setup (Settings -> Secrets and variables -> Actions):
+#   secret    OMNIROUTE_API_KEY    the gateway key
+#   variable  CUA_LLM_BASE_URL     the gateway's /v1 endpoint. It has to be reachable from a
+#                                  GitHub-hosted runner, so a localhost-only gateway will not work
+#   variable  CUA_LLM_MODEL        a model the gateway serves
+#
+# The run is checked by scripts/verify_live_run.py, so a scripted stand-in cannot pass, and the
+# resulting evidence is uploaded as a build artifact for review before anything is committed.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: live-discovery
+  cancel-in-progress: false
+
+env:
+  PYTHONUNBUFFERED: "1"
+  CUA_HEADLESS: "true"
+  OMNIROUTE_API_KEY: ${{ secrets.OMNIROUTE_API_KEY }}
+  CUA_LLM_BASE_URL: ${{ vars.CUA_LLM_BASE_URL }}
+  CUA_LLM_MODEL: ${{ vars.CUA_LLM_MODEL }}
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Require the gateway configuration
+        run: |
+          missing=0
+          for name in OMNIROUTE_API_KEY CUA_LLM_BASE_URL CUA_LLM_MODEL; do
+            if [ -z "${!name}" ]; then echo "::error::$name is not set (see the header of this workflow)"; missing=1; fi
+          done
+          exit $missing
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - uses: astral-sh/setup-uv@v3
+
+      - name: Install
+        run: |
+          uv venv --python 3.11 .venv
+          uv pip install --python .venv/bin/python -e ".[dev]"
+          .venv/bin/python -m playwright install chromium --with-deps
+
+      - name: Start the mock back-office
+        run: |
+          make app > app.log 2>&1 &
+          for _ in $(seq 1 60); do
+            curl -fs http://127.0.0.1:8811/login > /dev/null && exit 0
+            sleep 0.5
+          done
+          echo "::error::the mock app did not start"; cat app.log; exit 1
+
+      - name: Discover, driven by the live model
+        run: make discover
+
+      - name: Verify the run was live
+        run: make verify-live
+
+      - name: Upload the evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-discovery-evidence
+          path: |
+            evidence/discovery
+            evidence/capabilities
+            app.log

@@ -14,7 +14,6 @@ evidence that a model can actually navigate a hostile legacy surface it has neve
 
 from __future__ import annotations
 
-import os
 import socket
 import threading
 import time
@@ -25,7 +24,7 @@ import pytest
 import uvicorn
 from apps.mock_bank.server import VALID_PW, VALID_USER, create_app
 
-from cua.agent.llm import OpenRouterLlm
+from cua.agent.llm import OpenRouterLlm, api_key_from_env
 from cua.agent.loop import DiscoveryAgent
 from cua.agent.stop import Budget, StopReason
 from cua.evidence.bus import EvidenceBus
@@ -41,8 +40,8 @@ pytestmark = [
     pytest.mark.browser,
     pytest.mark.slow,
     pytest.mark.skipif(
-        not os.environ.get("OPENROUTER_API_KEY"),
-        reason="needs OPENROUTER_API_KEY; every other test runs without a model",
+        not api_key_from_env(),
+        reason="needs OMNIROUTE_API_KEY or OPENROUTER_API_KEY; all other tests run without one",
     ),
 ]
 

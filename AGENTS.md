@@ -226,7 +226,7 @@ testable, in isolation.
 
 ```bash
 make setup        # venv + deps + chromium
-make check        # lint + typecheck + invariants + tests  (what CI runs)
+make check        # lint + typecheck + invariants + secret scan + tests  (what CI runs)
 make test         # offline suite; no API key needed
 make invariants   # just the architectural contracts
 make app          # the hostile mock back-office

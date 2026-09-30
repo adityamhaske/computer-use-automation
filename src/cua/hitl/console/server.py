@@ -367,9 +367,13 @@ def create_console(deps: ConsoleDeps) -> FastAPI:
             "policy_file": str(deps.policy_path),
             "policy": policy,
             "llm": {
-                "base_url": os.environ.get("CUA_LLM_BASE_URL", "https://openrouter.ai/api/v1"),
-                "model": os.environ.get("CUA_LLM_MODEL", "anthropic/claude-sonnet-4.5"),
-                "api_key_configured": bool(os.environ.get("OPENROUTER_API_KEY")),
+                "base_url": os.environ.get("CUA_LLM_BASE_URL") or "https://openrouter.ai/api/v1",
+                "model": os.environ.get("CUA_LLM_MODEL") or "anthropic/claude-sonnet-4.5",
+                "api_key_configured": bool(
+                    # Same two names `cua.agent.llm.api_key_from_env` reads; not imported, because
+                    # `hitl` may not depend on `agent` (the layering contract).
+                    os.environ.get("OMNIROUTE_API_KEY") or os.environ.get("OPENROUTER_API_KEY")
+                ),
                 "max_steps": int(os.environ.get("CUA_LLM_MAX_STEPS", "40")),
                 "max_tokens": int(os.environ.get("CUA_LLM_MAX_TOKENS", "200000")),
                 "timeout_s": float(os.environ.get("CUA_LLM_TIMEOUT_S", "120")),
