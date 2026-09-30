@@ -197,11 +197,15 @@ recovery:
 
   - id: session_expired
     description: The session timed out and we were bounced to the sign-on screen.
+    # Detected on the screen, not the address bar. This app runs in its frameset, so an expired
+    # session swaps the *content frame* for the sign-on form while the top-level URL stays `/`.
+    # The detector used to require `url_matches: /login` against that top-level URL, so it could
+    # never fire: a timeout surfaced as UNEXPECTED_STATE and this rule was dead.
     detect:
       assert: all_of
       of:
-        - {assert: url_matches, pattern: "/login"}
-        - {assert: node_exists, query: {role: button, name: Sign On}}
+        - {assert: node_exists, query: {role: textbox, name: Operator ID, scope: {frame: content}}}
+        - {assert: node_exists, query: {role: button, name: Sign On, scope: {frame: content}}}
     remedy:
       - type: run_capability
         capability_id: corebank.auth.sign_on
@@ -227,4 +231,4 @@ provenance:
 # Sealed. The evidence copy is published from this file by `cua demo`, so the hash has to
 # live at the source -- adding it to the published copy alone meant the next demo run wiped it
 # and the reviewed artifact showed up in the catalog as an unsealed draft.
-content_hash: sha256:c02fd44b01c3c1a62e83ed2a18d249d6aa7be28e57ff18bcb45ee11d79739547
+content_hash: sha256:061c01cb033d48c9b773cf9da1265cdebf2cffc958e2c2324b7b46a703a74324

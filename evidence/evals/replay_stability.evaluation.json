@@ -1,6 +1,6 @@
 {
   "capability_ref": "corebank.member.savings_balance@1.0.0",
-  "content_hash": "sha256:c02fd44b01c3c1a62e83ed2a18d249d6aa7be28e57ff18bcb45ee11d79739547",
+  "content_hash": "sha256:061c01cb033d48c9b773cf9da1265cdebf2cffc958e2c2324b7b46a703a74324",
   "tenant": null,
   "runs": 20,
   "successes": 15,
