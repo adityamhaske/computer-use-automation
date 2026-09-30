@@ -20,13 +20,13 @@ from __future__ import annotations
 
 import contextlib
 import time
-import uuid
 from datetime import UTC, datetime
 from typing import Any
 
 from playwright.sync_api import Browser, BrowserContext, Page, sync_playwright
 
 from cua.domain.action import Click, Navigate, PressKey, RawInput, Reload, Scroll, Select, Type
+from cua.domain.ids import new_id
 from cua.domain.snapshot import Rect, UiSnapshot
 from cua.perception.build import build_snapshot
 from cua.perception.raw import RawElement
@@ -65,7 +65,7 @@ class PlaywrightCdpDriver:
         session_id: str | None = None,
         viewport: tuple[int, int] = (1280, 900),
     ) -> None:
-        self._session_id = session_id or f"sess-{uuid.uuid4().hex[:10]}"
+        self._session_id = session_id or new_id("sess", 10)
         self._playwright = sync_playwright().start()
         self._browser: Browser = self._playwright.chromium.launch(headless=headless)
         self._context: BrowserContext = self._browser.new_context(
@@ -181,7 +181,7 @@ class PlaywrightCdpDriver:
 
         snapshot = build_snapshot(
             elements,
-            snapshot_id=f"snap-{uuid.uuid4().hex[:10]}",
+            snapshot_id=new_id("snap", 10),
             url=self._page.url,
             title=self._page.title(),
             http_status=self._last_status,

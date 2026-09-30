@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import uuid
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
@@ -16,6 +15,7 @@ from cua.agent.llm import LlmError, OpenRouterLlm
 from cua.agent.loop import DiscoveryAgent
 from cua.agent.stop import Budget
 from cua.domain.capability import Capability
+from cua.domain.ids import new_id
 from cua.domain.result import RunResult, RunStatus
 from cua.domain.serde import dump_capability
 from cua.recorder.compile import compile_capability
@@ -67,7 +67,7 @@ def discover(
     ] = False,
 ) -> None:
     """Drive a live application with a model until the goal is met, and record what worked."""
-    run_id = f"disc-{uuid.uuid4().hex[:10]}"
+    run_id = new_id("disc", 10)
 
     try:
         llm = OpenRouterLlm()
@@ -194,7 +194,7 @@ def replay(
         name, _, value = pair.partition("=")
         supplied[name] = value
 
-    run_id = f"rep-{uuid.uuid4().hex[:10]}"
+    run_id = new_id("rep", 10)
     result, run_dir = _replay_once(
         capability=capability,
         inputs=supplied,
@@ -498,7 +498,7 @@ def console(
         typer.secho("--arm-fault needs --capability to run.", fg=typer.colors.RED, err=True)
         raise typer.Exit(code=2)
 
-    run_id = f"con-{uuid.uuid4().hex[:10]}"
+    run_id = new_id("con", 10)
     supervised = build_supervised_session(run_id=run_id, target=target, headless=headless)
 
     typer.secho(f"Operator console on http://127.0.0.1:{port}", fg=typer.colors.GREEN)
@@ -887,7 +887,7 @@ def catalog_invoke(
         inputs=supplied,
         base_url=base_url,
         headless=headless,
-        run_id=f"invoke-{uuid.uuid4().hex[:8]}",
+        run_id=new_id("invoke", 8),
         sign_in=sign_in,
         sign_in_url=base_url,
     )

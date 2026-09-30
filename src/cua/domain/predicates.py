@@ -24,7 +24,7 @@ import re
 from collections.abc import Mapping
 from typing import Annotated, Literal, TypeAlias
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from cua.domain.snapshot import NodeScope, UiNode, UiSnapshot
 from cua.domain.values import InputRef, OutputRef, ValueExpr
@@ -37,11 +37,25 @@ def _normalize(text: str) -> str:
     absorb rebranding -- "Member #" normalizes to "member #", which still does not equal
     "member number". Guessing they are the same is how automation clicks the wrong control.
     """
-    return re.sub(r"[^a-z0-9 ]+", "", text.lower().replace("\xa0", " ")).strip()
+    spaced = text.lower().replace("\xa0", " ")
+    # Whitespace is folded BEFORE punctuation is stripped, not removed with it: a tab or a run of
+    # spaces inside a banner is layout, and dropping it would glue two words into one.
+    return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9\s]+", "", spaced)).strip()
 
 
 def _squash(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
+
+
+def _require_valid_regex(value: str | None) -> str | None:
+    """Reject a pattern that cannot compile where the artifact is loaded, so the author sees it then
+    and not as a bare `re.error` in the middle of a replay."""
+    if value is not None:
+        try:
+            re.compile(value)
+        except re.error as exc:
+            raise ValueError(f"not a valid regular expression: {exc}") from exc
+    return value
 
 
 class NodeQuery(BaseModel):
@@ -58,6 +72,11 @@ class NodeQuery(BaseModel):
     name_contains: str | None = None
     name_matches: str | None = None
     scope: NodeScope | None = None
+
+    @field_validator("name_matches")
+    @classmethod
+    def _name_matches_compiles(cls, value: str | None) -> str | None:
+        return _require_valid_regex(value)
 
     def matches(self, node: UiNode) -> bool:
         if self.role is not None and node.role != self.role:
@@ -165,6 +184,11 @@ class TextAbsent(_Base):
 class UrlMatches(_Base):
     kind: Literal["url_matches"] = Field(default="url_matches", alias="assert")
     pattern: str
+
+    @field_validator("pattern")
+    @classmethod
+    def _pattern_compiles(cls, value: str) -> str:
+        return _require_valid_regex(value) or value
 
     def evaluate(self, snapshot: UiSnapshot, inputs: Mapping[str, object]) -> bool:
         return re.search(self.pattern, snapshot.url) is not None

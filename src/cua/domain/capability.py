@@ -23,7 +23,7 @@ import re
 from enum import StrEnum
 from typing import Any, Literal, Self, TypeAlias
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from cua.domain.action import Action, ActionRisk
 from cua.domain.predicates import Predicate
@@ -58,6 +58,18 @@ class InputSpec(_Doc):
     """Propagates everywhere: masked in logs, excluded from evidence, blurred in screenshots, and
     stripped from outbound model prompts. Marking an input sensitive is the single declaration that
     makes all of that happen."""
+
+    @field_validator("pattern")
+    @classmethod
+    def _pattern_compiles(cls, value: str | None) -> str | None:
+        # Caught at load, where the author can fix it, rather than as a bare re.error the first time
+        # an agent calls the capability.
+        if value is not None:
+            try:
+                re.compile(value)
+            except re.error as exc:
+                raise ValueError(f"pattern is not a valid regular expression: {exc}") from exc
+        return value
 
     def json_schema(self) -> dict[str, Any]:
         """This input as JSON Schema -- part of the agent-facing tool contract."""
@@ -338,7 +350,10 @@ class Capability(_Doc):
     @model_validator(mode="after")
     def _internally_consistent(self) -> Self:
         """Catch the mistakes that would otherwise surface as a confusing mid-replay failure."""
-        if not re.fullmatch(r"\d+\.\d+\.\d+", self.version):
+        # ASCII digits and no leading zeros, as semver section 2 has it. `\d` alone accepts every
+        # script's digits, and `ref` (`id@version`) keys approvals: a version spelled in
+        # Arabic-Indic digits would be a different key that reads as the same number.
+        if not re.fullmatch(r"(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)", self.version):
             raise ValueError(f"version must be semver, got {self.version!r}")
 
         step_ids = [s.id for s in self.steps]
@@ -347,6 +362,13 @@ class Capability(_Doc):
 
         input_names = {i.name for i in self.inputs}
         output_names = {o.name for o in self.outputs}
+        # A duplicate is the one mistake that changes what a *calling agent* is told: the tool
+        # schema would list the name twice in `required` and silently drop the earlier spec's
+        # constraints.
+        if len(input_names) != len(self.inputs):
+            raise ValueError("input names must be unique")
+        if len(output_names) != len(self.outputs):
+            raise ValueError("output names must be unique")
 
         for output in self.outputs:
             if output.source and output.source.step not in step_ids:

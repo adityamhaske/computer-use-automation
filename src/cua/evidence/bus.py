@@ -130,5 +130,8 @@ class EvidenceBus:
             event
             for event in events
             if event["event"] == EventType.DISPATCH.value
+            # A refused attempt (a stale lease epoch) never reached a surface, so it is the
+            # system working rather than the violation this reconciliation exists to catch.
+            and not event.get("refused")
             and event.get("decision_id") not in authorized
         ]

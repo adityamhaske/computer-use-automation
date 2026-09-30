@@ -25,8 +25,8 @@
         "ambiguity_score": null,
         "fingerprint_matched": null
       },
-      "started_at": "2026-09-30T04:08:51.424814Z",
-      "duration_ms": 10,
+      "started_at": "2026-09-30T22:07:02.371050Z",
+      "duration_ms": 4,
       "recovery_rule_applied": null,
       "error_code": null,
       "snapshot_ref": null,
@@ -50,8 +50,8 @@
         "ambiguity_score": null,
         "fingerprint_matched": null
       },
-      "started_at": "2026-09-30T04:08:53.740917Z",
-      "duration_ms": 4,
+      "started_at": "2026-09-30T22:07:04.780361Z",
+      "duration_ms": 1,
       "recovery_rule_applied": null,
       "error_code": null,
       "snapshot_ref": null,
@@ -59,11 +59,11 @@
     }
   ],
   "result": null,
-  "started_at": "2026-09-30T04:08:47.679761Z",
-  "duration_ms": 11347,
+  "started_at": "2026-09-30T22:06:59.903310Z",
+  "duration_ms": 10527,
   "evidence_ref": "evidence/discovery/demo-discovery",
   "model_name": "auto",
-  "tokens_used": 6939,
+  "tokens_used": 6947,
   "resolver_config_hash": null,
   "human_actions": 0,
   "lease_transitions": []

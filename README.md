@@ -121,6 +121,22 @@ The operator's clicks travel the same policy chokepoint as the machine's. From
 29 lease      actor=automation epoch=5  resumed
 ```
 
+## Verify it yourself
+
+```bash
+make check             # lint, strict types, import contracts, secret scan, the full suite, UI smoke test
+make test-report       # the suite under line + branch coverage -> evidence/tests/test-report.md
+make mutation-check    # break each invariant on purpose and prove the suite goes red
+```
+
+The suite is 2,067 tests and runs offline with no key. More than 1,700 are edge cases — boundary,
+malformed, hostile and out-of-order input for every subsystem — written to find defects rather than
+confirm assumptions, and every defect they found is fixed. The mutation check shows the tests would
+*fail* if a guarantee stopped holding: 16 of 16 deliberate violations are caught. The evidence is in
+[`evidence/tests/`](evidence/tests/): the [test report](evidence/tests/test-report.md), the
+[mutation report](evidence/tests/mutation-report.md) and the
+[catalogue of every edge case defended](evidence/tests/edge-case-catalogue.md).
+
 ## Where to read more
 
 | | |

@@ -84,6 +84,11 @@ class NavigationBlockedError(RuntimeError):
     """A navigation the allowlist refuses. Raised rather than returned: there is no run to fail."""
 
 
+class EntrypointUnreachableError(RuntimeError):
+    """An entry URL policy permitted but the target did not serve. Distinct from a refusal so the
+    remedy named in the message is the right one (bring the target up, not widen the allowlist)."""
+
+
 @dataclass
 class Dispatcher:
     """Enforces the sequence. Holds the driver so nothing else has to."""
@@ -113,10 +118,17 @@ class Dispatcher:
             session_id=session_id,
             lease_epoch=0,
         )
-        if not outcome.ok:
+        if outcome.failure_code in (FailureCode.NAVIGATION_BLOCKED, FailureCode.POLICY_DENIED):
             raise NavigationBlockedError(
                 f"could not open {url}: {outcome.message}. If this is a target this deployment "
                 "may drive, add its host to the allowlist in config/policy.yaml."
+            )
+        if not outcome.ok:
+            # Permitted and then failed (connection refused, DNS, a 5xx page). Saying "blocked" here
+            # sent an operator to edit an allowlist the host was already on.
+            raise EntrypointUnreachableError(
+                f"could not open {url}: {outcome.message}. The navigation was permitted; the "
+                "target did not answer."
             )
 
     def observe(self) -> UiSnapshot:
@@ -167,6 +179,10 @@ class Dispatcher:
                 actor=actor,
                 lease_epoch=lease_epoch,
                 ok=False,
+                # Nothing reached the surface, so this is a refused attempt and not a dispatch that
+                # skipped authorization: the reconciliation that proves "nothing reaches a surface
+                # without authorization" must not count a correct refusal as the thing it forbids.
+                refused=True,
                 reason="stale lease epoch",
                 expected_epoch=expected_epoch,
             )
@@ -269,7 +285,7 @@ class Dispatcher:
                 drifted=drifted,
                 failure_code=(
                     FailureCode.NAVIGATION_BLOCKED
-                    if "navigation blocked" in decision.reason
+                    if decision.navigation_blocked
                     else FailureCode.POLICY_DENIED
                 ),
                 message=decision.reason,

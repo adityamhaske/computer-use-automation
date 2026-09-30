@@ -67,6 +67,17 @@ These emit JSON Schema directly, so **the artifact is the agent tool contract** 
 source of truth to drift. `sensitive: true` propagates everywhere: the value is masked in logs,
 excluded from evidence, blurred in screenshots, and stripped from outbound LLM prompts.
 
+**Checked when the artifact loads, so a mistake fails in review and not mid-replay.** `version` is
+strict semver (ASCII digits, no leading zeros — otherwise `ref` could be spelled in another script
+and read as the same number); input names and output names are each unique (a duplicate would list a
+parameter twice in the published tool schema); and every regular expression (`pattern`,
+`name_matches`, `url_matches`) must compile.
+
+**Checked at replay, before the browser moves.** A declared `integer`, `number` or `boolean` input is
+validated exactly as the published JSON Schema says, and a JSON `null` counts as *no value* (the
+default, or a "missing required input" error) rather than being typed into the application as the
+text `None`. `money` and `date` are left to the application's own spellings and the input's `pattern`.
+
 ### Steps
 
 <!-- validates: Step -->

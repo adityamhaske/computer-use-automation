@@ -26,6 +26,11 @@ class InterventionState(StrEnum):
     quietly failing looks different from one that is working."""
 
 
+_CLAIMABLE = frozenset({InterventionState.OPEN, InterventionState.ABANDONED})
+"""An abandoned request goes back to the queue flagged, not out of it: its session is PAUSED, and if
+nobody could claim it again that session would be stranded by the very expiry meant to free it."""
+
+
 @dataclass
 class InterventionRequest:
     """One request for a human to take over a live session."""
@@ -92,13 +97,13 @@ class InterventionQueue:
         and newest-first ordering is how the oldest item never gets picked up.
         """
         return sorted(
-            (r for r in self.requests.values() if r.state is InterventionState.OPEN),
+            (r for r in self.requests.values() if r.state in _CLAIMABLE),
             key=lambda r: r.created_at,
         )
 
     def claim(self, intervention_id: str, operator: str) -> InterventionRequest:
         request = self._require(intervention_id)
-        if request.state is not InterventionState.OPEN:
+        if request.state not in _CLAIMABLE:
             raise ValueError(f"intervention {intervention_id} is {request.state.value}, not open")
         request.state = InterventionState.CLAIMED
         request.operator = operator

@@ -15,6 +15,7 @@ from typing import Any, TypeVar
 
 import yaml
 from pydantic import BaseModel
+from pydantic.fields import FieldInfo
 
 from cua.domain.capability import Capability
 
@@ -54,6 +55,18 @@ class _BlockStyleDumper(yaml.SafeDumper):
         super().increase_indent(flow=flow, indentless=False)
 
 
+def _represent_str(dumper: yaml.SafeDumper, data: str) -> yaml.ScalarNode:
+    # YAML 1.1 reads U+0085, U+2028 and U+2029 as line breaks, so a plain or block scalar holding
+    # one comes back as "\n" -- a different string, and a sealed artifact that reloads as TAMPERED.
+    # Double-quoted style is the one the emitter escapes them in.
+    if any(ch in data for ch in "\x85\u2028\u2029"):
+        return dumper.represent_scalar("tag:yaml.org,2002:str", data, style='"')
+    return dumper.represent_scalar("tag:yaml.org,2002:str", data)
+
+
+_BlockStyleDumper.add_representer(str, _represent_str)
+
+
 def _prune(value: Any) -> Any:
     """Drop nulls and empty containers.
 
@@ -68,9 +81,52 @@ def _prune(value: Any) -> Any:
     return value
 
 
+def _default_is_empty_container(field: FieldInfo) -> bool:
+    if field.is_required():
+        return False
+    default = field.get_default(call_default_factory=True)
+    return isinstance(default, list | tuple | dict | set | frozenset) and len(default) == 0
+
+
+def _prune_model(model: BaseModel, payload: dict[str, Any]) -> dict[str, Any]:
+    """`_prune`, but aware of each field's default.
+
+    An empty container is noise only when the field would come back empty anyway. When the default
+    is something else (`escalation.triggers` defaults to five triggers; `enum` defaults to None), an
+    explicit `[]` is a *declaration* -- "never escalates", "no allowed values" -- and dropping it
+    turns it back into the default on load, which changes the document and breaks its sealed hash.
+    """
+    by_key = {
+        (field.serialization_alias or field.alias or name): (name, field)
+        for name, field in type(model).model_fields.items()
+    }
+    out: dict[str, Any] = {}
+    for key, raw in payload.items():
+        if raw is None:
+            continue
+        found = by_key.get(key)
+        if found is None:
+            out[key] = _prune(raw)
+            continue
+        name, field = found
+        value = _prune_value(getattr(model, name), raw)
+        if (value == {} or value == []) and _default_is_empty_container(field):
+            continue
+        out[key] = value
+    return out
+
+
+def _prune_value(attr: Any, raw: Any) -> Any:
+    if isinstance(attr, BaseModel) and isinstance(raw, dict):
+        return _prune_model(attr, raw)
+    if isinstance(attr, list | tuple) and isinstance(raw, list) and len(attr) == len(raw):
+        return [_prune_value(a, r) for a, r in zip(attr, raw, strict=True)]
+    return _prune(raw)
+
+
 def to_dict(model: BaseModel, *, prune: bool = True) -> dict[str, Any]:
     payload = model.model_dump(by_alias=True, mode="json")
-    return _prune(payload) if prune else payload
+    return _prune_model(model, payload) if prune else payload
 
 
 def to_yaml(model: BaseModel, *, prune: bool = True) -> str:

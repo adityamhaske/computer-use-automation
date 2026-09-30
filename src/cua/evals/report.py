@@ -10,6 +10,7 @@ every time it ran, and "which version produced that run?" would stop having an a
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 from cua.domain.evaluation import CapabilityEvaluation
@@ -57,7 +58,25 @@ def _verdict(evaluation: CapabilityEvaluation, unauthorized: int) -> str:
             "**NON-DETERMINISTIC** — replays of the same inputs disagreed on which control to act "
             "on."
         )
+    if evaluation.determinism_holds is None:
+        # Nothing here replayed an input twice, so there was no chance to observe a disagreement --
+        # and no agreement either. Saying "reproducible" would be claiming an unmeasured thing.
+        return (
+            "**UNVERIFIED** — zero wrong actions, zero unauthorized dispatches, but no input was "
+            "replayed twice, so determinism was not measured."
+        )
     return "**SOUND** — zero wrong actions, zero unauthorized dispatches, decisions reproducible."
+
+
+def _cell(text: str) -> str:
+    """Make a value read off a page safe to place in one markdown table cell.
+
+    Page text is untrusted and this report is what a person reads to decide whether to trust the
+    system: a value holding `|` could add cells, and one holding a line break could start a new line
+    -- enough to forge a verdict. Pipes are escaped and every kind of line break becomes a space.
+    """
+    flattened = re.sub(r"[\r\n\x0b\x0c\x85\u2028\u2029]+", " ", text)
+    return flattened.replace("|", "\\|")
 
 
 def to_markdown(suite: SuiteResult, evaluation: CapabilityEvaluation) -> str:
@@ -126,7 +145,10 @@ def to_markdown(suite: SuiteResult, evaluation: CapabilityEvaluation) -> str:
         else:
             detail = "—"
         inputs = ", ".join(f"{k}={v}" for k, v in sorted(record.inputs.items()))
-        lines.append(f"| {inputs} | {result.status.value} | {detail} | {record.drift_score:.2f} |")
+        lines.append(
+            f"| {_cell(inputs)} | {result.status.value} | {_cell(detail)} | "
+            f"{record.drift_score:.2f} |"
+        )
 
     offenders = scorers.nondeterministic_cases(records)
     if offenders:

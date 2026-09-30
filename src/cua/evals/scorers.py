@@ -74,11 +74,21 @@ def wrong_action_count(records: list[RunRecord], truth: dict[str, GroundTruth]) 
             continue
 
         if record.result.status is RunStatus.SUCCESS:
+            # An answer for a member the seed says has none is as wrong as a wrong balance, and it
+            # has no pinned outputs to disagree with -- so the expected status has to be checked
+            # too.
+            if expected.expect_status is not RunStatus.SUCCESS:
+                wrong += 1
+                continue
             for name, value in expected.outputs.items():
                 if record.result.outputs.get(name) != value:
                     wrong += 1
                     break
         elif record.result.status is RunStatus.BUSINESS_OUTCOME:
+            # The mirror case: "no such member" confidently returned for a member who exists.
+            if expected.expect_status is not RunStatus.BUSINESS_OUTCOME:
+                wrong += 1
+                continue
             observed = record.result.outcome.code if record.result.outcome else None
             if expected.outcome_code is not None and observed != expected.outcome_code:
                 wrong += 1
@@ -118,7 +128,7 @@ def decision_trace(record: RunRecord) -> tuple[tuple[str, ...], ...]:
     not differ is *which control was chosen, by which rung of the ladder, and how the result was
     classified*. That is the claim "replay is deterministic" actually makes.
     """
-    trace = []
+    trace: list[tuple[str, ...]] = []
     for step in record.steps:
         resolution = step.resolution
         trace.append(
@@ -131,11 +141,26 @@ def decision_trace(record: RunRecord) -> tuple[tuple[str, ...], ...]:
                 resolution.resolved_node_id or "" if resolution else "",
             )
         )
+    # How the run ended is a decision too: two replays that took identical steps and then one
+    # succeeded while the other failed its checkpoint did not behave the same.
+    result = record.result
+    trace.append(
+        (
+            "<result>",
+            result.status.value if result else "",
+            str(result.error.code) if result and result.error else "",
+            result.outcome.code if result and result.outcome else "",
+        )
+    )
     return tuple(trace)
 
 
-def determinism_holds(records: list[RunRecord]) -> bool:
+def determinism_holds(records: list[RunRecord]) -> bool | None:
     """True when every replay of the *same inputs* made exactly the same decisions.
+
+    None when nothing was measured -- no input was replayed twice -- because "no disagreement was
+    observed" and "no agreement was observed" are different claims, and only the second one is
+    evidence that replay is deterministic.
 
     Grouped by inputs, which is the whole content of the claim. Comparing every run in a suite
     against one another would be comparing member 12345's run against member 99999's -- those are
@@ -146,13 +171,15 @@ def determinism_holds(records: list[RunRecord]) -> bool:
     A boolean rather than a percentage on purpose: "94% deterministic" is not a property anyone can
     act on, and it invites tuning a number that should be a yes.
     """
+    measured = False
     for group in _by_inputs(records).values():
         if len(group) < 2:
             continue
+        measured = True
         first = decision_trace(group[0])
         if any(decision_trace(r) != first for r in group[1:]):
             return False
-    return True
+    return True if measured else None
 
 
 def _by_inputs(records: list[RunRecord]) -> dict[str, list[RunRecord]]:
@@ -212,8 +239,15 @@ def unauthorized_dispatches(records: list[RunRecord]) -> int:
     return sum(len(r.unauthorized_dispatches) for r in records)
 
 
+def _escape(text: str) -> str:
+    return text.replace("\\", "\\\\").replace(",", "\\,").replace("=", "\\=")
+
+
 def _key(inputs: dict[str, object]) -> str:
-    return ",".join(f"{k}={inputs[k]}" for k in sorted(inputs))
+    # Escaped so the mapping from inputs to key is one-to-one: with a bare join, {"a": "1,b=2"} and
+    # {"a": "1", "b": "2"} were the same key, so unrelated runs shared a determinism group and one
+    # ground-truth entry. Ordinary values come out exactly as before ("member_id=12345").
+    return ",".join(f"{_escape(str(k))}={_escape(str(inputs[k]))}" for k in sorted(inputs))
 
 
 def truth_key(inputs: dict[str, str]) -> str:

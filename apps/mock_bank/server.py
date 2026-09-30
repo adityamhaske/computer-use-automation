@@ -22,6 +22,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 from typing import Annotated, Any
+from urllib.parse import quote
 
 import uvicorn
 from fastapi import FastAPI, Form, Request, Response
@@ -86,7 +87,12 @@ def create_app(variant_key: str = "base") -> FastAPI:
         if faults.should_trigger(Fault.UNDECLARED_DIALOG):
             return HTMLResponse(
                 templates.get_template("dialog.html").render(
-                    v=variant, next_url=str(request.url.path)
+                    v=variant,
+                    # Percent-encoded because this lands inside a single-quoted JS literal in an
+                    # attribute: Jinja's HTML escaping turns `'` into `&#39;`, which the browser
+                    # decodes back to `'` before the script runs, so a quote in the path broke out
+                    # of the literal. `%27` and `%5C` cannot, and the browser requests the same URL.
+                    next_url=quote(str(request.url.path), safe="/"),
                 )
             )
         return None
@@ -175,6 +181,10 @@ def create_app(variant_key: str = "base") -> FastAPI:
         member = find_member(member_id)
         if member is None:
             return render("not_found.html", request, member_id=member_id)
+        if member.restricted:
+            # The same refusal as the detail page: a restricted record is not reachable by going
+            # around the screen that denies it.
+            return render("denied.html", request)
         return render("new_subaccount.html", request, member=member, error=None)
 
     @app.post("/member/{member_id}/new-subaccount")
@@ -184,6 +194,8 @@ def create_app(variant_key: str = "base") -> FastAPI:
         member = find_member(member_id)
         if member is None:
             return render("not_found.html", request, member_id=member_id)
+        if member.restricted:
+            return render("denied.html", request)
 
         form = await request.form()
         acct_type = str(form.get(variant.field_acct_type, "")).strip()

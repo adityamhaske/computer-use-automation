@@ -37,11 +37,31 @@ class AllowlistCheck:
         if not url:
             return UrlVerdict(False, "empty url")
 
-        parsed = urlparse(url)
+        try:
+            parsed = urlparse(url)
+            # `.hostname` and `.port` are validated lazily, so touching them is what surfaces a
+            # malformed authority (an unterminated IPv6 bracket, a non-numeric port).
+            hostname = parsed.hostname
+            parsed.port  # noqa: B018
+        except ValueError:
+            # A URL the parser cannot read is a URL the allowlist cannot vouch for. The reason is
+            # deliberately generic: the parser's own message can echo the authority, credentials
+            # included, into the evidence trace.
+            return UrlVerdict(False, "url could not be parsed")
         if parsed.scheme not in ("http", "https"):
             # file://, data: and javascript: are all ways to leave the sandbox or execute
             # attacker-controlled content, and none of them is a legitimate app navigation.
             return UrlVerdict(False, f"scheme {parsed.scheme!r} is not permitted")
+        if not hostname:
+            # `http:evil.example.com` has no authority for urlparse but a browser reads it as
+            # `http://evil.example.com/`; without this it would compare as host "" and a stray empty
+            # entry in the configured domains would turn it into an open door.
+            return UrlVerdict(False, "url has no host")
+        if parsed.username is not None or parsed.password is not None:
+            # Refused outright rather than stripped: `user:secret@host` is never a legitimate app
+            # navigation, and the secret must not be copied into a deny reason that reaches the
+            # trace.
+            return UrlVerdict(False, "credentials embedded in a url are not permitted")
 
         host = parsed.netloc.lower()
         global_domains = {domain.lower() for domain in self.config.domains}

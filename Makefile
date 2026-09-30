@@ -148,6 +148,14 @@ report: require-venv ## Render REPORT.md to site/report/ as three pages, a PDF a
 eval: require-venv ## Stability + cross-tenant measurement -> evidence/evals/
 	$(PY) -m cua.cli.main eval
 
+.PHONY: test-report
+test-report: require-venv ## Whole suite under coverage -> evidence/tests/ (counts, coverage, edge-case catalogue)
+	$(PY) scripts/test_report.py
+
+.PHONY: mutation-check
+mutation-check: require-venv ## Break each invariant on purpose and prove the suite goes red -> evidence/tests/
+	$(PY) scripts/mutation_check.py
+
 # ------------------------------------------------------------------ housekeeping
 
 .PHONY: clean

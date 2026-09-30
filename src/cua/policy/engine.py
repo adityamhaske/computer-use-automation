@@ -27,13 +27,13 @@ A resolution failure short-circuits: there is nothing to authorize, so policy is
 
 from __future__ import annotations
 
-import uuid
 from dataclasses import dataclass
 from enum import StrEnum
 
 from cua.domain.action import HUMAN_ONLY_ACTIONS, Action, ActionRisk
 from cua.domain.actor import Actor
 from cua.domain.capability import Capability
+from cua.domain.ids import new_id
 from cua.domain.snapshot import UiNode
 from cua.policy.allowlist import AllowlistCheck
 from cua.policy.authorized import MINT_TOKEN, AuthorizedAction
@@ -61,6 +61,10 @@ class PolicyDecision:
     approved_under: str | None = None
     """For a step allowed by `allow_if_approved`, the approval and opt-in it ran under -- recorded
     with the authorization, because "who approved this wire transfer" is the audit question."""
+    navigation_blocked: bool = False
+    """The denial was the allowlist refusing a destination. A typed flag rather than a phrase in
+    `reason`: the reason can quote a control's name, which is page-controlled, so classifying the
+    failure by searching it would let a page relabel one kind of refusal as another."""
 
     @property
     def allowed(self) -> bool:
@@ -99,10 +103,19 @@ class PolicyEngine:
         grant: IrreversibleGrant | None = None,
     ) -> PolicyDecision:
         """Decide, and on approval mint the only token a driver will accept."""
-        decision_id = f"dec-{uuid.uuid4().hex[:12]}"
+        decision_id = new_id("dec", 12)
 
-        def deny(reason: str, risk: RiskAssessment) -> PolicyDecision:
-            return PolicyDecision(Outcome.DENY, decision_id, risk, reason, actor)
+        def deny(
+            reason: str, risk: RiskAssessment, *, navigation_blocked: bool = False
+        ) -> PolicyDecision:
+            return PolicyDecision(
+                Outcome.DENY,
+                decision_id,
+                risk,
+                reason,
+                actor,
+                navigation_blocked=navigation_blocked,
+            )
 
         baseline = RiskAssessment(ActionRisk.SAFE, ())
 
@@ -133,7 +146,9 @@ class PolicyEngine:
             extra = capability.policy.allowed_domains if capability else ()
             verdict = AllowlistCheck(self.config.allowlist, extra_domains=tuple(extra)).check(url)
             if not verdict.allowed:
-                return deny(f"navigation blocked: {verdict.reason}", baseline)
+                return deny(
+                    f"navigation blocked: {verdict.reason}", baseline, navigation_blocked=True
+                )
 
         # --- 4. How dangerous is this? ---------------------------------------
         risk = self._risk.classify(action, target=target, declared=declared_risk)

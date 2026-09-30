@@ -231,6 +231,8 @@ make test         # offline suite; no API key needed
 make invariants   # just the architectural contracts
 make app          # the hostile mock back-office
 make demo         # the full end-to-end story
+make test-report  # whole suite under coverage -> evidence/tests/ (counts, coverage, edge-case catalogue)
+make mutation-check  # break each invariant on purpose; prove the suite goes red -> evidence/tests/
 ```
 
 ---

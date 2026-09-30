@@ -109,7 +109,9 @@ def build_run_record(
             current_observation = _enum(ObservationClass, event.get("observation"))
         elif name == EventType.RECOVERY.value:
             recovery_rule = event.get("rule") or event.get("id")
-        elif name == EventType.DISPATCH.value:
+        elif name == EventType.DISPATCH.value and not event.get("refused"):
+            # A refused attempt (stale lease epoch) reached no surface, so it is not a step: listing
+            # it with authorized=False would report a correct refusal as an unauthorized dispatch.
             decision_id = event.get("decision_id")
             authorization = granted.get(decision_id) if decision_id else None
             steps.append(
