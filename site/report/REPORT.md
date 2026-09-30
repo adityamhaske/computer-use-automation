@@ -167,7 +167,7 @@ redactor, and the secret resolver registers each value as it issues it, closing 
 unregistered secret ran the redaction pass empty. Tested in both directions — `id@version` once
 matched the email pattern, so a run record named its own capability `<redacted:email>`. The
 operator's live view is redacted from the same `sensitive` declarations an evidence screenshot is,
-being the sink most likely to sit on a second monitor.
+being the sink most likely to sit on a second monitor. `make secrets` scans every commit in CI.
 
 **Limits, stated rather than claimed away.** Free-text redaction is patterns plus registered
 literals, so a member *name* is protected only where a capability declares that field `sensitive`,
@@ -201,7 +201,8 @@ calls, asserted rather than described.
 **What the evidence shows.**
 [`evidence/discovery/disc-e0aa86b951/`](https://github.com/adityamhaske/computer-use-automation/tree/main/evidence/discovery/disc-e0aa86b951/) is a genuine
 LLM-driven run: six model calls, 10,215 tokens, each carrying the gateway's own provider and
-request id. The artifact compiled from it,
+request id (`make verify-live` re-checks any run; this one predates latency tracing, so reconcile
+its request ids with the gateway's logs). The artifact compiled from it,
 [`memberdesk.savings_balance@1.0.0`](https://github.com/adityamhaske/computer-use-automation/tree/main/evidence/capabilities/), replays at zero drift for members
 that run never saw.
 

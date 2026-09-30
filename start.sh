@@ -48,7 +48,7 @@ MODES
                 has something in it and the human handoff is reachable from the served UI. Ctrl+C
                 stops both. Pass --bare for a console supervising an idle session instead.
   ui          Alias for `console` — the phrase people reach for when they mean "show me the app".
-  check       `make check` — lint + strict typecheck + architectural invariants + full test suite.
+  check       `make check` — lint + strict typecheck + architectural invariants + secret scan + full test suite.
   test        `make test` — the offline suite only (no API key, no network).
   eval        `make eval` — stability + cross-tenant measurement, written to evidence/evals/.
   setup       `make setup` only — venv, dependencies, Chromium. (Every other mode does this for you

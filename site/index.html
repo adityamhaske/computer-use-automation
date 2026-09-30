@@ -1074,7 +1074,8 @@
           <div class="evidence-label">Live model calls</div>
           <div class="evidence-note">One real LLM-driven discovery through an OpenAI-compatible
             gateway — 10,215 tokens. Each call records the gateway's own provider and request id,
-            so the run can be checked against gateway logs rather than taken on trust.</div>
+            so the run can be checked against gateway logs rather than taken on trust.
+            <code>make verify-live</code> re-checks any discovery run mechanically.</div>
         </div>
         <div class="evidence-card">
           <div class="evidence-figure">0.00</div>
@@ -1083,13 +1084,13 @@
             it never saw, including a closed account — no model, identical resolution strategies.</div>
         </div>
         <div class="evidence-card">
-          <div class="evidence-figure">273</div>
+          <div class="evidence-figure">334</div>
           <div class="evidence-label">Tests passing</div>
           <div class="evidence-note">Including invariant tests that fail the build if the policy
             chokepoint, redaction, layering or fail-closed guarantees stop holding.</div>
         </div>
         <div class="evidence-card">
-          <div class="evidence-figure">12</div>
+          <div class="evidence-figure">14</div>
           <div class="evidence-label">Demo stages</div>
           <div class="evidence-note">Discovery, compile, replay, business outcome, bounded recovery,
             escalation, operator handoff and resume — each writing its own evidence directory.</div>
@@ -1111,8 +1112,10 @@
         <div><span class="prompt">$ </span><span class="cmd">make setup</span></div>
         <div style="margin-top: 12px;"><span class="comment"># all 14 stages — falls back to a recorded transcript when no model is configured, and says so</span></div>
         <div><span class="prompt">$ </span><span class="cmd">make demo</span></div>
-        <div style="margin-top: 12px;"><span class="comment"># optional: a genuine LLM-driven discovery (needs an OpenAI-compatible endpoint in .env)</span></div>
+        <div style="margin-top: 12px;"><span class="comment"># optional: a genuine LLM-driven discovery (set OMNIROUTE_API_KEY, CUA_LLM_BASE_URL and CUA_LLM_MODEL in .env)</span></div>
         <div><span class="prompt">$ </span><span class="cmd">make discover</span></div>
+        <div style="margin-top: 12px;"><span class="comment"># check that run was a live model and not a script: model, tokens, request ids, latency</span></div>
+        <div><span class="prompt">$ </span><span class="cmd">make verify-live</span></div>
       </div>
 
       <table class="stages-table">

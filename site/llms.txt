@@ -47,7 +47,8 @@ CUA is an enterprise computer-use automation system engineered for regulated fin
 ```bash
 ./start.sh                 # Default: setup venv + run the full 14-stage demo
 ./start.sh ui              # Launch HITL Web Console (:8812) + Mock Bank (:8811)
-./start.sh check           # Run CI checks: lint + strict typecheck + invariants + tests
+./start.sh check           # Run CI checks: lint + strict typecheck + invariants + secret scan + tests + smoke
 ./start.sh test            # Run offline test suite (0 API keys, 0 network)
+make verify-live           # Check a discovery run was a live model, not a script
 cua replay <artifact>      # Replay a compiled capability deterministically
 ```

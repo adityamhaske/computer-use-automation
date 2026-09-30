@@ -140,6 +140,11 @@ PARTS: list[Part] = [
                     "be reconciled against the gateway's logs rather than taken on trust. That "
                     "matters for a claim like 'a real model did this': the evidence is issued by "
                     "something other than the process making the claim.",
+                    "Each call also records its measured latency, and "
+                    "<code>make verify-live</code> checks a run mechanically: a named, "
+                    "non-scripted model, tokens spent, a request id on every call. A model that "
+                    "answers in a few milliseconds earns a warning, since a hosted model rarely "
+                    "does.",
                 ],
             ),
             Step(

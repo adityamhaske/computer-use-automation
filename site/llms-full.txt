@@ -29,7 +29,7 @@ Goal + Target ──► LLM Discovery Run ──► Capability Artifact ──�
 - Python 3.11 or later
 - Playwright Chromium (`make setup` installs this)
 - macOS or Linux
-- An optional OpenRouter API key for live LLM discovery runs (offline recordings are provided for zero-API-key testing)
+- An optional OmniRoute API key (`OMNIROUTE_API_KEY`, with `CUA_LLM_BASE_URL` and `CUA_LLM_MODEL`) for live LLM discovery runs; `OPENROUTER_API_KEY` is still read as a fallback. Offline recordings are provided for zero-API-key testing
 
 ### Installation
 ```bash
@@ -47,6 +47,9 @@ make setup          # Creates venv, installs dependencies, installs Chromium
 ```bash
 make check          # lint + strict typecheck + invariants + secret scan + tests
 make test           # the offline suite -- no API key, no network
+make secrets        # fail on any key-shaped string in tracked files (HISTORY=1: every commit)
+make discover       # live LLM discovery; needs OMNIROUTE_API_KEY
+make verify-live    # check the newest discovery run was a live model, not a script
 ```
 
 ---

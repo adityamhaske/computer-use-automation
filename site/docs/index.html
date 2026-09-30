@@ -439,8 +439,8 @@ make setup</code></pre>
     <thead><tr><th>Variable</th><th>Purpose</th></tr></thead>
     <tbody>
       <tr><td><code>OMNIROUTE_API_KEY</code></td><td>Discovery only. Any OpenAI-compatible gateway works; <code>OPENROUTER_API_KEY</code> is still read as a fallback. Pair with <code>CUA_LLM_BASE_URL</code> and <code>CUA_LLM_MODEL</code>.</td></tr>
-      <tr><td><code>CUA_LLM_BASE_URL</code></td><td>Defaults to OpenRouter</td></tr>
-      <tr><td><code>CUA_LLM_MODEL</code></td><td>Model ID for discovery</td></tr>
+      <tr><td><code>CUA_LLM_BASE_URL</code></td><td>The gateway's <code>/v1</code> endpoint (OmniRoute). Blank falls back to OpenRouter.</td></tr>
+      <tr><td><code>CUA_LLM_MODEL</code></td><td>Model ID for discovery. Name a concrete model: a router alias such as <code>auto</code> hides which one ran.</td></tr>
       <tr><td><code>CUA_POLICY_FILE</code></td><td>Allowlist and risk policy — defaults to <code>config/policy.yaml</code></td></tr>
     </tbody>
   </table>
@@ -459,16 +459,19 @@ make demo</code></pre>
 ./start.sh ui --bare       <span class="comment"># Console over an idle session: the queue stays empty</span>
 ./start.sh app             <span class="comment"># Run hostile mock back-office app (port 8811)</span>
 ./start.sh app-b           <span class="comment"># Run rebranded second-tenant variant (port 8811)</span>
-./start.sh check           <span class="comment"># Run CI checks: lint + typecheck + invariants + tests</span>
+./start.sh check           <span class="comment"># Run CI checks: lint + typecheck + invariants + secret scan + tests + smoke</span>
 ./start.sh test            <span class="comment"># Run offline test suite (no API keys, no network)</span>
 ./start.sh eval            <span class="comment"># Run stability and cross-tenant drift evaluations</span></code></pre>
 
   <h2>Development commands (Makefile)</h2>
-  <pre><code>make check          <span class="comment"># lint + typecheck + invariants + secret scan + tests (CI)</span>
+  <pre><code>make check          <span class="comment"># lint + typecheck + invariants + secret scan + tests + smoke (CI)</span>
 make test           <span class="comment"># offline suite; no API key, no network</span>
 make invariants     <span class="comment"># just the architectural contracts</span>
+make secrets        <span class="comment"># fail on any key-shaped string in tracked files (HISTORY=1 adds every commit)</span>
+make discover       <span class="comment"># live LLM discovery against the mock app; needs OMNIROUTE_API_KEY</span>
+make verify-live    <span class="comment"># check the newest discovery run was a live model, not a script</span>
 make eval           <span class="comment"># stability + cross-tenant measurement</span></code></pre>
-  <p>273 tests, <code>mypy --strict</code> clean, five enforced import contracts. The whole suite runs offline with no API key.</p>
+  <p>334 tests, <code>mypy --strict</code> clean, five enforced import contracts. The whole suite runs offline with no API key.</p>
 </div>
 
 <!-- ================================ DEMO ================================ -->
@@ -1109,7 +1112,18 @@ overrides:
   </table>
 
   <h2>Offline by default</h2>
-  <p>Everything except <code>e2e/</code> runs with <strong>no API key and no network</strong>. 273 tests, <code>mypy --strict</code> clean. CI configures no API key on purpose — if a test needs the model, CI must fail rather than silently skip.</p>
+  <p>Everything except <code>e2e/</code> runs with <strong>no API key and no network</strong>. 334 tests, <code>mypy --strict</code> clean. CI configures no API key on purpose — if a test needs the model, CI must fail rather than silently skip.</p>
+
+  <h2>Continuous integration</h2>
+  <p><code>.github/workflows/ci.yml</code> runs the same targets a contributor runs locally, as separate steps so a failure names its stage:</p>
+  <ol>
+    <li>Lint and format, then strict type check</li>
+    <li>Architectural invariants: the five import contracts, plus a check that every path the docs cite exists</li>
+    <li><strong>Secret scan</strong> (<code>make secrets HISTORY=1</code>) over the tree and every commit. It never prints what it finds, since echoing a secret into CI logs is itself a leak</li>
+    <li>The offline test suite, the reviewer-path smoke test, and the full 14-stage demo</li>
+  </ol>
+  <p>The workflow holds read-only permissions, and a newer push cancels a superseded run on the same ref. CI has no model key on purpose.</p>
+  <p>The one thing CI cannot do on every commit is spend real tokens. A separate, manually triggered <strong>Live discovery</strong> workflow runs <code>make discover</code> against your gateway, then <code>make verify-live</code>, and uploads the evidence as a build artifact to review before anything is committed. It needs an <code>OMNIROUTE_API_KEY</code> secret, plus <code>CUA_LLM_BASE_URL</code> and <code>CUA_LLM_MODEL</code> variables, and the gateway must be reachable from a GitHub-hosted runner.</p>
 
   <h2>The fake LLM</h2>
   <p><code>agent/fake.py</code> implements <code>LlmPort</code> by replaying a recorded transcript. This exercises the real discovery loop — same policy, same resolver, same evidence bus — for free.</p>
@@ -1146,6 +1160,8 @@ make app                 <span class="comment"># the mock back-office on :8811</
   <h2>Output</h2>
   <pre><code>evidence/discovery/&lt;run_id&gt;/
   trace.jsonl        authorize / resolve / dispatch / observe, actor-tagged;
+                     each llm_call carries the gateway's provider and request id
+                     and the measured latency_ms;
                      run_end carries the stop reason and budget (steps, tokens, elapsed)
   snapshots/         UiSnapshot per step
   screenshots/       redacted
@@ -1153,10 +1169,16 @@ make app                 <span class="comment"># the mock back-office on :8811</
                      and equal to the budget's token count
 evidence/capabilities/&lt;id&gt;@&lt;version&gt;.yaml</code></pre>
 
+  <h2>Verify it was live</h2>
+  <pre><code>make verify-live                                   <span class="comment"># the newest evidence/discovery/disc-* run</span>
+make verify-live RUN=evidence/discovery/&lt;run_id&gt;  <span class="comment"># a specific one</span></code></pre>
+  <p>Hard checks fail the command: a named, non-scripted model, tokens spent, and a gateway-issued request id on every model call. A median latency under 100 ms only <em>warns</em>, because a hosted model rarely answers that fast but a local gateway with a warm cache can. Runs recorded before <code>latency_ms</code> existed fall back to timestamp gaps and are labelled <em>derived</em>, not measured.</p>
+
   <h2>If it fails</h2>
   <table>
     <thead><tr><th>Symptom</th><th>Look at</th></tr></thead>
     <tbody>
+      <tr><td><code>verify-live</code> says the run was scripted</td><td>No <code>OMNIROUTE_API_KEY</code> was set, so discovery fell back to the recorded transcript (<code>model_name: fake/scripted</code>)</td></tr>
       <tr><td>Stops at <code>max_steps</code></td><td>the <code>llm_call</code> events in <code>trace.jsonl</code> — is it looping on one screen?</td></tr>
       <tr><td><code>POLICY_DENIED</code></td><td>Expected if the goal needs an irreversible action</td></tr>
       <tr><td><code>TARGET_AMBIGUOUS</code></td><td>The screen genuinely has two matching controls. Good — it refused.</td></tr>
