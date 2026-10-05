@@ -233,6 +233,8 @@ make app          # the hostile mock back-office
 make demo         # the full end-to-end story
 make test-report  # whole suite under coverage -> evidence/tests/ (counts, coverage, edge-case catalogue)
 make mutation-check  # break each invariant on purpose; prove the suite goes red -> evidence/tests/
+make edge-cases   # the hostile/boundary scenarios run for real, every run saved -> evidence/edge-cases/
+make evidence     # refresh everything under evidence/ in one go (demo, eval, edge-cases, test-report)
 ```
 
 ---

@@ -66,6 +66,20 @@ tables keep each claim cheap to read and cheap to extend.
 `evidence/tests/edge-case-catalogue.md` lists every claim by name — a test name states the behaviour
 it defends, so the catalogue is the specification of what the system is required to handle.
 
+**The command line is tested through its real entry point.** `tests/integration/test_edge_cli_commands.py`
+drives `cua` with Typer's `CliRunner`, so argument parsing, exit codes and the wording of every error
+are asserted rather than assumed: a missing or tampered artifact, a malformed or repeated `--input`, a
+target that is not running, a policy refusal and an unknown capability each produce a sentence and a
+meaningful exit code, never a stack trace. This is also what keeps the CLI's coverage honest, instead of
+leaving it to the child processes an in-process measurement cannot see.
+
+**Some of it is run for real and kept.** `make edge-cases` (`scripts/run_edge_cases.py`) executes 22
+scenarios against a fresh mock app each, through the same executor, policy chokepoint and evidence bus
+as `make demo`, and saves every run under `evidence/edge-cases/`: every state a member can be in, the
+declared input pattern at and around its boundaries, faults (recovered, bounded, re-authenticated,
+failed closed) and governance refusals. A scenario that deviates from what it declares fails the run, so
+the saved evidence is also a test.
+
 These suites are how the hardening pass found real defects rather than confirming assumptions. Each
 was written as a strict-`xfail` test first, adversarially checked, then fixed in `src/` with the
 marker removed; none is left open. Among them: a malformed URL that raised out of the allowlist

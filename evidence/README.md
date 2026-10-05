@@ -34,7 +34,7 @@ only — the per-run traces behind them are working evidence and are gitignored.
 | Report | What it answers |
 |---|---|
 | [`evals/replay_stability.md`](evals/replay_stability.md) | Does the same artifact keep working over many runs, and does it ever act on the wrong control? |
-| [`evals/cross_tenant.md`](evals/cross_tenant.md) | Does it serve a **second institution** without being re-recorded? |
+| [`evals/cross_tenant.md`](evals/cross_tenant.md) | Does it serve a **second tenant** — the same product, rebranded and restyled (`variant_b` of the mock app, a stand-in for a second credit union) — through an overlay and not a re-recording? |
 | `evals/*.evaluation.json` | The same data as a `CapabilityEvaluation` — derived data about a frozen capability, kept separate from it on purpose (ADR 0002). |
 
 **The headline metric is wrong-action rate, and its target is zero.** A system that refuses is
@@ -50,6 +50,17 @@ same, only the source of truth is harder.
 Building the cross-tenant suite **falsified the reuse claim as it then stood**, which is the best
 argument for having built it. See `REPORT.md` §7.
 
+## The edge-case runs
+
+[`edge-cases/`](edge-cases/SUMMARY.md) is the hostile and boundary conditions, actually run: 22
+scenarios, each a saved run you can open. Every state a member can be in; the declared input pattern
+at and around its boundaries (including injection-shaped and non-ASCII input, rejected before the
+browser moves); faults (a 502 that recovers, a 502 that never clears and is bounded, an expired
+session re-authenticated through policy, an undeclared screen that fails closed); and governance (a
+tampered artifact refused, an off-allowlist navigation refused outside the model, a stale lease
+refused and not miscounted as a dispatch). A scenario that deviates from what it declares fails the
+run. Regenerate: `make edge-cases`.
+
 ## The verification evidence
 
 `evidence/tests/` answers a different question from the runs above: not *did the flow work* but *how
@@ -64,6 +75,9 @@ do we know the guarantees would notice if they broke*.
 ## Layout
 
 ```
+SUMMARY.md           one page: what was run, what it showed, where to look
+demo-transcript.txt  the console output of the last `make demo`
+edge-cases/          22 saved scenario runs and their SUMMARY.md (make edge-cases)
 tests/               test report, mutation report, edge-case catalogue (make test-report / mutation-check)
 capabilities/        the compiled draft and the reviewed capability, side by side
 discovery/<run_id>/  the run that discovered the flow

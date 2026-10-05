@@ -221,6 +221,17 @@ runnable entry point, so every "mechanically enforced" claim here held only once
 so `--base-url` substituted nothing, working only on the recording machine — now parameterised at
 compile time, and pinned under a test.
 
+**Then the question was whether the suite could fail at all.** A hardening pass wrote about 1,800
+edge-case tests — boundary, malformed, hostile and out-of-order input for every subsystem, the
+command line included — and the defects they exposed were real, and are all fixed: an allowlist that
+raised on a malformed URL instead of denying it; the headline wrong-action metric ignoring the
+expected status; a sealed artifact that reloaded as *tampered* after declaring an empty list; an
+identifier that was all digits one time in 300 and was redacted as an account number in its own
+trace; one redaction pattern that took minutes on a single long token. `make mutation-check` then
+breaks the code on purpose — each of the ten invariants, and a guard per fix — and records whether
+the suite noticed: 18 of 18 deliberate violations are caught. `make edge-cases` keeps 22 scenarios
+as saved runs, so the boundary conditions can be opened and read rather than only asserted.
+
 ### What to look at
 
 | | |
@@ -231,5 +242,8 @@ compile time, and pinned under a test.
 | The invariants, enforced | [`.importlinter`](https://github.com/adityamhaske/computer-use-automation/blob/main/.importlinter), [`tests/invariants/`](https://github.com/adityamhaske/computer-use-automation/tree/main/tests/invariants/) |
 | The whole story, one command | `make demo` |
 | The numbers behind §3 and §4 | [`evidence/evals/`](https://github.com/adityamhaske/computer-use-automation/tree/main/evidence/evals/) |
+| The edge cases, run and saved | [`evidence/edge-cases/`](https://github.com/adityamhaske/computer-use-automation/blob/main/evidence/edge-cases/SUMMARY.md) |
+| Does the suite fail when it should? | [`evidence/tests/mutation-report.md`](https://github.com/adityamhaske/computer-use-automation/blob/main/evidence/tests/mutation-report.md) |
+| One page of results | [`evidence/SUMMARY.md`](https://github.com/adityamhaske/computer-use-automation/blob/main/evidence/SUMMARY.md) |
 
 [Repository](https://github.com/adityamhaske/computer-use-automation)

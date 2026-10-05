@@ -42,3 +42,6 @@ trace.zip
 
 # Working notes for the submission cleanup — not part of the deliverable.
 SUBMISSION_PLAN.md
+
+# Presenter's demo guide (generated HTML + captured screenshots) — kept locally, not committed.
+docs/demo-guide/

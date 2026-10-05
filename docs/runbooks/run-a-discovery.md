@@ -10,6 +10,21 @@ cp .env.example .env     # set OMNIROUTE_API_KEY, CUA_LLM_BASE_URL, CUA_LLM_MODE
 make app                 # the mock back-office on :8811
 ```
 
+Two choices worth making deliberately:
+
+- **Pin a concrete model**, for example `CUA_LLM_MODEL=kr/claude-sonnet-4.5` on an OmniRoute gateway,
+  rather than an alias such as `auto`. An alias lets the gateway pick, and the run record can then
+  only say that *something* answered. The client records the model the response reports (and the
+  gateway's provider and request id), so a pinned model makes "which model ran, and can that be
+  checked against the gateway's own logs?" answerable.
+- **Keep a local gateway on loopback.** OmniRoute binds every interface by default, which exposes
+  `/v1/*` to anything on the network. Run it as
+  `OMNIROUTE_SERVER_HOST=127.0.0.1 omniroute serve --port 20128 --no-open --daemon`, and use
+  `http://localhost:20128/v1` as `CUA_LLM_BASE_URL`.
+
+`make verify-live RUN=evidence/discovery/<run_id>` then proves the run was a live model rather than
+a recorded script.
+
 ## Run
 
 ```bash

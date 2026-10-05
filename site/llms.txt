@@ -50,5 +50,8 @@ CUA is an enterprise computer-use automation system engineered for regulated fin
 ./start.sh check           # Run CI checks: lint + strict typecheck + invariants + secret scan + tests + smoke
 ./start.sh test            # Run offline test suite (0 API keys, 0 network)
 make verify-live           # Check a discovery run was a live model, not a script
+make edge-cases            # 22 hostile/boundary scenarios run for real; every run saved to evidence/edge-cases/
+make test-report           # Whole suite under line + branch coverage -> evidence/tests/
+make mutation-check        # Break each invariant on purpose; prove the suite goes red
 cua replay <artifact>      # Replay a compiled capability deterministically
 ```

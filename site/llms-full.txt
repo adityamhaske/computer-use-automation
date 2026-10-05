@@ -50,6 +50,9 @@ make test           # the offline suite -- no API key, no network
 make secrets        # fail on any key-shaped string in tracked files (HISTORY=1: every commit)
 make discover       # live LLM discovery; needs OMNIROUTE_API_KEY
 make verify-live    # check the newest discovery run was a live model, not a script
+make edge-cases     # 22 hostile/boundary scenarios run for real; every run saved to evidence/edge-cases/
+make test-report    # whole suite under line + branch coverage -> evidence/tests/
+make mutation-check # break each invariant on purpose; prove the suite goes red
 ```
 
 ---

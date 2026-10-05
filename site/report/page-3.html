@@ -240,6 +240,16 @@ runnable entry point, so every &quot;mechanically enforced&quot; claim here held
 <code>lint-imports</code>. And the compiler wrote the discovery host into <code>entrypoint.url_pattern</code> verbatim,
 so <code>--base-url</code> substituted nothing, working only on the recording machine — now parameterised at
 compile time, and pinned under a test.</p>
+<p><strong>Then the question was whether the suite could fail at all.</strong> A hardening pass wrote about 1,800
+edge-case tests — boundary, malformed, hostile and out-of-order input for every subsystem, the
+command line included — and the defects they exposed were real, and are all fixed: an allowlist that
+raised on a malformed URL instead of denying it; the headline wrong-action metric ignoring the
+expected status; a sealed artifact that reloaded as <em>tampered</em> after declaring an empty list; an
+identifier that was all digits one time in 300 and was redacted as an account number in its own
+trace; one redaction pattern that took minutes on a single long token. <code>make mutation-check</code> then
+breaks the code on purpose — each of the ten invariants, and a guard per fix — and records whether
+the suite noticed: 18 of 18 deliberate violations are caught. <code>make edge-cases</code> keeps 22 scenarios
+as saved runs, so the boundary conditions can be opened and read rather than only asserted.</p>
 <h3>What to look at</h3>
 <table>
 <thead>
@@ -272,6 +282,18 @@ compile time, and pinned under a test.</p>
 <tr>
 <td>The numbers behind §3 and §4</td>
 <td><a href="https://github.com/adityamhaske/computer-use-automation/tree/main/evidence/evals/"><code>evidence/evals/</code></a></td>
+</tr>
+<tr>
+<td>The edge cases, run and saved</td>
+<td><a href="https://github.com/adityamhaske/computer-use-automation/blob/main/evidence/edge-cases/SUMMARY.md"><code>evidence/edge-cases/</code></a></td>
+</tr>
+<tr>
+<td>Does the suite fail when it should?</td>
+<td><a href="https://github.com/adityamhaske/computer-use-automation/blob/main/evidence/tests/mutation-report.md"><code>evidence/tests/mutation-report.md</code></a></td>
+</tr>
+<tr>
+<td>One page of results</td>
+<td><a href="https://github.com/adityamhaske/computer-use-automation/blob/main/evidence/SUMMARY.md"><code>evidence/SUMMARY.md</code></a></td>
 </tr>
 </tbody>
 </table>

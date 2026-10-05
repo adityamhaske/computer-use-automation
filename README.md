@@ -31,9 +31,10 @@ make setup && make demo
 That is the whole assessment path: `make setup` builds the venv and installs Chromium, `make demo`
 runs all fourteen stages end to end in about a minute. Everything in this repository works offline
 with no key. The single exception is a live discovery run — copy `.env.example` to `.env` and set
-`OMNIROUTE_API_KEY`, `CUA_LLM_BASE_URL` and `CUA_LLM_MODEL` for that; without a key, discovery
-replays a recorded transcript and says so, in the output and in the evidence it writes.
-`make verify-live` then checks the resulting run was a live model and not a script.
+`OMNIROUTE_API_KEY`, `CUA_LLM_BASE_URL` and `CUA_LLM_MODEL` for that (name a concrete model, not an
+alias, so the run record says which one ran); without a key, discovery replays a recorded
+transcript and says so, in the output and in the evidence it writes. `make verify-live` then checks
+the resulting run was a live model and not a script.
 
 `make` on its own lists every target.
 
@@ -127,12 +128,14 @@ The operator's clicks travel the same policy chokepoint as the machine's. From
 make check             # lint, strict types, import contracts, secret scan, the full suite, UI smoke test
 make test-report       # the suite under line + branch coverage -> evidence/tests/test-report.md
 make mutation-check    # break each invariant on purpose and prove the suite goes red
+make edge-cases        # 22 hostile/boundary scenarios run for real, every run saved -> evidence/edge-cases/
+make evidence          # refresh everything under evidence/ in one go
 ```
 
-The suite is 2,067 tests and runs offline with no key. More than 1,700 are edge cases — boundary,
+The suite is 2,134 tests and runs offline with no key. More than 1,700 are edge cases — boundary,
 malformed, hostile and out-of-order input for every subsystem — written to find defects rather than
 confirm assumptions, and every defect they found is fixed. The mutation check shows the tests would
-*fail* if a guarantee stopped holding: 16 of 16 deliberate violations are caught. The evidence is in
+*fail* if a guarantee stopped holding: 18 of 18 deliberate violations are caught. The evidence is in
 [`evidence/tests/`](evidence/tests/): the [test report](evidence/tests/test-report.md), the
 [mutation report](evidence/tests/mutation-report.md) and the
 [catalogue of every edge case defended](evidence/tests/edge-case-catalogue.md).
