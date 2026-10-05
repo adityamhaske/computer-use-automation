@@ -25,8 +25,8 @@
         "ambiguity_score": null,
         "fingerprint_matched": null
       },
-      "started_at": "2026-09-30T22:07:02.371050Z",
-      "duration_ms": 4,
+      "started_at": "2026-10-05T14:49:30.812553Z",
+      "duration_ms": 8,
       "recovery_rule_applied": null,
       "error_code": null,
       "snapshot_ref": null,
@@ -50,8 +50,8 @@
         "ambiguity_score": null,
         "fingerprint_matched": null
       },
-      "started_at": "2026-09-30T22:07:04.780361Z",
-      "duration_ms": 1,
+      "started_at": "2026-10-05T14:49:35.382307Z",
+      "duration_ms": 3,
       "recovery_rule_applied": null,
       "error_code": null,
       "snapshot_ref": null,
@@ -59,11 +59,11 @@
     }
   ],
   "result": null,
-  "started_at": "2026-09-30T22:06:59.903310Z",
-  "duration_ms": 10527,
+  "started_at": "2026-10-05T14:49:26.986407Z",
+  "duration_ms": 17222,
   "evidence_ref": "evidence/discovery/demo-discovery",
-  "model_name": "auto",
-  "tokens_used": 6947,
+  "model_name": "kr/claude-sonnet-4.5",
+  "tokens_used": 35367,
   "resolver_config_hash": null,
   "human_actions": 0,
   "lease_transitions": []

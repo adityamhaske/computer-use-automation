@@ -2,7 +2,7 @@
   "run_id": "demo-agent-missing",
   "kind": "replay",
   "capability_ref": "corebank.member.savings_balance@1.0.0",
-  "capability_content_hash": "sha256:b3d50af36960c1dab728f9f2ac33d60e2090260fc90cb42d181ef068f28a11cb",
+  "capability_content_hash": "sha256:7f3dbf958c78e142fe6f0a184a8c31551a06221d4303eb94c59d5ddf758a7bf2",
   "tenant": null,
   "goal": null,
   "inputs": {
@@ -19,8 +19,8 @@
       "policy_decision": "safe (default)",
       "observation": null,
       "resolution": null,
-      "started_at": "2026-09-30T22:07:16.759026Z",
-      "duration_ms": 26,
+      "started_at": "2026-10-05T14:49:50.354960Z",
+      "duration_ms": 10,
       "recovery_rule_applied": null,
       "error_code": null,
       "snapshot_ref": null,
@@ -44,7 +44,7 @@
         "ambiguity_score": null,
         "fingerprint_matched": null
       },
-      "started_at": "2026-09-30T22:07:16.785241Z",
+      "started_at": "2026-10-05T14:49:50.376115Z",
       "duration_ms": 3,
       "recovery_rule_applied": null,
       "error_code": null,
@@ -69,7 +69,7 @@
         "ambiguity_score": null,
         "fingerprint_matched": null
       },
-      "started_at": "2026-09-30T22:07:16.886771Z",
+      "started_at": "2026-10-05T14:49:50.476588Z",
       "duration_ms": 1,
       "recovery_rule_applied": null,
       "error_code": null,
@@ -81,7 +81,7 @@
     "status": "business_outcome",
     "capability_id": "corebank.member.savings_balance",
     "capability_version": "1.0.0",
-    "run_id": "rep-de9de6d6a8",
+    "run_id": "rep-68f43d0b53",
     "outputs": {},
     "outcome": {
       "code": "member_not_found",
@@ -93,7 +93,7 @@
     "intervention": null,
     "steps_executed": 2,
     "steps_total": 5,
-    "duration_ms": 201,
+    "duration_ms": 176,
     "drift_score": 0.0,
     "strategy_mix": {
       "semantic_exact": 2
@@ -101,8 +101,8 @@
     "recovery_attempts": 0,
     "evidence_ref": "evidence/replay/demo-agent-missing"
   },
-  "started_at": "2026-09-30T22:07:16.713583Z",
-  "duration_ms": 200,
+  "started_at": "2026-10-05T14:49:50.325139Z",
+  "duration_ms": 176,
   "evidence_ref": "evidence/replay/demo-agent-missing",
   "model_name": null,
   "tokens_used": null,

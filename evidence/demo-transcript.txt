@@ -4,17 +4,17 @@ Computer-use automation — end-to-end demonstration
   discovery is probabilistic; execution is deterministic
 
   [ok] 1. Mock back-office running
-        hostile frameset app at http://127.0.0.1:51826
+        hostile frameset app at http://127.0.0.1:55311
   [ok] 2. Discovery
-        live model (auto) — 3 effective step(s)
+        live model (kr/claude-sonnet-4.5) — 3 effective step(s)
   [ok] 3. Capability compiled and sealed
         evidence/discovery/demo-discovery/compiled.yaml  inputs=['member_number'] outputs=['savings_balance']
   [ok] 4. Deterministic replay, new inputs
-        SUCCESS - 3 output(s) in 528ms  outputs={'savings_balance': '18730.00', 'account_status': 'Active', 'as_of': '09/11/2026'}
+        SUCCESS - 3 output(s) in 535ms  outputs={'savings_balance': '18730.00', 'account_status': 'Active', 'as_of': '09/11/2026'}
   [ok] 5. Business outcome (exit 0 — an answer, not a crash)
         BUSINESS OUTCOME - member_not_found   exit=0
   [ok] 6. Injected 502 — declared recovery cleared it
-        SUCCESS - 3 output(s) in 558ms  recovery_attempts=1
+        SUCCESS - 3 output(s) in 566ms  recovery_attempts=1
   [ok] 7. Same fault past its declared budget — bounded, so it escalated
         NEEDS HUMAN - recovery rule 'transient_load' did not clear the condition after 3 attempt(s)   exit=2
   [ok] 8. Malformed input rejected before acting
@@ -24,7 +24,7 @@ Computer-use automation — end-to-end demonstration
   [ok] 10. Operator drove the same live session, then handed it back
         epoch 5 — +77/-4 nodes
   [ok] 11. Re-anchored, and the run finished on the operator's session
-        SUCCESS - 3 output(s) in 365ms  outputs={'savings_balance': '4210.55', 'account_status': 'Active', 'as_of': '09/11/2026'}
+        SUCCESS - 3 output(s) in 345ms  outputs={'savings_balance': '4210.55', 'account_status': 'Active', 'as_of': '09/11/2026'}
   [ok] 12. An agent called it by name — typed args, declared outcomes
         catalog: 2 capability(ies) · answered: 4210.55 · answered_negative: "No member with that number exists."
   [ok] 13. Unattended replay is gated on review, not just integrity
@@ -33,6 +33,6 @@ Computer-use automation — end-to-end demonstration
         `cua codegen` emitted 94 lines of pytest + Playwright from 5 recorded step(s); 1 CSS hint(s) in the artifact, 0 in the output.
 
 
-  evidence: /Users/adityamhaske/Documents/projects/interface.ai/evidence
+  evidence: ./evidence
   done
 

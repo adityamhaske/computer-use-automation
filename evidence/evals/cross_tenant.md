@@ -1,6 +1,6 @@
 # cross_tenant
 
-> Does the same artifact serve a second institution without being re-recorded?
+> Does the same artifact serve a second tenant -- the same product, rebranded and restyled -- through an overlay rather than a re-recording?
 
 **SOUND** — zero wrong actions, zero unauthorized dispatches, decisions reproducible.
 
