@@ -51,6 +51,23 @@ from cua.runtime.wiring import Rig, build_rig
 EVIDENCE = Path("evidence")
 GOAL = "Look up member 12345 and read their current savings balance"
 
+
+def publish_path(capability: Capability, catalog: Path, discovery_dir: Path) -> Path:
+    """Where a compiled capability is written: the catalog's empty slot, or its own directory.
+
+    Two conditions keep it out of the catalog. The slot must be empty, so a demo never replaces an
+    artifact that was discovered earlier. And the capability must return something: a run whose
+    model called `finish` without ever recording a value compiles to a draft with no outputs, which
+    is not a capability worth publishing -- it would sit in the catalog and be offered to an agent
+    as a tool that returns nothing. Kept out, it stays in this run's own evidence directory, where
+    it can be read and where nothing mistakes it for the published one.
+    """
+    slot = catalog / f"{capability.id}@{capability.version}.yaml"
+    if capability.outputs and not slot.exists():
+        return slot
+    return discovery_dir / "compiled.yaml"
+
+
 RECORDED_FLOW = [
     ScriptedCall(
         "type_text",
@@ -321,10 +338,7 @@ class Demo:
             # nothing mistakes it for the published one.
             capabilities = EVIDENCE / "capabilities"
             capabilities.mkdir(parents=True, exist_ok=True)
-            published = (
-                capabilities / f"{compiled.capability.id}@{compiled.capability.version}.yaml"
-            )
-            artifact_path = disc_dir / "compiled.yaml" if published.exists() else published
+            artifact_path = publish_path(compiled.capability, capabilities, disc_dir)
             artifact_path.write_text(dump_capability(compiled.capability), encoding="utf-8")
             self.say(
                 "Capability compiled and sealed",

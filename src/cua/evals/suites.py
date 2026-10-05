@@ -1,8 +1,11 @@
 """The two suites.
 
 `replay_stability` answers "does the same artifact keep working, and does it ever act wrongly?"
-`cross_tenant` answers "does the same artifact work at a *different institution* without being
-re-recorded?" -- the claim the write-up leans on hardest, and the one most worth making falsifiable.
+`cross_tenant` answers "does the same artifact work for a *second tenant* -- the same product,
+rebranded and restyled -- without being re-recorded?" It is measured against `variant_b` of the mock
+application, a stand-in for a second credit union running the same vendor product, not against a
+real second institution. It is the claim the write-up leans on hardest, and the one most worth
+making falsifiable.
 """
 
 from __future__ import annotations
@@ -129,7 +132,7 @@ def replay_stability(*, repeats: int = 5, headless: bool = True) -> SuiteResult:
 
 
 def cross_tenant(*, repeats: int = 2, headless: bool = True) -> SuiteResult:
-    """The same artifact at a second institution, reached by an overlay rather than a re-recording.
+    """The same artifact for a second tenant, reached by an overlay rather than a re-recording.
 
     Variant B rebrands the labels *and* restyles the markup, so every cached CSS hint is dead and
     `semantic_exact` no longer matches. A run can therefore only succeed by descending to
@@ -200,7 +203,10 @@ def cross_tenant(*, repeats: int = 2, headless: bool = True) -> SuiteResult:
         )
     return SuiteResult(
         name="cross_tenant",
-        headline="Does the same artifact serve a second institution without being re-recorded?",
+        headline=(
+            "Does the same artifact serve a second tenant -- the same product, rebranded and "
+            "restyled -- through an overlay rather than a re-recording?"
+        ),
         capability=effective,
         tenant="northgate-fcu",
         source_hash=_source().content_hash,

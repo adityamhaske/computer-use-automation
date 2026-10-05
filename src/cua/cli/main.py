@@ -2,29 +2,63 @@
 
 from __future__ import annotations
 
+import functools
 import json
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Annotated, Any
+from typing import Annotated, Any, ParamSpec
 
 import typer
+import yaml
 from dotenv import load_dotenv
 
 from cua.agent.llm import LlmError, OpenRouterLlm
 from cua.agent.loop import DiscoveryAgent
 from cua.agent.stop import Budget
+from cua.cli.mock_login import TargetUnreachableError
 from cua.domain.capability import Capability
 from cua.domain.ids import new_id
 from cua.domain.result import RunResult, RunStatus
 from cua.domain.serde import dump_capability
 from cua.recorder.compile import compile_capability
+from cua.runtime.dispatcher import EntrypointUnreachableError, NavigationBlockedError
 from cua.runtime.wiring import build_rig
 
 app = typer.Typer(
     add_completion=False,
     help="Computer-use automation: discover once with an LLM, replay deterministically.",
 )
+
+_P = ParamSpec("_P")
+
+
+def _friendly_target_errors(command: Callable[_P, None]) -> Callable[_P, None]:
+    """Turn "the target would not load" into a sentence and an exit code, not a traceback.
+
+    Three layers can say it -- the sign-in helper (nothing listening), the entry-point open
+    (permitted, then unreachable) and the allowlist (refused) -- and each is a condition the person
+    at the keyboard can fix, so none should end in a stack trace. A traceback reads as a defect in
+    the system, and in front of an audience it is the first thing remembered.
+    """
+
+    @functools.wraps(command)
+    def wrapper(*args: _P.args, **kwargs: _P.kwargs) -> None:
+        try:
+            command(*args, **kwargs)
+        except (TargetUnreachableError, EntrypointUnreachableError) as exc:
+            typer.secho(f"Could not reach the target: {exc}", fg=typer.colors.RED, err=True)
+            typer.echo(
+                "Is the application running? For the bundled mock back-office: `make app` "
+                "(http://127.0.0.1:8811).",
+                err=True,
+            )
+            raise typer.Exit(code=1) from None
+        except NavigationBlockedError as exc:
+            typer.secho(f"Refused by policy: {exc}", fg=typer.colors.RED, err=True)
+            raise typer.Exit(code=2) from None
+
+    return wrapper
 
 
 @app.callback()
@@ -41,6 +75,7 @@ def _bootstrap() -> None:
 
 
 @app.command()
+@_friendly_target_errors
 def discover(
     goal: Annotated[str, typer.Option(help="What to accomplish, in plain language.")],
     target: Annotated[str, typer.Option(help="Entry-point URL of the application.")],
@@ -136,8 +171,17 @@ def discover(
 
 
 @app.command()
+@_friendly_target_errors
 def replay(
-    artifact: Annotated[Path, typer.Argument(help="Path to a capability YAML.")],
+    artifact: Annotated[
+        Path,
+        typer.Argument(
+            help="Path to a capability YAML.",
+            exists=True,
+            dir_okay=False,
+            readable=True,
+        ),
+    ],
     input: Annotated[  # noqa: A002 - reads naturally on the command line
         list[str] | None, typer.Option("--input", help="name=value, repeatable.")
     ] = None,
@@ -184,15 +228,17 @@ def replay(
         )
         raise typer.Exit(code=2)
 
-    capability = load_capability(artifact.read_text(encoding="utf-8"))
+    try:
+        capability = load_capability(artifact.read_text(encoding="utf-8"))
+    except (OSError, ValueError, yaml.YAMLError) as exc:
+        # An unreadable file, malformed YAML, a schema violation or a content-hash mismatch (an
+        # artifact edited after it was sealed): all are "this is not a capability I will run", and
+        # the message names which. First line only -- pydantic's full report is a screenful.
+        reason = str(exc).strip().splitlines()[0] if str(exc).strip() else type(exc).__name__
+        typer.secho(f"cannot run {artifact}: {reason}", fg=typer.colors.RED, err=True)
+        raise typer.Exit(code=2) from None
 
-    supplied: dict[str, str] = {}
-    for pair in input or []:
-        if "=" not in pair:
-            typer.secho(f"--input expects name=value, got {pair!r}", fg=typer.colors.RED, err=True)
-            raise typer.Exit(code=2)
-        name, _, value = pair.partition("=")
-        supplied[name] = value
+    supplied = _parse_inputs(input)
 
     run_id = new_id("rep", 10)
     result, run_dir = _replay_once(
@@ -356,10 +402,15 @@ def _parse_inputs(pairs: list[str] | None) -> dict[str, str]:
     """`--input name=value`, repeated, into a dict."""
     supplied: dict[str, str] = {}
     for pair in pairs or []:
-        if "=" not in pair:
+        name, separator, value = pair.partition("=")
+        if not separator or not name.strip():
             typer.secho(f"--input expects name=value, got {pair!r}", fg=typer.colors.RED, err=True)
             raise typer.Exit(code=2)
-        name, _, value = pair.partition("=")
+        if name in supplied:
+            # Last-one-wins would silently pick a value for the caller; for a command that can act
+            # on a real system, "which one did you mean" is a question to ask, not to guess.
+            typer.secho(f"--input {name!r} was given more than once", fg=typer.colors.RED, err=True)
+            raise typer.Exit(code=2)
         supplied[name] = value
     return supplied
 
@@ -447,6 +498,7 @@ class _BorrowedRig:
 
 
 @app.command()
+@_friendly_target_errors
 def console(
     port: Annotated[int, typer.Option(help="Port for the operator console.")] = 8812,
     target: Annotated[str, typer.Option(help="URL to open in the supervised session.")] = (
@@ -834,6 +886,7 @@ def catalog_show(
 
 
 @catalog_app.command("invoke")
+@_friendly_target_errors
 def catalog_invoke(
     ref: Annotated[str, typer.Argument(help="Capability `id` or `id@version`.")],
     input: Annotated[  # noqa: A002 - reads naturally on the command line
@@ -874,13 +927,7 @@ def catalog_invoke(
         typer.secho(str(exc), fg=typer.colors.RED, err=True)
         raise typer.Exit(code=2) from exc
 
-    supplied: dict[str, str] = {}
-    for pair in input or []:
-        if "=" not in pair:
-            typer.secho(f"--input expects name=value, got {pair!r}", fg=typer.colors.RED, err=True)
-            raise typer.Exit(code=2)
-        name, _, value = pair.partition("=")
-        supplied[name] = value
+    supplied = _parse_inputs(input)
 
     result, run_dir = _replay_once(
         capability=capability,
@@ -899,6 +946,7 @@ def catalog_invoke(
 
 
 @app.command("agent-demo")
+@_friendly_target_errors
 def agent_demo(
     base_url: Annotated[str, typer.Option(help="Where the target application is running.")],
     ref: Annotated[

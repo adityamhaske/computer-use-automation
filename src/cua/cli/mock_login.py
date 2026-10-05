@@ -24,6 +24,8 @@ import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from playwright.sync_api import Error as PlaywrightError
+
 if TYPE_CHECKING:
     from cua.runtime.wiring import Rig
 
@@ -57,12 +59,25 @@ def _demo_credentials() -> tuple[str, str]:
     return VALID_USER, VALID_PW
 
 
+class TargetUnreachableError(RuntimeError):
+    """The browser could not load the target at all: nothing listening, a refused connection, DNS.
+
+    Typed so the CLI can say "is the app running?" instead of printing a Playwright traceback --
+    the failure a presenter hits when the app was never started, and not a defect in the system.
+    """
+
+
 def sign_in(rig: Rig, base_url: str) -> None:
     """Put the mock app's session where an already-authenticated operator's would already be."""
     user, password = _demo_credentials()
 
     page = rig.driver.page
-    page.goto(f"{base_url}/login")
+    try:
+        page.goto(f"{base_url}/login")
+    except PlaywrightError as exc:
+        # First line only: Playwright appends a multi-line call log that is noise to a reader.
+        reason = str(exc).strip().splitlines()[0] if str(exc).strip() else "navigation failed"
+        raise TargetUnreachableError(f"{base_url} -- {reason}") from exc
     page.fill('input[name="user"]', user)
     page.fill('input[name="pw"]', password)
     page.click('input[type="submit"]')
