@@ -134,8 +134,12 @@ def test_a_rejected_arm_returns_a_bare_error_over_the_wire_with_no_traceback(
         assert response.status_code >= 400
         for needle in ("Traceback", "faults.py", 'File "', "ValueError"):
             assert needle not in response.text
-        # ...and the server survived it: the next request is answered normally.
-        assert client.get(f"{live.url}/_control/state").json()["armed"] == {}
+    # ...and the server survived it: a new request is answered normally. A NEW connection, not the
+    # same client: uvicorn closes the connection after an unhandled application error, and whether
+    # a request reused on that keep-alive connection sees the reset depends on the platform (it
+    # passed on macOS and failed on Linux CI with "Connection reset by peer").
+    with httpx.Client(timeout=10) as fresh:
+        assert fresh.get(f"{live.url}/_control/state").json()["armed"] == {}
 
 
 def test_two_clients_share_one_fault_but_not_one_session(live: _Server) -> None:
