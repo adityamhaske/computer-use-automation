@@ -85,3 +85,17 @@ jobs:
       # should fail here rather than in front of someone reading the README.
       - name: The demo a reviewer runs
         run: make demo
+
+      # What a reviewer is shown is the demo's evidence, so keep exactly what this run produced. CI
+      # has no model key on purpose, so its discovery stage says it ran from the recorded transcript.
+      - name: Upload the demo evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-evidence-${{ github.sha }}
+          path: |
+            evidence/discovery/demo-discovery/
+            evidence/replay/demo-*/
+            evidence/escalation/demo-escalation/
+          retention-days: 14
+          if-no-files-found: warn

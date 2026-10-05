@@ -1,0 +1,38 @@
+# Keeps the pinned toolchain from rotting. Weekly, grouped, and capped, so it is a small Monday
+# review and not a stream of one-line pull requests. Every update is gated by the same CI as any
+# other change: lint, strict types, the architectural contracts, secret scan, the whole suite.
+version: 2
+
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    groups:
+      dev-tooling:
+        patterns:
+          - "ruff"
+          - "mypy"
+          - "pytest*"
+          - "coverage"
+          - "import-linter"
+          - "types-*"
+      runtime:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "ruff"
+          - "mypy"
+          - "pytest*"
+          - "coverage"
+          - "import-linter"
+          - "types-*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3

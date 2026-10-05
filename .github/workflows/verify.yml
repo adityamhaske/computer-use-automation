@@ -1,0 +1,95 @@
+name: Verify
+
+# The slow checks that CI does not run on every push -- and the ones that answer a different question
+# from "do the tests pass?":
+#
+#   mutation check   Does the suite go RED when an invariant is broken on purpose? A passing test only
+#                    means something if it would fail when the claim stopped being true. A mutation
+#                    that survives is a hole in the suite and fails this workflow.
+#   edge-case runs   The hostile and boundary scenarios actually executed against the live mock app,
+#                    every run saved. A scenario that deviates from what it declares fails.
+#   test report      Counts and line/branch coverage, plus the catalogue of every edge case defended.
+#
+# Runs nightly, on demand, and on pushes that touch code or tests. The evidence is uploaded as a
+# build artifact, so a reviewer can download exactly what this run produced. No API key is configured
+# on purpose: nothing here needs a model.
+
+on:
+  schedule:
+    - cron: "23 5 * * *"
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "apps/**"
+      - "config/**"
+      - "scripts/mutation_check.py"
+      - "scripts/run_edge_cases.py"
+      - "scripts/test_report.py"
+      - "pyproject.toml"
+      - ".github/workflows/verify.yml"
+
+permissions:
+  contents: read
+
+# A newer push supersedes a run in flight; the group is keyed on the event as well as the ref, so a
+# scheduled run never cancels a push-triggered one.
+concurrency:
+  group: verify-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHONUNBUFFERED: "1"
+  CUA_HEADLESS: "true"
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Install dependencies
+        run: |
+          uv venv --python 3.11 .venv
+          uv pip install --python .venv/bin/python -e ".[dev]"
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pyproject.toml') }}
+
+      - name: Install Chromium
+        run: .venv/bin/python -m playwright install chromium --with-deps
+
+      - name: Edge-case runs (every scenario must behave as declared)
+        run: make edge-cases
+
+      - name: Test report (whole suite under coverage)
+        run: make test-report
+
+      - name: Mutation check (every deliberate violation must be caught)
+        run: make mutation-check
+
+      # `if: always()` so a failing run still uploads what it produced -- the evidence for a failure
+      # is the most useful thing to have.
+      - name: Upload the evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verification-evidence-${{ github.sha }}
+          path: |
+            evidence/tests/
+            evidence/edge-cases/
+          retention-days: 30
+          if-no-files-found: warn
