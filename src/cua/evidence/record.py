@@ -77,7 +77,7 @@ def build_run_record(
                 events.append(json.loads(line))
 
     start = next((e for e in events if e["event"] == EventType.RUN_START.value), {})
-    end = next(
+    end: dict[str, Any] = next(
         (
             e
             for e in reversed(events)
