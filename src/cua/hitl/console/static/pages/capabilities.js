@@ -147,7 +147,7 @@ function renderDetail(detailEl, result) {
 
   detailEl.innerHTML = `
     <div class="detail-panel-header">
-      <h2>${escapeHtml(capability.title || capability.id)}</h2>
+      <h2 title="${escapeHtml(capability.title || capability.id)}">${escapeHtml(capability.title || capability.id)}</h2>
       ${statusPill(state)}
     </div>
     <dl class="kv-grid" style="margin-bottom:var(--space-6);">
