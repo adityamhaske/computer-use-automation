@@ -95,6 +95,35 @@ claim it defends, so this list is the specification of what the system must hand
 - concurrent readers all get the same verified capability
 - a large catalog lists completely and deterministically
 
+## `tests/integration/test_edge_cli_commands.py` -- 62 tests
+
+- version prints the package version and exits zero
+- help lists every command a reader is told about
+- every command documents itself (x8)
+- an unknown command is a usage error not a crash
+- catalog list shows the reference capability and its integrity
+- catalog show prints the artifact and resolves a bare id
+- catalog show tool schema is json an agent can load
+- catalog show of something that is not there is a clean refusal (x7)
+- codegen writes a test that is valid python
+- codegen for an unknown capability is refused without writing anything
+- input pairs split on the first equals and keep the value verbatim (x8)
+- a malformed input pair is a usage error (x5)
+- replay of a file that does not exist is a usage error
+- replay of a directory is a usage error
+- sign in without a base url says what is missing
+- a malformed input pair stops replay before anything is launched
+- replay of a document that is not a capability is refused cleanly (x5)
+- replay of an artifact edited after it was sealed is refused
+- catalog invoke validates its arguments before acting
+- discover without a model key says so instead of starting
+- a target problem becomes a sentence and the right exit code (x3)
+- the wrapper does not swallow a commands own exit code
+- the wrapper does not hide a genuine defect
+- the wrapper keeps the commands options working
+- replay against a target that is not running is a clean error
+- a value outside the declared pattern fails before the browser moves (x7)
+
 ## `tests/integration/test_edge_hitl_broker.py` -- 50 tests
 
 - a second escalation is refused and opens nothing (x3)
@@ -453,6 +482,14 @@ claim it defends, so this list is the specification of what the system must hand
 - fallback rate skips steps that resolved nothing
 - unauthorized dispatches count every offending step
 - ground truth outputs default is not shared between instances
+
+## `tests/unit/test_edge_demo_publish.py` -- 5 tests
+
+- a capability that returns something is published into an empty slot
+- an occupied slot is never overwritten
+- a capability with no outputs stays in its own run directory
+- a capability with no outputs in an occupied slot is also kept out
+- publishing decides a path and does not touch the filesystem
 
 ## `tests/unit/test_edge_domain_ids.py` -- 13 tests
 

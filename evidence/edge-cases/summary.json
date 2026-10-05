@@ -1,0 +1,224 @@
+{
+  "scenarios": [
+    {
+      "scenario": "member-active",
+      "group": "member",
+      "proves": "The straightforward case: an answer with three typed outputs.",
+      "input": "member_id='12345'",
+      "expected": "success, exit 0",
+      "observed": "success, exit 0, 6 dispatch(es)",
+      "passed": true,
+      "problems": []
+    },
+    {
+      "scenario": "member-closed-account",
+      "group": "member",
+      "proves": "A closed savings account with a $0.00 balance is still an answer, not an error.",
+      "input": "member_id='24680'",
+      "expected": "success, exit 0",
+      "observed": "success, exit 0, 6 dispatch(es)",
+      "passed": true,
+      "problems": []
+    },
+    {
+      "scenario": "member-no-savings",
+      "group": "member",
+      "proves": "Checking-only member: a declared business outcome, exit 0.",
+      "input": "member_id='13579'",
+      "expected": "business_outcome, exit 0, no_savings_account",
+      "observed": "business_outcome, exit 0, no_savings_account, 3 dispatch(es)",
+      "passed": true,
+      "problems": []
+    },
+    {
+      "scenario": "member-restricted",
+      "group": "member",
+      "proves": "The application denies the record: `permission_denied`, an answer, exit 0.",
+      "input": "member_id='55555'",
+      "expected": "business_outcome, exit 0, permission_denied",
+      "observed": "business_outcome, exit 0, permission_denied, 3 dispatch(es)",
+      "passed": true,
+      "problems": []
+    },
+    {
+      "scenario": "member-not-found",
+      "group": "member",
+      "proves": "'No such member' is a legitimate answer the caller needs, not a crash.",
+      "input": "member_id='99999'",
+      "expected": "business_outcome, exit 0, member_not_found",
+      "observed": "business_outcome, exit 0, member_not_found, 3 dispatch(es)",
+      "passed": true,
+      "problems": []
+    },
+    {
+      "scenario": "input-minimum-length",
+      "group": "input",
+      "proves": "Four digits is the shortest the pattern allows: accepted, and simply not found.",
+      "input": "member_id='1234'",
+      "expected": "business_outcome, exit 0, member_not_found",
+      "observed": "business_outcome, exit 0, member_not_found, 3 dispatch(es)",
+      "passed": true,
+      "problems": []
+    },
+    {
+      "scenario": "input-maximum-length",
+      "group": "input",
+      "proves": "Ten digits is the longest the pattern allows: accepted, and simply not found.",
+      "input": "member_id='1234567890'",
+      "expected": "business_outcome, exit 0, member_not_found",
+      "observed": "business_outcome, exit 0, member_not_found, 3 dispatch(es)",
+      "passed": true,
+      "problems": []
+    },
+    {
+      "scenario": "input-too-short",
+      "group": "input",
+      "proves": "Three digits: rejected before the browser moves.",
+      "input": "member_id='123'",
+      "expected": "failed, exit 1, input_validation_failed",
+      "observed": "failed, exit 1, input_validation_failed, 0 dispatch(es)",
+      "passed": true,
+      "problems": []
+    },
+    {
+      "scenario": "input-too-long",
+      "group": "input",
+      "proves": "Eleven digits: rejected before the browser moves.",
+      "input": "member_id='12345678901'",
+      "expected": "failed, exit 1, input_validation_failed",
+      "observed": "failed, exit 1, input_validation_failed, 0 dispatch(es)",
+      "passed": true,
+      "problems": []
+    },
+    {
+      "scenario": "input-empty",
+      "group": "input",
+      "proves": "An empty value: rejected, zero actions.",
+      "input": "member_id=''",
+      "expected": "failed, exit 1, input_validation_failed",
+      "observed": "failed, exit 1, input_validation_failed, 0 dispatch(es)",
+      "passed": true,
+      "problems": []
+    },
+    {
+      "scenario": "input-padded-with-space",
+      "group": "input",
+      "proves": "A leading space is not a digit: rejected, never trimmed into validity.",
+      "input": "member_id=' 12345'",
+      "expected": "failed, exit 1, input_validation_failed",
+      "observed": "failed, exit 1, input_validation_failed, 0 dispatch(es)",
+      "passed": true,
+      "problems": []
+    },
+    {
+      "scenario": "input-non-ascii-digits",
+      "group": "input",
+      "proves": "Arabic-Indic digits look like a number and are not one: rejected.",
+      "input": "member_id='\u0661\u0662\u0663\u0664\u0665'",
+      "expected": "failed, exit 1, input_validation_failed",
+      "observed": "failed, exit 1, input_validation_failed, 0 dispatch(es)",
+      "passed": true,
+      "problems": []
+    },
+    {
+      "scenario": "input-sql-shaped",
+      "group": "input",
+      "proves": "Injection-shaped text never reaches the application.",
+      "input": "member_id=\"1'; DROP TABLE members; --\"",
+      "expected": "failed, exit 1, input_validation_failed",
+      "observed": "failed, exit 1, input_validation_failed, 0 dispatch(es)",
+      "passed": true,
+      "problems": []
+    },
+    {
+      "scenario": "input-html-shaped",
+      "group": "input",
+      "proves": "Markup in an input is refused at the door.",
+      "input": "member_id='<script>alert(1)</script>'",
+      "expected": "failed, exit 1, input_validation_failed",
+      "observed": "failed, exit 1, input_validation_failed, 0 dispatch(es)",
+      "passed": true,
+      "problems": []
+    },
+    {
+      "scenario": "fault-transient-recovered",
+      "group": "fault",
+      "proves": "A 502 matches the declared `transient_load` rule; the run recovers and finishes.",
+      "input": "member_id='12345'  + fault transient_load",
+      "expected": "success, exit 0",
+      "observed": "success, exit 0, 7 dispatch(es)",
+      "passed": true,
+      "problems": []
+    },
+    {
+      "scenario": "fault-transient-exhausted",
+      "group": "fault",
+      "proves": "A 502 that never clears: recovery is bounded, so it ends as RECOVERY_EXHAUSTED and asks a human.",
+      "input": "member_id='12345'  + fault transient_load",
+      "expected": "needs_human, exit 2, recovery_exhausted",
+      "observed": "needs_human, exit 2, recovery_exhausted, 4 dispatch(es)",
+      "passed": true,
+      "problems": []
+    },
+    {
+      "scenario": "fault-session-expired-reauth",
+      "group": "fault",
+      "proves": "The session silently expires; the declared remedy signs in again through policy and the run finishes.",
+      "input": "member_id='12345'  + fault session_timeout",
+      "expected": "success, exit 0",
+      "observed": "success, exit 0, 9 dispatch(es)",
+      "passed": true,
+      "problems": []
+    },
+    {
+      "scenario": "fault-session-expired-no-remedy",
+      "group": "fault",
+      "proves": "The same expiry when the remedy cannot run: recovery is exhausted and a human is asked, rather than the run guessing its way on.",
+      "input": "member_id='12345'  + fault session_timeout",
+      "expected": "needs_human, exit 2, recovery_exhausted",
+      "observed": "needs_human, exit 2, recovery_exhausted, 1 dispatch(es)",
+      "passed": true,
+      "problems": []
+    },
+    {
+      "scenario": "fault-undeclared-screen",
+      "group": "fault",
+      "proves": "A friendly 'System Notice' nobody declared appears. It is NOT clicked through: unknown state, fail closed.",
+      "input": "member_id='12345'  + fault undeclared_dialog",
+      "expected": "needs_human, exit 2, unexpected_state",
+      "observed": "needs_human, exit 2, unexpected_state, 1 dispatch(es)",
+      "passed": true,
+      "problems": []
+    },
+    {
+      "scenario": "governance-tampered-artifact",
+      "group": "governance",
+      "proves": "A capability edited after it was sealed is refused: the content hash is the contract.",
+      "input": "(sealed artifact, one word edited)",
+      "expected": "refused: content hash mismatch",
+      "observed": "content hash mismatch for corebank.member.savings_balance@1.0.0",
+      "passed": true,
+      "problems": []
+    },
+    {
+      "scenario": "governance-off-allowlist-navigation",
+      "group": "governance",
+      "proves": "A page that talks the agent into leaving the approved hosts is refused by policy, outside the model.",
+      "input": "(direct call through the dispatcher)",
+      "expected": "DENIED / navigation_blocked, browser did not move",
+      "observed": "denied / navigation_blocked, browser did not move: True",
+      "passed": true,
+      "problems": []
+    },
+    {
+      "scenario": "governance-stale-lease",
+      "group": "governance",
+      "proves": "Automation acting after a human took the session is refused (LEASE_LOST) and is not counted as a dispatch.",
+      "input": "(direct call through the dispatcher)",
+      "expected": "LEASE_LOST, nothing dispatched, 0 unauthorized",
+      "observed": "lease_lost, dispatched=0, unauthorized=0",
+      "passed": true,
+      "problems": []
+    }
+  ]
+}

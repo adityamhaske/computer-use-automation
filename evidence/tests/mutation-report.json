@@ -1,6 +1,6 @@
 {
-  "mutations": 16,
-  "killed": 16,
+  "mutations": 18,
+  "killed": 18,
   "results": [
     {
       "invariant": "1. Replay never imports the LLM",
@@ -16,7 +16,7 @@
       "file": "src/cua/runtime/dispatcher.py",
       "verdict": "KILLED",
       "caught_by": "tests/integration/test_dispatcher.py::test_a_denied_action_is_authorized_against_but_never_dispatched",
-      "seconds": 0.5
+      "seconds": 0.3
     },
     {
       "invariant": "2. No action reaches a driver without policy authorization",
@@ -24,7 +24,7 @@
       "file": "src/cua/policy/engine.py",
       "verdict": "KILLED",
       "caught_by": "tests/integration/test_dispatcher.py::test_an_entrypoint_outside_the_allowlist_is_refused",
-      "seconds": 0.4
+      "seconds": 0.3
     },
     {
       "invariant": "3. Targets are semantic, never raw selectors",
@@ -56,7 +56,7 @@
       "file": "src/cua/policy/redact.py",
       "verdict": "KILLED",
       "caught_by": "tests/invariants/test_redaction.py::test_no_sink_retains_seeded_secrets",
-      "seconds": 0.3
+      "seconds": 0.2
     },
     {
       "invariant": "7. Business outcomes are not failures",
@@ -124,11 +124,27 @@
     },
     {
       "invariant": "Edge-case fixes",
+      "what": "the CLI prints a traceback instead of a clean error when the target is down",
+      "file": "src/cua/cli/mock_login.py",
+      "verdict": "KILLED",
+      "caught_by": "tests/integration/test_edge_cli_commands.py::test_replay_against_a_target_that_is_not_running_is_a_clean_error",
+      "seconds": 1.5
+    },
+    {
+      "invariant": "Edge-case fixes",
+      "what": "a repeated --input is silently last-one-wins",
+      "file": "src/cua/cli/main.py",
+      "verdict": "KILLED",
+      "caught_by": "tests/integration/test_edge_cli_commands.py::test_a_malformed_input_pair_is_a_usage_error[duplicate]",
+      "seconds": 0.7
+    },
+    {
+      "invariant": "Edge-case fixes",
       "what": "an explicit empty container is pruned and the sealed artifact reloads as tampered",
       "file": "src/cua/domain/serde.py",
       "verdict": "KILLED",
       "caught_by": "tests/contract/test_edge_domain_capability_schema.py::test_a_declared_empty_collection_round_trips[driver_capabilities=()]",
-      "seconds": 3.1
+      "seconds": 3.0
     }
   ]
 }

@@ -1,0 +1,68 @@
+{
+  "run_id": "fault-session-expired-no-remedy",
+  "kind": "replay",
+  "capability_ref": "corebank.member.savings_balance@1.0.0",
+  "capability_content_hash": "sha256:585ae5c2aa06465810023f7b583b9dc3b5d3c1e6ebad4ba6f44596d40c59d37e",
+  "tenant": null,
+  "goal": null,
+  "inputs": {
+    "member_id": "12345"
+  },
+  "steps": [
+    {
+      "index": 0,
+      "step_id": "navigate",
+      "action_type": "navigate",
+      "actor": "automation",
+      "lease_epoch": 1,
+      "authorized": true,
+      "policy_decision": "safe (default)",
+      "observation": null,
+      "resolution": null,
+      "started_at": "2026-10-05T14:44:07.531760Z",
+      "duration_ms": 12,
+      "recovery_rule_applied": null,
+      "error_code": null,
+      "snapshot_ref": null,
+      "screenshot_ref": null
+    }
+  ],
+  "result": {
+    "status": "needs_human",
+    "capability_id": "corebank.member.savings_balance",
+    "capability_version": "1.0.0",
+    "run_id": "rep-9e985b4d15",
+    "outputs": {},
+    "outcome": null,
+    "error": {
+      "code": "recovery_exhausted",
+      "message": "recovery rule 'session_expired' cannot run capability 'corebank.auth.sign_on': no capability source is configured for this run",
+      "step_id": null,
+      "expected": null,
+      "observed": "http://127.0.0.1:54801/",
+      "resolution": null
+    },
+    "intervention": {
+      "intervention_id": "int-4d1b945e",
+      "reason": "recovery rule 'session_expired' cannot run capability 'corebank.auth.sign_on': no capability source is configured for this run",
+      "step_id": null,
+      "step_index": 0,
+      "outputs_so_far": {}
+    },
+    "steps_executed": 0,
+    "steps_total": 5,
+    "duration_ms": 65,
+    "drift_score": 0.0,
+    "strategy_mix": {},
+    "recovery_attempts": 1,
+    "evidence_ref": "evidence/edge-cases/fault-session-expired-no-remedy"
+  },
+  "started_at": "2026-10-05T14:44:07.502239Z",
+  "duration_ms": 65,
+  "evidence_ref": "evidence/edge-cases/fault-session-expired-no-remedy",
+  "model_name": null,
+  "tokens_used": null,
+  "resolver_config_hash": null,
+  "human_actions": 0,
+  "lease_transitions": []
+}

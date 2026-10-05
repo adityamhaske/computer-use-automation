@@ -1,21 +1,21 @@
 {
-  "generated": "2026-09-30",
-  "tests": 2067,
-  "passed": 2067,
+  "generated": "2026-10-05",
+  "tests": 2134,
+  "passed": 2134,
   "failed": 0,
   "skipped_or_deselected": 0,
-  "edge_case_tests": 1733,
+  "edge_case_tests": 1800,
   "tests_by_layer": {
     "contract": 217,
-    "integration": 1130,
+    "integration": 1192,
     "invariants": 188,
-    "unit": 532
+    "unit": 537
   },
-  "suite_seconds": 114.4,
+  "suite_seconds": 108.4,
   "coverage": {
-    "line_percent": 78.9,
-    "branch_percent": 71.8,
-    "statements": 5395,
+    "line_percent": 82.8,
+    "branch_percent": 74.4,
+    "statements": 5424,
     "packages": {
       "cua (top level)": {
         "statements": 1,
@@ -38,14 +38,14 @@
         "branch_percent": 64.3
       },
       "cua.cli": {
-        "statements": 658,
-        "line_percent": 14.3,
-        "branch_percent": 8.0
+        "statements": 687,
+        "line_percent": 44.4,
+        "branch_percent": 30.6
       },
       "cua.domain": {
         "statements": 1141,
-        "line_percent": 95.8,
-        "branch_percent": 87.4
+        "line_percent": 96.3,
+        "branch_percent": 89.0
       },
       "cua.evals": {
         "statements": 284,
@@ -84,8 +84,8 @@
       },
       "cua.runtime": {
         "statements": 213,
-        "line_percent": 76.5,
-        "branch_percent": 62.5
+        "line_percent": 84.0,
+        "branch_percent": 75.0
       },
       "cua.surfaces": {
         "statements": 296,

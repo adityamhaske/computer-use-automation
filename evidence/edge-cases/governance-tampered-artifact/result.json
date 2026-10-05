@@ -1,0 +1,4 @@
+{
+  "refused": true,
+  "reason": "content hash mismatch for corebank.member.savings_balance@1.0.0: declared sha256:061c01cb033d48c9b773cf9da1265cdebf2cffc958e2c2324b7b46a703a74324, computed sha256:138440a87d131f501d4640f05151c84f9a761874c79a6eca67d8427b6292fa00. The artifact was modified after it was sealed."
+}

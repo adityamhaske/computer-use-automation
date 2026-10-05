@@ -1,0 +1,2 @@
+{"seq": 1, "at": "2026-10-05T14:44:09.662405+00:00", "run_id": "governance-stale-lease", "event": "observe", "actor": "system", "lease_epoch": 0, "url": "http://127.0.0.1:54812/", "title": "MemberDesk", "node_count": 112, "http_status": 303, "snapshot_ref": "snapshots/0000-observe.json"}
+{"seq": 2, "at": "2026-10-05T14:44:09.662541+00:00", "run_id": "governance-stale-lease", "event": "dispatch", "actor": "automation", "lease_epoch": 1, "ok": false, "refused": true, "reason": "stale lease epoch", "expected_epoch": 3}

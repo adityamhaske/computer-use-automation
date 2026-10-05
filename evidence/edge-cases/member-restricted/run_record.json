@@ -1,0 +1,112 @@
+{
+  "run_id": "member-restricted",
+  "kind": "replay",
+  "capability_ref": "corebank.member.savings_balance@1.0.0",
+  "capability_content_hash": "sha256:da6fe39e3e8c4d3a04a4114cdcd1cd56b877a4a1c5c5974ddd785069a15b5373",
+  "tenant": null,
+  "goal": null,
+  "inputs": {
+    "member_id": "55555"
+  },
+  "steps": [
+    {
+      "index": 0,
+      "step_id": "navigate",
+      "action_type": "navigate",
+      "actor": "automation",
+      "lease_epoch": 1,
+      "authorized": true,
+      "policy_decision": "safe (default)",
+      "observation": null,
+      "resolution": null,
+      "started_at": "2026-10-05T14:43:55.484605Z",
+      "duration_ms": 10,
+      "recovery_rule_applied": null,
+      "error_code": null,
+      "snapshot_ref": null,
+      "screenshot_ref": null
+    },
+    {
+      "index": 1,
+      "step_id": "enter_member_id",
+      "action_type": "type",
+      "actor": "automation",
+      "lease_epoch": 1,
+      "authorized": true,
+      "policy_decision": "safe (default)",
+      "observation": "expected",
+      "resolution": {
+        "target_description": "textbox named exact \"Member Number\" row_of \"Member Number\" in frame content",
+        "strategy_recorded": null,
+        "strategy_used": "semantic_exact",
+        "resolved_node_id": "content:/row[22]/cell[1]/textbox[0]",
+        "candidates_considered": 1,
+        "ambiguity_score": null,
+        "fingerprint_matched": null
+      },
+      "started_at": "2026-10-05T14:43:55.504983Z",
+      "duration_ms": 2,
+      "recovery_rule_applied": null,
+      "error_code": null,
+      "snapshot_ref": null,
+      "screenshot_ref": null
+    },
+    {
+      "index": 2,
+      "step_id": "submit_search",
+      "action_type": "click",
+      "actor": "automation",
+      "lease_epoch": 1,
+      "authorized": true,
+      "policy_decision": "elevated (declared:elevated)",
+      "observation": "expected",
+      "resolution": {
+        "target_description": "button named exact \"Search\" in frame content",
+        "strategy_recorded": null,
+        "strategy_used": "semantic_exact",
+        "resolved_node_id": "content:/row[23]/cell[1]/button[0]",
+        "candidates_considered": 1,
+        "ambiguity_score": null,
+        "fingerprint_matched": null
+      },
+      "started_at": "2026-10-05T14:43:55.620108Z",
+      "duration_ms": 1,
+      "recovery_rule_applied": null,
+      "error_code": null,
+      "snapshot_ref": null,
+      "screenshot_ref": null
+    }
+  ],
+  "result": {
+    "status": "business_outcome",
+    "capability_id": "corebank.member.savings_balance",
+    "capability_version": "1.0.0",
+    "run_id": "rep-442c66df2b",
+    "outputs": {},
+    "outcome": {
+      "code": "permission_denied",
+      "data": {
+        "member_id": "55555"
+      }
+    },
+    "error": null,
+    "intervention": null,
+    "steps_executed": 2,
+    "steps_total": 5,
+    "duration_ms": 191,
+    "drift_score": 0.0,
+    "strategy_mix": {
+      "semantic_exact": 2
+    },
+    "recovery_attempts": 0,
+    "evidence_ref": "evidence/edge-cases/member-restricted"
+  },
+  "started_at": "2026-10-05T14:43:55.456857Z",
+  "duration_ms": 191,
+  "evidence_ref": "evidence/edge-cases/member-restricted",
+  "model_name": null,
+  "tokens_used": null,
+  "resolver_config_hash": null,
+  "human_actions": 0,
+  "lease_transitions": []
+}

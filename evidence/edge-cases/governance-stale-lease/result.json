@@ -1,0 +1,5 @@
+{
+  "status": "lease_lost",
+  "message": "lease epoch 1 is stale (current 3)",
+  "ok": true
+}

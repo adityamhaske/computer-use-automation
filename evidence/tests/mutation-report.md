@@ -5,7 +5,7 @@ claim stopped holding: each row deliberately breaks the code in one way, runs th
 meant to defend it, and records whether any went red. The source is restored
 byte-for-byte after each one. Regenerate with `make mutation-check`.
 
-**16 of 16 mutations caught.**
+**18 of 18 mutations caught.**
 
 | Invariant / area | Deliberate violation | Verdict | First test to catch it |
 |---|---|---|---|
@@ -24,4 +24,6 @@ byte-for-byte after each one. Regenerate with `make mutation-check`.
 | Edge-case fixes | the wrong-action metric ignores the expected status | **KILLED** | `tests/unit/test_edge_cli_evals_codegen_scorers.py::test_a_success_where_the_seeded_truth_is_a_business_outcome_is_a_wrong_action` |
 | Edge-case fixes | a refused stale-lease attempt is counted as an unauthorized dispatch | **KILLED** | `tests/integration/test_edge_runtime_dispatch_pipeline.py::test_a_refused_stale_dispatch_is_not_an_unauthorized_dispatch` |
 | Edge-case fixes | minted ids may be all digits and get redacted as account numbers | **KILLED** | `tests/unit/test_edge_domain_ids.py::test_an_id_always_contains_a_letter_however_many_are_drawn[8]` |
+| Edge-case fixes | the CLI prints a traceback instead of a clean error when the target is down | **KILLED** | `tests/integration/test_edge_cli_commands.py::test_replay_against_a_target_that_is_not_running_is_a_clean_error` |
+| Edge-case fixes | a repeated --input is silently last-one-wins | **KILLED** | `tests/integration/test_edge_cli_commands.py::test_a_malformed_input_pair_is_a_usage_error[duplicate]` |
 | Edge-case fixes | an explicit empty container is pruned and the sealed artifact reloads as tampered | **KILLED** | `tests/contract/test_edge_domain_capability_schema.py::test_a_declared_empty_collection_round_trips[driver_capabilities=()]` |

@@ -1,0 +1,5 @@
+{
+  "status": "denied",
+  "message": "navigation blocked: 'evil.example.com' is not in the allowlist ['127.0.0.1:54809', '127.0.0.1:8811', '127.0.0.1:8812', 'localhost:8811', 'localhost:8812']",
+  "ok": true
+}

@@ -172,6 +172,22 @@ MUTATIONS: tuple[Mutation, ...] = (
     ),
     Mutation(
         "Edge-case fixes",
+        "the CLI prints a traceback instead of a clean error when the target is down",
+        "src/cua/cli/mock_login.py",
+        "except PlaywrightError as exc:",
+        "except KeyError as exc:",
+        pytest("tests/integration/test_edge_cli_commands.py"),
+    ),
+    Mutation(
+        "Edge-case fixes",
+        "a repeated --input is silently last-one-wins",
+        "src/cua/cli/main.py",
+        "if name in supplied:",
+        "if False:",
+        pytest("tests/integration/test_edge_cli_commands.py"),
+    ),
+    Mutation(
+        "Edge-case fixes",
         "an explicit empty container is pruned and the sealed artifact reloads as tampered",
         "src/cua/domain/serde.py",
         "return _prune_model(model, payload) if prune else payload",

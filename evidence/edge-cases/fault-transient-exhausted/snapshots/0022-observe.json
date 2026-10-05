@@ -1,0 +1,693 @@
+{
+  "snapshot_id": "snap-2553a40f5a",
+  "url": "http://127.0.0.1:54793/",
+  "title": "MemberDesk",
+  "nodes": [
+    {
+      "node_id": "main:/document[0]",
+      "role": "document",
+      "name": "MemberDesk",
+      "value": null,
+      "states": [
+        "focused"
+      ],
+      "bounds": null,
+      "scope": {
+        "frame": null,
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "517"
+      },
+      "fingerprint": "34942f57acae2b27"
+    },
+    {
+      "node_id": "main:/frame[1]",
+      "role": "frame",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": null,
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "525"
+      },
+      "fingerprint": "dac0da6641c0fbca"
+    },
+    {
+      "node_id": "main:/frame[2]",
+      "role": "frame",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": null,
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "526"
+      },
+      "fingerprint": "dac0da6641c0fbca"
+    },
+    {
+      "node_id": "nav:/document[3]",
+      "role": "document",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "518"
+      },
+      "fingerprint": "d3a596dc8cf2c44a"
+    },
+    {
+      "node_id": "nav:/generic[4]",
+      "role": "generic",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/generic[4]/text[0]"
+      ],
+      "hints": {
+        "native": "534"
+      },
+      "fingerprint": "a8ff80b0f161e267"
+    },
+    {
+      "node_id": "nav:/generic[4]/text[0]",
+      "role": "text",
+      "name": "MemberDesk",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/generic[4]",
+      "child_ids": [],
+      "hints": {
+        "native": "554"
+      },
+      "fingerprint": "06d59be9b77f218f"
+    },
+    {
+      "node_id": "nav:/generic[5]",
+      "role": "generic",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/generic[5]/text[0]"
+      ],
+      "hints": {
+        "native": "535"
+      },
+      "fingerprint": "a8ff80b0f161e267"
+    },
+    {
+      "node_id": "nav:/generic[5]/text[0]",
+      "role": "text",
+      "name": "Core Banking System v2.4",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/generic[5]",
+      "child_ids": [],
+      "hints": {
+        "native": "555"
+      },
+      "fingerprint": "0a382f79a9b7333e"
+    },
+    {
+      "node_id": "nav:/generic[6]",
+      "role": "generic",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/generic[6]/text[0]"
+      ],
+      "hints": {
+        "native": "536"
+      },
+      "fingerprint": "a8ff80b0f161e267"
+    },
+    {
+      "node_id": "nav:/generic[6]/text[0]",
+      "role": "text",
+      "name": "WORKFLOWS",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/generic[6]",
+      "child_ids": [],
+      "hints": {
+        "native": "556"
+      },
+      "fingerprint": "c402e295accdbf69"
+    },
+    {
+      "node_id": "nav:/table[7]",
+      "role": "table",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "537"
+      },
+      "fingerprint": "71449859354b6cef"
+    },
+    {
+      "node_id": "nav:/generic[8]",
+      "role": "generic",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/generic[8]/text[0]",
+        "nav:/generic[8]/text[1]"
+      ],
+      "hints": {
+        "native": "552"
+      },
+      "fingerprint": "a8ff80b0f161e267"
+    },
+    {
+      "node_id": "nav:/generic[8]/text[0]",
+      "role": "text",
+      "name": "\u2022",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/generic[8]",
+      "child_ids": [],
+      "hints": {
+        "native": "562"
+      },
+      "fingerprint": "c79329f8d8d2d557"
+    },
+    {
+      "node_id": "nav:/generic[8]/text[1]",
+      "role": "text",
+      "name": "Online \u00b7 Fixture Ready",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/generic[8]",
+      "child_ids": [],
+      "hints": {
+        "native": "563"
+      },
+      "fingerprint": "bdad67387a00acff"
+    },
+    {
+      "node_id": "nav:/row[9]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/row[9]/cell[0]"
+      ],
+      "hints": {
+        "native": "539"
+      },
+      "fingerprint": "fa1f5bbbdad001d1"
+    },
+    {
+      "node_id": "nav:/row[9]/cell[0]",
+      "role": "cell",
+      "name": "Member Search",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[9]",
+      "child_ids": [
+        "nav:/row[9]/cell[0]/link[0]"
+      ],
+      "hints": {
+        "native": "540"
+      },
+      "fingerprint": "d50d2553ca8865ec"
+    },
+    {
+      "node_id": "nav:/row[9]/cell[0]/link[0]",
+      "role": "link",
+      "name": "Member Search",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[9]/cell[0]",
+      "child_ids": [
+        "nav:/row[9]/cell[0]/link[0]/text[0]"
+      ],
+      "hints": {
+        "css": "a.nav-link-btn",
+        "native": "541"
+      },
+      "fingerprint": "c5ec08a2c78d2403"
+    },
+    {
+      "node_id": "nav:/row[9]/cell[0]/link[0]/text[0]",
+      "role": "text",
+      "name": "Member Search",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[9]/cell[0]/link[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "557"
+      },
+      "fingerprint": "46ba5b490b98688e"
+    },
+    {
+      "node_id": "nav:/row[10]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/row[10]/cell[0]"
+      ],
+      "hints": {
+        "native": "542"
+      },
+      "fingerprint": "fa1f5bbbdad001d1"
+    },
+    {
+      "node_id": "nav:/row[10]/cell[0]",
+      "role": "cell",
+      "name": "Reports Core",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[10]",
+      "child_ids": [
+        "nav:/row[10]/cell[0]/link[0]"
+      ],
+      "hints": {
+        "native": "543"
+      },
+      "fingerprint": "66987dac872f321c"
+    },
+    {
+      "node_id": "nav:/row[10]/cell[0]/link[0]",
+      "role": "link",
+      "name": "Reports Core",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[10]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "css": "a.nav-link-disabled",
+        "native": "544"
+      },
+      "fingerprint": "57694f773dac3ffa"
+    },
+    {
+      "node_id": "nav:/row[11]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/row[11]/cell[0]"
+      ],
+      "hints": {
+        "native": "547"
+      },
+      "fingerprint": "fa1f5bbbdad001d1"
+    },
+    {
+      "node_id": "nav:/row[11]/cell[0]",
+      "role": "cell",
+      "name": "Administration Core",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[11]",
+      "child_ids": [
+        "nav:/row[11]/cell[0]/link[0]"
+      ],
+      "hints": {
+        "native": "548"
+      },
+      "fingerprint": "f56beefd1c51c710"
+    },
+    {
+      "node_id": "nav:/row[11]/cell[0]/link[0]",
+      "role": "link",
+      "name": "Administration Core",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[11]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "css": "a.nav-link-disabled",
+        "native": "549"
+      },
+      "fingerprint": "9121073edbb9c685"
+    },
+    {
+      "node_id": "nav:/text[12]",
+      "role": "text",
+      "name": "Reports",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "558"
+      },
+      "fingerprint": "ca4c1a686b35aada"
+    },
+    {
+      "node_id": "nav:/text[13]",
+      "role": "text",
+      "name": "Core",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "559"
+      },
+      "fingerprint": "03cff1e7f00ab099"
+    },
+    {
+      "node_id": "nav:/text[14]",
+      "role": "text",
+      "name": "Administration",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "560"
+      },
+      "fingerprint": "3a9c4d5892cb41ff"
+    },
+    {
+      "node_id": "nav:/text[15]",
+      "role": "text",
+      "name": "Core",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "561"
+      },
+      "fingerprint": "03cff1e7f00ab099"
+    },
+    {
+      "node_id": "content:/document[16]",
+      "role": "document",
+      "name": "Service Unavailable",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "519"
+      },
+      "fingerprint": "2036af81e670b643"
+    },
+    {
+      "node_id": "content:/table[17]",
+      "role": "table",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "568"
+      },
+      "fingerprint": "f6d07955fec5f341"
+    },
+    {
+      "node_id": "content:/row[18]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[18]/cell[0]"
+      ],
+      "hints": {
+        "native": "570"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[18]/cell[0]",
+      "role": "cell",
+      "name": "502 \u2014 Service Temporarily Unavailable",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[18]",
+      "child_ids": [
+        "content:/row[18]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "571"
+      },
+      "fingerprint": "c394caaebdfce97b"
+    },
+    {
+      "node_id": "content:/row[18]/cell[0]/text[0]",
+      "role": "text",
+      "name": "502 \u2014 Service Temporarily Unavailable",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[18]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "575"
+      },
+      "fingerprint": "a760c5991922e47e"
+    },
+    {
+      "node_id": "content:/row[19]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[19]/cell[0]"
+      ],
+      "hints": {
+        "native": "573"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[19]/cell[0]",
+      "role": "cell",
+      "name": "The application server did not respond. Please try again.",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[19]",
+      "child_ids": [
+        "content:/row[19]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "574"
+      },
+      "fingerprint": "1933f3b8613c4c07"
+    },
+    {
+      "node_id": "content:/row[19]/cell[0]/text[0]",
+      "role": "text",
+      "name": "The application server did not respond. Please try again.",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[19]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "576"
+      },
+      "fingerprint": "faaa60e7413fd03b"
+    }
+  ],
+  "captured_at": "2026-10-05T14:44:05.241423Z",
+  "http_status": 502
+}

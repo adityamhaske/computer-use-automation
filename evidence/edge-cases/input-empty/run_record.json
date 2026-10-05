@@ -1,0 +1,44 @@
+{
+  "run_id": "input-empty",
+  "kind": "replay",
+  "capability_ref": "corebank.member.savings_balance@1.0.0",
+  "capability_content_hash": "sha256:e5d2c236dc796aed25b0b92fc6bea1bed9b06ec44f7264930b8451e3f95a16a4",
+  "tenant": null,
+  "goal": null,
+  "inputs": {
+    "member_id": ""
+  },
+  "steps": [],
+  "result": {
+    "status": "failed",
+    "capability_id": "corebank.member.savings_balance",
+    "capability_version": "1.0.0",
+    "run_id": "rep-c9364d77b5",
+    "outputs": {},
+    "outcome": null,
+    "error": {
+      "code": "input_validation_failed",
+      "message": "input 'member_id' = '' does not match the declared pattern '^[0-9]{4,10}$'",
+      "step_id": null,
+      "expected": null,
+      "observed": null,
+      "resolution": null
+    },
+    "intervention": null,
+    "steps_executed": 0,
+    "steps_total": 5,
+    "duration_ms": 0,
+    "drift_score": 0.0,
+    "strategy_mix": {},
+    "recovery_attempts": 0,
+    "evidence_ref": "evidence/edge-cases/input-empty"
+  },
+  "started_at": "2026-10-05T14:44:00.338704Z",
+  "duration_ms": 0,
+  "evidence_ref": "evidence/edge-cases/input-empty",
+  "model_name": null,
+  "tokens_used": null,
+  "resolver_config_hash": null,
+  "human_actions": 0,
+  "lease_transitions": []
+}

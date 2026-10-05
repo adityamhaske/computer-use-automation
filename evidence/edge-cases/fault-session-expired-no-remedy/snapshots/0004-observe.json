@@ -1,0 +1,1516 @@
+{
+  "snapshot_id": "snap-9306d2b613",
+  "url": "http://127.0.0.1:54801/",
+  "title": "MemberDesk",
+  "nodes": [
+    {
+      "node_id": "main:/document[0]",
+      "role": "document",
+      "name": "MemberDesk",
+      "value": null,
+      "states": [
+        "focused"
+      ],
+      "bounds": null,
+      "scope": {
+        "frame": null,
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "332"
+      },
+      "fingerprint": "34942f57acae2b27"
+    },
+    {
+      "node_id": "main:/frame[1]",
+      "role": "frame",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": null,
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "342"
+      },
+      "fingerprint": "dac0da6641c0fbca"
+    },
+    {
+      "node_id": "main:/frame[2]",
+      "role": "frame",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": null,
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "343"
+      },
+      "fingerprint": "dac0da6641c0fbca"
+    },
+    {
+      "node_id": "nav:/document[3]",
+      "role": "document",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "335"
+      },
+      "fingerprint": "d3a596dc8cf2c44a"
+    },
+    {
+      "node_id": "nav:/generic[4]",
+      "role": "generic",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/generic[4]/text[0]"
+      ],
+      "hints": {
+        "native": "351"
+      },
+      "fingerprint": "a8ff80b0f161e267"
+    },
+    {
+      "node_id": "nav:/generic[4]/text[0]",
+      "role": "text",
+      "name": "MemberDesk",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/generic[4]",
+      "child_ids": [],
+      "hints": {
+        "native": "371"
+      },
+      "fingerprint": "06d59be9b77f218f"
+    },
+    {
+      "node_id": "nav:/generic[5]",
+      "role": "generic",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/generic[5]/text[0]"
+      ],
+      "hints": {
+        "native": "352"
+      },
+      "fingerprint": "a8ff80b0f161e267"
+    },
+    {
+      "node_id": "nav:/generic[5]/text[0]",
+      "role": "text",
+      "name": "Core Banking System v2.4",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/generic[5]",
+      "child_ids": [],
+      "hints": {
+        "native": "372"
+      },
+      "fingerprint": "0a382f79a9b7333e"
+    },
+    {
+      "node_id": "nav:/generic[6]",
+      "role": "generic",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/generic[6]/text[0]"
+      ],
+      "hints": {
+        "native": "353"
+      },
+      "fingerprint": "a8ff80b0f161e267"
+    },
+    {
+      "node_id": "nav:/generic[6]/text[0]",
+      "role": "text",
+      "name": "WORKFLOWS",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/generic[6]",
+      "child_ids": [],
+      "hints": {
+        "native": "373"
+      },
+      "fingerprint": "c402e295accdbf69"
+    },
+    {
+      "node_id": "nav:/table[7]",
+      "role": "table",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "354"
+      },
+      "fingerprint": "71449859354b6cef"
+    },
+    {
+      "node_id": "nav:/generic[8]",
+      "role": "generic",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/generic[8]/text[0]",
+        "nav:/generic[8]/text[1]"
+      ],
+      "hints": {
+        "native": "369"
+      },
+      "fingerprint": "a8ff80b0f161e267"
+    },
+    {
+      "node_id": "nav:/generic[8]/text[0]",
+      "role": "text",
+      "name": "\u2022",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/generic[8]",
+      "child_ids": [],
+      "hints": {
+        "native": "379"
+      },
+      "fingerprint": "c79329f8d8d2d557"
+    },
+    {
+      "node_id": "nav:/generic[8]/text[1]",
+      "role": "text",
+      "name": "Online \u00b7 Fixture Ready",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/generic[8]",
+      "child_ids": [],
+      "hints": {
+        "native": "380"
+      },
+      "fingerprint": "bdad67387a00acff"
+    },
+    {
+      "node_id": "nav:/row[9]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/row[9]/cell[0]"
+      ],
+      "hints": {
+        "native": "356"
+      },
+      "fingerprint": "fa1f5bbbdad001d1"
+    },
+    {
+      "node_id": "nav:/row[9]/cell[0]",
+      "role": "cell",
+      "name": "Member Search",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[9]",
+      "child_ids": [
+        "nav:/row[9]/cell[0]/link[0]"
+      ],
+      "hints": {
+        "native": "357"
+      },
+      "fingerprint": "d50d2553ca8865ec"
+    },
+    {
+      "node_id": "nav:/row[9]/cell[0]/link[0]",
+      "role": "link",
+      "name": "Member Search",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[9]/cell[0]",
+      "child_ids": [
+        "nav:/row[9]/cell[0]/link[0]/text[0]"
+      ],
+      "hints": {
+        "css": "a.nav-link-btn",
+        "native": "358"
+      },
+      "fingerprint": "c5ec08a2c78d2403"
+    },
+    {
+      "node_id": "nav:/row[9]/cell[0]/link[0]/text[0]",
+      "role": "text",
+      "name": "Member Search",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[9]/cell[0]/link[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "374"
+      },
+      "fingerprint": "46ba5b490b98688e"
+    },
+    {
+      "node_id": "nav:/row[10]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/row[10]/cell[0]"
+      ],
+      "hints": {
+        "native": "359"
+      },
+      "fingerprint": "fa1f5bbbdad001d1"
+    },
+    {
+      "node_id": "nav:/row[10]/cell[0]",
+      "role": "cell",
+      "name": "Reports Core",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[10]",
+      "child_ids": [
+        "nav:/row[10]/cell[0]/link[0]"
+      ],
+      "hints": {
+        "native": "360"
+      },
+      "fingerprint": "66987dac872f321c"
+    },
+    {
+      "node_id": "nav:/row[10]/cell[0]/link[0]",
+      "role": "link",
+      "name": "Reports Core",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[10]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "css": "a.nav-link-disabled",
+        "native": "361"
+      },
+      "fingerprint": "57694f773dac3ffa"
+    },
+    {
+      "node_id": "nav:/row[11]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "nav:/row[11]/cell[0]"
+      ],
+      "hints": {
+        "native": "364"
+      },
+      "fingerprint": "fa1f5bbbdad001d1"
+    },
+    {
+      "node_id": "nav:/row[11]/cell[0]",
+      "role": "cell",
+      "name": "Administration Core",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[11]",
+      "child_ids": [
+        "nav:/row[11]/cell[0]/link[0]"
+      ],
+      "hints": {
+        "native": "365"
+      },
+      "fingerprint": "f56beefd1c51c710"
+    },
+    {
+      "node_id": "nav:/row[11]/cell[0]/link[0]",
+      "role": "link",
+      "name": "Administration Core",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": "nav:/row[11]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "css": "a.nav-link-disabled",
+        "native": "366"
+      },
+      "fingerprint": "9121073edbb9c685"
+    },
+    {
+      "node_id": "nav:/text[12]",
+      "role": "text",
+      "name": "Reports",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "375"
+      },
+      "fingerprint": "ca4c1a686b35aada"
+    },
+    {
+      "node_id": "nav:/text[13]",
+      "role": "text",
+      "name": "Core",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "376"
+      },
+      "fingerprint": "03cff1e7f00ab099"
+    },
+    {
+      "node_id": "nav:/text[14]",
+      "role": "text",
+      "name": "Administration",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "377"
+      },
+      "fingerprint": "3a9c4d5892cb41ff"
+    },
+    {
+      "node_id": "nav:/text[15]",
+      "role": "text",
+      "name": "Core",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "nav",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "378"
+      },
+      "fingerprint": "03cff1e7f00ab099"
+    },
+    {
+      "node_id": "content:/document[16]",
+      "role": "document",
+      "name": "MemberDesk",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "336"
+      },
+      "fingerprint": "eba30ff83962866f"
+    },
+    {
+      "node_id": "content:/table[17]",
+      "role": "table",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "388"
+      },
+      "fingerprint": "f6d07955fec5f341"
+    },
+    {
+      "node_id": "content:/row[18]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[18]/cell[0]"
+      ],
+      "hints": {
+        "native": "390"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[18]/cell[0]",
+      "role": "cell",
+      "name": "First Valley Credit Union \u2014 MemberDesk",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[18]",
+      "child_ids": [
+        "content:/row[18]/cell[0]/table[0]"
+      ],
+      "hints": {
+        "native": "391"
+      },
+      "fingerprint": "db3531c999a9d575"
+    },
+    {
+      "node_id": "content:/row[18]/cell[0]/table[0]",
+      "role": "table",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[18]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "392"
+      },
+      "fingerprint": "db0f241a64a7611f"
+    },
+    {
+      "node_id": "content:/row[19]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[19]/cell[0]"
+      ],
+      "hints": {
+        "native": "398"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[19]/cell[0]",
+      "role": "cell",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[19]",
+      "child_ids": [
+        "content:/row[19]/cell[0]/form[0]",
+        "content:/row[19]/cell[0]/table[0]"
+      ],
+      "hints": {
+        "native": "399"
+      },
+      "fingerprint": "1bd1205026807024"
+    },
+    {
+      "node_id": "content:/row[19]/cell[0]/form[0]",
+      "role": "form",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[19]/cell[0]",
+      "child_ids": [
+        "content:/row[19]/cell[0]/form[0]/table[0]"
+      ],
+      "hints": {
+        "native": "400"
+      },
+      "fingerprint": "113912ea86f27a83"
+    },
+    {
+      "node_id": "content:/row[19]/cell[0]/form[0]/table[0]",
+      "role": "table",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[19]/cell[0]/form[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "401"
+      },
+      "fingerprint": "2236ddbc1907bb17"
+    },
+    {
+      "node_id": "content:/row[19]/cell[0]/table[0]",
+      "role": "table",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[19]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "421"
+      },
+      "fingerprint": "db0f241a64a7611f"
+    },
+    {
+      "node_id": "content:/row[20]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[20]/cell[0]",
+        "content:/row[20]/cell[1]"
+      ],
+      "hints": {
+        "native": "394"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[20]/cell[0]",
+      "role": "cell",
+      "name": "First Valley Credit Union \u2014 MemberDesk",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[20]",
+      "child_ids": [
+        "content:/row[20]/cell[0]/text[0]",
+        "content:/row[20]/cell[0]/text[1]"
+      ],
+      "hints": {
+        "native": "395"
+      },
+      "fingerprint": "db3531c999a9d575"
+    },
+    {
+      "node_id": "content:/row[20]/cell[0]/text[0]",
+      "role": "text",
+      "name": "First Valley Credit Union",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[20]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "447"
+      },
+      "fingerprint": "ddb193202da1e4c9"
+    },
+    {
+      "node_id": "content:/row[20]/cell[0]/text[1]",
+      "role": "text",
+      "name": "\u2014 MemberDesk",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[20]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "448"
+      },
+      "fingerprint": "e0bbb5ae6b8cabc8"
+    },
+    {
+      "node_id": "content:/row[20]/cell[1]",
+      "role": "cell",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[20]",
+      "child_ids": [],
+      "hints": {
+        "native": "397"
+      },
+      "fingerprint": "1bd1205026807024"
+    },
+    {
+      "node_id": "content:/row[21]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[21]/cell[0]"
+      ],
+      "hints": {
+        "native": "423"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[21]/cell[0]",
+      "role": "cell",
+      "name": "Demo credentials reference",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[21]",
+      "child_ids": [
+        "content:/row[21]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "424"
+      },
+      "fingerprint": "3fcb551b6c53bccd"
+    },
+    {
+      "node_id": "content:/row[21]/cell[0]/text[0]",
+      "role": "text",
+      "name": "Demo credentials reference",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[21]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "453"
+      },
+      "fingerprint": "9ca294d7de8fa400"
+    },
+    {
+      "node_id": "content:/row[22]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[22]/cell[0]",
+        "content:/row[22]/cell[1]"
+      ],
+      "hints": {
+        "native": "426"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[22]/cell[0]",
+      "role": "cell",
+      "name": "Available accounts",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[22]",
+      "child_ids": [
+        "content:/row[22]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "427"
+      },
+      "fingerprint": "c9224eafba82012f"
+    },
+    {
+      "node_id": "content:/row[22]/cell[0]/text[0]",
+      "role": "text",
+      "name": "Available accounts",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[22]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "454"
+      },
+      "fingerprint": "707b800883760e2e"
+    },
+    {
+      "node_id": "content:/row[22]/cell[1]",
+      "role": "cell",
+      "name": "teller01 / not-a-real-password",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[22]",
+      "child_ids": [
+        "content:/row[22]/cell[1]/combobox[0]"
+      ],
+      "hints": {
+        "native": "428"
+      },
+      "fingerprint": "46ad0024b03432cd"
+    },
+    {
+      "node_id": "content:/row[22]/cell[1]/combobox[0]",
+      "role": "combobox",
+      "name": "Demo credentials",
+      "value": "teller01 / not-a-real-password",
+      "states": [
+        "disabled"
+      ],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[22]/cell[1]",
+      "child_ids": [
+        "content:/row[22]/cell[1]/combobox[0]/menulistpopup[0]"
+      ],
+      "hints": {
+        "css": "select.frmfld",
+        "native": "429"
+      },
+      "fingerprint": "514aed207be9cf1f"
+    },
+    {
+      "node_id": "content:/row[22]/cell[1]/combobox[0]/menulistpopup[0]",
+      "role": "menulistpopup",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[22]/cell[1]/combobox[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "432"
+      },
+      "fingerprint": "db216f122587a7c9"
+    },
+    {
+      "node_id": "content:/row[23]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[23]/cell[0]"
+      ],
+      "hints": {
+        "native": "445"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[23]/cell[0]",
+      "role": "cell",
+      "name": "This is a mock core-banking application. Copy any credentials above into the sign-on form.",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[23]",
+      "child_ids": [
+        "content:/row[23]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "446"
+      },
+      "fingerprint": "43118e82e3eb34c3"
+    },
+    {
+      "node_id": "content:/row[23]/cell[0]/text[0]",
+      "role": "text",
+      "name": "This is a mock core-banking application. Copy any credentials above into the sign-on form.",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[23]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "455"
+      },
+      "fingerprint": "eedf9e50cbda3af0"
+    },
+    {
+      "node_id": "content:/row[24]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[24]/cell[0]"
+      ],
+      "hints": {
+        "native": "403"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[24]/cell[0]",
+      "role": "cell",
+      "name": "Sign On \u2014 Teller Access",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[24]",
+      "child_ids": [
+        "content:/row[24]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "404"
+      },
+      "fingerprint": "3f6d951791d78832"
+    },
+    {
+      "node_id": "content:/row[24]/cell[0]/text[0]",
+      "role": "text",
+      "name": "Sign On \u2014 Teller Access",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[24]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "449"
+      },
+      "fingerprint": "87903e83f0750a1c"
+    },
+    {
+      "node_id": "content:/row[25]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[25]/cell[0]",
+        "content:/row[25]/cell[1]"
+      ],
+      "hints": {
+        "native": "406"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[25]/cell[0]",
+      "role": "cell",
+      "name": "Operator ID",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[25]",
+      "child_ids": [
+        "content:/row[25]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "407"
+      },
+      "fingerprint": "e1651f7efda38c02"
+    },
+    {
+      "node_id": "content:/row[25]/cell[0]/text[0]",
+      "role": "text",
+      "name": "Operator ID",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[25]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "450"
+      },
+      "fingerprint": "1a71ffc8390abca4"
+    },
+    {
+      "node_id": "content:/row[25]/cell[1]",
+      "role": "cell",
+      "name": "Operator ID",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[25]",
+      "child_ids": [
+        "content:/row[25]/cell[1]/textbox[0]"
+      ],
+      "hints": {
+        "native": "408"
+      },
+      "fingerprint": "e1651f7efda38c02"
+    },
+    {
+      "node_id": "content:/row[25]/cell[1]/textbox[0]",
+      "role": "textbox",
+      "name": "Operator ID",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[25]/cell[1]",
+      "child_ids": [
+        "content:/row[25]/cell[1]/textbox[0]/generic[0]"
+      ],
+      "hints": {
+        "css": "input[name=\"user\"]",
+        "native": "409"
+      },
+      "fingerprint": "725db46ac49f70f9"
+    },
+    {
+      "node_id": "content:/row[25]/cell[1]/textbox[0]/generic[0]",
+      "role": "generic",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[25]/cell[1]/textbox[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "410"
+      },
+      "fingerprint": "2df0b7969bca5fce"
+    },
+    {
+      "node_id": "content:/row[26]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[26]/cell[0]",
+        "content:/row[26]/cell[1]"
+      ],
+      "hints": {
+        "native": "411"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[26]/cell[0]",
+      "role": "cell",
+      "name": "Password",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[26]",
+      "child_ids": [
+        "content:/row[26]/cell[0]/text[0]"
+      ],
+      "hints": {
+        "native": "412"
+      },
+      "fingerprint": "bdda65c1bca2ea36"
+    },
+    {
+      "node_id": "content:/row[26]/cell[0]/text[0]",
+      "role": "text",
+      "name": "Password",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[26]/cell[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "451"
+      },
+      "fingerprint": "cbe744655ebb16ec"
+    },
+    {
+      "node_id": "content:/row[26]/cell[1]",
+      "role": "cell",
+      "name": "Password",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[26]",
+      "child_ids": [
+        "content:/row[26]/cell[1]/textbox[0]"
+      ],
+      "hints": {
+        "native": "413"
+      },
+      "fingerprint": "bdda65c1bca2ea36"
+    },
+    {
+      "node_id": "content:/row[26]/cell[1]/textbox[0]",
+      "role": "textbox",
+      "name": "Password",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[26]/cell[1]",
+      "child_ids": [
+        "content:/row[26]/cell[1]/textbox[0]/generic[0]"
+      ],
+      "hints": {
+        "css": "input[name=\"pw\"]",
+        "native": "414"
+      },
+      "fingerprint": "51f8b1795f7bd38c"
+    },
+    {
+      "node_id": "content:/row[26]/cell[1]/textbox[0]/generic[0]",
+      "role": "generic",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[26]/cell[1]/textbox[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "416"
+      },
+      "fingerprint": "2df0b7969bca5fce"
+    },
+    {
+      "node_id": "content:/row[27]",
+      "role": "row",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [
+        "content:/row[27]/cell[0]",
+        "content:/row[27]/cell[1]"
+      ],
+      "hints": {
+        "native": "417"
+      },
+      "fingerprint": "13ca239244183fe8"
+    },
+    {
+      "node_id": "content:/row[27]/cell[0]",
+      "role": "cell",
+      "name": null,
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[27]",
+      "child_ids": [],
+      "hints": {
+        "native": "418"
+      },
+      "fingerprint": "1bd1205026807024"
+    },
+    {
+      "node_id": "content:/row[27]/cell[1]",
+      "role": "cell",
+      "name": "Sign On",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[27]",
+      "child_ids": [
+        "content:/row[27]/cell[1]/button[0]"
+      ],
+      "hints": {
+        "native": "419"
+      },
+      "fingerprint": "53bf9432a4969881"
+    },
+    {
+      "node_id": "content:/row[27]/cell[1]/button[0]",
+      "role": "button",
+      "name": "Sign On",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[27]/cell[1]",
+      "child_ids": [
+        "content:/row[27]/cell[1]/button[0]/text[0]"
+      ],
+      "hints": {
+        "css": "input.btn1",
+        "native": "420"
+      },
+      "fingerprint": "b5066b9f3cd1dd80"
+    },
+    {
+      "node_id": "content:/row[27]/cell[1]/button[0]/text[0]",
+      "role": "text",
+      "name": "Sign On",
+      "value": null,
+      "states": [],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": "content:/row[27]/cell[1]/button[0]",
+      "child_ids": [],
+      "hints": {
+        "native": "452"
+      },
+      "fingerprint": "3515ee59e241f41c"
+    },
+    {
+      "node_id": "content:/option[28]",
+      "role": "option",
+      "name": "teller01 / not-a-real-password",
+      "value": null,
+      "states": [
+        "disabled"
+      ],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "436"
+      },
+      "fingerprint": "cc77858049d746b5"
+    },
+    {
+      "node_id": "content:/option[29]",
+      "role": "option",
+      "name": "admin / admin",
+      "value": null,
+      "states": [
+        "disabled"
+      ],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "439"
+      },
+      "fingerprint": "4e7245e88c546eb6"
+    },
+    {
+      "node_id": "content:/option[30]",
+      "role": "option",
+      "name": "user / password",
+      "value": null,
+      "states": [
+        "disabled"
+      ],
+      "bounds": null,
+      "scope": {
+        "frame": "content",
+        "region": null
+      },
+      "parent_id": null,
+      "child_ids": [],
+      "hints": {
+        "native": "442"
+      },
+      "fingerprint": "ed3b322a78ae1ccc"
+    }
+  ],
+  "captured_at": "2026-10-05T14:44:07.544204Z",
+  "http_status": 200
+}

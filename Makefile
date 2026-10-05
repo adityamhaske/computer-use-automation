@@ -156,6 +156,13 @@ test-report: require-venv ## Whole suite under coverage -> evidence/tests/ (coun
 mutation-check: require-venv ## Break each invariant on purpose and prove the suite goes red -> evidence/tests/
 	$(PY) scripts/mutation_check.py
 
+.PHONY: edge-cases
+edge-cases: require-venv ## Run the hostile/boundary scenarios against the live mock app, keep every run -> evidence/edge-cases/
+	$(PY) scripts/run_edge_cases.py
+
+.PHONY: evidence
+evidence: demo eval edge-cases test-report ## Refresh everything under evidence/ in one go (add mutation-check for the full set)
+
 # ------------------------------------------------------------------ housekeeping
 
 .PHONY: clean
