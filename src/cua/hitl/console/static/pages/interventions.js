@@ -330,6 +330,21 @@ function onLiveEvent(container, ctx, event) {
       event.status && event.status !== "ok"
         ? `${event.status}${event.message ? ": " + event.message : ""}`
         : "gesture applied";
+    if (event.status === "needs_confirmation" && event.gesture) {
+      // Policy classified the gesture as irreversible (it landed on, say, "Transfer Funds"). An
+      // operator may do that, but only having been shown what it is and said yes.
+      ctx
+        .confirmDialog({
+          title: "Confirm irreversible action",
+          message: event.message || "Policy requires explicit confirmation for this action.",
+          confirmLabel: "Confirm and perform",
+          tone: "danger",
+        })
+        .then((ok) => {
+          if (ok) gesture.confirm(event.gesture);
+          else log.textContent = "not confirmed: nothing was sent to the page";
+        });
+    }
   } else if (event.type === "refused") {
     log.textContent = "refused: " + event.error;
     ctx.showToast({ title: "Gesture refused", message: event.error, tone: "warning" });

@@ -157,13 +157,24 @@ class PolicyEngine:
         if disposition == "block_and_escalate":
             return deny(f"{risk.tier.value} action requires a human: {risk.explain()}", risk)
 
-        if disposition == "allow_if_declared" and declared_risk is None and action.risk is None:
-            # An elevated action must be one the artifact anticipated. An agent improvising a form
-            # submission that no reviewer saw is exactly what this blocks.
-            return deny(
-                f"{risk.tier.value} action is not declared by the capability: {risk.explain()}",
-                risk,
-            )
+        if disposition == "allow_if_declared":
+            # An elevated action must be one the artifact anticipated -- at that tier. An agent
+            # improvising a form submission that no reviewer saw is exactly what this blocks, and
+            # so is a step a reviewer saw and marked `safe`. Asking only whether *a* declaration
+            # existed made this gate vacuous for replay: every step declares a risk (`safe` by
+            # default), so every elevated control a replay reached was let through.
+            declared = declared_risk or action.risk
+            if declared is None:
+                return deny(
+                    f"{risk.tier.value} action is not declared by the capability: {risk.explain()}",
+                    risk,
+                )
+            if declared is not risk.tier:
+                return deny(
+                    f"{risk.tier.value} action is not declared at that tier by the capability "
+                    f"(declared {declared.value}): {risk.explain()}",
+                    risk,
+                )
 
         if disposition == "require_confirmation" and not confirmed:
             return PolicyDecision(

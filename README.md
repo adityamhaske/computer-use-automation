@@ -132,10 +132,10 @@ make edge-cases        # 22 hostile/boundary scenarios run for real, every run s
 make evidence          # refresh everything under evidence/ in one go
 ```
 
-The suite is 2,134 tests and runs offline with no key. More than 1,700 are edge cases — boundary,
+The suite is 2,158 tests and runs offline with no key. More than 1,700 are edge cases — boundary,
 malformed, hostile and out-of-order input for every subsystem — written to find defects rather than
 confirm assumptions, and every defect they found is fixed. The mutation check shows the tests would
-*fail* if a guarantee stopped holding: 18 of 18 deliberate violations are caught. The evidence is in
+*fail* if a guarantee stopped holding: 22 of 22 deliberate violations are caught. The evidence is in
 [`evidence/tests/`](evidence/tests/): the [test report](evidence/tests/test-report.md), the
 [mutation report](evidence/tests/mutation-report.md) and the
 [catalogue of every edge case defended](evidence/tests/edge-case-catalogue.md).

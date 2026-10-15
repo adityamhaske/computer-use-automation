@@ -153,7 +153,9 @@ One chokepoint, three enforcements (§1), applied identically to all three actor
 [`config/policy.yaml`](https://github.com/adityamhaske/computer-use-automation/blob/main/config/policy.yaml). Navigation outside it is `NAVIGATION_BLOCKED`, for
 humans too; a capability's own `allowed_domains` only ever *narrows* the global list, checked both
 on a `navigate`'s declared URL and again against where the session actually landed, since checking
-intent is not checking outcome.
+intent is not checking outcome. "Landed" means every frame, not the top-level document — on a
+frameset the shell never moves — and the driver also refuses an off-list document navigation in any
+frame, redirect hops included, before it is fetched.
 
 **Risk tiers** — `safe → elevated → irreversible`, from three independent signals (action type ×
 target semantics × artifact annotation), since any one alone is fooled. Automation is refused an
@@ -208,9 +210,10 @@ that run never saw.
 
 **Known weaknesses, stated rather than hidden.** The compiler reads a value by the label beside it
 — right on a label/value table, wrong in an n-column grid, where it cannot yet read a *column
-header* and falls back to a flagged positional descriptor. `raw_input` is authorized by a declared
-tier rather than by classifying what it touches, since a mouse-move has no resolved target to
-reason about. Approval pins the sealed base; a `--base-url` binding is re-derived at the gate and
+header* and falls back to a flagged positional descriptor. `raw_input` is classified by what it
+lands on — a click is hit-tested against the controls' geometry, a key against the focused control
+— so a click on "Transfer Funds" needs the operator's explicit confirmation; a gesture on something
+the semantic tree does not expose falls back to its action type's tier. Approval pins the sealed base; a `--base-url` binding is re-derived at the gate and
 covered only because it fills a declared slot — a tenant overlay that overrides steps has no approval
 path of its own yet, so an irreversible capability behind one fails closed.
 
@@ -229,7 +232,7 @@ expected status; a sealed artifact that reloaded as *tampered* after declaring a
 identifier that was all digits one time in 300 and was redacted as an account number in its own
 trace; one redaction pattern that took minutes on a single long token. `make mutation-check` then
 breaks the code on purpose — each of the ten invariants, and a guard per fix — and records whether
-the suite noticed: 18 of 18 deliberate violations are caught. `make edge-cases` keeps 22 scenarios
+the suite noticed: 22 of 22 deliberate violations are caught. `make edge-cases` keeps 22 scenarios
 as saved runs, so the boundary conditions can be opened and read rather than only asserted.
 
 ### What to look at

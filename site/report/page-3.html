@@ -182,7 +182,9 @@ supervised session, so the queue a reviewer opens has something waiting in it.</
 <a href="https://github.com/adityamhaske/computer-use-automation/blob/main/config/policy.yaml"><code>config/policy.yaml</code></a>. Navigation outside it is <code>NAVIGATION_BLOCKED</code>, for
 humans too; a capability's own <code>allowed_domains</code> only ever <em>narrows</em> the global list, checked both
 on a <code>navigate</code>'s declared URL and again against where the session actually landed, since checking
-intent is not checking outcome.</p>
+intent is not checking outcome. &quot;Landed&quot; means every frame, not the top-level document — on a
+frameset the shell never moves — and the driver also refuses an off-list document navigation in any
+frame, redirect hops included, before it is fetched.</p>
 <p><strong>Risk tiers</strong> — <code>safe → elevated → irreversible</code>, from three independent signals (action type ×
 target semantics × artifact annotation), since any one alone is fooled. Automation is refused an
 irreversible action unless the step is declared irreversible <strong>and</strong> the run carries an approval of
@@ -229,9 +231,10 @@ its request ids with the gateway's logs). The artifact compiled from it,
 that run never saw.</p>
 <p><strong>Known weaknesses, stated rather than hidden.</strong> The compiler reads a value by the label beside it
 — right on a label/value table, wrong in an n-column grid, where it cannot yet read a <em>column
-header</em> and falls back to a flagged positional descriptor. <code>raw_input</code> is authorized by a declared
-tier rather than by classifying what it touches, since a mouse-move has no resolved target to
-reason about. Approval pins the sealed base; a <code>--base-url</code> binding is re-derived at the gate and
+header</em> and falls back to a flagged positional descriptor. <code>raw_input</code> is classified by what it
+lands on — a click is hit-tested against the controls' geometry, a key against the focused control
+— so a click on &quot;Transfer Funds&quot; needs the operator's explicit confirmation; a gesture on something
+the semantic tree does not expose falls back to its action type's tier. Approval pins the sealed base; a <code>--base-url</code> binding is re-derived at the gate and
 covered only because it fills a declared slot — a tenant overlay that overrides steps has no approval
 path of its own yet, so an irreversible capability behind one fails closed.</p>
 <p><strong>Two failures of the same shape: a check existed, the test was green, and nothing was actually
@@ -248,7 +251,7 @@ expected status; a sealed artifact that reloaded as <em>tampered</em> after decl
 identifier that was all digits one time in 300 and was redacted as an account number in its own
 trace; one redaction pattern that took minutes on a single long token. <code>make mutation-check</code> then
 breaks the code on purpose — each of the ten invariants, and a guard per fix — and records whether
-the suite noticed: 18 of 18 deliberate violations are caught. <code>make edge-cases</code> keeps 22 scenarios
+the suite noticed: 22 of 22 deliberate violations are caught. <code>make edge-cases</code> keeps 22 scenarios
 as saved runs, so the boundary conditions can be opened and read rather than only asserted.</p>
 <h3>What to look at</h3>
 <table>

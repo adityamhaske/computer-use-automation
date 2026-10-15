@@ -92,7 +92,9 @@ risk:
 dispositions:
   AUTOMATION:
     safe: allow
-    elevated: allow_if_declared     # the artifact must annotate the step
+    # The step must be declared `risk: elevated` -- a step declared `safe` (the default) does not
+    # cover a control the lexicon marks elevated, or every replay step would satisfy this.
+    elevated: allow_if_declared
     # Refused, unless the step is declared `risk: irreversible` in the artifact AND the run clears
     # `replay_gates` below. Checked by PolicyEngine at the dispatch itself, not only before the run.
     # Discovery and assisted recovery present no approval, so for them this is always a refusal.

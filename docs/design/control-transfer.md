@@ -83,7 +83,12 @@ Consequences worth stating plainly:
 
 - A human still cannot navigate off the allowlist.
 - An irreversible action still requires explicit confirmation — but a human *can* confirm it, which
-  is the entire point of escalating.
+  is the entire point of escalating. A raw click is classified by the control it lands on (a
+  hit test against node geometry; a key by the focused control), and a `needs_confirmation` answer
+  comes back to the console with the gesture, which the operator confirms in a dialog before it is
+  resent as a confirmed action.
+- Only the console's own pages may drive it: a WebSocket or state-changing request whose `Origin`
+  names another site is refused, because a localhost bind keeps out other machines, not other tabs.
 - Every human action lands in the same evidence stream, in the same shape, tagged `actor=HUMAN`.
   "Record what the human did" is not a feature we built; it is a consequence of the path.
 

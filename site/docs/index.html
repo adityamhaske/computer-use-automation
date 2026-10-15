@@ -475,7 +475,7 @@ make edge-cases     <span class="comment"># 22 hostile/boundary scenarios run fo
 make test-report    <span class="comment"># whole suite under line + branch coverage -> evidence/tests/</span>
 make mutation-check <span class="comment"># break each invariant on purpose; prove the suite goes red</span>
 make evidence       <span class="comment"># refresh everything under evidence/ in one go</span></code></pre>
-  <p>2,134 tests, <code>mypy --strict</code> clean, five enforced import contracts. The whole suite runs offline with no API key. <code>make test-report</code> writes the counts and coverage to <code>evidence/tests/</code>; <code>make mutation-check</code> breaks each invariant on purpose and proves the suite goes red.</p>
+  <p>2,158 tests, <code>mypy --strict</code> clean, five enforced import contracts. The whole suite runs offline with no API key. <code>make test-report</code> writes the counts and coverage to <code>evidence/tests/</code>; <code>make mutation-check</code> breaks each invariant on purpose and proves the suite goes red.</p>
 </div>
 
 <!-- ================================ DEMO ================================ -->
@@ -624,7 +624,7 @@ evidence/         proof that the end-to-end thread actually ran
     <tbody>
       <tr><td>Domain allowlist</td><td>enforced</td><td><strong>enforced</strong></td></tr>
       <tr><td><code>safe</code> actions</td><td>allow</td><td>allow</td></tr>
-      <tr><td><code>elevated</code> actions</td><td>allow if declared</td><td>allow, recorded</td></tr>
+      <tr><td><code>elevated</code> actions</td><td>allow if declared <code>elevated</code> by the step</td><td>allow, recorded</td></tr>
       <tr><td><code>irreversible</code> actions</td><td>refused, unless the step is declared irreversible <strong>and</strong> the run carries an approval of that exact content plus the caller's opt-in (<code>allow_if_approved</code>, checked at dispatch)</td><td>allow <strong>with confirmation</strong>, recorded</td></tr>
       <tr><td>Off-artifact navigation</td><td>NAVIGATION_BLOCKED</td><td>allowed within allowlist, recorded</td></tr>
       <tr><td>Evidence redaction</td><td>applied</td><td><strong>applied</strong></td></tr>
@@ -850,7 +850,7 @@ recovery:
       <tr><td>undeclared interstitial</td><td><code>NEEDS_HUMAN</code></td><td><code>UNEXPECTED_STATE</code></td></tr>
       <tr><td>validation_error on submit</td><td><code>BUSINESS_OUTCOME</code></td><td><code>validation_rejected</code></td></tr>
       <tr><td>permission-denied account</td><td><code>BUSINESS_OUTCOME</code></td><td><code>permission_denied</code></td></tr>
-      <tr><td>off-allowlist redirect</td><td><code>FAILED</code></td><td><code>NAVIGATION_BLOCKED</code></td></tr>
+      <tr><td>off-allowlist redirect or frame navigation (refused before it is fetched)</td><td><code>FAILED</code></td><td><code>NAVIGATION_BLOCKED</code></td></tr>
     </tbody>
   </table>
 </div>
@@ -979,7 +979,7 @@ recovery:
 
   <h2>Consequences</h2>
   <p><strong>Good.</strong> Discovery, replay, and human intervention are the same code path, differing only in who originates the action — so the guardrails we test are the guardrails that run.</p>
-  <p><strong>Bad.</strong> <code>raw_input</code> is awkward to police semantically. We evaluate on coarse attributes and say so as a stated limit.</p>
+  <p><strong>Bad.</strong> <code>raw_input</code> is awkward to police semantically. A click is hit-tested against control geometry and a key against the focused control, so a click on &ldquo;Transfer Funds&rdquo; needs explicit confirmation; a gesture on something the semantic tree does not expose falls back to its action type&rsquo;s tier.</p>
 </div>
 
 <!-- ================================ ADR 0005 ================================ -->
@@ -1116,7 +1116,7 @@ overrides:
   </table>
 
   <h2>Offline by default</h2>
-  <p>Everything except <code>e2e/</code> runs with <strong>no API key and no network</strong>. 2,134 tests (1,800 of them edge cases: boundary, malformed, hostile and out-of-order input), <code>mypy --strict</code> clean. CI configures no API key on purpose — if a test needs the model, CI must fail rather than silently skip.</p>
+  <p>Everything except <code>e2e/</code> runs with <strong>no API key and no network</strong>. 2,158 tests (1,800 of them edge cases: boundary, malformed, hostile and out-of-order input), <code>mypy --strict</code> clean. CI configures no API key on purpose — if a test needs the model, CI must fail rather than silently skip.</p>
 
   <h2>Continuous integration</h2>
   <p><code>.github/workflows/ci.yml</code> runs the same targets a contributor runs locally, as separate steps so a failure names its stage:</p>

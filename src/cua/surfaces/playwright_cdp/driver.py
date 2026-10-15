@@ -20,8 +20,10 @@ from __future__ import annotations
 
 import contextlib
 import time
+from collections.abc import Callable
 from datetime import UTC, datetime
 from typing import Any
+from urllib.parse import urljoin
 
 from playwright.sync_api import Browser, BrowserContext, Page, sync_playwright
 
@@ -35,6 +37,20 @@ from cua.surfaces.base import ActionResult, SessionInfo
 from cua.surfaces.playwright_cdp.ax import css_hint, fetch_attributes, fetch_tree, frame_ids
 
 CAPABILITIES: tuple[str, ...] = ("semantic_tree", "screenshot", "raw_input", "frames")
+
+# Documents a frame holds before it has loaded anything, or after a navigation was refused. Not a
+# destination the page chose, so not an allowlist question -- every frameset frame passes through
+# `about:blank` on its way to its real `src`, and a refused navigation leaves `chrome-error://`.
+_NOT_DESTINATIONS = ("about:blank", "about:srcdoc", "chrome-error://")
+
+
+_VETTING_TIMEOUT_S = 10.0
+"""Upper bound on waiting for the navigation guard's verdict -- a slow target's response time."""
+
+
+def _is_destination(url: str) -> bool:
+    return bool(url) and not url.startswith(_NOT_DESTINATIONS)
+
 
 _CLICK_JS = "function() { this.click(); }"
 _FOCUS_JS = "function() { this.focus(); this.scrollIntoView({block: 'center'}); }"
@@ -86,6 +102,22 @@ class PlaywrightCdpDriver:
         self._frame_status: dict[str, int] = {}
         self._page.on("response", self._note_response)
 
+        # Where frames went, and where they were stopped from going, since the last dispatch began.
+        # Recorded from events rather than read off `page.url` afterwards: on a frameset app the
+        # top-level URL never changes, so comparing it said "did not navigate" while the content
+        # frame was off on another host entirely.
+        self._landed: list[str] = []
+        self._refused: list[str] = []
+        self._guard: Callable[[str], bool] | None = None
+        self._vetting = 0
+        """Navigations the route is deciding on right now. A dispatch does not report until this is
+        zero, or a redirect refused a moment later would be reported as a success."""
+        self._page.on("framenavigated", self._note_frame_navigated)
+        # Routed from construction, on the thread that owns the browser. Synchronous Playwright is
+        # bound to its creating thread, and a dispatcher -- which installs the guard -- is often
+        # built on another one (the console builds it on the server's thread).
+        self._context.route("**/*", self._route)
+
     # ------------------------------------------------------------- plumbing
     def _note_response(self, response: Any) -> None:
         """Remember each frame's navigation status, so a recovery rule can match on 502/503/504.
@@ -101,6 +133,55 @@ class PlaywrightCdpDriver:
                 self._frame_status[response.url] = response.status
         except Exception:
             pass
+
+    def _note_frame_navigated(self, frame: Any) -> None:
+        with contextlib.suppress(Exception):
+            if _is_destination(frame.url):
+                self._landed.append(frame.url)
+
+    def _route(self, route: Any) -> None:
+        """Refuse an off-list document navigation in any frame, including one reached by redirect.
+
+        A route sees the request a navigation *starts* with, not the hops a redirect adds -- the
+        browser follows those itself. So a permitted navigation is fetched here with redirects off:
+        a `Location` outside the allowlist is refused before the browser can follow it, and
+        anything else is handed back to the browser as the response it would have received. A
+        fulfilled redirect is followed as a new request, which comes back through this route.
+        """
+        request = route.request
+        if self._guard is None or not request.is_navigation_request():
+            route.continue_()
+            return
+        self._vetting += 1
+        try:
+            if not self._guard(request.url):
+                self._refuse(route, request.url)
+                return
+            response = route.fetch(max_redirects=0)
+            location = response.headers.get("location")
+            if 300 <= response.status < 400 and location:
+                destination = urljoin(request.url, location)
+                if not self._guard(destination):
+                    self._refuse(route, destination)
+                    return
+            route.fulfill(response=response)
+        except Exception:
+            # A navigation the guard could not vet has not been permitted.
+            self._refuse(route, request.url)
+        finally:
+            self._vetting -= 1
+
+    def _refuse(self, route: Any, url: str) -> None:
+        self._refused.append(url)
+        with contextlib.suppress(Exception):
+            route.abort("blockedbyclient")
+
+    def set_navigation_guard(self, guard: Callable[[str], bool]) -> None:
+        """Install the allowlist at the surface. Applies to every frame and every later navigation,
+        including one the page starts by itself after the action that caused it has returned.
+
+        Touches no browser state, so it is safe to call from any thread."""
+        self._guard = guard
 
     @property
     def _last_status(self) -> int | None:
@@ -199,22 +280,55 @@ class PlaywrightCdpDriver:
     def dispatch(self, action: AuthorizedAction) -> ActionResult:
         """Perform an authorized action. The type signature is the chokepoint."""
         started = time.perf_counter()
-        before_url = self._page.url
+        before = self._frame_urls()
+        self._landed.clear()
+        # `_refused` is drained, not cleared: a navigation the page started on its own after an
+        # earlier action returned may have been refused since, and it must still be reported.
         inner = action.action
         node_id = action.resolved_node_id
 
         try:
             ok, message = self._perform(inner, node_id)
+            # One round trip to the page before reading what happened. A scripted click starts its
+            # navigation as the call returns, so reading straight away reported "went nowhere" for
+            # a link that was, at that moment, on its way off the allowlist. A round trip is a
+            # condition, not a sleep: it costs a few milliseconds and orders the events before it.
+            self._page.evaluate("0")
+            self._await_vetting()
         except Exception as exc:
             ok, message = False, f"{type(exc).__name__}: {exc}"
 
+        after = self._frame_urls()
+        changed = [url for frame, url in after.items() if before.get(frame) != url]
+        landed = tuple(dict.fromkeys([*self._landed, *changed]))
         return ActionResult(
             ok=ok,
-            navigated=self._page.url != before_url,
+            navigated=bool(landed),
+            landed_urls=landed,
+            refused_navigations=self._drain_refused(),
             http_status=self._last_status,
             message=message,
             duration_ms=int((time.perf_counter() - started) * 1000),
         )
+
+    def _await_vetting(self) -> None:
+        """Let the route finish deciding on any navigation this action started.
+
+        Waiting on a condition with a declared bound, not a duration: it returns the moment nothing
+        is being vetted, which for an action that did not navigate is immediately.
+        """
+        deadline = time.monotonic() + _VETTING_TIMEOUT_S
+        while self._vetting and time.monotonic() < deadline:
+            self._page.wait_for_timeout(10)
+
+    def _drain_refused(self) -> tuple[str, ...]:
+        refused = tuple(dict.fromkeys(self._refused))
+        self._refused.clear()
+        return refused
+
+    def _frame_urls(self) -> dict[int, str]:
+        """Every frame's current document URL, keyed by frame identity."""
+        return {id(frame): frame.url for frame in self._page.frames if _is_destination(frame.url)}
 
     def _perform(self, inner: Any, node_id: str | None) -> tuple[bool, str]:
         if isinstance(inner, Navigate):

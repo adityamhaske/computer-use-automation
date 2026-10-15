@@ -16,6 +16,7 @@ policy chokepoint is made structural rather than conventional. See ADR 0004.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import Protocol, runtime_checkable
 
 from pydantic import BaseModel, ConfigDict
@@ -51,6 +52,18 @@ class ActionResult(BaseModel):
 
     ok: bool
     navigated: bool = False
+    landed_urls: tuple[str, ...] = ()
+    """Every document URL a frame arrived at while the action ran, main frame included.
+
+    `navigated` alone was judged on the top-level URL, and on a frameset application the top-level
+    URL never changes -- the content frame does. The allowlist has to be checked against where each
+    frame actually went, so the driver reports all of them.
+    """
+
+    refused_navigations: tuple[str, ...] = ()
+    """Navigations the driver's navigation guard stopped before any byte was fetched. Reported so a
+    refusal is a recorded outcome rather than a click that silently did nothing."""
+
     http_status: int | None = None
     message: str = ""
     duration_ms: int = 0
@@ -90,5 +103,14 @@ class SurfaceDriver(Protocol):
         ...
 
     def session_info(self) -> SessionInfo: ...
+
+    def set_navigation_guard(self, guard: Callable[[str], bool]) -> None:
+        """Refuse, at the surface, any document navigation `guard` rejects -- in any frame.
+
+        The dispatcher installs its allowlist here. Checking where an action *landed* is detection;
+        this is prevention, and it is the only point that sees a navigation the page starts on its
+        own after the action has returned.
+        """
+        ...
 
     def close(self) -> None: ...

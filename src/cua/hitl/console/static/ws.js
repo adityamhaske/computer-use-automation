@@ -49,6 +49,7 @@ export function connectLive() {
       status: data.status,
       message: data.message,
       frame: data.frame, // base64 PNG, already produced by the driver's screenshot() after each gesture
+      gesture: data.gesture, // present on needs_confirmation: exactly what to resend once confirmed
     });
   };
 }
@@ -71,4 +72,7 @@ export const gesture = {
   move: (x, y) => send({ kind: "mouse_move", x: Math.round(x), y: Math.round(y) }),
   key: (key) => send({ kind: "key", key }),
   text: (text) => send({ kind: "text", text }),
+  // Resends a gesture policy asked the operator to confirm. Only the server's own echo of the
+  // gesture is ever confirmed, so what is confirmed is what was shown.
+  confirm: (sent) => send({ ...sent, confirm: true }),
 };

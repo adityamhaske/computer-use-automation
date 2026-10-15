@@ -123,7 +123,7 @@ Artifacts describe controls by role, accessible name, scope, structural anchor, 
 - Enforced by: `surface-neutral-targeting` contract and `tests/integration/test_variant_b.py`.
 
 ### 4. Human input cannot bypass policy or evidence
-The operator console never injects directly into the page. It submits `raw_input` actions to `SessionBroker`, which routes them through the policy chokepoint under the `HUMAN` policy profile.
+The operator console never injects directly into the page. It submits `raw_input` actions to `SessionBroker`, which routes them through the policy chokepoint under the `HUMAN` policy profile. A raw click is classified by the control it lands on (hit-tested against node geometry; a key by the focused control), so an irreversible control needs the operator's explicit confirmation. The console refuses WebSocket and state-changing requests whose `Origin` is not its own.
 - Enforced by: `tests/invariants/test_human_control_safety.py`.
 
 ### 5. Unknown states fail closed

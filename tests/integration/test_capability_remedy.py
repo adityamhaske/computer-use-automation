@@ -105,6 +105,10 @@ class Desk:
     def bounds_for(self, node_ids: tuple[str, ...]) -> dict:
         return {}
 
+    def set_navigation_guard(self, guard) -> None:
+
+        self.navigation_guard = guard
+
     def session_info(self) -> SessionInfo:
         return SessionInfo(session_id="s", driver="fake", url=URL)
 

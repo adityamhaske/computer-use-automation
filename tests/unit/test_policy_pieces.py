@@ -174,3 +174,44 @@ def test_short_secrets_are_not_registered(config) -> None:
     redactor = Redactor(config.redaction)
     redactor.register_secret("ab")
     assert "ab" not in redactor.extra_secrets
+
+
+# ---------------------------------------------------- declared-tier gate
+
+
+def _authorize(config, name: str, declared: ActionRisk | None):
+    from cua.domain.actor import Actor
+    from cua.domain.target import NameMatch
+    from cua.policy.engine import PolicyEngine
+
+    return PolicyEngine(config).authorize(
+        Click(target=TargetDescriptor(role="button", name=NameMatch(value=name))),
+        actor=Actor.AUTOMATION,
+        session_id="s",
+        lease_epoch=1,
+        target=UiNode(node_id="n1", role="button", name=name),
+        declared_risk=declared,
+    )
+
+
+@pytest.mark.parametrize("name", ["Submit", "Confirm", "Create subaccount"])
+def test_a_step_declared_safe_does_not_cover_an_elevated_control(config, name: str) -> None:
+    """`allow_if_declared` means the artifact anticipated an elevated action -- at that tier.
+
+    Every replay step carries a declared risk (it defaults to `safe`), so a gate that only asked
+    whether *a* declaration existed was satisfied by every step, and a step a reviewer marked safe
+    could press "Submit" unattended. A `safe` declaration is the opposite of anticipating it.
+    """
+    decision = _authorize(config, name, ActionRisk.SAFE)
+
+    assert not decision.allowed
+    assert decision.risk.tier is ActionRisk.ELEVATED
+    assert "not declared at that tier" in decision.reason
+
+
+def test_a_step_declared_elevated_may_press_an_elevated_control(config) -> None:
+    assert _authorize(config, "Submit", ActionRisk.ELEVATED).allowed
+
+
+def test_an_undeclared_elevated_action_is_still_refused(config) -> None:
+    assert not _authorize(config, "Submit", None).allowed

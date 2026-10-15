@@ -20,9 +20,10 @@ from dataclasses import dataclass, field
 from functools import partial
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
-from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect, status
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from cua.catalog.store import CapabilityNotFoundError, CapabilityStore
@@ -31,10 +32,11 @@ from cua.domain.capability import Capability
 from cua.domain.run_record import RunKind
 from cua.evidence.record import build_run_record
 from cua.hitl.broker import SessionBroker
-from cua.hitl.lease import ControlState
+from cua.hitl.lease import ControlState, LeaseError
 from cua.hitl.session_thread import SessionThread
 from cua.policy.config import parse_policy
 from cua.runtime.capture import FailureCapture
+from cua.runtime.dispatcher import DispatchStatus
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 
@@ -105,6 +107,22 @@ def create_console(deps: ConsoleDeps) -> FastAPI:
             response.headers["Cache-Control"] = "no-cache"
         return response
 
+    @app.middleware("http")
+    async def same_origin_writes(request: Request, call_next: Any) -> Any:
+        """Refuse a state-changing request a foreign page sent.
+
+        The console binds to 127.0.0.1 and has no login, which keeps other machines out and does
+        nothing about other *tabs*: a cross-site form POST needs no CORS preflight, so any page the
+        operator had open could claim or release the session. A browser always names the page that
+        sent such a request in `Origin`, so that is the check. Reads are left alone -- they change
+        nothing, and the browser will not show a foreign page the answer.
+        """
+        if request.method not in _SAFE_METHODS and not _same_origin(
+            request.headers.get("origin"), request.headers.get("host")
+        ):
+            return JSONResponse({"detail": "cross-origin request refused"}, status_code=403)
+        return await call_next(request)
+
     @app.get("/", response_class=HTMLResponse)
     def index() -> str:
         return (STATIC_DIR / "index.html").read_text("utf-8")
@@ -166,6 +184,12 @@ def create_console(deps: ConsoleDeps) -> FastAPI:
         is sent back to the operator rather than swallowed: being told "that navigation is outside
         the allowlist" is far more useful than a click that silently does nothing.
         """
+        # Browsers do not apply the same-origin policy to WebSockets: a page on any site can open
+        # one to 127.0.0.1 and drive the session the operator holds. Checked before accepting, so
+        # a foreign page gets no frame of the live screen either.
+        if not _same_origin(socket.headers.get("origin"), socket.headers.get("host")):
+            await socket.close(code=status.WS_1008_POLICY_VIOLATION)
+            return
         await socket.accept()
 
         # Send the current screen before waiting for input. Without this the operator's first click
@@ -188,17 +212,30 @@ def create_console(deps: ConsoleDeps) -> FastAPI:
                         {"error": f"unsupported gesture {message.get('kind')!r}"}
                     )
                     continue
+                # A confirmation is a deliberate act, so only a literal `true` counts: a truthy
+                # accident ("yes", 1) goes the ordinary way and comes back asking again.
+                confirmed = message.get("confirm") is True
+                perform = deps.broker.confirm_action if confirmed else deps.broker.human_action
                 # Bound explicitly rather than closed over: the lambda runs immediately here, but
                 # a loop variable captured by reference is one refactor away from dispatching the
                 # wrong operator gesture.
-                outcome = deps.on_session(partial(deps.broker.human_action, action))
-                await socket.send_json(
-                    {
-                        "status": outcome.status.value,
-                        "message": outcome.message,
-                        "frame": _frame(deps),
-                    }
-                )
+                try:
+                    outcome = deps.on_session(partial(perform, action))
+                except LeaseError as exc:
+                    # An operator whose hold lapsed is told why. Letting this escape closed the
+                    # socket with a server error, which reads as "the console is broken".
+                    await socket.send_json({"error": str(exc)})
+                    continue
+                reply: dict[str, Any] = {
+                    "status": outcome.status.value,
+                    "message": outcome.message,
+                    "frame": _frame(deps),
+                }
+                if outcome.status is DispatchStatus.NEEDS_CONFIRMATION:
+                    # Handed back as sent, so the console can show the operator what policy wants
+                    # confirmed and resend exactly that gesture -- not a reconstruction of it.
+                    reply["gesture"] = {k: v for k, v in message.items() if k != "confirm"}
+                await socket.send_json(reply)
         except WebSocketDisconnect:
             pass
 
@@ -418,6 +455,23 @@ def _frame(deps: ConsoleDeps) -> str:
         return shot
 
     return base64.b64encode(deps.on_session(grab)).decode()
+
+
+_SAFE_METHODS = frozenset({"GET", "HEAD", "OPTIONS"})
+
+
+def _same_origin(origin: str | None, host: str | None) -> bool:
+    """Whether a request came from the console's own pages.
+
+    No `Origin` means no browser sent it -- every browser sets it on a WebSocket and on a cross-site
+    POST -- so it is not a foreign page, and the CLI and tests are let through. A present `Origin`
+    must name exactly the host the request was addressed to.
+    """
+    if origin is None:
+        return True
+    if not host:
+        return False
+    return urlparse(origin).netloc.lower() == host.lower()
 
 
 def _to_action(message: dict[str, Any]) -> RawInput | None:

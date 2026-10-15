@@ -76,6 +76,11 @@ caller-supplied and the allowlist exists precisely to constrain where the browse
 `Dispatcher.open_entrypoint`, which runs the ordinary path and refuses a host outside the allowlist
 (`tests/integration/test_dispatcher.py::test_an_entrypoint_outside_the_allowlist_is_refused`).
 
+Where an action *lands* is checked as well as where it says it is going, in **every frame** --
+on a frameset the top-level URL never changes. The dispatcher also installs the allowlist in the
+driver as a navigation guard, which refuses an off-list document navigation (redirect hops
+included) before it is fetched (`tests/integration/test_frame_navigation.py`).
+
 *Enforced by:* `.importlinter` contract `policy-chokepoint`;
 `tests/invariants/test_policy_chokepoint.py` (a hand-constructed action is rejected, and every
 dispatch event in a run record must have a matching authorization event).
@@ -105,8 +110,15 @@ still apply.
 
 *Why:* the moment a person takes over is exactly when a regulated system most needs an audit trail.
 
+A raw gesture carries coordinates, not a target, so the dispatcher hit-tests it -- a click against
+the actionable controls' geometry, a key against the focused control -- and policy classifies it by
+what it lands on. A click on "Transfer Funds" is `irreversible` and needs the operator's explicit
+confirmation in the console. The console refuses a WebSocket or state-changing request whose
+`Origin` is not its own: binding to 127.0.0.1 keeps out other machines, not other browser tabs.
+
 *Enforced by:* `tests/invariants/test_human_control_safety.py`,
-`tests/integration/test_handoff.py::test_human_input_goes_through_policy`.
+`tests/integration/test_handoff.py::test_human_input_goes_through_policy`,
+`tests/integration/test_human_raw_input_risk.py`, `tests/integration/test_console_live.py`.
 
 ### 5. Unknown states fail closed
 

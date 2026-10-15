@@ -29,11 +29,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import StrEnum
 
-from cua.domain.action import Action, ActionRisk, Navigate
+from cua.domain.action import Action, ActionRisk, Navigate, RawInput, RawInputKind
 from cua.domain.actor import Actor
 from cua.domain.capability import Capability
 from cua.domain.result import FailureCode, ResolutionDebug
-from cua.domain.snapshot import UiSnapshot
+from cua.domain.snapshot import UiNode, UiSnapshot
 from cua.domain.target import TargetDescriptor
 from cua.evidence.bus import EventType, EvidenceBus
 from cua.policy.allowlist import AllowlistCheck
@@ -42,6 +42,26 @@ from cua.policy.irreversible import IrreversibleGrant
 from cua.policy.secrets import SecretResolver
 from cua.surfaces.base import ActionResult, SurfaceDriver
 from cua.targeting.resolver import Resolution, TargetResolutionError, TargetResolver
+
+_ACTIVATABLE_ROLES = frozenset(
+    {
+        "button",
+        "link",
+        "menuitem",
+        "menuitemcheckbox",
+        "menuitemradio",
+        "checkbox",
+        "radio",
+        "switch",
+        "tab",
+        "option",
+    }
+)
+"""Roles an operator's click can set off. A hit test over every node would pick the text or cell
+under the pointer rather than the control it activates."""
+
+
+_DOCUMENT_ROLES = frozenset({"document", "RootWebArea", "WebArea"})
 
 
 class DispatchStatus(StrEnum):
@@ -99,6 +119,14 @@ class Dispatcher:
     evidence: EvidenceBus
     secrets: SecretResolver | None = None
 
+    def __post_init__(self) -> None:
+        # The allowlist is enforced at the surface as well as here. The check after each dispatch
+        # (step 4 below) sees where frames *landed*; the guard refuses the navigation before it is
+        # fetched, which is the only thing that stops one the page starts on its own a moment after
+        # the action that caused it has returned.
+        allowlist = AllowlistCheck(self.policy.config.allowlist)
+        self.driver.set_navigation_guard(lambda url: allowlist.check(url).allowed)
+
     def open_entrypoint(self, url: str, *, session_id: str) -> None:
         """Put the session on an entry URL, through the same chokepoint as everything else.
 
@@ -130,6 +158,43 @@ class Dispatcher:
                 f"could not open {url}: {outcome.message}. The navigation was permitted; the "
                 "target did not answer."
             )
+
+    def _raw_input_target(self, action: RawInput, snapshot: UiSnapshot) -> UiNode | None:
+        """The control an operator's gesture will act on, for classification only.
+
+        A click is hit-tested against the actionable controls' geometry -- the smallest one that
+        contains the point, since controls nest. A key activates whatever has focus. Text typed
+        into a field is classified as the field it lands in would be, which is the focused one.
+
+        Best effort by necessity: a gesture on a control the snapshot does not expose is classified
+        on its action type alone, exactly as before. What this closes is the common case -- a
+        click on a plainly labelled button -- being classified as though it hit nothing.
+        """
+        if (
+            action.kind is RawInputKind.MOUSE_CLICK
+            and action.x is not None
+            and action.y is not None
+        ):
+            candidates = tuple(n.node_id for n in snapshot.nodes if n.role in _ACTIVATABLE_ROLES)
+            if not candidates:
+                return None
+            bounds = self.driver.bounds_for(candidates)
+            nodes = {n.node_id: n for n in snapshot.nodes}
+            hits = [
+                (rect.width * rect.height, node_id)
+                for node_id, rect in bounds.items()
+                if rect.x <= action.x <= rect.x + rect.width
+                and rect.y <= action.y <= rect.y + rect.height
+            ]
+            return nodes[min(hits)[1]] if hits else None
+        if action.kind in (RawInputKind.KEY, RawInputKind.TEXT):
+            # A frame's document reports focus along with the control inside it that holds it, so
+            # the innermost focused node that is not a document is the one a key acts on.
+            focused = [
+                n for n in snapshot.nodes if "focused" in n.states and n.role not in _DOCUMENT_ROLES
+            ]
+            return focused[-1] if focused else None
+        return None
 
     def observe(self) -> UiSnapshot:
         """Capture the surface and record that we looked.
@@ -241,13 +306,30 @@ class Dispatcher:
                 drifted=drifted,
             )
 
+        # --- 1b. What a raw gesture lands on --------------------------------
+        # An operator's gesture carries coordinates or a key, not a target, so there is nothing to
+        # resolve -- and policy classifying it blind made every click `elevated`, including one on
+        # "Transfer Funds". The HUMAN profile's confirmation for irreversible actions was then
+        # unreachable from the console, the only input path a human has.
+        hit = self._raw_input_target(action, snapshot) if isinstance(action, RawInput) else None
+        if hit is not None:
+            self.evidence.emit(
+                EventType.RESOLVE,
+                actor=actor,
+                lease_epoch=lease_epoch,
+                resolved=True,
+                target=f"{hit.role} {hit.name!r} under the operator's {action.type}",
+                node_id=hit.node_id,
+                strategy="raw_input_hit_test",
+            )
+
         # --- 2. Authorize, now knowing what will be acted on -----------------
         decision = self.policy.authorize(
             action,
             actor=actor,
             session_id=session_id,
             lease_epoch=lease_epoch,
-            target=resolution.node if resolution else None,
+            target=resolution.node if resolution else hit,
             capability=capability,
             declared_risk=declared_risk,
             confirmed=confirmed,
@@ -318,35 +400,42 @@ class Dispatcher:
         # navigates. A link on an untrusted page is untrusted input, so "the action was a click, so
         # no destination to check" is exactly the gap a redirect walks through. Checked after the
         # fact because there is no destination to check before it.
+        #
+        # Every frame, not the top-level document. On a frameset application the top-level URL
+        # never changes; the content frame is what navigates, and judging by the main URL let a
+        # link in it go to any host while this step reported `ok`.
+        extra = capability.policy.allowed_domains if capability else ()
+        check = AllowlistCheck(self.policy.config.allowlist, extra_domains=tuple(extra))
+        destinations: tuple[str, ...] = result.refused_navigations
         if result.ok and result.navigated:
-            landed = self.driver.session_info().url
-            extra = capability.policy.allowed_domains if capability else ()
-            verdict = AllowlistCheck(
-                self.policy.config.allowlist, extra_domains=tuple(extra)
-            ).check(landed)
-            if not verdict.allowed:
-                self.evidence.emit(
-                    EventType.NOTE,
-                    actor=actor,
-                    lease_epoch=lease_epoch,
-                    note="navigation left the allowlist",
-                    url=landed,
-                    reason=verdict.reason,
-                    action_type=action.type,
-                )
-                return DispatchOutcome(
-                    status=DispatchStatus.DENIED,
-                    decision=decision,
-                    resolution=resolution,
-                    result=result,
-                    drifted=drifted,
-                    failure_code=FailureCode.NAVIGATION_BLOCKED,
-                    message=(
-                        f"the session landed on {landed}, which is outside the allowlist "
-                        f"({verdict.reason}). The action itself was permitted; its destination "
-                        "was not."
-                    ),
-                )
+            destinations += result.landed_urls or (self.driver.session_info().url,)
+        for landed in dict.fromkeys(destinations):
+            verdict = check.check(landed)
+            if verdict.allowed:
+                continue
+            self.evidence.emit(
+                EventType.NOTE,
+                actor=actor,
+                lease_epoch=lease_epoch,
+                note="navigation left the allowlist",
+                url=landed,
+                reason=verdict.reason,
+                action_type=action.type,
+                refused_at_surface=landed in result.refused_navigations,
+            )
+            return DispatchOutcome(
+                status=DispatchStatus.DENIED,
+                decision=decision,
+                resolution=resolution,
+                result=result,
+                drifted=drifted,
+                failure_code=FailureCode.NAVIGATION_BLOCKED,
+                message=(
+                    f"the action led to {landed}, which is outside the allowlist "
+                    f"({verdict.reason}). The action itself was permitted; its destination "
+                    "was not."
+                ),
+            )
 
         return DispatchOutcome(
             status=DispatchStatus.OK if result.ok else DispatchStatus.FAILED,

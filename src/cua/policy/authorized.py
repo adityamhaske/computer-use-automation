@@ -69,7 +69,8 @@ class AuthorizedAction:
     of three inputs to the classification, never the conclusion."""
 
     resolved_node_id: str | None = None
-    """Filled in by the resolver, after authorization and before dispatch."""
+    """The node policy authorized against. Resolution precedes authorization; this is set from it
+    when the action is minted, and again by `with_resolution` before dispatch."""
 
     requires_confirmation: bool = False
     """An irreversible action a human operator may perform, but only after confirming explicitly."""
@@ -86,8 +87,9 @@ class AuthorizedAction:
     def with_resolution(self, node_id: str) -> AuthorizedAction:
         """Attach the resolved target. Preserves the authorization; does not re-open it.
 
-        Resolution happens *after* authorization (Action -> Policy -> Resolver -> Driver), so the
-        approved action has to be able to carry its node without being rebuilt -- rebuilding would
+        Resolution runs *before* authorization (Action -> Resolver -> Policy -> Driver), so policy
+        judges the node it is about to act on. The dispatcher still attaches the node here, after
+        the decision, so the approved action carries it without being rebuilt -- rebuilding would
         mean re-minting, and re-minting outside the engine is exactly what this type prevents.
         """
         return replace(self, resolved_node_id=node_id)

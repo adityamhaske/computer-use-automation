@@ -38,6 +38,8 @@ stop. A half-built desktop driver would be worse than an honest seam.
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 from cua.domain.snapshot import Rect, UiSnapshot
 from cua.policy.authorized import AuthorizedAction
 from cua.surfaces.base import ActionResult, SessionInfo
@@ -61,6 +63,9 @@ class DesktopUiaDriver:
         raise NotImplementedError
 
     def dispatch(self, action: AuthorizedAction) -> ActionResult:  # pragma: no cover - seam
+        raise NotImplementedError
+
+    def set_navigation_guard(self, guard: Callable[[str], bool]) -> None:  # pragma: no cover
         raise NotImplementedError
 
     def screenshot(self, *, redact: tuple[Rect, ...] = ()) -> bytes:  # pragma: no cover - seam

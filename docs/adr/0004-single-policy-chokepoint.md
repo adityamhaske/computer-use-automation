@@ -56,7 +56,7 @@ profile**:
 |---|---|---|
 | Domain allowlist | enforced | **enforced** |
 | `safe` actions | allow | allow |
-| `elevated` actions | allow if declared | allow, recorded |
+| `elevated` actions | allow if the step is declared `elevated` | allow, recorded |
 | `irreversible` actions | refused, unless the step is declared irreversible **and** the run carries an approval of that exact content plus the caller's opt-in (`allow_if_approved`, checked at dispatch) | allow **with explicit console confirmation**, recorded |
 | Off-artifact navigation | `NAVIGATION_BLOCKED` | allowed within allowlist, recorded |
 | Evidence redaction | applied | **applied** |
@@ -71,8 +71,11 @@ originates the action — so the guardrails we test are the guardrails that run.
 human did" comes free and arrives in the same shape as everything else, tagged `actor=HUMAN`.
 
 **Bad.** `raw_input` is genuinely awkward to police semantically: a mouse-move is not a meaningful
-unit of authorization. We evaluate it on coarse attributes (target scope, resulting navigation)
-rather than pretending otherwise, and say so as a stated limit in REPORT.md §6.
+unit of authorization. A click is hit-tested against the actionable controls' geometry and a key
+against the focused control, so policy classifies the gesture by what it lands on (amended: it was
+first classified with no target at all, which made every click `elevated` and the confirmation for
+irreversible actions unreachable from the console). A gesture on something the semantic tree does
+not expose still falls back to its action type's tier — a stated limit in REPORT.md §6.
 
 **Cost.** One extra indirection on every action, and the console is harder to build than direct
 injection. Both are worth it; the second is the reason Phase 09 builds the control model headless
